@@ -2,7 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Award, Calendar, CreditCard, Shield } from "lucide-react";
+import { ArrowRight, Award, Calendar, CreditCard, Shield, BookOpen, Syringe } from "lucide-react";
 
 export default function Home() {
   return (
@@ -13,14 +13,14 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent z-10"></div>
           <div className="container relative z-20 flex flex-col items-start justify-center h-full py-10 px-4 sm:px-6">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 max-w-2xl animate-slide-in">
-              Serpentes exóticas com <span className="text-earth-200">certificação legal</span>
+              Animais silvestres <span className="text-earth-200">legalizados</span>
             </h1>
             <p className="text-lg md:text-xl text-white/90 max-w-xl mb-8 animate-fade-in">
-              Venha conhecer as espécies mais fascinantes em um criadouro 100% legalizado pelo IBAMA e INEA
+              Venha conhecer as espécies mais fascinantes em um criadouro 100% legalizado pelo IBAMA e INEA-RJ
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700">
-                Ver Catálogo <ArrowRight className="ml-2 h-4 w-4" />
+              <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white">
+                Animais Disponíveis <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <Button variant="outline" size="lg" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
                 Conheça nossa História
@@ -42,13 +42,13 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
             {/* Species Card 1 */}
             <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
               <div className="relative h-64 overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1585095595239-2c5d5b3721f5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80" 
-                  alt="Python regius" 
+                  src="https://images.unsplash.com/photo-1633527316352-52177079b3f3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80" 
+                  alt="Erythrolamprus miliaris" 
                   className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
@@ -56,11 +56,12 @@ export default function Home() {
                 </div>
               </div>
               <div className="p-4">
-                <h3 className="font-bold text-lg mb-1">Python regius</h3>
-                <p className="text-muted-foreground text-sm mb-3">Python-bola</p>
-                <div className="flex justify-between items-center">
-                  <span className="font-semibold text-lg text-serpente-600">R$ 1.500,00</span>
-                  <Button variant="outline" size="sm">Ver Detalhes</Button>
+                <h3 className="font-bold text-lg mb-1">Erythrolamprus miliaris</h3>
+                <p className="text-muted-foreground text-sm mb-3">Cobra-d'água</p>
+                <div className="flex justify-end items-center">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/catalogo">Ver Detalhes</Link>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -69,20 +70,21 @@ export default function Home() {
             <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
               <div className="relative h-64 overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1557178985-891076b318dd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80" 
-                  alt="Morelia viridis" 
+                  src="https://images.unsplash.com/photo-1550172268-9a48af98ac5f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80" 
+                  alt="Tupinambis teguixin" 
                   className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                  <span className="inline-block bg-earth-600 text-white text-xs px-2 py-1 rounded">Pré-venda</span>
+                  <span className="inline-block bg-serpente-600 text-white text-xs px-2 py-1 rounded">Disponível</span>
                 </div>
               </div>
               <div className="p-4">
-                <h3 className="font-bold text-lg mb-1">Morelia viridis</h3>
-                <p className="text-muted-foreground text-sm mb-3">Píton-verde-arbórea</p>
-                <div className="flex justify-between items-center">
-                  <span className="font-semibold text-lg text-serpente-600">R$ 3.200,00</span>
-                  <Button variant="outline" size="sm">Ver Detalhes</Button>
+                <h3 className="font-bold text-lg mb-1">Tupinambis teguixin</h3>
+                <p className="text-muted-foreground text-sm mb-3">Teiú-amarelo</p>
+                <div className="flex justify-end items-center">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/catalogo">Ver Detalhes</Link>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -91,8 +93,8 @@ export default function Home() {
             <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
               <div className="relative h-64 overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1535295119433-5a3d0c779053?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80" 
-                  alt="Pogona vitticeps" 
+                  src="/lovable-uploads/8353d3e8-d19d-4821-8a00-892cf9ac6bae.png" 
+                  alt="Epicrates crassus" 
                   className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
@@ -100,11 +102,12 @@ export default function Home() {
                 </div>
               </div>
               <div className="p-4">
-                <h3 className="font-bold text-lg mb-1">Pogona vitticeps</h3>
-                <p className="text-muted-foreground text-sm mb-3">Dragão-barbudo</p>
-                <div className="flex justify-between items-center">
-                  <span className="font-semibold text-lg text-serpente-600">R$ 800,00</span>
-                  <Button variant="outline" size="sm">Ver Detalhes</Button>
+                <h3 className="font-bold text-lg mb-1">Epicrates crassus</h3>
+                <p className="text-muted-foreground text-sm mb-3">Jiboia-do-Cerrado</p>
+                <div className="flex justify-end items-center">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/catalogo">Ver Detalhes</Link>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -124,8 +127,8 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row gap-12 items-center">
             <div className="w-full lg:w-1/2">
               <img 
-                src="https://images.unsplash.com/photo-1591824438708-ce405f36ba3d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80" 
-                alt="Patrick Henriques Petitinga" 
+                src="/lovable-uploads/512cf52a-d274-4b7c-9451-f807b6f9a431.png" 
+                alt="Yan Nery" 
                 className="rounded-lg shadow-lg w-full h-auto object-cover aspect-[4/3]"
               />
             </div>
@@ -134,10 +137,10 @@ export default function Home() {
                 <h2 className="text-3xl font-bold">Sobre o Criadouro</h2>
               </div>
               <p className="mt-6 text-lg leading-relaxed text-foreground/90">
-                O <strong>Pet Serpentes & Companhia</strong> nasceu da paixão de Patrick Henriques Petitinga, biólogo e pesquisador especializado em comportamento animal. Localizado no Rio de Janeiro, nosso criadouro é 100% legalizado pelo IBAMA e INEA.
+                O <strong>Pet Serpentes & Companhia</strong> é conduzido por Yan Nery, professor e biólogo apaixonado por herpetologia. Localizado no Rio de Janeiro, nosso criadouro é 100% legalizado pelo IBAMA e INEA-RJ, com foco total no bem-estar animal, criação responsável e na disseminação de conhecimento sobre répteis nativos.
               </p>
               <p className="mt-4 text-lg leading-relaxed text-foreground/90">
-                Nossa missão é promover a criação responsável, contribuir com a conservação das espécies e disseminar conhecimento sobre esses fascinantes animais através da educação ambiental e pesquisa científica.
+                Atuamos com ética e compromisso, promovendo educação ambiental, pesquisa científica e o manejo consciente das espécies.
               </p>
               
               <div className="grid grid-cols-2 gap-4 mt-8">
@@ -167,6 +170,13 @@ export default function Home() {
                   <div>
                     <h3 className="font-bold">Facilidades</h3>
                     <p className="text-sm text-muted-foreground">Parcelamento e formas de pagamento</p>
+                  </div>
+                </div>
+                <div className="flex gap-3 items-start">
+                  <Syringe className="text-serpente-600 h-6 w-6 mt-1" />
+                  <div>
+                    <h3 className="font-bold">Acompanhamento Veterinário</h3>
+                    <p className="text-sm text-muted-foreground">Suporte constante em prevenção, remediação e monitoramento da saúde dos animais, garantindo bem-estar e conformidade com exigências legais.</p>
                   </div>
                 </div>
               </div>

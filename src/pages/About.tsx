@@ -10,7 +10,7 @@ export default function About() {
       {/* Hero Section */}
       <section className="relative bg-serpente-900 text-white">
         <div className="absolute inset-0 opacity-30" style={{ 
-          backgroundImage: `url('https://images.unsplash.com/photo-1591824438708-ce405f36ba3d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80')`,
+          backgroundImage: `url('/lovable-uploads/8353d3e8-d19d-4821-8a00-892cf9ac6bae.png')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}></div>
@@ -30,26 +30,20 @@ export default function About() {
           <div className="flex flex-col lg:flex-row gap-12 items-center">
             <div className="w-full lg:w-1/2">
               <img 
-                src="https://images.unsplash.com/photo-1591824438708-ce405f36ba3d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80" 
-                alt="Patrick Henriques Petitinga" 
+                src="/lovable-uploads/512cf52a-d274-4b7c-9451-f807b6f9a431.png" 
+                alt="Yan Nery" 
                 className="rounded-lg shadow-lg w-full h-auto object-cover aspect-[4/3]"
               />
             </div>
             <div className="w-full lg:w-1/2">
               <div className="docs-section-title">
-                <h2 className="text-3xl font-bold">Patrick Henriques Petitinga</h2>
+                <h2 className="text-3xl font-bold">Yan Nery</h2>
               </div>
-              <p className="text-muted-foreground mb-6">Fundador e Biólogo especialista</p>
+              <p className="text-muted-foreground mb-6">CEO e Biólogo especialista</p>
               
               <div className="space-y-4 text-lg">
                 <p>
-                  A paixão pelos répteis começou ainda na infância, quando Patrick ficou fascinado pelo comportamento desses animais incríveis. Aos 12 anos, já cuidava de sua primeira serpente, e essa paixão nunca mais o abandonou.
-                </p>
-                <p>
-                  Graduado em Biologia com especialização em Comportamento Animal pela UFRJ, Patrick dedicou sua carreira acadêmica ao estudo dos répteis e suas adaptações evolutivas. Com mais de 10 anos de experiência no manejo e criação de diferentes espécies, ele decidiu transformar seu conhecimento em um projeto que unisse conservação, educação ambiental e comércio responsável.
-                </p>
-                <p>
-                  Assim nasceu o Pet Serpentes & Companhia, um criadouro totalmente legalizado pelo IBAMA e INEA, com o objetivo de fornecer animais saudáveis e com procedência, enquanto promove a educação ambiental e o conhecimento científico sobre estas espécies tão incompreendidas.
+                  Desde os 5 anos de idade, Yan já era fascinado pelo mundo aquático como aquarista. Graduado em Biologia com licenciatura, hoje soma mais de 5 anos de experiência no manejo e criação de répteis e outros grupos de animais. Seu trabalho se destaca pela promoção do bem-estar animal, conservação e educação ambiental.
                 </p>
               </div>
               
@@ -84,14 +78,14 @@ export default function About() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mt-8">
             <div className="docs-card p-6 border rounded-lg flex flex-col items-center text-center">
               <div className="bg-serpente-100 dark:bg-serpente-900/50 p-3 rounded-full mb-4">
                 <Shield className="h-8 w-8 text-serpente-600" />
               </div>
               <h3 className="text-xl font-bold mb-3">Conservação</h3>
               <p className="text-muted-foreground">
-                Promovemos práticas sustentáveis de criação que contribuem para a conservação das espécies em seu habitat natural.
+                Promovemos práticas sustentáveis de criação que contribuem para a conservação das espécies.
               </p>
             </div>
             
@@ -101,7 +95,7 @@ export default function About() {
               </div>
               <h3 className="text-xl font-bold mb-3">Educação</h3>
               <p className="text-muted-foreground">
-                Compartilhamos conhecimento científico sobre répteis para desmistificar preconceitos e promover respeito a esses animais.
+                Compartilhamos conhecimento para formar tutores mais conscientes e promover a posse responsável no Brasil.
               </p>
             </div>
             
@@ -112,6 +106,16 @@ export default function About() {
               <h3 className="text-xl font-bold mb-3">Excelência</h3>
               <p className="text-muted-foreground">
                 Asseguramos os mais altos padrões de qualidade no manejo, reprodução e venda de répteis para criadores responsáveis.
+              </p>
+            </div>
+            
+            <div className="docs-card p-6 border rounded-lg flex flex-col items-center text-center">
+              <div className="bg-serpente-100 dark:bg-serpente-900/50 p-3 rounded-full mb-4">
+                <Heart className="h-8 w-8 text-serpente-600" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Bem-estar Animal</h3>
+              <p className="text-muted-foreground">
+                Garantimos ambiente, alimentação e estímulos adequados para o desenvolvimento saudável de cada animal.
               </p>
             </div>
           </div>
@@ -137,7 +141,7 @@ export default function About() {
                 <span className="text-sm text-muted-foreground">2012</span>
                 <h3 className="text-xl font-bold mt-1 mb-2">Fundação do Criadouro</h3>
                 <p className="text-foreground/80">
-                  Patrick inicia oficialmente o criadouro com apenas 10 espécimes e obtém os primeiros registros junto aos órgãos ambientais.
+                  Pet Serpentes inicia oficialmente o criadouro com apenas 10 espécimes e obtém os primeiros registros junto aos órgãos ambientais.
                 </p>
               </div>
             </div>

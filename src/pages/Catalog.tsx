@@ -16,36 +16,36 @@ export default function Catalog() {
   const speciesList = [
     {
       id: 1,
-      name: "Python regius",
-      commonName: "Python-bola",
+      name: "Erythrolamprus miliaris",
+      commonName: "Cobra-d'água",
       type: "serpente",
       habitat: "terrestre",
       stage: "filhote",
       price: 1500,
       available: true,
-      image: "https://images.unsplash.com/photo-1585095595239-2c5d5b3721f5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80"
+      image: "https://images.unsplash.com/photo-1633527316352-52177079b3f3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80"
     },
     {
       id: 2,
-      name: "Morelia viridis",
-      commonName: "Píton-verde-arbórea",
-      type: "serpente",
+      name: "Tupinambis teguixin",
+      commonName: "Teiú-amarelo",
+      type: "lagarto",
       habitat: "arboricola",
       stage: "adulto",
       price: 3200,
       available: true,
-      image: "https://images.unsplash.com/photo-1557178985-891076b318dd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80"
+      image: "https://images.unsplash.com/photo-1550172268-9a48af98ac5f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80"
     },
     {
       id: 3,
-      name: "Pogona vitticeps",
-      commonName: "Dragão-barbudo",
-      type: "lagarto",
+      name: "Epicrates crassus",
+      commonName: "Jiboia-do-Cerrado",
+      type: "serpente",
       habitat: "terrestre",
       stage: "filhote",
       price: 800,
       available: true,
-      image: "https://images.unsplash.com/photo-1535295119433-5a3d0c779053?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80"
+      image: "https://images.unsplash.com/photo-1598445609092-7c7d80d816dd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80"
     },
     {
       id: 4,
@@ -67,7 +67,7 @@ export default function Catalog() {
       stage: "filhote",
       price: 900,
       available: true,
-      image: "https://images.unsplash.com/photo-1633527316352-52177079b3f3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80"
+      image: "/lovable-uploads/8353d3e8-d19d-4821-8a00-892cf9ac6bae.png"
     },
     {
       id: 6,
@@ -98,7 +98,7 @@ export default function Catalog() {
     <div className="container px-4 py-12 sm:px-6">
       <div className="flex flex-col items-center mb-12 text-center">
         <div className="docs-section-title">
-          <h1 className="text-4xl font-bold">Catálogo de Espécies</h1>
+          <h1 className="text-4xl font-bold">Animais Disponíveis</h1>
         </div>
         <p className="text-muted-foreground max-w-2xl mt-4">
           Conheça nossas serpentes e lagartos disponíveis para venda, todos com procedência legal e documentação

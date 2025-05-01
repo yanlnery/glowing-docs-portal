@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
 import ThemeToggle from "@/components/ThemeToggle";
-import { Menu, X, ShoppingCart, User } from "lucide-react";
+import { Menu, X, ShoppingCart, User, Book, Box, FileText, Users, Phone, Syringe } from "lucide-react";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -23,11 +23,12 @@ export default function Header() {
   };
   
   const menuItems = [
-    { title: "Home", path: "/" },
-    { title: "Catálogo", path: "/catalogo" },
-    { title: "Sobre", path: "/sobre" },
-    { title: "Educação", path: "/educacao" },
-    { title: "Academy", path: "/academy" },
+    { title: "Início", path: "/" },
+    { title: "P. S. Academy", path: "/academy" },
+    { title: "Animais Disponíveis", path: "/catalogo" },
+    { title: "Espécies Criadas", path: "/especies" },
+    { title: "Manuais de Criação", path: "/manuais" },
+    { title: "Quem somos", path: "/sobre" },
     { title: "Contato", path: "/contato" },
   ];
   
@@ -37,9 +38,9 @@ export default function Header() {
         <div className="flex items-center gap-2">
           <Link to="/" className="flex items-center">
             <img 
-              src="/lovable-uploads/7cf1001e-0989-475f-aaf5-fb56c4fb22a4.png" 
+              src="/lovable-uploads/4d77b820-b366-45b8-b64b-1568abded363.png" 
               alt="Pet Serpentes" 
-              className="h-10 w-auto mr-2" 
+              className="h-12 w-auto mr-2" 
             />
             <span className="hidden md:inline-flex font-semibold text-xl">PET SERPENTES</span>
           </Link>
