@@ -1,65 +1,143 @@
 
-import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import ThemeToggle from './ThemeToggle';
-import SearchBar from './SearchBar';
-import { Button } from '@/components/ui/button';
-import { Github } from 'lucide-react';
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
+import { cn } from "@/lib/utils";
+import ThemeToggle from "@/components/ThemeToggle";
+import { Menu, X, ShoppingCart, User } from "lucide-react";
 
 export default function Header() {
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Get title based on route
-  const getTitle = () => {
-    if (location.pathname === '/') return 'Home';
-    if (location.pathname === '/api') return 'API Reference';
-    if (location.pathname === '/examples') return 'Examples';
-    
-    // Remove leading slash and capitalize
-    const path = location.pathname.substring(1);
-    return path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, ' ');
+  const isActive = (path: string) => {
+    return location.pathname === path;
   };
-
+  
+  const menuItems = [
+    { title: "Home", path: "/" },
+    { title: "Catálogo", path: "/catalogo" },
+    { title: "Sobre", path: "/sobre" },
+    { title: "Educação", path: "/educacao" },
+    { title: "Academy", path: "/academy" },
+    { title: "Contato", path: "/contato" },
+  ];
+  
   return (
-    <header 
-      className={cn(
-        "sticky top-0 z-20 w-full transition-all duration-200 bg-background/80 backdrop-blur-md",
-        isScrolled ? "border-b shadow-sm" : ""
-      )}
-    >
-      <div className="md:pl-64">
-        <div className="flex h-16 items-center justify-between px-4 md:px-6 lg:px-8">
-          <div className="hidden md:block ml-auto">
-            <div className="font-medium text-lg md:hidden">
-              {getTitle()}
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2 md:gap-4 ml-auto">
-            <div className="hidden sm:block">
-              <SearchBar />
-            </div>
-            <Button variant="outline" size="icon" asChild>
-              <a href="https://github.com/pet-serpentes" target="_blank" rel="noopener noreferrer">
-                <Github size={18} />
-                <span className="sr-only">GitHub</span>
-              </a>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center">
+            <img 
+              src="/lovable-uploads/7cf1001e-0989-475f-aaf5-fb56c4fb22a4.png" 
+              alt="Pet Serpentes" 
+              className="h-10 w-auto mr-2" 
+            />
+            <span className="hidden md:inline-flex font-semibold text-xl">PET SERPENTES</span>
+          </Link>
+        </div>
+        
+        {/* Desktop Navigation */}
+        <NavigationMenu className="hidden md:flex">
+          <NavigationMenuList className="gap-1">
+            {menuItems.map((item) => (
+              <NavigationMenuItem key={item.title}>
+                <Link 
+                  to={item.path}
+                  className={cn(
+                    "group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors",
+                    isActive(item.path) 
+                      ? "bg-accent text-accent-foreground" 
+                      : "text-foreground/60 hover:bg-accent hover:text-accent-foreground"
+                  )}
+                >
+                  {item.title}
+                </Link>
+              </NavigationMenuItem>
+            ))}
+          </NavigationMenuList>
+        </NavigationMenu>
+        
+        {/* Right-side Actions */}
+        <div className="flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-2">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/area-cliente">
+                <User size={20} />
+                <span className="sr-only">Área do Cliente</span>
+              </Link>
+            </Button>
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/carrinho">
+                <ShoppingCart size={20} />
+                <span className="sr-only">Carrinho</span>
+              </Link>
             </Button>
             <ThemeToggle />
           </div>
+          
+          {/* Mobile menu button */}
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="md:hidden"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </Button>
         </div>
       </div>
+      
+      {/* Mobile Navigation */}
+      {isMenuOpen && (
+        <div className="fixed inset-0 top-16 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden">
+          <nav className="container py-8">
+            <ul className="flex flex-col space-y-4">
+              {menuItems.map((item) => (
+                <li key={item.title}>
+                  <Link
+                    to={item.path}
+                    className={cn(
+                      "flex w-full rounded-md p-3 text-base font-medium",
+                      isActive(item.path) 
+                        ? "bg-accent text-accent-foreground" 
+                        : "hover:bg-accent/50"
+                    )}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {item.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8 flex items-center justify-between border-t pt-4">
+              <div className="flex items-center gap-4">
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/area-cliente" onClick={() => setIsMenuOpen(false)}>
+                    <User size={16} className="mr-2" />
+                    Área do Cliente
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/carrinho" onClick={() => setIsMenuOpen(false)}>
+                    <ShoppingCart size={16} className="mr-2" />
+                    Carrinho
+                  </Link>
+                </Button>
+              </div>
+              <ThemeToggle />
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
