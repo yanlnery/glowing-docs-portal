@@ -1,10 +1,28 @@
 
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BookOpen, Users, Shield, CheckCircle, Lock } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import WaitlistForm from "@/components/WaitlistForm";
+import ConfirmationModal from "@/components/ConfirmationModal";
 
 export default function Academy() {
+  const [showWaitlistModal, setShowWaitlistModal] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [userData, setUserData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    contactPreference: ""
+  });
+
+  const handleWaitlistSubmit = (formData) => {
+    setUserData(formData);
+    setShowWaitlistModal(false);
+    setShowConfirmationModal(true);
+  };
+
+  // Hero Section
   return (
     <div>
       {/* Hero Section */}
@@ -20,8 +38,8 @@ export default function Academy() {
             <p className="text-xl text-white/80 mb-6">
               Cursos online especializados sobre répteis, para iniciantes e profissionais
             </p>
-            <Button size="lg" className="bg-white text-serpente-600 hover:bg-white/90">
-              Assinar Agora <ArrowRight className="ml-2 h-5 w-5" />
+            <Button size="lg" className="bg-white text-serpente-600 hover:bg-white/90" onClick={() => setShowWaitlistModal(true)}>
+              Entrar na Lista de Espera <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
         </div>
@@ -239,7 +257,9 @@ export default function Academy() {
                   <span>Certificados</span>
                 </li>
               </ul>
-              <Button variant="outline" className="w-full">Assinar Plano</Button>
+              <Button variant="outline" className="w-full" onClick={() => setShowWaitlistModal(true)}>
+                Entrar na Lista de Espera
+              </Button>
             </div>
             
             {/* Premium Plan (Highlighted) */}
@@ -275,7 +295,9 @@ export default function Academy() {
                   <span>Consultoria mensal (30 min)</span>
                 </li>
               </ul>
-              <Button className="w-full">Assinar Plano</Button>
+              <Button className="w-full" onClick={() => setShowWaitlistModal(true)}>
+                Entrar na Lista de Espera
+              </Button>
             </div>
             
             {/* Professional Plan */}
@@ -308,7 +330,9 @@ export default function Academy() {
                   <span>Desconto em produtos</span>
                 </li>
               </ul>
-              <Button variant="outline" className="w-full">Assinar Plano</Button>
+              <Button variant="outline" className="w-full" onClick={() => setShowWaitlistModal(true)}>
+                Entrar na Lista de Espera
+              </Button>
             </div>
           </div>
         </div>
@@ -386,12 +410,31 @@ export default function Academy() {
               <h2 className="text-2xl md:text-3xl font-bold mb-2">Pronto para começar?</h2>
               <p className="text-white/80">Inicie sua jornada na Pet Serpentes Academy hoje mesmo</p>
             </div>
-            <Button size="lg" variant="outline" className="bg-white text-serpente-600 hover:bg-white/90 border-none">
-              Assinar Agora <ArrowRight className="ml-2 h-4 w-4" />
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="bg-white text-serpente-600 hover:bg-white/90 border-none"
+              onClick={() => setShowWaitlistModal(true)}
+            >
+              Entrar na Lista de Espera <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </div>
       </section>
+
+      {/* Waitlist Modal */}
+      <Dialog open={showWaitlistModal} onOpenChange={setShowWaitlistModal}>
+        <DialogContent className="sm:max-w-md">
+          <WaitlistForm onSubmit={handleWaitlistSubmit} onCancel={() => setShowWaitlistModal(false)} />
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirmation Modal */}
+      <Dialog open={showConfirmationModal} onOpenChange={setShowConfirmationModal}>
+        <DialogContent className="sm:max-w-lg">
+          <ConfirmationModal userData={userData} onClose={() => setShowConfirmationModal(false)} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

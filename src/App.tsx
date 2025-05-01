@@ -30,6 +30,8 @@ const App = () => (
           <Route path="/sobre" element={<WebsiteLayout><About /></WebsiteLayout>} />
           <Route path="/educacao" element={<WebsiteLayout><Education /></WebsiteLayout>} />
           <Route path="/academy" element={<WebsiteLayout><Academy /></WebsiteLayout>} />
+          <Route path="/lista-de-espera" element={<WebsiteLayout><Academy /></WebsiteLayout>} />
+          <Route path="/confirmacao-inscricao" element={<WebsiteLayout><Academy /></WebsiteLayout>} />
           <Route path="/contato" element={<WebsiteLayout><Contact /></WebsiteLayout>} />
           <Route path="/area-cliente" element={<WebsiteLayout><ClientArea /></WebsiteLayout>} />
           {/* Legacy routes - keeping for backward compatibility */}
