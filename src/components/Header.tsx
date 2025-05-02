@@ -28,7 +28,7 @@ export default function Header() {
     { title: "Animais Disponíveis", path: "/catalogo" },
     { title: "Espécies Criadas", path: "/especies" },
     { title: "Manuais de Criação", path: "/manuais" },
-    { title: "Quem somos", path: "/sobre" },
+    { title: "Quem Somos", path: "/sobre" },
     { title: "Contato", path: "/contato" },
   ];
   
@@ -40,7 +40,7 @@ export default function Header() {
             <img 
               src="/lovable-uploads/4d77b820-b366-45b8-b64b-1568abded363.png" 
               alt="Pet Serpentes" 
-              className="h-12 w-auto mr-2" 
+              className="h-12 w-12 rounded-full object-contain mr-2" 
             />
             <span className="hidden md:inline-flex font-semibold text-xl">PET SERPENTES</span>
           </Link>

@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BookOpen, Users, Shield, CheckCircle, Lock } from "lucide-react";
+import { BookOpen, Users, Shield, CheckCircle, Lock, Video, MessageSquare, Trophy } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import WaitlistForm from "@/components/WaitlistForm";
 import ConfirmationModal from "@/components/ConfirmationModal";
@@ -22,13 +22,12 @@ export default function Academy() {
     setShowConfirmationModal(true);
   };
 
-  // Hero Section
   return (
     <div>
       {/* Hero Section */}
       <section className="relative bg-serpente-900 text-white">
         <div className="absolute inset-0 opacity-30" style={{ 
-          backgroundImage: `url('https://images.unsplash.com/photo-1591824438708-ce405f36ba3d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80')`,
+          backgroundImage: `url('https://images.unsplash.com/photo-1557178985-891076b318dd?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}></div>
@@ -36,10 +35,10 @@ export default function Academy() {
           <div className="max-w-2xl">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">Pet Serpentes Academy</h1>
             <p className="text-xl text-white/80 mb-6">
-              Cursos online especializados sobre répteis, para iniciantes e profissionais
+              Uma comunidade completa para criadores e amantes de répteis
             </p>
             <Button size="lg" className="bg-white text-serpente-600 hover:bg-white/90" onClick={() => setShowWaitlistModal(true)}>
-              Entrar na Lista de Espera <ArrowRight className="ml-2 h-5 w-5" />
+              Entrar na Lista de Espera
             </Button>
           </div>
         </div>
@@ -53,115 +52,78 @@ export default function Academy() {
               <h2 className="text-3xl font-bold">Por que escolher a Academy?</h2>
             </div>
             <p className="text-muted-foreground max-w-2xl mt-4">
-              Uma plataforma de ensino completa criada por especialistas em herpetologia
+              Uma plataforma completa criada por especialistas em herpetologia
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
             <div className="docs-card p-6 border rounded-lg flex flex-col items-center text-center">
               <div className="bg-serpente-100 dark:bg-serpente-900/50 p-3 rounded-full mb-4">
-                <BookOpen className="h-8 w-8 text-serpente-600" />
+                <Video className="h-8 w-8 text-serpente-600" />
               </div>
-              <h3 className="text-xl font-bold mb-3">Conteúdo Exclusivo</h3>
+              <h3 className="text-xl font-bold mb-3">Aulas e Demonstrações</h3>
               <p className="text-muted-foreground">
-                Materiais didáticos desenvolvidos por biólogos e especialistas com experiência prática no manejo de répteis.
+                Vídeos práticos e educativos desenvolvidos por biólogos e especialistas com experiência prática no manejo de répteis.
               </p>
             </div>
             
             <div className="docs-card p-6 border rounded-lg flex flex-col items-center text-center">
               <div className="bg-serpente-100 dark:bg-serpente-900/50 p-3 rounded-full mb-4">
-                <Users className="h-8 w-8 text-serpente-600" />
+                <MessageSquare className="h-8 w-8 text-serpente-600" />
               </div>
-              <h3 className="text-xl font-bold mb-3">Comunidade Ativa</h3>
+              <h3 className="text-xl font-bold mb-3">Rede Social Interna</h3>
               <p className="text-muted-foreground">
-                Fóruns de discussão moderados por tutores, onde você pode tirar dúvidas e interagir com outros entusiastas.
+                Muro de postagens, fóruns e interações entre membros, onde você pode compartilhar experiências e aprender com outros entusiastas.
               </p>
             </div>
             
             <div className="docs-card p-6 border rounded-lg flex flex-col items-center text-center">
               <div className="bg-serpente-100 dark:bg-serpente-900/50 p-3 rounded-full mb-4">
-                <Shield className="h-8 w-8 text-serpente-600" />
+                <Trophy className="h-8 w-8 text-serpente-600" />
               </div>
-              <h3 className="text-xl font-bold mb-3">Certificação</h3>
+              <h3 className="text-xl font-bold mb-3">Sistema de Recompensas</h3>
               <p className="text-muted-foreground">
-                Receba certificados ao concluir os cursos, reconhecidos por criadores e profissionais da área.
+                Sistema de gamificação e recompensas baseado em participação, compartilhamento de conhecimento e engajamento na comunidade.
               </p>
             </div>
           </div>
         </div>
       </section>
       
-      {/* Courses Section */}
+      {/* Content Highlight Cards */}
       <section className="py-16 bg-muted/30 snake-pattern-bg">
         <div className="container px-4 sm:px-6">
           <div className="flex flex-col items-center mb-12 text-center">
             <div className="docs-section-title">
-              <h2 className="text-3xl font-bold">Cursos em Destaque</h2>
+              <h2 className="text-3xl font-bold">Conteúdos Destacados</h2>
             </div>
             <p className="text-muted-foreground max-w-2xl mt-4">
-              Conheça alguns dos nossos cursos mais populares disponíveis para assinantes
+              Confira alguns dos conteúdos disponíveis para os membros da comunidade
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
-            {/* Course 1 */}
+            {/* Content Card 1 */}
             <div className="border rounded-lg overflow-hidden bg-card shadow-sm transition-all hover:shadow-md">
               <div className="relative h-48 overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1550172268-9a48af98ac5f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80" 
-                  alt="Fundamentos da Herpetocultura" 
+                  src="https://images.unsplash.com/photo-1633527316352-52177079b3f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80" 
+                  alt="Vídeos Técnicos" 
                   className="w-full h-full object-cover object-center"
                 />
                 <div className="absolute top-4 right-4">
-                  <span className="bg-serpente-600 text-white text-xs font-medium px-2 py-1 rounded">Básico</span>
+                  <span className="bg-serpente-600 text-white text-xs font-medium px-2 py-1 rounded">Exclusivo</span>
                 </div>
               </div>
               <div className="p-5">
-                <h3 className="font-bold text-xl mb-2">Fundamentos da Herpetocultura</h3>
+                <h3 className="font-bold text-xl mb-2">Vídeos Técnicos</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Curso introdutório para quem deseja iniciar na criação de répteis, com conceitos básicos e práticas essenciais.
+                  Conteúdo especializado sobre manejo, reprodução, genética e veterinária de répteis.
                 </p>
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-serpente-600" />
-                    <span className="text-sm">12 módulos em vídeo</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-serpente-600" />
-                    <span className="text-sm">Material complementar em PDF</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-serpente-600" />
-                    <span className="text-sm">Certificado de conclusão</span>
-                  </div>
-                </div>
-                <Button className="w-full" variant="outline">
-                  <Lock className="h-4 w-4 mr-2" /> Acesso Exclusivo para Assinantes
-                </Button>
-              </div>
-            </div>
-            
-            {/* Course 2 */}
-            <div className="border rounded-lg overflow-hidden bg-card shadow-sm transition-all hover:shadow-md">
-              <div className="relative h-48 overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1585095595239-2c5d5b3721f5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80" 
-                  alt="Reprodução de Serpentes" 
-                  className="w-full h-full object-cover object-center"
-                />
-                <div className="absolute top-4 right-4">
-                  <span className="bg-earth-600 text-white text-xs font-medium px-2 py-1 rounded">Avançado</span>
-                </div>
-              </div>
-              <div className="p-5">
-                <h3 className="font-bold text-xl mb-2">Reprodução de Serpentes</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Técnicas avançadas de reprodução, incubação de ovos e cuidados com filhotes de diversas espécies.
-                </p>
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-serpente-600" />
-                    <span className="text-sm">15 módulos em vídeo</span>
+                    <span className="text-sm">Aulas de especialistas</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-serpente-600" />
@@ -169,48 +131,85 @@ export default function Academy() {
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-serpente-600" />
-                    <span className="text-sm">Fórum de dúvidas especializado</span>
+                    <span className="text-sm">Conteúdo profissional</span>
                   </div>
                 </div>
-                <Button className="w-full" variant="outline">
-                  <Lock className="h-4 w-4 mr-2" /> Acesso Exclusivo para Assinantes
+                <Button className="w-full" variant="outline" onClick={() => setShowWaitlistModal(true)}>
+                  <Lock className="h-4 w-4 mr-2" /> Entrar na Lista de Espera
                 </Button>
               </div>
             </div>
             
-            {/* Course 3 */}
+            {/* Content Card 2 */}
             <div className="border rounded-lg overflow-hidden bg-card shadow-sm transition-all hover:shadow-md">
               <div className="relative h-48 overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1557178985-891076b318dd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80" 
-                  alt="Genética e Morfos" 
+                  src="https://images.unsplash.com/photo-1598445609092-7c7d80d816dd?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80" 
+                  alt="Tutoriais em Vídeo" 
                   className="w-full h-full object-cover object-center"
                 />
                 <div className="absolute top-4 right-4">
-                  <span className="bg-earth-600 text-white text-xs font-medium px-2 py-1 rounded">Avançado</span>
+                  <span className="bg-serpente-600 text-white text-xs font-medium px-2 py-1 rounded">Exclusivo</span>
                 </div>
               </div>
               <div className="p-5">
-                <h3 className="font-bold text-xl mb-2">Genética e Morfos</h3>
+                <h3 className="font-bold text-xl mb-2">Tutoriais em Vídeo</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Entenda os princípios genéticos por trás das diferentes variações morfológicas em répteis.
+                  Aprenda passo a passo a criar, manter e reproduzir diferentes espécies de répteis.
                 </p>
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-serpente-600" />
-                    <span className="text-sm">10 módulos em vídeo</span>
+                    <span className="text-sm">Guias completos</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-serpente-600" />
-                    <span className="text-sm">Estudos de caso</span>
+                    <span className="text-sm">Passo a passo detalhado</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-serpente-600" />
-                    <span className="text-sm">Tabelas de probabilidade genética</span>
+                    <span className="text-sm">Técnicas exclusivas</span>
                   </div>
                 </div>
-                <Button className="w-full" variant="outline">
-                  <Lock className="h-4 w-4 mr-2" /> Acesso Exclusivo para Assinantes
+                <Button className="w-full" variant="outline" onClick={() => setShowWaitlistModal(true)}>
+                  <Lock className="h-4 w-4 mr-2" /> Entrar na Lista de Espera
+                </Button>
+              </div>
+            </div>
+            
+            {/* Content Card 3 */}
+            <div className="border rounded-lg overflow-hidden bg-card shadow-sm transition-all hover:shadow-md">
+              <div className="relative h-48 overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1550172268-9a48af98ac5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80" 
+                  alt="Histórias de Criadores" 
+                  className="w-full h-full object-cover object-center"
+                />
+                <div className="absolute top-4 right-4">
+                  <span className="bg-serpente-600 text-white text-xs font-medium px-2 py-1 rounded">Exclusivo</span>
+                </div>
+              </div>
+              <div className="p-5">
+                <h3 className="font-bold text-xl mb-2">Histórias de Criadores</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Conheça a trajetória e experiências de criadores de sucesso no universo da herpetocultura.
+                </p>
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-serpente-600" />
+                    <span className="text-sm">Entrevistas exclusivas</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-serpente-600" />
+                    <span className="text-sm">Histórias inspiradoras</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-serpente-600" />
+                    <span className="text-sm">Dicas de sucesso</span>
+                  </div>
+                </div>
+                <Button className="w-full" variant="outline" onClick={() => setShowWaitlistModal(true)}>
+                  <Lock className="h-4 w-4 mr-2" /> Entrar na Lista de Espera
                 </Button>
               </div>
             </div>
@@ -235,26 +234,26 @@ export default function Academy() {
             <div className="border rounded-lg p-6 bg-card shadow-sm transition-all hover:shadow-md flex flex-col">
               <div className="mb-4">
                 <h3 className="font-bold text-xl mb-1">Básico</h3>
-                <p className="text-sm text-muted-foreground">Acesso aos cursos introdutórios</p>
+                <p className="text-sm text-muted-foreground">Acesso aos conteúdos introdutórios</p>
               </div>
               <div className="mb-6">
                 <div className="flex items-baseline">
-                  <span className="text-3xl font-bold">R$29</span>
+                  <span className="text-3xl font-bold">R$14</span>
                   <span className="text-muted-foreground ml-1">/mês</span>
                 </div>
               </div>
               <ul className="space-y-3 mb-8 flex-grow">
                 <li className="flex items-center">
                   <CheckCircle className="h-5 w-5 text-serpente-600 mr-2" />
-                  <span>5 cursos básicos</span>
+                  <span>5 vídeos básicos por mês</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="h-5 w-5 text-serpente-600 mr-2" />
-                  <span>Material em PDF</span>
+                  <span>Acesso ao fórum</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="h-5 w-5 text-serpente-600 mr-2" />
-                  <span>Certificados</span>
+                  <span>Eventos virtuais</span>
                 </li>
               </ul>
               <Button variant="outline" className="w-full" onClick={() => setShowWaitlistModal(true)}>
@@ -269,30 +268,30 @@ export default function Academy() {
               </div>
               <div className="mb-4 mt-2">
                 <h3 className="font-bold text-xl mb-1">Premium</h3>
-                <p className="text-sm text-muted-foreground">Acesso completo à biblioteca</p>
+                <p className="text-sm text-muted-foreground">Acesso completo à comunidade</p>
               </div>
               <div className="mb-6">
                 <div className="flex items-baseline">
-                  <span className="text-3xl font-bold">R$49</span>
+                  <span className="text-3xl font-bold">R$29</span>
                   <span className="text-muted-foreground ml-1">/mês</span>
                 </div>
               </div>
               <ul className="space-y-3 mb-8 flex-grow">
                 <li className="flex items-center">
                   <CheckCircle className="h-5 w-5 text-serpente-600 mr-2" />
-                  <span>Todos os cursos (20+)</span>
+                  <span>Todos os vídeos (20+ por mês)</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="h-5 w-5 text-serpente-600 mr-2" />
-                  <span>Material em PDF e vídeos</span>
+                  <span>Postagens ilimitadas no mural</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="h-5 w-5 text-serpente-600 mr-2" />
-                  <span>Acesso ao fórum exclusivo</span>
+                  <span>Acesso à rede social exclusiva</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="h-5 w-5 text-serpente-600 mr-2" />
-                  <span>Consultoria mensal (30 min)</span>
+                  <span>Consulta mensal (30 min)</span>
                 </li>
               </ul>
               <Button className="w-full" onClick={() => setShowWaitlistModal(true)}>
@@ -308,14 +307,14 @@ export default function Academy() {
               </div>
               <div className="mb-6">
                 <div className="flex items-baseline">
-                  <span className="text-3xl font-bold">R$99</span>
+                  <span className="text-3xl font-bold">R$49</span>
                   <span className="text-muted-foreground ml-1">/mês</span>
                 </div>
               </div>
               <ul className="space-y-3 mb-8 flex-grow">
                 <li className="flex items-center">
                   <CheckCircle className="h-5 w-5 text-serpente-600 mr-2" />
-                  <span>Todos os cursos Premium</span>
+                  <span>Todos os benefícios Premium</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="h-5 w-5 text-serpente-600 mr-2" />
@@ -343,10 +342,10 @@ export default function Academy() {
         <div className="container px-4 sm:px-6">
           <div className="flex flex-col items-center mb-12 text-center">
             <div className="docs-section-title">
-              <h2 className="text-3xl font-bold">O Que Dizem Nossos Alunos</h2>
+              <h2 className="text-3xl font-bold">O Que Dizem Nossos Membros</h2>
             </div>
             <p className="text-muted-foreground max-w-2xl mt-4">
-              Depoimentos de membros da Pet Serpentes Academy
+              Depoimentos de participantes da Pet Serpentes Academy
             </p>
           </div>
           
@@ -363,7 +362,7 @@ export default function Academy() {
                 </div>
               </div>
               <p className="text-foreground/80 italic">
-                "Os cursos da Academy foram fundamentais para que eu tivesse segurança ao adquirir minha primeira serpente. O conteúdo é claro, prático e muito bem explicado."
+                "Os conteúdos da Academy foram fundamentais para que eu tivesse segurança ao adquirir minha primeira serpente. O suporte da comunidade é incrível."
               </p>
             </div>
             
@@ -379,7 +378,7 @@ export default function Academy() {
                 </div>
               </div>
               <p className="text-foreground/80 italic">
-                "Como profissional da área veterinária, encontrei na Academy conteúdos específicos que complementaram minha formação acadêmica. Recomendo especialmente os cursos avançados."
+                "Como profissional da área veterinária, encontrei na comunidade Academy conteúdos específicos que complementaram minha formação acadêmica."
               </p>
             </div>
             
@@ -395,7 +394,7 @@ export default function Academy() {
                 </div>
               </div>
               <p className="text-foreground/80 italic">
-                "O curso de genética e morfos revolucionou meu negócio. Consegui melhorar significativamente os resultados de reprodução e a qualidade dos filhotes no meu criadouro."
+                "A rede social interna da Academy é um diferencial incrível. Consegui conectar com outros criadores e resolver dúvidas importantes para o meu negócio."
               </p>
             </div>
           </div>
@@ -408,7 +407,7 @@ export default function Academy() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold mb-2">Pronto para começar?</h2>
-              <p className="text-white/80">Inicie sua jornada na Pet Serpentes Academy hoje mesmo</p>
+              <p className="text-white/80">Junte-se à comunidade Pet Serpentes Academy hoje mesmo</p>
             </div>
             <Button 
               size="lg" 
@@ -416,7 +415,7 @@ export default function Academy() {
               className="bg-white text-serpente-600 hover:bg-white/90 border-none"
               onClick={() => setShowWaitlistModal(true)}
             >
-              Entrar na Lista de Espera <ArrowRight className="ml-2 h-4 w-4" />
+              Entrar na Lista de Espera
             </Button>
           </div>
         </div>

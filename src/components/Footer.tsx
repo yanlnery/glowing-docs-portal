@@ -14,12 +14,12 @@ export default function Footer() {
               <img 
                 src="/lovable-uploads/7cf1001e-0989-475f-aaf5-fb56c4fb22a4.png" 
                 alt="Pet Serpentes" 
-                className="h-12 w-auto mr-2" 
+                className="h-12 w-auto mr-2 rounded-full" 
               />
               <span className="font-semibold text-xl text-white">PET SERPENTES</span>
             </Link>
             <p className="text-sm text-white/70 mb-4">
-              Criadouro especializado em serpentes e outros répteis, devidamente registrado no IBAMA e INEA.
+              Criadouro especializado em répteis e aves, devidamente registrado no IBAMA e INEA.
             </p>
             <div className="flex space-x-3">
               <a href="https://facebook.com" className="hover:text-white transition-colors" aria-label="Facebook">
@@ -39,16 +39,25 @@ export default function Footer() {
             <h3 className="font-semibold text-lg mb-4 text-white">Links Rápidos</h3>
             <ul className="space-y-2 text-white/70">
               <li>
-                <Link to="/catalogo" className="hover:text-white transition-colors">Catálogo</Link>
+                <Link to="/" className="hover:text-white transition-colors">Início</Link>
               </li>
               <li>
-                <Link to="/sobre" className="hover:text-white transition-colors">Sobre Nós</Link>
+                <Link to="/academy" className="hover:text-white transition-colors">P.S. Academy</Link>
               </li>
               <li>
-                <Link to="/educacao" className="hover:text-white transition-colors">Educação</Link>
+                <Link to="/catalogo" className="hover:text-white transition-colors">Animais Disponíveis</Link>
               </li>
               <li>
-                <Link to="/academy" className="hover:text-white transition-colors">Academy</Link>
+                <Link to="/especies" className="hover:text-white transition-colors">Espécies Criadas</Link>
+              </li>
+              <li>
+                <Link to="/manuais" className="hover:text-white transition-colors">Manuais de Criação</Link>
+              </li>
+              <li>
+                <Link to="/sobre" className="hover:text-white transition-colors">Quem Somos</Link>
+              </li>
+              <li>
+                <Link to="/contato" className="hover:text-white transition-colors">Contato</Link>
               </li>
               <li>
                 <Link to="/termos" className="hover:text-white transition-colors">Termos de Uso</Link>
@@ -65,7 +74,7 @@ export default function Footer() {
             <ul className="space-y-3 text-white/70">
               <li className="flex items-center">
                 <Phone size={18} className="mr-2 text-serpente-400" />
-                <a href="tel:+5521999999999" className="hover:text-white transition-colors">+55 21 99999-9999</a>
+                <a href="tel:+5521967802174" className="hover:text-white transition-colors">+55 21 96780-2174</a>
               </li>
               <li className="flex items-center">
                 <Mail size={18} className="mr-2 text-serpente-400" />
@@ -73,7 +82,7 @@ export default function Footer() {
               </li>
               <li className="flex items-start">
                 <MapPin size={18} className="mr-2 mt-1 flex-shrink-0 text-serpente-400" />
-                <span>Rio de Janeiro, RJ - Brasil</span>
+                <span>Duque de Caxias, RJ - Brasil</span>
               </li>
             </ul>
           </div>

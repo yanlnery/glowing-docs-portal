@@ -2,32 +2,15 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Award, Calendar, CreditCard, Shield, BookOpen, Syringe } from "lucide-react";
+import { ArrowRight, Award, Calendar, CreditCard, Shield, BookOpen, Users, Video, Syringe } from "lucide-react";
+import HeroCarousel from "@/components/HeroCarousel";
 
 export default function Home() {
   return (
     <div className="flex flex-col w-full">
-      {/* Hero Banner Section */}
+      {/* Hero Carousel Section */}
       <section className="relative">
-        <div className="hero-pattern relative w-full h-[70vh] flex items-center overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent z-10"></div>
-          <div className="container relative z-20 flex flex-col items-start justify-center h-full py-10 px-4 sm:px-6">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 max-w-2xl animate-slide-in">
-              Animais silvestres <span className="text-earth-200">legalizados</span>
-            </h1>
-            <p className="text-lg md:text-xl text-white/90 max-w-xl mb-8 animate-fade-in">
-              Venha conhecer as espécies mais fascinantes em um criadouro 100% legalizado pelo IBAMA e INEA-RJ
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white">
-                Animais Disponíveis <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="lg" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
-                Conheça nossa História
-              </Button>
-            </div>
-          </div>
-        </div>
+        <HeroCarousel />
       </section>
 
       {/* Featured Species Section */}
@@ -176,7 +159,7 @@ export default function Home() {
                   <Syringe className="text-serpente-600 h-6 w-6 mt-1" />
                   <div>
                     <h3 className="font-bold">Acompanhamento Veterinário</h3>
-                    <p className="text-sm text-muted-foreground">Suporte constante em prevenção, remediação e monitoramento da saúde dos animais, garantindo bem-estar e conformidade com exigências legais.</p>
+                    <p className="text-sm text-muted-foreground">Suporte em prevenção e saúde dos animais</p>
                   </div>
                 </div>
               </div>
@@ -203,26 +186,29 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="docs-card-gradient p-6 rounded-lg border">
-              <h3 className="font-bold text-xl mb-4">Guias de Cuidados</h3>
-              <p className="text-muted-foreground mb-6">Manuais completos para cuidados específicos de cada espécie</p>
-              <Link to="/educacao/guias" className="text-serpente-600 font-medium hover:underline inline-flex items-center">
-                Ver Guias <ArrowRight className="ml-1 h-4 w-4" />
+              <BookOpen className="h-8 w-8 text-serpente-600 mb-4" />
+              <h3 className="font-bold text-xl mb-4">Manuais de Criação</h3>
+              <p className="text-muted-foreground mb-6">Guias completos e técnicos para o manejo adequado de cada espécie</p>
+              <Link to="/manuais" className="text-serpente-600 font-medium hover:underline inline-flex items-center">
+                Ver Manuais <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </div>
             
             <div className="docs-card-gradient p-6 rounded-lg border">
-              <h3 className="font-bold text-xl mb-4">Blog Especializado</h3>
-              <p className="text-muted-foreground mb-6">Artigos informativos sobre comportamento, alimentação e saúde</p>
-              <Link to="/educacao/blog" className="text-serpente-600 font-medium hover:underline inline-flex items-center">
-                Ler Artigos <ArrowRight className="ml-1 h-4 w-4" />
+              <Video className="h-8 w-8 text-serpente-600 mb-4" />
+              <h3 className="font-bold text-xl mb-4">Conteúdos em Vídeo</h3>
+              <p className="text-muted-foreground mb-6">Aulas práticas, demonstrações e tutoriais em formato audiovisual</p>
+              <Link to="/educacao/videos" className="text-serpente-600 font-medium hover:underline inline-flex items-center">
+                Assistir Vídeos <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </div>
             
             <div className="docs-card-gradient p-6 rounded-lg border">
-              <h3 className="font-bold text-xl mb-4">Academy Pet Serpentes</h3>
-              <p className="text-muted-foreground mb-6">Cursos online para criadores e entusiastas de répteis</p>
+              <Users className="h-8 w-8 text-serpente-600 mb-4" />
+              <h3 className="font-bold text-xl mb-4">Pet Serpentes Academy</h3>
+              <p className="text-muted-foreground mb-6">Comunidade interativa para criadores e amantes de répteis</p>
               <Link to="/academy" className="text-serpente-600 font-medium hover:underline inline-flex items-center">
-                Conhecer Cursos <ArrowRight className="ml-1 h-4 w-4" />
+                Conhecer Comunidade <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </div>
           </div>

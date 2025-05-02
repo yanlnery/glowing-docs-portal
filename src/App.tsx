@@ -8,6 +8,9 @@ import WebsiteLayout from "./layouts/WebsiteLayout";
 import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
 import About from "./pages/About";
+import Species from "./pages/Species";
+import SpeciesDetail from "./pages/SpeciesDetail";
+import Manuals from "./pages/Manuals";
 import Education from "./pages/Education";
 import Academy from "./pages/Academy";
 import Contact from "./pages/Contact";
@@ -25,8 +28,9 @@ const App = () => (
         <Routes>
           <Route path="/" element={<WebsiteLayout><Home /></WebsiteLayout>} />
           <Route path="/catalogo" element={<WebsiteLayout><Catalog /></WebsiteLayout>} />
-          <Route path="/especies" element={<WebsiteLayout><Catalog /></WebsiteLayout>} />
-          <Route path="/manuais" element={<WebsiteLayout><Education /></WebsiteLayout>} />
+          <Route path="/especies" element={<WebsiteLayout><Species /></WebsiteLayout>} />
+          <Route path="/especies/:id" element={<WebsiteLayout><SpeciesDetail /></WebsiteLayout>} />
+          <Route path="/manuais" element={<WebsiteLayout><Manuals /></WebsiteLayout>} />
           <Route path="/sobre" element={<WebsiteLayout><About /></WebsiteLayout>} />
           <Route path="/educacao" element={<WebsiteLayout><Education /></WebsiteLayout>} />
           <Route path="/academy" element={<WebsiteLayout><Academy /></WebsiteLayout>} />
