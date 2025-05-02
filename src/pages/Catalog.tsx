@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Filter, SortDesc, Search, ChevronDown } from "lucide-react";
+import { Filter, SortDesc, Search, ChevronDown, X } from "lucide-react";
 
 export default function Catalog() {
   const [activeFilter, setActiveFilter] = useState("todos");
