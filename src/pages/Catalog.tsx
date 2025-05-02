@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,7 +30,7 @@ export default function Catalog() {
       stage: "filhote",
       price: 1500,
       available: true,
-      image: "https://images.unsplash.com/photo-1633527316352-52177079b3f3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80"
+      image: "/lovable-uploads/87bb79b7-12d7-41e7-9b09-a2a646636a7f.png" // Cobra d'água filhote
     },
     {
       id: 2,
@@ -41,7 +42,7 @@ export default function Catalog() {
       stage: "adulto",
       price: 3200,
       available: true,
-      image: "https://images.unsplash.com/photo-1550172268-9a48af98ac5f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80"
+      image: "/lovable-uploads/b81f6c0b-360a-4408-834b-cb20bd36e3da.png" // Teiú filhote
     },
     {
       id: 3,
@@ -53,7 +54,7 @@ export default function Catalog() {
       stage: "filhote",
       price: 800,
       available: true,
-      image: "https://images.unsplash.com/photo-1598445609092-7c7d80d816dd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80"
+      image: "/lovable-uploads/764f832e-e068-449d-80be-7d670575665f.png" // Jiboia filhote
     },
     {
       id: 4,
@@ -65,7 +66,7 @@ export default function Catalog() {
       stage: "adulto",
       price: 2100,
       available: false,
-      image: "https://images.unsplash.com/photo-1550172268-9a48af98ac5f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80"
+      image: "/lovable-uploads/f7bc5a30-657d-418c-8b25-7b0494f36029.png" // Falsa-coral amarela e preta
     },
     {
       id: 5,
@@ -77,7 +78,7 @@ export default function Catalog() {
       stage: "filhote",
       price: 900,
       available: true,
-      image: "/lovable-uploads/8353d3e8-d19d-4821-8a00-892cf9ac6bae.png"
+      image: "/lovable-uploads/51de7896-4d25-4af0-af9d-31c8028fcc3b.png" // Corn snake na mão
     },
     {
       id: 6,
@@ -89,7 +90,7 @@ export default function Catalog() {
       stage: "adulto",
       price: 650,
       available: true,
-      image: "https://images.unsplash.com/photo-1597284902002-b783970afd73?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80"
+      image: "/lovable-uploads/11848f61-6118-4555-92b5-61760f34cf00.png" // Gecko de corpo inteiro
     },
     {
       id: 7,
@@ -101,7 +102,7 @@ export default function Catalog() {
       stage: "adulto",
       price: 1800,
       available: true,
-      image: "https://images.unsplash.com/photo-1557178985-891076b318dd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80"
+      image: "/lovable-uploads/90e09ad1-fa3b-48d6-9979-59f090220fcb.png" // Jabuti com carapaça preta e cabeça vermelha
     },
     {
       id: 8,
@@ -113,7 +114,7 @@ export default function Catalog() {
       stage: "filhote",
       price: 550,
       available: true,
-      image: "https://images.unsplash.com/photo-1591824438708-ce405f36ba3d?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80"
+      image: "/lovable-uploads/d7cd39f5-e491-4eb3-a10d-6cf8ad24669a.png" // Tartaruga aquática
     }
   ];
   

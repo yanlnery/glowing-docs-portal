@@ -12,11 +12,11 @@ const speciesList = [
     name: "Erythrolamprus miliaris",
     commonName: "Cobra-d'água",
     type: "serpente",
-    image: "https://images.unsplash.com/photo-1633527316352-52177079b3f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
+    image: "/lovable-uploads/764f832e-e068-449d-80be-7d670575665f.png",
     gallery: [
-      "https://images.unsplash.com/photo-1633527316352-52177079b3f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
-      "https://images.unsplash.com/photo-1557178985-891076b318dd?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
-      "https://images.unsplash.com/photo-1598445609092-7c7d80d816dd?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80"
+      "/lovable-uploads/764f832e-e068-449d-80be-7d670575665f.png",
+      "/lovable-uploads/87bb79b7-12d7-41e7-9b09-a2a646636a7f.png",
+      "/lovable-uploads/d71c2fb7-1bfe-41ba-8db3-d2d0b4279365.png"
     ],
     description: "Espaço reservado para descrição detalhada da espécie Erythrolamprus miliaris (Cobra-d'água).",
     characteristics: [
@@ -27,7 +27,198 @@ const speciesList = [
     ],
     curiosities: "Curiosidades sobre a Cobra-d'água serão adicionadas aqui."
   },
-  // ... additional species data would be here for all 19 species
+  {
+    id: 2,
+    name: "Tupinambis teguixin",
+    commonName: "Teiú-amarelo",
+    type: "lagarto",
+    image: "/lovable-uploads/b81f6c0b-360a-4408-834b-cb20bd36e3da.png",
+    gallery: [
+      "/lovable-uploads/b81f6c0b-360a-4408-834b-cb20bd36e3da.png",
+      "/lovable-uploads/370accb0-50cf-459e-a966-c1fc135ecb83.png"
+    ],
+    description: "Descrição detalhada do Teiú-amarelo (Tupinambis teguixin).",
+    characteristics: [
+      "Tamanho: 1-1,5m incluindo a cauda",
+      "Dieta: onívoro (ovos, pequenos vertebrados, frutas)",
+      "Habitat: áreas florestais e campos",
+      "Comportamento: territorial e diurno"
+    ]
+  },
+  {
+    id: 3,
+    name: "Epicrates crassus",
+    commonName: "Jiboia-do-Cerrado",
+    type: "serpente",
+    image: "/lovable-uploads/c1a72b2c-2c6e-4822-9c71-13485444c48a.png",
+    gallery: [
+      "/lovable-uploads/c1a72b2c-2c6e-4822-9c71-13485444c48a.png",
+      "/lovable-uploads/f6e67c5c-183d-46ac-a882-997f826be1b3.png"
+    ]
+  },
+  {
+    id: 4,
+    name: "Lampropeltis triangulum",
+    commonName: "Falsa-coral",
+    type: "serpente",
+    image: "/lovable-uploads/f7bc5a30-657d-418c-8b25-7b0494f36029.png",
+    gallery: [
+      "/lovable-uploads/f7bc5a30-657d-418c-8b25-7b0494f36029.png"
+    ]
+  },
+  {
+    id: 5,
+    name: "Pantherophis guttatus",
+    commonName: "Corn Snake",
+    type: "serpente",
+    image: "/lovable-uploads/51de7896-4d25-4af0-af9d-31c8028fcc3b.png",
+    gallery: [
+      "/lovable-uploads/51de7896-4d25-4af0-af9d-31c8028fcc3b.png",
+      "/lovable-uploads/0e7c1a90-84bb-4471-908a-af3fcab85c04.png"
+    ]
+  },
+  {
+    id: 6,
+    name: "Eublepharis macularius",
+    commonName: "Leopard Gecko",
+    type: "lagarto",
+    image: "/lovable-uploads/11848f61-6118-4555-92b5-61760f34cf00.png",
+    gallery: [
+      "/lovable-uploads/11848f61-6118-4555-92b5-61760f34cf00.png"
+    ]
+  },
+  {
+    id: 7,
+    name: "Chelonoidis carbonarius",
+    commonName: "Jabuti-piranga",
+    type: "quelonio",
+    image: "/lovable-uploads/90e09ad1-fa3b-48d6-9979-59f090220fcb.png",
+    gallery: [
+      "/lovable-uploads/90e09ad1-fa3b-48d6-9979-59f090220fcb.png"
+    ]
+  },
+  {
+    id: 8,
+    name: "Trachemys scripta elegans",
+    commonName: "Tartaruga-de-orelha-vermelha",
+    type: "quelonio",
+    image: "/lovable-uploads/d7cd39f5-e491-4eb3-a10d-6cf8ad24669a.png",
+    gallery: [
+      "/lovable-uploads/d7cd39f5-e491-4eb3-a10d-6cf8ad24669a.png"
+    ]
+  },
+  {
+    id: 9,
+    name: "Bothrops jararaca",
+    commonName: "Jararaca",
+    type: "serpente",
+    image: "/lovable-uploads/d71c2fb7-1bfe-41ba-8db3-d2d0b4279365.png",
+    gallery: [
+      "/lovable-uploads/d71c2fb7-1bfe-41ba-8db3-d2d0b4279365.png"
+    ]
+  },
+  {
+    id: 10,
+    name: "Iguana iguana",
+    commonName: "Iguana-verde",
+    type: "lagarto",
+    image: "/lovable-uploads/c138dc46-3fd6-4dda-aa7b-c02dead150e7.png",
+    gallery: [
+      "/lovable-uploads/c138dc46-3fd6-4dda-aa7b-c02dead150e7.png"
+    ]
+  },
+  {
+    id: 11,
+    name: "Boa constrictor",
+    commonName: "Jiboia",
+    type: "serpente",
+    image: "/lovable-uploads/f6e67c5c-183d-46ac-a882-997f826be1b3.png",
+    gallery: [
+      "/lovable-uploads/f6e67c5c-183d-46ac-a882-997f826be1b3.png",
+      "/lovable-uploads/c1a72b2c-2c6e-4822-9c71-13485444c48a.png"
+    ]
+  },
+  {
+    id: 12,
+    name: "Crotalus durissus",
+    commonName: "Cascavel",
+    type: "serpente",
+    image: "/lovable-uploads/0e7c1a90-84bb-4471-908a-af3fcab85c04.png",
+    gallery: [
+      "/lovable-uploads/0e7c1a90-84bb-4471-908a-af3fcab85c04.png"
+    ]
+  },
+  {
+    id: 13,
+    name: "Salvator merianae",
+    commonName: "Teiú",
+    type: "lagarto",
+    image: "/lovable-uploads/370accb0-50cf-459e-a966-c1fc135ecb83.png",
+    gallery: [
+      "/lovable-uploads/370accb0-50cf-459e-a966-c1fc135ecb83.png",
+      "/lovable-uploads/b81f6c0b-360a-4408-834b-cb20bd36e3da.png"
+    ]
+  },
+  {
+    id: 14,
+    name: "Chelonoidis denticulatus",
+    commonName: "Jabuti-tinga",
+    type: "quelonio",
+    image: "/lovable-uploads/90e09ad1-fa3b-48d6-9979-59f090220fcb.png",
+    gallery: [
+      "/lovable-uploads/90e09ad1-fa3b-48d6-9979-59f090220fcb.png"
+    ]
+  },
+  {
+    id: 15,
+    name: "Lachesis muta",
+    commonName: "Surucucu-pico-de-jaca",
+    type: "serpente",
+    image: "/lovable-uploads/87bb79b7-12d7-41e7-9b09-a2a646636a7f.png",
+    gallery: [
+      "/lovable-uploads/87bb79b7-12d7-41e7-9b09-a2a646636a7f.png"
+    ]
+  },
+  {
+    id: 16,
+    name: "Diploglossus fasciatus",
+    commonName: "Cobra-de-vidro",
+    type: "lagarto",
+    image: "/lovable-uploads/481f8f82-22b1-407d-9e88-623e453faf6a.png",
+    gallery: [
+      "/lovable-uploads/481f8f82-22b1-407d-9e88-623e453faf6a.png"
+    ]
+  },
+  {
+    id: 17,
+    name: "Micrurus corallinus",
+    commonName: "Coral-verdadeira",
+    type: "serpente",
+    image: "/lovable-uploads/6dcc0ef5-dc47-4f3c-9020-54ecc65ed390.png",
+    gallery: [
+      "/lovable-uploads/6dcc0ef5-dc47-4f3c-9020-54ecc65ed390.png"
+    ]
+  },
+  {
+    id: 18,
+    name: "Phrynops geoffroanus",
+    commonName: "Cágado-de-barbicha",
+    type: "quelonio",
+    image: "/lovable-uploads/d7cd39f5-e491-4eb3-a10d-6cf8ad24669a.png",
+    gallery: [
+      "/lovable-uploads/d7cd39f5-e491-4eb3-a10d-6cf8ad24669a.png"
+    ]
+  },
+  {
+    id: 19,
+    name: "Tropidurus torquatus",
+    commonName: "Calango",
+    type: "lagarto",
+    image: "/lovable-uploads/b11770a0-4aca-4362-aa63-c0e9a9d4df0c.png",
+    gallery: [
+      "/lovable-uploads/b11770a0-4aca-4362-aa63-c0e9a9d4df0c.png"
+    ]
+  },
 ];
 
 export default function SpeciesDetail() {

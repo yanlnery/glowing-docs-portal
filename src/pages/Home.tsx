@@ -30,7 +30,7 @@ export default function Home() {
             <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
               <div className="relative h-64 overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1633527316352-52177079b3f3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80" 
+                  src="/lovable-uploads/87bb79b7-12d7-41e7-9b09-a2a646636a7f.png" 
                   alt="Erythrolamprus miliaris" 
                   className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
                 />
@@ -53,7 +53,7 @@ export default function Home() {
             <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
               <div className="relative h-64 overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1550172268-9a48af98ac5f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=900&q=80" 
+                  src="/lovable-uploads/b81f6c0b-360a-4408-834b-cb20bd36e3da.png" 
                   alt="Tupinambis teguixin" 
                   className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
                 />
@@ -76,7 +76,7 @@ export default function Home() {
             <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
               <div className="relative h-64 overflow-hidden">
                 <img 
-                  src="/lovable-uploads/8353d3e8-d19d-4821-8a00-892cf9ac6bae.png" 
+                  src="/lovable-uploads/c1a72b2c-2c6e-4822-9c71-13485444c48a.png" 
                   alt="Epicrates crassus" 
                   className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
                 />
@@ -110,7 +110,7 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row gap-12 items-center">
             <div className="w-full lg:w-1/2">
               <img 
-                src="/lovable-uploads/512cf52a-d274-4b7c-9451-f807b6f9a431.png" 
+                src="/lovable-uploads/420a5a2e-8cec-420f-89e1-3f9a584e00f7.png" 
                 alt="Yan Nery" 
                 className="rounded-lg shadow-lg w-full h-auto object-cover aspect-[4/3]"
               />
@@ -159,7 +159,7 @@ export default function Home() {
                   <Syringe className="text-serpente-600 h-6 w-6 mt-1" />
                   <div>
                     <h3 className="font-bold">Acompanhamento Veterinário</h3>
-                    <p className="text-sm text-muted-foreground">Suporte em prevenção e saúde dos animais</p>
+                    <p className="text-sm text-muted-foreground">Suporte em saúde animal</p>
                   </div>
                 </div>
               </div>
