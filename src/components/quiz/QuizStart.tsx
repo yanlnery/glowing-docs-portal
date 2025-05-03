@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Flask } from "lucide-react";
+import { Brain } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface QuizStartProps {
@@ -14,7 +14,7 @@ const QuizStart: React.FC<QuizStartProps> = ({ onStart }) => {
       <Card className="max-w-lg w-full">
         <CardHeader className="text-center">
           <div className="mx-auto bg-serpente-100 text-serpente-600 h-16 w-16 rounded-full flex items-center justify-center mb-4 dark:bg-serpente-900/50">
-            <Flask className="h-8 w-8" />
+            <Brain className="h-8 w-8" />
           </div>
           <CardTitle className="text-2xl sm:text-3xl">Descubra Qual Espécie Combina com Você</CardTitle>
           <CardDescription className="text-lg mt-2">

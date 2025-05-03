@@ -1,8 +1,7 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Award, Calendar, CreditCard, Shield, Book, Brain, Flask, Users, Video, Syringe } from "lucide-react";
+import { ArrowRight, Award, Calendar, CreditCard, Shield, Book, Brain, Syringe, Users, Video } from "lucide-react";
 import HeroCarousel from "@/components/HeroCarousel";
 
 export default function Home() {
@@ -228,7 +227,7 @@ export default function Home() {
             {/* Card 3: Descubra seu Animal Ideal */}
             <div className="docs-card-gradient p-6 rounded-lg border hover:shadow-md transition-all group">
               <div className="h-16 w-16 rounded-full bg-serpente-100 text-serpente-600 flex items-center justify-center mb-6 group-hover:bg-serpente-200 transition-colors dark:bg-serpente-900/50">
-                <Flask className="h-8 w-8" />
+                <Brain className="h-8 w-8" />
               </div>
               <h3 className="font-bold text-xl mb-4">Descubra seu Animal Ideal</h3>
               <p className="text-muted-foreground mb-6 min-h-[80px]">
