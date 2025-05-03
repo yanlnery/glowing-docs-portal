@@ -56,25 +56,25 @@ export default function HeroCarousel() {
             backgroundPosition: "center",
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent z-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent z-10"></div>
         </div>
       ))}
 
       {/* Content */}
       <div className="container relative z-20 flex flex-col items-start justify-center h-full py-10 px-4 sm:px-6">
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 max-w-2xl animate-slide-in">
+        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-4 max-w-2xl animate-slide-in pt-6 sm:pt-0">
           {carouselImages[currentImageIndex].title}
         </h1>
-        <p className="text-lg md:text-xl text-white/90 max-w-xl mb-8 animate-fade-in">
+        <p className="text-md md:text-xl text-white/90 max-w-xl mb-8 animate-fade-in">
           {carouselImages[currentImageIndex].subtitle}
         </p>
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white" asChild>
+        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center sm:items-start">
+          <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[44px] w-full sm:w-auto" asChild>
             <Link to="/catalogo">
               Animais Disponíveis <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
-          <Button variant="outline" size="lg" className="bg-white/10 border-white/20 text-white hover:bg-white/20" asChild>
+          <Button variant="outline" size="lg" className="bg-white/10 border-white/20 text-white hover:bg-white/20 min-h-[44px] w-full sm:w-auto" asChild>
             <Link to="/sobre">
               Conheça nossa História
             </Link>

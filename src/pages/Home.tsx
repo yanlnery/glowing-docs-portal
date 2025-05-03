@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,21 +13,21 @@ export default function Home() {
       </section>
 
       {/* Featured Species Section */}
-      <section className="py-16 bg-background">
+      <section className="py-10 sm:py-16 bg-background">
         <div className="container px-4 sm:px-6">
-          <div className="flex flex-col items-center mb-12 text-center">
+          <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">
             <div className="docs-section-title">
-              <h2 className="text-3xl font-bold">Espécies em Destaque</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold">Espécies em Destaque</h2>
             </div>
             <p className="text-muted-foreground max-w-2xl mt-4">
               Conheça algumas das serpentes e lagartos disponíveis no nosso criadouro, todos com certificação de origem e documentação legal.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mt-8">
             {/* Species Card 1 */}
             <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
-              <div className="relative h-64 overflow-hidden">
+              <div className="relative h-48 sm:h-64 overflow-hidden">
                 <img 
                   src="/lovable-uploads/87bb79b7-12d7-41e7-9b09-a2a646636a7f.png" 
                   alt="Erythrolamprus miliaris" 
@@ -42,7 +41,7 @@ export default function Home() {
                 <h3 className="font-bold text-lg mb-1">Erythrolamprus miliaris</h3>
                 <p className="text-muted-foreground text-sm mb-3">Cobra-d'água</p>
                 <div className="flex justify-end items-center">
-                  <Button variant="outline" size="sm" asChild>
+                  <Button variant="outline" size="sm" className="min-h-[44px] w-full sm:w-auto" asChild>
                     <Link to="/catalogo">Ver Detalhes</Link>
                   </Button>
                 </div>
@@ -51,7 +50,7 @@ export default function Home() {
             
             {/* Species Card 2 */}
             <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
-              <div className="relative h-64 overflow-hidden">
+              <div className="relative h-48 sm:h-64 overflow-hidden">
                 <img 
                   src="/lovable-uploads/b81f6c0b-360a-4408-834b-cb20bd36e3da.png" 
                   alt="Tupinambis teguixin" 
@@ -65,7 +64,7 @@ export default function Home() {
                 <h3 className="font-bold text-lg mb-1">Tupinambis teguixin</h3>
                 <p className="text-muted-foreground text-sm mb-3">Teiú-amarelo</p>
                 <div className="flex justify-end items-center">
-                  <Button variant="outline" size="sm" asChild>
+                  <Button variant="outline" size="sm" className="min-h-[44px] w-full sm:w-auto" asChild>
                     <Link to="/catalogo">Ver Detalhes</Link>
                   </Button>
                 </div>
@@ -74,7 +73,7 @@ export default function Home() {
             
             {/* Species Card 3 */}
             <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
-              <div className="relative h-64 overflow-hidden">
+              <div className="relative h-48 sm:h-64 overflow-hidden">
                 <img 
                   src="/lovable-uploads/c1a72b2c-2c6e-4822-9c71-13485444c48a.png" 
                   alt="Epicrates crassus" 
@@ -88,7 +87,7 @@ export default function Home() {
                 <h3 className="font-bold text-lg mb-1">Epicrates crassus</h3>
                 <p className="text-muted-foreground text-sm mb-3">Jiboia-do-Cerrado</p>
                 <div className="flex justify-end items-center">
-                  <Button variant="outline" size="sm" asChild>
+                  <Button variant="outline" size="sm" className="min-h-[44px] w-full sm:w-auto" asChild>
                     <Link to="/catalogo">Ver Detalhes</Link>
                   </Button>
                 </div>
@@ -96,8 +95,8 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="flex justify-center mt-10">
-            <Button size="lg" asChild>
+          <div className="flex justify-center mt-8 sm:mt-10">
+            <Button size="lg" className="min-h-[44px] w-full sm:w-auto" asChild>
               <Link to="/catalogo">Ver Catálogo Completo <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
           </div>

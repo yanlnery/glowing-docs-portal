@@ -133,10 +133,10 @@ export default function Catalog() {
   };
   
   return (
-    <div className="container px-4 py-12 sm:px-6">
-      <div className="flex flex-col items-center mb-12 text-center">
+    <div className="container px-4 py-8 sm:py-12 sm:px-6">
+      <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">
         <div className="docs-section-title">
-          <h1 className="text-4xl font-bold">Animais Disponíveis</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold">Animais Disponíveis</h1>
         </div>
         <p className="text-muted-foreground max-w-2xl mt-4">
           Conheça nossas serpentes, lagartos e quelônios disponíveis para venda, todos com procedência legal e documentação
@@ -144,17 +144,17 @@ export default function Catalog() {
       </div>
       
       {/* Filters */}
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <Tabs defaultValue="todos" className="w-full" onValueChange={handleCategoryChange}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-              <TabsList className="h-auto p-1 overflow-x-auto">
-                <TabsTrigger value="todos">Todos</TabsTrigger>
-                <TabsTrigger value="serpentes" className="flex items-center">
+              <TabsList className="h-auto p-1 overflow-x-auto w-full sm:w-auto">
+                <TabsTrigger value="todos" className="min-h-[44px]">Todos</TabsTrigger>
+                <TabsTrigger value="serpentes" className="flex items-center min-h-[44px]">
                   Serpentes
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0 ml-1">
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 ml-1">
                         <ChevronDown className="h-3 w-3" />
                         <span className="sr-only">Subcategorias</span>
                       </Button>
@@ -164,6 +164,7 @@ export default function Catalog() {
                         <Button 
                           variant={subCategory === "colubrideos" ? "default" : "ghost"} 
                           size="sm"
+                          className="min-h-[44px]"
                           onClick={() => setSubCategory(subCategory === "colubrideos" ? "" : "colubrideos")}
                         >
                           Colubrídeos
@@ -171,6 +172,7 @@ export default function Catalog() {
                         <Button 
                           variant={subCategory === "boideos" ? "default" : "ghost"} 
                           size="sm"
+                          className="min-h-[44px]"
                           onClick={() => setSubCategory(subCategory === "boideos" ? "" : "boideos")}
                         >
                           Boídeos
@@ -179,11 +181,11 @@ export default function Catalog() {
                     </PopoverContent>
                   </Popover>
                 </TabsTrigger>
-                <TabsTrigger value="lagartos" className="flex items-center">
+                <TabsTrigger value="lagartos" className="flex items-center min-h-[44px]">
                   Lagartos
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0 ml-1">
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 ml-1">
                         <ChevronDown className="h-3 w-3" />
                         <span className="sr-only">Subcategorias</span>
                       </Button>
@@ -193,6 +195,7 @@ export default function Catalog() {
                         <Button 
                           variant={subCategory === "pequenos" ? "default" : "ghost"} 
                           size="sm"
+                          className="min-h-[44px]"
                           onClick={() => setSubCategory(subCategory === "pequenos" ? "" : "pequenos")}
                         >
                           Pequenos
@@ -200,6 +203,7 @@ export default function Catalog() {
                         <Button 
                           variant={subCategory === "grandes" ? "default" : "ghost"} 
                           size="sm"
+                          className="min-h-[44px]"
                           onClick={() => setSubCategory(subCategory === "grandes" ? "" : "grandes")}
                         >
                           Grandes
@@ -208,11 +212,11 @@ export default function Catalog() {
                     </PopoverContent>
                   </Popover>
                 </TabsTrigger>
-                <TabsTrigger value="quelonios" className="flex items-center">
+                <TabsTrigger value="quelonios" className="flex items-center min-h-[44px]">
                   Quelônios
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0 ml-1">
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 ml-1">
                         <ChevronDown className="h-3 w-3" />
                         <span className="sr-only">Subcategorias</span>
                       </Button>
@@ -222,6 +226,7 @@ export default function Catalog() {
                         <Button 
                           variant={subCategory === "terrestres" ? "default" : "ghost"} 
                           size="sm"
+                          className="min-h-[44px]"
                           onClick={() => setSubCategory(subCategory === "terrestres" ? "" : "terrestres")}
                         >
                           Terrestres
@@ -229,6 +234,7 @@ export default function Catalog() {
                         <Button 
                           variant={subCategory === "aquaticos" ? "default" : "ghost"} 
                           size="sm"
+                          className="min-h-[44px]"
                           onClick={() => setSubCategory(subCategory === "aquaticos" ? "" : "aquaticos")}
                         >
                           Aquáticos
@@ -245,7 +251,7 @@ export default function Catalog() {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="h-4 w-4 p-0 ml-1"
+                    className="h-6 w-6 p-0 ml-1"
                     onClick={() => setSubCategory("")}
                   >
                     <X className="h-3 w-3" />
@@ -255,22 +261,22 @@ export default function Catalog() {
               )}
             </div>
             
-            <div className="flex items-center gap-2">
-              <div className="relative">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <div className="relative flex-1 sm:flex-none">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <input
                   type="text"
                   placeholder="Buscar espécie..."
-                  className="h-10 rounded-md border border-input pl-8 pr-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="h-10 w-full rounded-md border border-input pl-8 pr-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 />
               </div>
               
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" className="h-10 w-10">
                 <SortDesc className="h-4 w-4" />
                 <span className="sr-only">Ordenar</span>
               </Button>
               
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" className="h-10 w-10">
                 <Filter className="h-4 w-4" />
                 <span className="sr-only">Filtrar</span>
               </Button>
@@ -278,27 +284,27 @@ export default function Catalog() {
           </div>
           
           {/* Species Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
             {filteredSpecies.map((species) => (
               <div key={species.id} className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
-                <div className="relative h-60 overflow-hidden">
+                <div className="relative h-40 sm:h-60 overflow-hidden">
                   <img 
                     src={species.image}
                     alt={species.name} 
                     className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 sm:p-4">
                     <span className={`inline-block text-white text-xs px-2 py-1 rounded ${species.available ? 'bg-serpente-600' : 'bg-earth-600'}`}>
                       {species.available ? 'Disponível' : 'Pré-venda'}
                     </span>
                   </div>
                 </div>
-                <div className="p-4">
-                  <h3 className="font-bold text-lg mb-1">{species.name}</h3>
-                  <p className="text-muted-foreground text-sm mb-3">{species.commonName}</p>
-                  <div className="flex justify-between items-center">
-                    <span className="font-semibold text-lg text-serpente-600">R$ {species.price.toLocaleString('pt-BR')}</span>
-                    <Button variant="outline" size="sm">Ver Detalhes</Button>
+                <div className="p-3 sm:p-4">
+                  <h3 className="font-bold text-sm sm:text-lg mb-1 line-clamp-1">{species.name}</h3>
+                  <p className="text-muted-foreground text-xs sm:text-sm mb-2 sm:mb-3">{species.commonName}</p>
+                  <div className="flex justify-between items-center flex-col sm:flex-row gap-2 sm:gap-0">
+                    <span className="font-semibold text-base sm:text-lg text-serpente-600">R$ {species.price.toLocaleString('pt-BR')}</span>
+                    <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px] text-xs sm:text-sm">Ver Detalhes</Button>
                   </div>
                 </div>
               </div>

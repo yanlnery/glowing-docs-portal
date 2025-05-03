@@ -13,10 +13,12 @@ import {
 import { cn } from "@/lib/utils";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Menu, X, ShoppingCart, User, Book, Box, FileText, Users, Phone, Syringe } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const isMobile = useIsMobile();
   
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -99,7 +101,7 @@ export default function Header() {
       
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="fixed inset-0 top-16 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden">
+        <div className="fixed inset-0 top-16 z-50 bg-[#1a1a1a] md:hidden">
           <nav className="container py-8">
             <ul className="flex flex-col space-y-4">
               {menuItems.map((item) => (
@@ -107,7 +109,7 @@ export default function Header() {
                   <Link
                     to={item.path}
                     className={cn(
-                      "flex w-full rounded-md p-3 text-base font-medium",
+                      "flex w-full rounded-md p-4 text-base font-medium text-white min-h-[44px] items-center",
                       isActive(item.path) 
                         ? "bg-accent text-accent-foreground" 
                         : "hover:bg-accent/50"
@@ -119,15 +121,15 @@ export default function Header() {
                 </li>
               ))}
             </ul>
-            <div className="mt-8 flex items-center justify-between border-t pt-4">
+            <div className="mt-8 flex items-center justify-between border-t border-white/20 pt-4">
               <div className="flex items-center gap-4">
-                <Button variant="outline" size="sm" asChild>
+                <Button variant="outline" size="sm" className="min-h-[44px]" asChild>
                   <Link to="/area-cliente" onClick={() => setIsMenuOpen(false)}>
                     <User size={16} className="mr-2" />
                     Área do Cliente
                   </Link>
                 </Button>
-                <Button variant="outline" size="sm" asChild>
+                <Button variant="outline" size="sm" className="min-h-[44px]" asChild>
                   <Link to="/carrinho" onClick={() => setIsMenuOpen(false)}>
                     <ShoppingCart size={16} className="mr-2" />
                     Carrinho

@@ -262,7 +262,7 @@ export default function SpeciesDetail() {
           <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2">Espécie não encontrada</h1>
           <p className="mb-6 text-muted-foreground">Esta espécie não está disponível em nosso catálogo.</p>
-          <Button asChild>
+          <Button asChild className="min-h-[44px]">
             <Link to="/especies">Voltar para espécies</Link>
           </Button>
         </div>
@@ -271,10 +271,10 @@ export default function SpeciesDetail() {
   }
   
   return (
-    <div className="container px-4 py-12 sm:px-6">
+    <div className="container px-4 py-8 sm:py-12 sm:px-6">
       {/* Breadcrumb */}
       <div className="mb-6">
-        <Button variant="ghost" size="sm" asChild className="pl-0">
+        <Button variant="ghost" size="sm" asChild className="pl-0 min-h-[44px]">
           <Link to="/especies">
             <ChevronLeft className="h-4 w-4 mr-1" /> Voltar para Espécies
           </Link>
@@ -282,16 +282,16 @@ export default function SpeciesDetail() {
       </div>
       
       {/* Species Header */}
-      <div className="flex flex-col items-start mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold">{species.name}</h1>
-        <p className="text-xl text-muted-foreground">{species.commonName}</p>
+      <div className="flex flex-col items-start mb-6 sm:mb-8">
+        <h1 className="text-2xl md:text-4xl font-bold">{species.name}</h1>
+        <p className="text-lg sm:text-xl text-muted-foreground">{species.commonName}</p>
         <div className="mt-2 inline-block bg-muted text-muted-foreground text-xs px-3 py-1 rounded-full">
           {species.type === "serpente" ? "Serpente" : species.type === "lagarto" ? "Lagarto" : "Quelônio"}
         </div>
       </div>
       
       {/* Image Gallery and Details */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-12">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 sm:gap-8 mb-10 sm:mb-12">
         {/* Gallery */}
         <div className="lg:col-span-3">
           <div className="rounded-lg overflow-hidden">
@@ -309,13 +309,13 @@ export default function SpeciesDetail() {
               {species.gallery.map((img, idx) => (
                 <button 
                   key={idx}
-                  className={`rounded-md overflow-hidden border-2 ${selectedImage === img ? 'border-serpente-600' : 'border-transparent'}`}
+                  className={`rounded-md overflow-hidden border-2 min-h-[44px] ${selectedImage === img ? 'border-serpente-600' : 'border-transparent'}`}
                   onClick={() => setSelectedImage(img)}
                 >
                   <img 
                     src={img} 
                     alt={`${species.name} - imagem ${idx + 1}`}
-                    className="w-20 h-20 object-cover" 
+                    className="w-16 h-16 sm:w-20 sm:h-20 object-cover" 
                   />
                 </button>
               ))}
@@ -327,9 +327,9 @@ export default function SpeciesDetail() {
         <div className="lg:col-span-2">
           <Tabs defaultValue="description">
             <TabsList className="w-full">
-              <TabsTrigger value="description" className="flex-1">Descrição</TabsTrigger>
-              <TabsTrigger value="characteristics" className="flex-1">Características</TabsTrigger>
-              <TabsTrigger value="curiosities" className="flex-1">Curiosidades</TabsTrigger>
+              <TabsTrigger value="description" className="flex-1 min-h-[44px]">Descrição</TabsTrigger>
+              <TabsTrigger value="characteristics" className="flex-1 min-h-[44px]">Características</TabsTrigger>
+              <TabsTrigger value="curiosities" className="flex-1 min-h-[44px]">Curiosidades</TabsTrigger>
             </TabsList>
             
             <TabsContent value="description" className="mt-4">
@@ -385,9 +385,9 @@ export default function SpeciesDetail() {
       </div>
       
       {/* Related Species */}
-      <div className="mt-16">
-        <h2 className="text-2xl font-bold mb-6">Espécies Relacionadas</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="mt-12 sm:mt-16">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Espécies Relacionadas</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           {speciesList
             .filter(s => s.id !== Number(id) && s.type === species.type)
             .slice(0, 4)
@@ -400,11 +400,11 @@ export default function SpeciesDetail() {
                     className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
-                <div className="p-4">
-                  <h3 className="font-bold mb-1">{relatedSpecies.name}</h3>
-                  <p className="text-muted-foreground text-sm mb-3">{relatedSpecies.commonName}</p>
+                <div className="p-3 sm:p-4">
+                  <h3 className="font-bold text-sm sm:text-base mb-1 line-clamp-1">{relatedSpecies.name}</h3>
+                  <p className="text-muted-foreground text-xs sm:text-sm mb-2 sm:mb-3">{relatedSpecies.commonName}</p>
                   <div className="flex justify-end">
-                    <Button variant="outline" size="sm" asChild>
+                    <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px]" asChild>
                       <Link to={`/especies/${relatedSpecies.id}`}>Ver Detalhes</Link>
                     </Button>
                   </div>

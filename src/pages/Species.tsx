@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 
 // Mock data for species listing
 const speciesList = [
@@ -157,10 +157,10 @@ export default function Species() {
     : filteredSpecies;
     
   return (
-    <div className="container px-4 py-12 sm:px-6">
-      <div className="flex flex-col items-center mb-12 text-center">
+    <div className="container px-4 py-8 sm:py-12 sm:px-6">
+      <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">
         <div className="docs-section-title">
-          <h1 className="text-4xl font-bold">Espécies Criadas</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold">Espécies Criadas</h1>
         </div>
         <p className="text-muted-foreground max-w-2xl mt-4">
           Conheça todas as espécies criadas em nosso plantel, com informações detalhadas e características
@@ -182,10 +182,11 @@ export default function Species() {
           </div>
         </div>
         
-        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+        <div className="flex items-center gap-2 w-full sm:w-auto justify-end overflow-x-auto py-2 sm:py-0">
           <Button 
             variant={activeFilter === "todos" ? "outline" : "ghost"} 
             size="sm"
+            className="min-h-[44px]"
             onClick={() => setActiveFilter("todos")}
           >
             Todos
@@ -193,6 +194,7 @@ export default function Species() {
           <Button 
             variant={activeFilter === "serpente" ? "outline" : "ghost"} 
             size="sm"
+            className="min-h-[44px]"
             onClick={() => setActiveFilter("serpente")}
           >
             Serpentes
@@ -200,6 +202,7 @@ export default function Species() {
           <Button 
             variant={activeFilter === "lagarto" ? "outline" : "ghost"} 
             size="sm"
+            className="min-h-[44px]"
             onClick={() => setActiveFilter("lagarto")}
           >
             Lagartos
@@ -207,6 +210,7 @@ export default function Species() {
           <Button 
             variant={activeFilter === "quelonio" ? "outline" : "ghost"} 
             size="sm"
+            className="min-h-[44px]"
             onClick={() => setActiveFilter("quelonio")}
           >
             Quelônios
@@ -215,21 +219,21 @@ export default function Species() {
       </div>
       
       {/* Species Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
         {searchedSpecies.map((species) => (
           <div key={species.id} className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
-            <div className="relative h-60 overflow-hidden">
+            <div className="relative h-40 sm:h-60 overflow-hidden">
               <img 
                 src={species.image}
                 alt={species.name} 
                 className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
               />
             </div>
-            <div className="p-4">
-              <h3 className="font-bold text-lg mb-1">{species.name}</h3>
-              <p className="text-muted-foreground text-sm mb-3">{species.commonName}</p>
+            <div className="p-3 sm:p-4">
+              <h3 className="font-bold text-sm sm:text-lg mb-1 line-clamp-1">{species.name}</h3>
+              <p className="text-muted-foreground text-xs sm:text-sm mb-2 sm:mb-3">{species.commonName}</p>
               <div className="flex justify-end">
-                <Button variant="outline" size="sm" asChild>
+                <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px] text-xs sm:text-sm" asChild>
                   <Link to={`/especies/${species.id}`}>Ver Detalhes</Link>
                 </Button>
               </div>
