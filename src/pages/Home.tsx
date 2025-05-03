@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -25,11 +26,11 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mt-8">
-            {/* Species Card 1 */}
+            {/* Species Card 1 - Corrigido para Erythrolamprus miliaris (cobra-d'água) */}
             <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
               <div className="relative h-48 sm:h-64 overflow-hidden">
                 <img 
-                  src="/lovable-uploads/87bb79b7-12d7-41e7-9b09-a2a646636a7f.png" 
+                  src="/lovable-uploads/610934d9-5fa0-47d8-9148-cc584b051100.png" 
                   alt="Erythrolamprus miliaris" 
                   className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
                 />
@@ -48,11 +49,11 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Species Card 2 */}
+            {/* Species Card 2 - Corrigido para Tupinambis teguixin (teiú-amarelo) */}
             <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
               <div className="relative h-48 sm:h-64 overflow-hidden">
                 <img 
-                  src="/lovable-uploads/b81f6c0b-360a-4408-834b-cb20bd36e3da.png" 
+                  src="/lovable-uploads/921c3722-02d0-419b-b003-caa6b5de021d.png" 
                   alt="Tupinambis teguixin" 
                   className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
                 />
