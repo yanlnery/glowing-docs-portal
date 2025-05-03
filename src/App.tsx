@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +15,7 @@ import Academy from "./pages/Academy";
 import Contact from "./pages/Contact";
 import ClientArea from "./pages/ClientArea";
 import NotFound from "./pages/NotFound";
+import Quiz from "./pages/Quiz";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +38,10 @@ const App = () => (
           <Route path="/confirmacao-inscricao" element={<WebsiteLayout><Academy /></WebsiteLayout>} />
           <Route path="/contato" element={<WebsiteLayout><Contact /></WebsiteLayout>} />
           <Route path="/area-cliente" element={<WebsiteLayout><ClientArea /></WebsiteLayout>} />
+          {/* Rotas do Quiz */}
+          <Route path="/quiz" element={<WebsiteLayout><Quiz /></WebsiteLayout>} />
+          <Route path="/manuais-de-criacao" element={<WebsiteLayout><Manuals /></WebsiteLayout>} />
+          <Route path="/ps-academy" element={<WebsiteLayout><Academy /></WebsiteLayout>} />
           {/* Legacy routes - keeping for backward compatibility */}
           <Route path="/getting-started" element={<WebsiteLayout><Home /></WebsiteLayout>} />
           <Route path="/api" element={<WebsiteLayout><Home /></WebsiteLayout>} />
