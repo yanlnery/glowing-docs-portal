@@ -103,14 +103,14 @@ export default function Home() {
         </div>
       </section>
       
-      {/* About Section */}
+      {/* About Section - UPDATED WITH NEW IMAGE */}
       <section className="py-16 bg-muted/30 snake-pattern-bg">
         <div className="container px-4 sm:px-6">
           <div className="flex flex-col lg:flex-row gap-12 items-center">
             <div className="w-full lg:w-1/2">
               <img 
-                src="/lovable-uploads/420a5a2e-8cec-420f-89e1-3f9a584e00f7.png" 
-                alt="Yan Nery" 
+                src="/lovable-uploads/3b1edcbf-8480-4165-934c-0dfcb0ec9b59.png" 
+                alt="Pet Serpentes & Companhia" 
                 className="rounded-lg shadow-lg w-full h-auto object-cover aspect-[4/3]"
               />
             </div>
@@ -171,7 +171,7 @@ export default function Home() {
         </div>
       </section>
       
-      {/* Educational Content Preview - REESTRUTURADO */}
+      {/* Educational Content Preview */}
       <section className="py-16 bg-background">
         <div className="container px-4 sm:px-6">
           <div className="flex flex-col items-center mb-12 text-center">
