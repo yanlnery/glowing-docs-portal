@@ -101,7 +101,7 @@ export default function Header() {
       
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="fixed inset-0 top-16 z-50 bg-[#1a1a1a] md:hidden">
+        <div className="fixed inset-0 top-16 z-50 bg-black md:hidden">
           <nav className="container py-8">
             <ul className="flex flex-col space-y-4">
               {menuItems.map((item) => (
