@@ -30,6 +30,7 @@ const App = () => (
           <Route path="/catalogo" element={<WebsiteLayout><Catalog /></WebsiteLayout>} />
           <Route path="/especies" element={<WebsiteLayout><Species /></WebsiteLayout>} />
           <Route path="/especies/:id" element={<WebsiteLayout><SpeciesDetail /></WebsiteLayout>} />
+          <Route path="/especies-criadas/:slug" element={<WebsiteLayout><SpeciesDetail /></WebsiteLayout>} />
           <Route path="/manuais" element={<WebsiteLayout><Manuals /></WebsiteLayout>} />
           <Route path="/sobre" element={<WebsiteLayout><About /></WebsiteLayout>} />
           <Route path="/educacao" element={<WebsiteLayout><Education /></WebsiteLayout>} />
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/quiz" element={<WebsiteLayout><Quiz /></WebsiteLayout>} />
           <Route path="/manuais-de-criacao" element={<WebsiteLayout><Manuals /></WebsiteLayout>} />
           <Route path="/ps-academy" element={<WebsiteLayout><Academy /></WebsiteLayout>} />
+          
           {/* Legacy routes - keeping for backward compatibility */}
           <Route path="/getting-started" element={<WebsiteLayout><Home /></WebsiteLayout>} />
           <Route path="/api" element={<WebsiteLayout><Home /></WebsiteLayout>} />

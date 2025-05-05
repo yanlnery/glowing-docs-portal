@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { MapPin, Phone, Mail, MessageSquare, Instagram, Facebook, Youtube } from "lucide-react";
+import { Phone, Mail, MessageSquare, Instagram, Facebook, Youtube } from "lucide-react";
 
 export default function Contact() {
   return (
@@ -61,24 +61,12 @@ export default function Contact() {
           </div>
         </div>
         
-        {/* Contact Info & Map */}
+        {/* Contact Info - REMOVED ADDRESS AND MAP */}
         <div className="order-1 lg:order-2">
           <div className="mb-8">
             <h2 className="text-2xl font-bold mb-6">Informações de Contato</h2>
             
             <div className="space-y-4">
-              <div className="flex items-start">
-                <MapPin className="h-5 w-5 text-serpente-600 mr-3 mt-1" />
-                <div>
-                  <h3 className="font-medium">Endereço</h3>
-                  <address className="not-italic text-muted-foreground">
-                    Estrada do Criadouro, 123<br />
-                    Bairro Verde - Rio de Janeiro, RJ<br />
-                    CEP: 22000-000
-                  </address>
-                </div>
-              </div>
-              
               <div className="flex items-start">
                 <Phone className="h-5 w-5 text-serpente-600 mr-3 mt-1" />
                 <div>
@@ -135,23 +123,6 @@ export default function Contact() {
                   <Youtube className="h-5 w-5" />
                 </a>
               </div>
-            </div>
-          </div>
-          
-          <div className="rounded-lg overflow-hidden border shadow-sm h-80 bg-card">
-            {/* Embed Google Maps here */}
-            <div className="h-full w-full bg-muted flex items-center justify-center">
-              <p className="text-muted-foreground">Mapa do Google será carregado aqui</p>
-              {/* Uncomment and replace API_KEY with your Google Maps API key
-              <iframe
-                title="Pet Serpentes Location"
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                src="https://www.google.com/maps/embed/v1/place?key=API_KEY&q=Rio+de+Janeiro,Brasil"
-                allowFullScreen
-              ></iframe>
-              */}
             </div>
           </div>
         </div>

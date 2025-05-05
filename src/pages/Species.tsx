@@ -2,142 +2,177 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Search, X } from "lucide-react";
+import { Search } from "lucide-react";
 
-// Mock data for species listing
+// Updated species data with 21 species
 const speciesList = [
   {
     id: 1,
-    name: "Erythrolamprus miliaris",
-    commonName: "Cobra-d'água",
+    name: "Boa constrictor constrictor",
+    commonName: "Jiboia Amazônica",
     type: "serpente",
-    image: "/lovable-uploads/764f832e-e068-449d-80be-7d670575665f.png" // Jiboia filhote face
+    image: "/lovable-uploads/764f832e-e068-449d-80be-7d670575665f.png",
+    slug: "boa-constrictor-constrictor"
   },
   {
     id: 2,
-    name: "Tupinambis teguixin",
-    commonName: "Teiú-amarelo",
-    type: "lagarto",
-    image: "/lovable-uploads/b81f6c0b-360a-4408-834b-cb20bd36e3da.png" // Teiú amarelo
+    name: "Boa constrictor amarali",
+    commonName: "Jiboia do Cerrado",
+    type: "serpente",
+    image: "/lovable-uploads/f6e67c5c-183d-46ac-a882-997f826be1b3.png",
+    slug: "boa-constrictor-amarali"
   },
   {
     id: 3,
-    name: "Epicrates crassus",
-    commonName: "Jiboia-do-Cerrado",
+    name: "Boa atlantica",
+    commonName: "Jiboia da Mata Atlântica",
     type: "serpente",
-    image: "/lovable-uploads/c1a72b2c-2c6e-4822-9c71-13485444c48a.png" // Cobra amarela enrolada
+    image: "/lovable-uploads/c1a72b2c-2c6e-4822-9c71-13485444c48a.png",
+    slug: "boa-atlantica"
   },
   {
     id: 4,
-    name: "Lampropeltis triangulum",
-    commonName: "Falsa-coral",
+    name: "Epicrates cenchria",
+    commonName: "Jiboia Arco-íris da Amazônia",
     type: "serpente",
-    image: "/lovable-uploads/f7bc5a30-657d-418c-8b25-7b0494f36029.png" // Falsa-coral amarela e preta
+    image: "/lovable-uploads/f7bc5a30-657d-418c-8b25-7b0494f36029.png",
+    slug: "epicrates-cenchria"
   },
   {
     id: 5,
-    name: "Pantherophis guttatus",
-    commonName: "Corn Snake",
+    name: "Epicrates assisi",
+    commonName: "Jiboia Arco-íris da Caatinga",
     type: "serpente",
-    image: "/lovable-uploads/51de7896-4d25-4af0-af9d-31c8028fcc3b.png" // Corn snake mão
+    image: "/lovable-uploads/51de7896-4d25-4af0-af9d-31c8028fcc3b.png",
+    slug: "epicrates-assisi"
   },
   {
     id: 6,
-    name: "Eublepharis macularius",
-    commonName: "Leopard Gecko",
-    type: "lagarto",
-    image: "/lovable-uploads/11848f61-6118-4555-92b5-61760f34cf00.png" // Gecko amarelo e preto
+    name: "Epicrates crassus",
+    commonName: "Jiboia Arco-íris do Cerrado",
+    type: "serpente",
+    image: "/lovable-uploads/c1a72b2c-2c6e-4822-9c71-13485444c48a.png",
+    slug: "epicrates-crassus"
   },
   {
     id: 7,
-    name: "Chelonoidis carbonarius",
-    commonName: "Jabuti-piranga",
-    type: "quelonio",
-    image: "/lovable-uploads/90e09ad1-fa3b-48d6-9979-59f090220fcb.png" // Jabuti cabeça vermelha
+    name: "Epicrates maurus",
+    commonName: "Jiboia Arco-íris do Norte",
+    type: "serpente",
+    image: "/lovable-uploads/0e7c1a90-84bb-4471-908a-af3fcab85c04.png",
+    slug: "epicrates-maurus"
   },
   {
     id: 8,
-    name: "Trachemys scripta elegans",
-    commonName: "Tartaruga-de-orelha-vermelha",
-    type: "quelonio",
-    image: "/lovable-uploads/d7cd39f5-e491-4eb3-a10d-6cf8ad24669a.png" // Tartaruga aquática
+    name: "Corallus batesii",
+    commonName: "Jiboia Esmeralda",
+    type: "serpente",
+    image: "/lovable-uploads/6dcc0ef5-dc47-4f3c-9020-54ecc65ed390.png",
+    slug: "corallus-batesii"
   },
   {
     id: 9,
-    name: "Bothrops jararaca",
-    commonName: "Jararaca",
+    name: "Corallus hortulana",
+    commonName: "Suaçuboia",
     type: "serpente",
-    image: "/lovable-uploads/d71c2fb7-1bfe-41ba-8db3-d2d0b4279365.png" // Cobra amarela em tronco
+    image: "/lovable-uploads/87bb79b7-12d7-41e7-9b09-a2a646636a7f.png",
+    slug: "corallus-hortulana"
   },
   {
     id: 10,
-    name: "Iguana iguana",
-    commonName: "Iguana-verde",
-    type: "lagarto",
-    image: "/lovable-uploads/c138dc46-3fd6-4dda-aa7b-c02dead150e7.png" // Iguana verde em tronco
+    name: "Erythrolamprus miliaris",
+    commonName: "Cobra d'água",
+    type: "serpente",
+    image: "/lovable-uploads/764f832e-e068-449d-80be-7d670575665f.png",
+    slug: "erythrolamprus-miliaris"
   },
   {
     id: 11,
-    name: "Boa constrictor",
-    commonName: "Jiboia",
+    name: "Spilotes pullatus",
+    commonName: "Caninana",
     type: "serpente",
-    image: "/lovable-uploads/f6e67c5c-183d-46ac-a882-997f826be1b3.png" // Jiboia amarela enrolada
+    image: "/lovable-uploads/d71c2fb7-1bfe-41ba-8db3-d2d0b4279365.png",
+    slug: "spilotes-pullatus"
   },
   {
     id: 12,
-    name: "Crotalus durissus",
-    commonName: "Cascavel",
+    name: "Spilotes sulphureus",
+    commonName: "Caninana de Fogo",
     type: "serpente",
-    image: "/lovable-uploads/0e7c1a90-84bb-4471-908a-af3fcab85c04.png" // Cobra preta com amarelo
+    image: "/lovable-uploads/0e7c1a90-84bb-4471-908a-af3fcab85c04.png",
+    slug: "spilotes-sulphureus"
   },
   {
     id: 13,
-    name: "Salvator merianae",
-    commonName: "Teiú",
+    name: "Salvator teguixin",
+    commonName: "Teiú Dourado",
     type: "lagarto",
-    image: "/lovable-uploads/370accb0-50cf-459e-a966-c1fc135ecb83.png" // Teiú lingua de fora
+    image: "/lovable-uploads/b81f6c0b-360a-4408-834b-cb20bd36e3da.png",
+    slug: "salvator-teguixin"
   },
   {
     id: 14,
-    name: "Chelonoidis denticulatus",
-    commonName: "Jabuti-tinga",
-    type: "quelonio",
-    image: "/lovable-uploads/90e09ad1-fa3b-48d6-9979-59f090220fcb.png" // Reuso da foto do jabuti
+    name: "Salvator merianae",
+    commonName: "Teiú",
+    type: "lagarto",
+    image: "/lovable-uploads/370accb0-50cf-459e-a966-c1fc135ecb83.png",
+    slug: "salvator-merianae"
   },
   {
     id: 15,
-    name: "Lachesis muta",
-    commonName: "Surucucu-pico-de-jaca",
-    type: "serpente",
-    image: "/lovable-uploads/87bb79b7-12d7-41e7-9b09-a2a646636a7f.png" // Cobra d'água
+    name: "Iguana iguana",
+    commonName: "Iguana",
+    type: "lagarto",
+    image: "/lovable-uploads/c138dc46-3fd6-4dda-aa7b-c02dead150e7.png",
+    slug: "iguana-iguana"
   },
   {
     id: 16,
-    name: "Diploglossus fasciatus",
-    commonName: "Cobra-de-vidro",
+    name: "Diploglossus lessonae",
+    commonName: "Lagarto Coral",
     type: "lagarto",
-    image: "/lovable-uploads/481f8f82-22b1-407d-9e88-623e453faf6a.png" // Lagarto pequeno em planta
+    image: "/lovable-uploads/481f8f82-22b1-407d-9e88-623e453faf6a.png",
+    slug: "diploglossus-lessonae"
   },
   {
     id: 17,
-    name: "Micrurus corallinus",
-    commonName: "Coral-verdadeira",
-    type: "serpente",
-    image: "/lovable-uploads/6dcc0ef5-dc47-4f3c-9020-54ecc65ed390.png" // Cobra verde
+    name: "Polychrus marmoratus",
+    commonName: "Lagarto Preguiça",
+    type: "lagarto",
+    image: "/lovable-uploads/b11770a0-4aca-4362-aa63-c0e9a9d4df0c.png",
+    slug: "polychrus-marmoratus"
   },
   {
     id: 18,
-    name: "Phrynops geoffroanus",
-    commonName: "Cágado-de-barbicha",
-    type: "quelonio",
-    image: "/lovable-uploads/d7cd39f5-e491-4eb3-a10d-6cf8ad24669a.png" // Reuso da tartaruga
+    name: "Thecadactylus rapicauda",
+    commonName: "Lagartixa Rabo de Nabo",
+    type: "lagarto",
+    image: "/lovable-uploads/11848f61-6118-4555-92b5-61760f34cf00.png",
+    slug: "thecadactylus-rapicauda"
   },
   {
     id: 19,
-    name: "Tropidurus torquatus",
-    commonName: "Calango",
+    name: "Chelonoidis carbonaria",
+    commonName: "Jabuti Piranga",
+    type: "quelonio",
+    image: "/lovable-uploads/90e09ad1-fa3b-48d6-9979-59f090220fcb.png",
+    slug: "chelonoidis-carbonaria"
+  },
+  {
+    id: 20,
+    name: "Chelonoidis denticulata",
+    commonName: "Jabuti Tinga",
+    type: "quelonio",
+    image: "/lovable-uploads/90e09ad1-fa3b-48d6-9979-59f090220fcb.png",
+    slug: "chelonoidis-denticulata"
+  },
+  {
+    id: 21,
+    name: "Crocodilurus amazonicus",
+    commonName: "Jacarerana",
     type: "lagarto",
-    image: "/lovable-uploads/b11770a0-4aca-4362-aa63-c0e9a9d4df0c.png" // Lagarto sobre tronco
+    image: "/lovable-uploads/b11770a0-4aca-4362-aa63-c0e9a9d4df0c.png",
+    slug: "crocodilurus-amazonicus"
   }
 ];
 
@@ -230,11 +265,11 @@ export default function Species() {
               />
             </div>
             <div className="p-3 sm:p-4">
-              <h3 className="font-bold text-sm sm:text-lg mb-1 line-clamp-1">{species.name}</h3>
+              <h3 className="font-bold text-sm sm:text-lg mb-1 line-clamp-1"><em>{species.name}</em></h3>
               <p className="text-muted-foreground text-xs sm:text-sm mb-2 sm:mb-3">{species.commonName}</p>
               <div className="flex justify-end">
                 <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px] text-xs sm:text-sm" asChild>
-                  <Link to={`/especies/${species.id}`}>Ver Detalhes</Link>
+                  <Link to={`/especies-criadas/${species.slug}`}>Ver Detalhes</Link>
                 </Button>
               </div>
             </div>

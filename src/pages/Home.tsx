@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -25,53 +26,7 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mt-8">
-            {/* Species Card 1 - Corrigido para Erythrolamprus miliaris (cobra-d'água) */}
-            <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
-              <div className="relative h-48 sm:h-64 overflow-hidden">
-                <img 
-                  src="/lovable-uploads/610934d9-5fa0-47d8-9148-cc584b051100.png" 
-                  alt="Erythrolamprus miliaris" 
-                  className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                  <span className="inline-block bg-serpente-600 text-white text-xs px-2 py-1 rounded">Disponível</span>
-                </div>
-              </div>
-              <div className="p-4">
-                <h3 className="font-bold text-lg mb-1">Erythrolamprus miliaris</h3>
-                <p className="text-muted-foreground text-sm mb-3">Cobra-d'água</p>
-                <div className="flex justify-end items-center">
-                  <Button variant="outline" size="sm" className="min-h-[44px] w-full sm:w-auto" asChild>
-                    <Link to="/catalogo">Ver Detalhes</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
-            
-            {/* Species Card 2 - Corrigido para Tupinambis teguixin (teiú-amarelo) */}
-            <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
-              <div className="relative h-48 sm:h-64 overflow-hidden">
-                <img 
-                  src="/lovable-uploads/921c3722-02d0-419b-b003-caa6b5de021d.png" 
-                  alt="Tupinambis teguixin" 
-                  className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                  <span className="inline-block bg-serpente-600 text-white text-xs px-2 py-1 rounded">Disponível</span>
-                </div>
-              </div>
-              <div className="p-4">
-                <h3 className="font-bold text-lg mb-1">Tupinambis teguixin</h3>
-                <p className="text-muted-foreground text-sm mb-3">Teiú-amarelo</p>
-                <div className="flex justify-end items-center">
-                  <Button variant="outline" size="sm" className="min-h-[44px] w-full sm:w-auto" asChild>
-                    <Link to="/catalogo">Ver Detalhes</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
-            
-            {/* Species Card 3 */}
+            {/* Species Card 1 - Epicrates crassus */}
             <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
               <div className="relative h-48 sm:h-64 overflow-hidden">
                 <img 
@@ -84,11 +39,57 @@ export default function Home() {
                 </div>
               </div>
               <div className="p-4">
-                <h3 className="font-bold text-lg mb-1">Epicrates crassus</h3>
-                <p className="text-muted-foreground text-sm mb-3">Jiboia-do-Cerrado</p>
+                <h3 className="font-bold text-lg mb-1"><em>Epicrates crassus</em></h3>
+                <p className="text-muted-foreground text-sm mb-3">Jiboia Arco-íris do Cerrado</p>
                 <div className="flex justify-end items-center">
                   <Button variant="outline" size="sm" className="min-h-[44px] w-full sm:w-auto" asChild>
-                    <Link to="/catalogo">Ver Detalhes</Link>
+                    <Link to="/especies-criadas/epicrates-crassus">Ver Detalhes</Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Species Card 2 - Salvator merianae */}
+            <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
+              <div className="relative h-48 sm:h-64 overflow-hidden">
+                <img 
+                  src="/lovable-uploads/921c3722-02d0-419b-b003-caa6b5de021d.png" 
+                  alt="Salvator merianae" 
+                  className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                  <span className="inline-block bg-serpente-600 text-white text-xs px-2 py-1 rounded">Disponível</span>
+                </div>
+              </div>
+              <div className="p-4">
+                <h3 className="font-bold text-lg mb-1"><em>Salvator merianae</em></h3>
+                <p className="text-muted-foreground text-sm mb-3">Teiú</p>
+                <div className="flex justify-end items-center">
+                  <Button variant="outline" size="sm" className="min-h-[44px] w-full sm:w-auto" asChild>
+                    <Link to="/especies-criadas/salvator-merianae">Ver Detalhes</Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Species Card 3 - Corallus batesii */}
+            <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
+              <div className="relative h-48 sm:h-64 overflow-hidden">
+                <img 
+                  src="/lovable-uploads/c1a72b2c-2c6e-4822-9c71-13485444c48a.png" 
+                  alt="Corallus batesii" 
+                  className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                  <span className="inline-block bg-serpente-600 text-white text-xs px-2 py-1 rounded">Disponível</span>
+                </div>
+              </div>
+              <div className="p-4">
+                <h3 className="font-bold text-lg mb-1"><em>Corallus batesii</em></h3>
+                <p className="text-muted-foreground text-sm mb-3">Jiboia Esmeralda</p>
+                <div className="flex justify-end items-center">
+                  <Button variant="outline" size="sm" className="min-h-[44px] w-full sm:w-auto" asChild>
+                    <Link to="/especies-criadas/corallus-batesii">Ver Detalhes</Link>
                   </Button>
                 </div>
               </div>
@@ -103,7 +104,7 @@ export default function Home() {
         </div>
       </section>
       
-      {/* About Section - UPDATED WITH NEW IMAGE */}
+      {/* About Section - UPDATED WITH ADJUSTED IMAGE */}
       <section className="py-16 bg-muted/30 snake-pattern-bg">
         <div className="container px-4 sm:px-6">
           <div className="flex flex-col lg:flex-row gap-12 items-center">
@@ -111,7 +112,7 @@ export default function Home() {
               <img 
                 src="/lovable-uploads/3b1edcbf-8480-4165-934c-0dfcb0ec9b59.png" 
                 alt="Pet Serpentes & Companhia" 
-                className="rounded-lg shadow-lg w-full h-auto object-cover aspect-[4/3]"
+                className="rounded-lg shadow-lg w-full h-auto object-cover object-top aspect-[4/3]"
               />
             </div>
             <div className="w-full lg:w-1/2">
@@ -171,7 +172,7 @@ export default function Home() {
         </div>
       </section>
       
-      {/* Educational Content Preview */}
+      {/* Educational Content Preview - UPDATED SUBTITLE */}
       <section className="py-16 bg-background">
         <div className="container px-4 sm:px-6">
           <div className="flex flex-col items-center mb-12 text-center">
@@ -179,7 +180,7 @@ export default function Home() {
               <h2 className="text-3xl font-bold">Aprenda a Criar com Responsabilidade</h2>
             </div>
             <p className="text-muted-foreground max-w-2xl mt-4">
-              Guias e ferramentas para criadores iniciantes e entusiastas do hobby, com base em experiência real e prática legalizada.
+              Conteúdo gratuito e acessível para promover a posse responsável de répteis no Brasil
             </p>
           </div>
           
