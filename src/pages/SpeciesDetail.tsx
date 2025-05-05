@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -81,7 +82,17 @@ const speciesList = [
     image: "/lovable-uploads/f7bc5a30-657d-418c-8b25-7b0494f36029.png",
     gallery: [
       "/lovable-uploads/f7bc5a30-657d-418c-8b25-7b0494f36029.png"
-    ]
+    ],
+    description: "A *Epicrates cenchria* é a famosa **Jiboia Arco-íris da Amazônia**, reconhecida por seu brilho iridescente que reflete as cores do arco-íris sob luz natural. De porte médio e comportamento dócil, tornou-se uma das serpentes mais populares no terrarismo mundial.\n\nÉ ideal para criadores iniciantes ou intermediários que desejam uma serpente visualmente impactante e com boa adaptabilidade em cativeiro.",
+    characteristics: [
+      "Tamanho adulto: 1,8 a 2,4 metros",
+      "Comportamento: Tranquila e de fácil manuseio",
+      "Expectativa de vida: Até 25 anos",
+      "Atividade: Noturna",
+      "Alimentação: Roedores",
+      "Ambientação ideal: Alta umidade (70–80%), temperatura entre 26 °C e 30 °C, substrato natural e tocas"
+    ],
+    curiosities: "- O brilho do corpo vem da microestrutura das escamas, que refratam luz.\n- É um dos répteis brasileiros mais admirados no exterior.\n- Tem grande valor ecológico e está presente em vários programas de conservação.\n- O padrão de manchas varia entre indivíduos, mesmo dentro de uma mesma ninhada."
   },
   {
     id: 5,
@@ -92,7 +103,17 @@ const speciesList = [
     image: "/lovable-uploads/51de7896-4d25-4af0-af9d-31c8028fcc3b.png",
     gallery: [
       "/lovable-uploads/51de7896-4d25-4af0-af9d-31c8028fcc3b.png"
-    ]
+    ],
+    description: "A *Epicrates assisi*, conhecida como **Jiboia Arco-íris da Caatinga**, é endêmica do nordeste brasileiro e possui uma das aparências mais distintas entre as jiboias arco-íris. Menor e mais ágil, essa serpente se adapta muito bem ao clima semiárido e tem comportamento ativo.\n\nSua beleza e rusticidade a tornam uma ótima escolha para iniciantes no hobby.",
+    characteristics: [
+      "Tamanho adulto: 1,2 a 1,6 metros",
+      "Comportamento: Curiosa e ativa, mas tolerante ao manejo",
+      "Expectativa de vida: 18 a 22 anos",
+      "Atividade: Noturna",
+      "Alimentação: Roedores e pequenos répteis",
+      "Ambientação ideal: Baixa umidade, ventilação constante, temperatura entre 27 °C e 32 °C"
+    ],
+    curiosities: "- É considerada uma das menores jiboias do Brasil.\n- Possui padrão visual menos marcado que a *E. cenchria*, com tons mais discretos.\n- É uma das primeiras espécies de jiboias arco-íris legalmente reproduzidas em cativeiro no Brasil.\n- Se estressa menos com movimentação, o que facilita sua manutenção por iniciantes."
   },
   {
     id: 6,
@@ -103,7 +124,17 @@ const speciesList = [
     image: "/lovable-uploads/c1a72b2c-2c6e-4822-9c71-13485444c48a.png",
     gallery: [
       "/lovable-uploads/c1a72b2c-2c6e-4822-9c71-13485444c48a.png"
-    ]
+    ],
+    description: "A *Epicrates crassus* é conhecida como **Jiboia Arco-íris do Cerrado**. Muito semelhante visualmente à *E. cenchria*, essa espécie possui um corpo mais robusto e comportamento mais reservado. Por habitar regiões de vegetação mais aberta, é bastante adaptada ao clima seco.\n\nÉ indicada para criadores que desejam um animal bonito e mais discreto, com comportamento tranquilo.",
+    characteristics: [
+      "Tamanho adulto: 1,5 a 2 metros",
+      "Comportamento: Mais reservado, mas tolerante ao manejo",
+      "Expectativa de vida: Até 25 anos",
+      "Atividade: Noturna",
+      "Alimentação: Roedores e pequenos mamíferos",
+      "Ambientação ideal: Clima ameno e seco, substrato leve, temperatura entre 26 °C e 30 °C"
+    ],
+    curiosities: "- Costuma apresentar brilho iridescente menos intenso que a *E. cenchria*, mas ainda impressionante.\n- É uma das espécies mais fáceis de reproduzir em criadouros licenciados.\n- Apresenta resistência natural a doenças fúngicas, comuns em ambientes úmidos.\n- Raramente emite sinais de estresse, sendo considerada excelente para observação tranquila."
   },
   {
     id: 7,
@@ -114,7 +145,17 @@ const speciesList = [
     image: "/lovable-uploads/0e7c1a90-84bb-4471-908a-af3fcab85c04.png",
     gallery: [
       "/lovable-uploads/0e7c1a90-84bb-4471-908a-af3fcab85c04.png"
-    ]
+    ],
+    description: "A *Epicrates maurus*, ou **Jiboia Arco-íris do Norte**, habita regiões mais setentrionais da Amazônia e é menos conhecida comercialmente. Apresenta coloração escura, com tons terrosos profundos, e comportamento calmo, ideal para observadores.\n\nÉ uma boa escolha para criadores que buscam uma espécie discreta e exótica, com padrão visual incomum.",
+    characteristics: [
+      "Tamanho adulto: 1,3 a 1,8 metros",
+      "Comportamento: Extremamente tranquila e de baixa atividade",
+      "Expectativa de vida: 20 a 25 anos",
+      "Atividade: Noturna",
+      "Alimentação: Roedores e aves pequenas",
+      "Ambientação ideal: Clima úmido, pouca luz direta, substrato natural e troncos para esconderijo"
+    ],
+    curiosities: "- Raramente é encontrada em criadouros, sendo uma das mais raras do gênero.\n- Sua coloração camuflada a torna quase invisível no ambiente natural.\n- Emite vibrações corporais quando estressada, como forma de defesa passiva.\n- É uma das poucas jiboias que raramente se enrola para dormir — prefere se manter esticada em ambientes seguros."
   },
   {
     id: 8,
@@ -125,7 +166,17 @@ const speciesList = [
     image: "/lovable-uploads/6dcc0ef5-dc47-4f3c-9020-54ecc65ed390.png",
     gallery: [
       "/lovable-uploads/6dcc0ef5-dc47-4f3c-9020-54ecc65ed390.png"
-    ]
+    ],
+    description: "A *Corallus batesii*, chamada de **Jiboia Esmeralda**, é uma das serpentes mais estonteantes do mundo. Sua coloração verde vibrante com manchas brancas em forma de raio contrasta com o ventre amarelo intenso, criando um visual hipnótico.\n\nÉ uma serpente exigente e de difícil manejo, geralmente mantida por criadores experientes voltados à observação, fotografia ou reprodução.",
+    characteristics: [
+      "Tamanho adulto: 1,6 a 2,2 metros",
+      "Comportamento: Muito territorial e estressável",
+      "Expectativa de vida: Até 20 anos",
+      "Atividade: Noturna",
+      "Alimentação: Pequenos mamíferos e aves",
+      "Ambientação ideal: Alta umidade (75–85%), iluminação indireta, galhos resistentes, temperatura controlada entre 25 °C e 29 °C"
+    ],
+    curiosities: "- Seu nome homenageia Henry Walter Bates, naturalista britânico que explorou a Amazônia.\n- É muitas vezes confundida com a *Corallus caninus*, mas possui diferenças anatômicas e comportamentais.\n- Tem uma das mordidas mais rápidas entre os boídeos.\n- Quando em repouso, costuma manter o corpo enrolado em galhos com a cabeça no centro — uma postura clássica de emboscada."
   },
   {
     id: 9,
@@ -136,7 +187,17 @@ const speciesList = [
     image: "/lovable-uploads/87bb79b7-12d7-41e7-9b09-a2a646636a7f.png",
     gallery: [
       "/lovable-uploads/87bb79b7-12d7-41e7-9b09-a2a646636a7f.png"
-    ]
+    ],
+    description: "A *Corallus hortulana*, conhecida popularmente como **Suaçuboia**, é uma serpente arborícola nativa do Brasil, com hábitos noturnos e comportamento observacional. Seu corpo esguio e a variedade de colorações — do verde-limão ao acinzentado — chamam atenção de entusiastas por animais exóticos.\n\nDevido ao seu comportamento defensivo e sensibilidade ao toque, é mais indicada para criadores avançados ou focados em observação.",
+    characteristics: [
+      "Tamanho adulto: 1,4 a 1,8 metros",
+      "Comportamento: Defensiva, prefere pouca manipulação",
+      "Expectativa de vida: 15 a 20 anos",
+      "Atividade: Noturna",
+      "Alimentação: Aves e roedores",
+      "Ambientação ideal: Altura, galhos para escalada, iluminação difusa e boa umidade (65–80%)"
+    ],
+    curiosities: "- Possui sensores térmicos entre as escamas labiais para detectar presas no escuro.\n- Tem a dentição mais longa do que a maioria das serpentes brasileiras.\n- Não tolera ambientes secos — a umidade inadequada pode causar lesões respiratórias.\n- Mesmo em cativeiro, pode passar longos períodos sem se alimentar voluntariamente."
   },
   {
     id: 10,
@@ -148,7 +209,17 @@ const speciesList = [
     gallery: [
       "/lovable-uploads/764f832e-e068-449d-80be-7d670575665f.png",
       "/lovable-uploads/87bb79b7-12d7-41e7-9b09-a2a646636a7f.png"
-    ]
+    ],
+    description: "A *Erythrolamprus miliaris*, chamada popularmente de **Cobra d'Água**, é uma serpente semi-aquática e diurna, amplamente distribuída no Brasil. Pequena, discreta e inofensiva, é uma das melhores espécies para iniciantes no hobby.\n\nÉ uma excelente introdução ao mundo das serpentes, ideal para espaços reduzidos e ambientes educativos.",
+    characteristics: [
+      "Tamanho adulto: 60 cm a 1 metro",
+      "Comportamento: Dócil, ativa e curiosa",
+      "Expectativa de vida: 12 a 15 anos",
+      "Atividade: Diurna",
+      "Alimentação: Peixes, pequenos anfíbios e, em cativeiro, roedores adaptados",
+      "Ambientação ideal: Área com piscina ou recipiente d'água, substrato úmido e plantas"
+    ],
+    curiosities: "- Tem escamas suaves e coloração que camufla entre folhas úmidas.\n- É uma das serpentes mais tranquilas para se iniciar no manejo.\n- Raramente morde — emite um cheiro forte como defesa passiva (Descarga Cloacal).\n- Pode ser criada com enriquecimento aquático, o que favorece seu comportamento natural."
   },
   {
     id: 11,
@@ -159,7 +230,17 @@ const speciesList = [
     image: "/lovable-uploads/d71c2fb7-1bfe-41ba-8db3-d2d0b4279365.png",
     gallery: [
       "/lovable-uploads/d71c2fb7-1bfe-41ba-8db3-d2d0b4279365.png"
-    ]
+    ],
+    description: "A *Spilotes pullatus*, chamada de **Caninana**, é uma das serpentes mais conhecidas do Brasil. De comportamento ativo, corpo ágil e coloração marcante (preta com manchas amarelas), é temida injustamente por muitos, apesar de não ser peçonhenta.\n\nÉ ideal para observadores experientes, pois exige bastante espaço e pode apresentar comportamento defensivo quando acuada.",
+    characteristics: [
+      "Tamanho adulto: 2 a 2,5 metros",
+      "Comportamento: Ágil, defensiva e muito ativa",
+      "Expectativa de vida: 15 a 20 anos",
+      "Atividade: Diurna",
+      "Alimentação: Aves, roedores e répteis",
+      "Ambientação ideal: Recintos longos, com troncos para escalada, boa ventilação e temperatura entre 26 °C e 32 °C"
+    ],
+    curiosities: "- Costuma vibrar a cauda como forma de aviso, semelhante a cascavéis.\n- Apesar do porte imponente, é completamente inofensiva ao ser humano.\n- Pode subir em árvores com extrema agilidade.\n- Seu nome popular virou sinônimo de algo \"valente e arisco\".\n- Quando ameaçada, se achata lateralmente e assopra, emitindo som."
   },
   {
     id: 12,
@@ -170,7 +251,17 @@ const speciesList = [
     image: "/lovable-uploads/0e7c1a90-84bb-4471-908a-af3fcab85c04.png",
     gallery: [
       "/lovable-uploads/0e7c1a90-84bb-4471-908a-af3fcab85c04.png"
-    ]
+    ],
+    description: "A *Spilotes sulphureus*, chamada de **Caninana de Fogo**, é uma parente próxima da *S. pullatus*, mas com coloração mais clara e vibrante. Endêmica de áreas de floresta tropical, é uma serpente imponente, veloz e de comportamento reativo.\n\nNão indicada para iniciantes, mas extremamente valorizada por colecionadores e projetos de educação ambiental.",
+    characteristics: [
+      "Tamanho adulto: 2 a 2,3 metros",
+      "Comportamento: Muito ativa, defensiva e veloz",
+      "Expectativa de vida: 15 a 20 anos",
+      "Atividade: Diurna",
+      "Alimentação: Pequenos vertebrados",
+      "Ambientação ideal: Espaço amplo, boa iluminação, galhos para escalada, substrato seco e ventilação constante"
+    ],
+    curiosities: "- Seu nome vem da coloração amarela vibrante que lembra \"chamas\".\n- Pode subir em árvores com velocidade impressionante.\n- Raramente é mantida em cativeiro fora de criadouros licenciados.\n- Apesar de brava, raramente morde — prefere fugir rapidamente.\n- O *Pseustes sulphureus* é tratado como sinônimo por alguns autores da *Spilotes sulphureus*\n- Quando ameaçada, se achata lateralmente e assopra, emitindo som."
   },
   {
     id: 13,
@@ -181,7 +272,17 @@ const speciesList = [
     image: "/lovable-uploads/b81f6c0b-360a-4408-834b-cb20bd36e3da.png",
     gallery: [
       "/lovable-uploads/b81f6c0b-360a-4408-834b-cb20bd36e3da.png"
-    ]
+    ],
+    description: "O *Salvator teguixin*, ou **Teiú Dourado**, é uma versão mais ágil e esguia do teiú tradicional. Com coloração vibrante e comportamento mais desconfiado, é indicado para criadores com experiência ou foco em observação.\n\nMenor que o *S. merianae*, é uma boa alternativa para quem deseja criar um teiú em espaços medianos.",
+    characteristics: [
+      "Tamanho adulto: 90 cm a 1,1 metros",
+      "Comportamento: Ágil, desconfiado, curioso",
+      "Expectativa de vida: Até 15 anos",
+      "Atividade: Diurna",
+      "Alimentação: Onívoro",
+      "Ambientação ideal: Substrato seco, tocas e galhos baixos"
+    ],
+    curiosities: "- Seu brilho dourado é mais acentuado na fase juvenil.\n- Se adapta tão facilmente ao contato humano quanto o *S. merianae*.\n- Emite sopros como forma de defesa.\n- É especialista em escavar buracos em recintos."
   },
   {
     id: 14,
@@ -193,7 +294,17 @@ const speciesList = [
     gallery: [
       "/lovable-uploads/370accb0-50cf-459e-a966-c1fc135ecb83.png",
       "/lovable-uploads/b81f6c0b-360a-4408-834b-cb20bd36e3da.png"
-    ]
+    ],
+    description: "O *Salvator merianae*, conhecido como **Teiú**, é um dos maiores lagartos da América do Sul. Inteligente, interativo e com forte capacidade de adaptação, é uma das espécies mais procuradas no Brasil por criadores que desejam um réptil de comportamento interessante.\n\nÉ uma excelente espécie para tutores experientes que têm espaço e dedicação para o manejo adequado.",
+    characteristics: [
+      "Tamanho adulto: Até 1,4 metros",
+      "Comportamento: Inteligente, ativo e interativo",
+      "Expectativa de vida: 15 a 20 anos",
+      "Atividade: Diurna",
+      "Alimentação: Onívoro (frutas, ovos, carnes e vegetais)",
+      "Ambientação ideal: Grande área terrestre, tocas, luz UVB, aquecimento"
+    ],
+    curiosities: "- Entra em brumação (sono leve) no inverno.\n- Reconhece vozes e pessoas ao longo do tempo.\n- Pode ser treinado a fazer necessidades em um local fixo.\n- Necessita de rotina rígida para socialização desde filhote."
   },
   {
     id: 15,
@@ -204,7 +315,17 @@ const speciesList = [
     image: "/lovable-uploads/c138dc46-3fd6-4dda-aa7b-c02dead150e7.png",
     gallery: [
       "/lovable-uploads/c138dc46-3fd6-4dda-aa7b-c02dead150e7.png"
-    ]
+    ],
+    description: "A *Iguana iguana* é um dos répteis mais populares do mundo, conhecida por sua beleza exótica e comportamento arborícola. Exige cuidados específicos com alimentação, espaço e exposição solar, sendo indicada para criadores que buscam um compromisso de longo prazo.\n\nPode atingir grandes dimensões e desenvolver forte vínculo com o tutor se bem socializada desde filhote.",
+    characteristics: [
+      "Tamanho adulto: Até 1,8 metros",
+      "Comportamento: Territorial, arborícola e observacional",
+      "Expectativa de vida: 15 a 20 anos",
+      "Atividade: Diurna",
+      "Alimentação: Herbívora (folhas, flores, frutas)",
+      "Ambientação ideal: Espaço vertical, luz solar direta ou UVB potente, temperatura entre 28 °C e 34 °C"
+    ],
+    curiosities: "- Possui um terceiro olho sensível à luz no topo da cabeça.\n- Pode mudar de cor levemente dependendo da temperatura.\n- Seu chicote caudal é usado como defesa.\n- Requer alta umidade e rotina alimentar equilibrada."
   },
   {
     id: 16,
@@ -215,7 +336,17 @@ const speciesList = [
     image: "/lovable-uploads/481f8f82-22b1-407d-9e88-623e453faf6a.png",
     gallery: [
       "/lovable-uploads/481f8f82-22b1-407d-9e88-623e453faf6a.png"
-    ]
+    ],
+    description: "O *Diploglossus lessonae*, ou **Lagarto Coral**, é uma espécie terrestre e escavadora, rara em cativeiro. Com corpo robusto e hábito reservado, chama atenção por sua aparência exótica e comportamento discreto.\n\nExcelente para criadores que desejam observar padrões naturais e comportamento de forrageamento.",
+    characteristics: [
+      "Tamanho adulto: 30 a 40 cm",
+      "Comportamento: Reservado, escavador, observacional",
+      "Expectativa de vida: 10 a 12 anos",
+      "Atividade: Diurna",
+      "Alimentação: Insetívoro e onívoro",
+      "Ambientação ideal: Substrato profundo, folhas secas, esconderijos e toca úmida"
+    ],
+    curiosities: "- Tem escamas lisas e aparência semelhante a uma cobra com patas.\n- Costuma se enterrar rapidamente ao menor sinal de ameaça.\n- Pouco comum em criadouros comerciais.\n- Se adaptam melhor a ambientes com folhas e galhos secos."
   },
   {
     id: 17,
@@ -226,7 +357,17 @@ const speciesList = [
     image: "/lovable-uploads/b11770a0-4aca-4362-aa63-c0e9a9d4df0c.png",
     gallery: [
       "/lovable-uploads/b11770a0-4aca-4362-aa63-c0e9a9d4df0c.png"
-    ]
+    ],
+    description: "O *Polychrus marmoratus*, conhecido como **Lagarto Preguiça**, é uma joia entre os répteis tropicais. De movimentação lenta, comportamento pacífico e coloração camuflada, é perfeito para espaços verticais e com plantas naturais.\n\nIdeal para criadores que querem um lagarto único, com hábitos diferenciados.",
+    characteristics: [
+      "Tamanho adulto: Até 30 cm",
+      "Comportamento: Pacífico, observacional, lento",
+      "Expectativa de vida: 8 a 10 anos",
+      "Atividade: Diurna",
+      "Alimentação: Insetívoro",
+      "Ambientação ideal: Terrário bioativo com folhagens, umidade e galhos verticais"
+    ],
+    curiosities: "- Seu nome vem do jeito vagaroso de se movimentar.\n- Tem capacidade limitada de trocar de cor.\n- Gosta de ambientes úmidos e pouco barulho.\n- É sensível ao estresse — precisa de local tranquilo."
   },
   {
     id: 18,
@@ -237,7 +378,17 @@ const speciesList = [
     image: "/lovable-uploads/11848f61-6118-4555-92b5-61760f34cf00.png",
     gallery: [
       "/lovable-uploads/11848f61-6118-4555-92b5-61760f34cf00.png"
-    ]
+    ],
+    description: "A *Thecadactylus rapicauda*, chamada de **Lagartixa Rabo de Nabo**, é uma espécie arborícola noturna com aparência robusta e olhos expressivos. Vive bem em grupos e é ativa durante a noite, sendo uma excelente opção para quem deseja um réptil diferente.\n\nÉ ideal para terrários verticais e pouco iluminados.",
+    characteristics: [
+      "Tamanho adulto: Até 14 cm",
+      "Comportamento: Sociável, ágil, noturno",
+      "Expectativa de vida: 10 a 12 anos",
+      "Atividade: Noturna",
+      "Alimentação: Insetívora",
+      "Ambientação ideal: Terrários verticais com esconderijos e paredes ásperas"
+    ],
+    curiosities: "- Pode emitir sons agudos semelhantes a grilos.\n- Seu rabo grosso funciona como reserva de gordura.\n- Tem a habilidade de escalar vidros e superfícies lisas.\n- Prefere ambientes escuros e úmidos."
   },
   {
     id: 19,
@@ -248,7 +399,17 @@ const speciesList = [
     image: "/lovable-uploads/90e09ad1-fa3b-48d6-9979-59f090220fcb.png",
     gallery: [
       "/lovable-uploads/90e09ad1-fa3b-48d6-9979-59f090220fcb.png"
-    ]
+    ],
+    description: "O *Chelonoidis carbonaria*, conhecido como **Jabuti Piranga**, é um dos quelônios terrestres mais criados no Brasil. De comportamento dócil, é ativo durante o dia e pode ser criado em jardins com segurança.\n\nÉ ideal para criadores que buscam um animal longevo, de fácil manejo e visual encantador.",
+    characteristics: [
+      "Tamanho adulto: 30 a 40 cm",
+      "Comportamento: Lento, dócil, explorador",
+      "Expectativa de vida: 40 a 60 anos",
+      "Atividade: Diurna",
+      "Alimentação: Herbívora com suplementação de cálcio",
+      "Ambientação ideal: Área externa, sombra, abrigo contra frio e chuva"
+    ],
+    curiosities: "- Suas escamas de cor laranja ajudam na identificação.\n- Interagem com o ambiente e reconhecem padrões.\n- Podem viver décadas com alimentação e sol adequados.\n- Costumam ter hábitos bem previsíveis."
   },
   {
     id: 20,
@@ -259,7 +420,17 @@ const speciesList = [
     image: "/lovable-uploads/90e09ad1-fa3b-48d6-9979-59f090220fcb.png",
     gallery: [
       "/lovable-uploads/90e09ad1-fa3b-48d6-9979-59f090220fcb.png"
-    ]
+    ],
+    description: "O *Chelonoidis denticulata*, chamado de **Jabuti Tinga**, é o maior jabuti das Américas. Com comportamento tranquilo, é menos ativo que o piranga e prefere áreas sombreadas e úmidas.\n\nIdeal para áreas externas amplas e com temperatura controlada, é um símbolo de longevidade e tranquilidade.",
+    characteristics: [
+      "Tamanho adulto: 40 a 50 cm",
+      "Comportamento: Calmo, reservado, observador",
+      "Expectativa de vida: 60 anos ou mais",
+      "Atividade: Diurna",
+      "Alimentação: Frutas, flores e folhas verdes",
+      "Ambientação ideal: Sombra constante, abrigo úmido e área ampla"
+    ],
+    curiosities: "- Possui coloração mais escura que o piranga.\n- É menos ativo, mas muito longevo.\n- Costuma se esconder sob folhas e galhos.\n- Pode conviver com outros jabutis sem problemas."
   },
   {
     id: 21,
@@ -270,7 +441,17 @@ const speciesList = [
     image: "/lovable-uploads/b11770a0-4aca-4362-aa63-c0e9a9d4df0c.png",
     gallery: [
       "/lovable-uploads/b11770a0-4aca-4362-aa63-c0e9a9d4df0c.png"
-    ]
+    ],
+    description: "A *Crocodilurus amazonicus*, chamada popularmente de **Jacarerana**, é um lagarto semiaquático raro e fascinante. De corpo achatado e cauda achatada lateralmente, lembra um pequeno jacaré. Vive tanto em terra quanto em ambientes alagados.\n\nPerfeita para criadores avançados, com sistema aquático em funcionamento e foco em espécies amazônicas.",
+    characteristics: [
+      "Tamanho adulto: Até 1 metro",
+      "Comportamento: Ágil, semiaquático, discreto",
+      "Expectativa de vida: 12 a 15 anos",
+      "Atividade: Diurna",
+      "Alimentação: Peixes, insetos e carnes magras",
+      "Ambientação ideal: Aquaterrário com áreas secas e aquáticas bem definidas"
+    ],
+    curiosities: "- Nada com habilidade e pode permanecer submerso por longos períodos.\n- Sua cauda atua como leme aquático.\n- É extremamente sensível à movimentação brusca.\n- Ainda pouco difundida no hobby, mas de grande valor ecológico."
   }
   // The rest of the 21 species would follow the same format
 ];
