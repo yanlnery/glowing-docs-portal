@@ -30,7 +30,7 @@ export default function About() {
           <div className="flex flex-col lg:flex-row gap-12 items-center">
             <div className="w-full lg:w-1/2">
               <img 
-                src="/lovable-uploads/e045c67b-a1d3-4a76-9c84-7a52ef1a076f.png" 
+                src="/lovable-uploads/6a2fd199-0d12-4c44-986a-c3bd3551768e.png" 
                 alt="Yan Nery" 
                 className="rounded-lg shadow-lg w-full h-auto object-cover aspect-[4/3]"
               />
