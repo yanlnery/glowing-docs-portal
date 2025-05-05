@@ -24,13 +24,13 @@ export default function About() {
         </div>
       </section>
       
-      {/* Founder Story */}
+      {/* Founder Story - UPDATED IMAGE */}
       <section className="py-16 bg-background">
         <div className="container px-4 sm:px-6">
           <div className="flex flex-col lg:flex-row gap-12 items-center">
             <div className="w-full lg:w-1/2">
               <img 
-                src="/lovable-uploads/512cf52a-d274-4b7c-9451-f807b6f9a431.png" 
+                src="/lovable-uploads/e045c67b-a1d3-4a76-9c84-7a52ef1a076f.png" 
                 alt="Yan Nery" 
                 className="rounded-lg shadow-lg w-full h-auto object-cover aspect-[4/3]"
               />

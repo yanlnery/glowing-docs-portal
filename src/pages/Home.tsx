@@ -104,7 +104,7 @@ export default function Home() {
         </div>
       </section>
       
-      {/* About Section - UPDATED WITH ADJUSTED IMAGE */}
+      {/* About Section - UPDATED WITH ADJUSTED IMAGE POSITION */}
       <section className="py-16 bg-muted/30 snake-pattern-bg">
         <div className="container px-4 sm:px-6">
           <div className="flex flex-col lg:flex-row gap-12 items-center">
@@ -112,7 +112,7 @@ export default function Home() {
               <img 
                 src="/lovable-uploads/3b1edcbf-8480-4165-934c-0dfcb0ec9b59.png" 
                 alt="Pet Serpentes & Companhia" 
-                className="rounded-lg shadow-lg w-full h-auto object-cover object-top aspect-[4/3]"
+                className="rounded-lg shadow-lg w-full h-auto object-cover object-bottom aspect-[4/3]"
               />
             </div>
             <div className="w-full lg:w-1/2">

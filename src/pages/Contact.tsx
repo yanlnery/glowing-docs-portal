@@ -1,12 +1,50 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Phone, Mail, MessageSquare, Instagram, Facebook, Youtube } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function Contact() {
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: ""
+  });
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Simulate form submission
+    setTimeout(() => {
+      toast({
+        title: "Mensagem enviada!",
+        description: "Em breve entraremos em contato com você.",
+        variant: "default",
+      });
+      setIsSubmitting(false);
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        subject: "",
+        message: ""
+      });
+    }, 1500);
+  };
+
   return (
     <div className="container px-4 py-12 sm:px-6">
       <div className="flex flex-col items-center mb-12 text-center">
@@ -24,26 +62,50 @@ export default function Contact() {
           <div className="bg-card border rounded-lg p-6 shadow-sm">
             <h2 className="text-2xl font-bold mb-6">Envie-nos uma mensagem</h2>
             
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Nome</Label>
-                  <Input id="name" placeholder="Seu nome" required />
+                  <Input 
+                    id="name" 
+                    placeholder="Seu nome" 
+                    required 
+                    value={formData.name}
+                    onChange={handleChange}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">E-mail</Label>
-                  <Input id="email" type="email" placeholder="seu.email@exemplo.com" required />
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="seu.email@exemplo.com" 
+                    required 
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
                 </div>
               </div>
               
               <div className="space-y-2">
                 <Label htmlFor="phone">Telefone</Label>
-                <Input id="phone" placeholder="(00) 00000-0000" />
+                <Input 
+                  id="phone" 
+                  placeholder="(00) 00000-0000" 
+                  value={formData.phone}
+                  onChange={handleChange}
+                />
               </div>
               
               <div className="space-y-2">
                 <Label htmlFor="subject">Assunto</Label>
-                <Input id="subject" placeholder="Assunto da sua mensagem" required />
+                <Input 
+                  id="subject" 
+                  placeholder="Assunto da sua mensagem" 
+                  required 
+                  value={formData.subject}
+                  onChange={handleChange}
+                />
               </div>
               
               <div className="space-y-2">
@@ -53,10 +115,18 @@ export default function Contact() {
                   placeholder="Descreva sua dúvida ou solicitação..." 
                   rows={5} 
                   required 
+                  value={formData.message}
+                  onChange={handleChange}
                 />
               </div>
               
-              <Button type="submit" className="w-full">Enviar Mensagem</Button>
+              <Button 
+                type="submit" 
+                className="w-full min-h-[44px]"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Enviando..." : "Enviar Mensagem"}
+              </Button>
             </form>
           </div>
         </div>
