@@ -1,152 +1,63 @@
 
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { useCartStore } from '@/stores/cartStore';
 import WebsiteLayout from '@/layouts/WebsiteLayout';
-import { productService } from '@/services/productService';
-import { Product } from '@/types/product';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
-import {
-  ArrowLeft,
-  CircleDollarSign,
-  ImageIcon,
-  ShoppingCart,
-  ExternalLink,
-  MessageSquare,
-} from 'lucide-react';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
-
-// Get settings from localStorage
-const getSettings = () => {
-  try {
-    const settingsData = localStorage.getItem('pet_serpentes_admin_settings');
-    return settingsData 
-      ? JSON.parse(settingsData) 
-      : {
-          whatsappNumber: '5521999999999',
-          whatsappDefaultMessage: 'Olá! Acabei de realizar a compra do [NOME DO ANIMAL] no site PetSerpentes. Este é o comprovante/link que recebi: [URL DO PAGAMENTO]. Aguardando confirmação. Obrigado!',
-        };
-  } catch (error) {
-    console.error('Failed to load settings:', error);
-    return {
-      whatsappNumber: '5521999999999',
-      whatsappDefaultMessage: 'Olá! Acabei de realizar a compra do [NOME DO ANIMAL] no site PetSerpentes. Este é o comprovante/link que recebi: [URL DO PAGAMENTO]. Aguardando confirmação. Obrigado!',
-    };
-  }
-};
+import { Badge } from '@/components/ui/badge';
+import { Star, ShoppingCart, ArrowLeft, CheckCircle } from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
+import { productService } from '@/services/productService';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
-  const { toast } = useToast();
-  const navigate = useNavigate();
-
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [quantity, setQuantity] = useState(1);
+  const { addToCart } = useCartStore();
+  
   useEffect(() => {
     window.scrollTo(0, 0);
-    loadProduct();
+    
+    if (id) {
+      const foundProduct = productService.getProductById(id);
+      setProduct(foundProduct);
+      if (foundProduct?.images && foundProduct.images.length > 0) {
+        setSelectedImage(foundProduct.images[0].url);
+      }
+      setLoading(false);
+    }
   }, [id]);
-
-  const loadProduct = () => {
-    setIsLoading(true);
-    
-    // Check if id exists
-    if (!id) {
-      setIsLoading(false);
-      toast({
-        title: "Produto não encontrado",
-        description: "O produto que você está procurando não existe.",
-        variant: "destructive",
-      });
-      navigate('/catalogo');
-      return;
-    }
-    
-    // Try to find the product
-    const foundProduct = productService.getById(id);
-    
-    if (!foundProduct) {
-      setIsLoading(false);
-      toast({
-        title: "Produto não encontrado",
-        description: "O produto que você está procurando não existe.",
-        variant: "destructive",
-      });
-      navigate('/catalogo');
-      return;
-    }
-    
-    // Check if product is visible and available
-    if (!foundProduct.visible) {
-      setIsLoading(false);
-      toast({
-        title: "Produto indisponível",
-        description: "Este produto não está mais disponível para visualização.",
-        variant: "destructive",
-      });
-      navigate('/catalogo');
-      return;
-    }
-    
-    setProduct(foundProduct);
-    setIsLoading(false);
-  };
-
-  const handleGoBack = () => {
-    navigate(-1);
-  };
-
-  const handleBuyNow = () => {
-    setShowPaymentDialog(true);
-  };
-
-  const handleExternalPayment = () => {
-    if (!product || !product.paymentLink) return;
-    
-    // Open the payment link in a new tab
-    window.open(product.paymentLink, '_blank');
-    setShowPaymentDialog(false);
-  };
-
-  const handleWhatsAppRedirect = () => {
-    if (!product) return;
-    
-    const settings = getSettings();
-    const phoneNumber = settings.whatsappNumber;
-    
-    // Replace placeholders in the message
-    let message = settings.whatsappDefaultMessage
-      .replace('[NOME DO ANIMAL]', product.name)
-      .replace('[URL DO PAGAMENTO]', product.paymentLink || 'não disponível');
-    
-    // Encode message for URL
-    message = encodeURIComponent(message);
-    
-    // Create WhatsApp URL
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
-    
-    // Open WhatsApp in a new tab
-    window.open(whatsappUrl, '_blank');
-  };
-
+  
+  if (loading) {
+    return (
+      <WebsiteLayout>
+        <div className="container px-4 py-12 sm:px-6 flex justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-serpente-600"></div>
+        </div>
+      </WebsiteLayout>
+    );
+  }
+  
+  if (!product) {
+    return (
+      <WebsiteLayout>
+        <div className="container px-4 py-12 sm:px-6 flex flex-col items-center">
+          <h1 className="text-2xl font-bold mb-4">Produto não encontrado</h1>
+          <p className="text-muted-foreground mb-6">
+            O produto que você está procurando não existe ou foi removido.
+          </p>
+          <Button asChild>
+            <Link to="/catalogo">
+              <ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao Catálogo
+            </Link>
+          </Button>
+        </div>
+      </WebsiteLayout>
+    );
+  }
+  
   const formatPrice = (price: number) => {
     if (price === 0) return "Sob consulta";
     return new Intl.NumberFormat('pt-BR', {
@@ -154,227 +65,186 @@ const ProductDetail = () => {
       currency: 'BRL'
     }).format(price);
   };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'disponivel':
-        return 'Disponível';
-      case 'indisponivel':
-        return 'Indisponível';
-      case 'vendido':
-        return 'Vendido';
-      default:
-        return 'Status desconhecido';
-    }
+  
+  const handleAddToCart = () => {
+    addToCart(product, quantity);
+    toast({
+      title: "Produto adicionado ao carrinho",
+      description: `${product.name} foi adicionado ao seu carrinho.`,
+      action: (
+        <Link to="/carrinho">
+          <Button variant="outline" size="sm">
+            Ver Carrinho
+          </Button>
+        </Link>
+      ),
+    });
   };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'disponivel':
-        return 'bg-green-500';
-      case 'indisponivel':
-        return 'bg-yellow-500';
-      case 'vendido':
-        return 'bg-red-500';
-      default:
-        return 'bg-gray-500';
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <WebsiteLayout>
-        <div className="container py-12 min-h-[70vh] flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-serpente-600"></div>
-        </div>
-      </WebsiteLayout>
-    );
-  }
-
-  if (!product) {
-    return (
-      <WebsiteLayout>
-        <div className="container py-12 min-h-[70vh] flex flex-col items-center justify-center">
-          <h2 className="text-2xl font-bold mb-4">Produto não encontrado</h2>
-          <p className="text-muted-foreground mb-6">
-            O produto que você está procurando não está disponível.
-          </p>
-          <Button onClick={handleGoBack}>Voltar para a lista</Button>
-        </div>
-      </WebsiteLayout>
-    );
-  }
-
+  
   return (
     <WebsiteLayout>
-      <div className="container py-6 md:py-12">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleGoBack}
-          className="mb-6"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Voltar
-        </Button>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          {/* Product Images */}
-          <div className="space-y-4">
-            {product.images && product.images.length > 0 ? (
-              <div className="relative rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 aspect-square">
-                <img
-                  src={product.images[currentImageIndex].url}
-                  alt={product.images[currentImageIndex].alt || product.name}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute top-2 right-2">
-                  <span className={`px-3 py-1.5 text-xs font-medium text-white rounded-full ${getStatusColor(product.status)}`}>
-                    {getStatusText(product.status)}
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center border border-gray-200 dark:border-gray-800 rounded-lg aspect-square bg-gray-100 dark:bg-gray-800">
-                <ImageIcon className="h-12 w-12 text-gray-400" />
-              </div>
-            )}
-
-            {product.images && product.images.length > 1 && (
-              <Carousel className="w-full max-w-sm mx-auto">
-                <CarouselContent>
-                  {product.images.map((image, index) => (
-                    <CarouselItem key={image.id} className="basis-1/4 md:basis-1/5">
-                      <div 
-                        className={`relative aspect-square cursor-pointer overflow-hidden rounded border ${
-                          index === currentImageIndex 
-                            ? 'border-serpente-600 ring-2 ring-serpente-600 ring-offset-2' 
-                            : 'border-gray-200 dark:border-gray-800'
-                        }`}
-                        onClick={() => setCurrentImageIndex(index)}
-                      >
-                        <img
-                          src={image.url}
-                          alt={image.alt || `${product.name} - Imagem ${index + 1}`}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
-              </Carousel>
-            )}
+      <div className="container px-4 py-12 sm:px-6">
+        <div className="mb-4">
+          <div className="flex items-center text-muted-foreground text-sm mb-8">
+            <Link to="/" className="hover:underline">Home</Link>
+            <span className="mx-2">/</span>
+            <Link to="/catalogo" className="hover:underline">Catálogo</Link>
+            <span className="mx-2">/</span>
+            <span className="text-foreground">{product.name}</span>
           </div>
-
-          {/* Product Info */}
-          <div className="space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold">{product.name}</h1>
-              <p className="text-lg italic text-muted-foreground mt-1">
-                {product.speciesName}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="text-3xl font-bold text-serpente-600">
-                {formatPrice(product.price)}
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Product Images */}
+            <div className="space-y-4">
+              <div className="aspect-square bg-muted rounded-lg overflow-hidden">
+                {selectedImage ? (
+                  <img 
+                    src={selectedImage} 
+                    alt={product.name} 
+                    className="w-full h-full object-contain"
+                    loading="eager"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <span className="text-muted-foreground">Imagem não disponível</span>
+                  </div>
+                )}
               </div>
-              {product.status === 'disponivel' && (
-                <span className="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-3 py-1 text-sm font-medium text-green-800 dark:text-green-300">
-                  <span className="mr-1.5 h-2 w-2 rounded-full bg-green-500"></span>
-                  Disponível
-                </span>
+              
+              {/* Thumbnail Gallery */}
+              {product.images && product.images.length > 1 && (
+                <div className="grid grid-cols-4 gap-2">
+                  {product.images.map((image: any, index: number) => (
+                    <div 
+                      key={index} 
+                      className={`aspect-square bg-muted rounded-md overflow-hidden cursor-pointer border-2 ${
+                        selectedImage === image.url ? 'border-serpente-500' : 'border-transparent'
+                      }`}
+                      onClick={() => setSelectedImage(image.url)}
+                    >
+                      <img 
+                        src={image.url} 
+                        alt={`${product.name} - imagem ${index + 1}`} 
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
-
-            <div className="border-t pt-6">
-              <h3 className="text-lg font-semibold mb-2">Descrição</h3>
-              <p className="text-muted-foreground whitespace-pre-line">
-                {product.description}
-              </p>
-            </div>
-
-            {product.status === 'disponivel' && (
-              <div className="pt-4 flex flex-col sm:flex-row gap-4">
-                <Button 
-                  size="lg" 
-                  className="flex-1"
-                  onClick={handleBuyNow}
-                  disabled={!product.paymentLink}
-                >
-                  <ShoppingCart className="mr-2 h-5 w-5" />
-                  Comprar Agora
-                </Button>
-                <Button 
-                  variant="outline"
-                  size="lg"
-                  className="flex-1"
-                  onClick={handleWhatsAppRedirect}
-                >
-                  <MessageSquare className="mr-2 h-5 w-5" />
-                  Entrar em Contato
-                </Button>
+            
+            {/* Product Information */}
+            <div className="space-y-6">
+              {/* Badges */}
+              <div className="flex flex-wrap gap-2">
+                {product.featured && (
+                  <Badge variant="secondary" className="bg-yellow-100 hover:bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 text-sm">
+                    <Star className="h-3 w-3 mr-1 inline" /> Destaque
+                  </Badge>
+                )}
+                {product.isNew && (
+                  <Badge variant="secondary" className="bg-blue-100 hover:bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 text-sm">
+                    Novidade
+                  </Badge>
+                )}
+                <Badge variant={product.available ? "default" : "outline"} className="text-sm">
+                  {product.available ? "Disponível" : "Indisponível"}
+                </Badge>
               </div>
-            )}
-
-            {product.status !== 'disponivel' && (
-              <div className="pt-4">
-                <Button 
-                  variant="outline"
-                  size="lg"
-                  className="w-full"
-                  onClick={handleWhatsAppRedirect}
-                >
-                  <MessageSquare className="mr-2 h-5 w-5" />
-                  Falar com o Criador
-                </Button>
+              
+              <div>
+                <h1 className="text-3xl font-bold">{product.name}</h1>
+                <p className="text-xl text-muted-foreground italic mt-1">
+                  <em>{product.speciesName}</em>
+                </p>
               </div>
-            )}
-
-            <div className="p-4 rounded-lg border bg-muted/30 text-sm text-muted-foreground">
-              <p>
-                A venda só será confirmada após verificação manual via WhatsApp ou e-mail. 
-                Após o pagamento, entre em contato para confirmação.
-              </p>
+              
+              <div>
+                <div className="text-3xl font-bold text-serpente-600">
+                  {formatPrice(product.price)}
+                </div>
+                {product.oldPrice > 0 && (
+                  <div className="text-sm text-muted-foreground line-through">
+                    {formatPrice(product.oldPrice)}
+                  </div>
+                )}
+              </div>
+              
+              <div className="pt-4 border-t">
+                <h2 className="font-semibold mb-2">Descrição</h2>
+                <p className="text-muted-foreground whitespace-pre-line">
+                  {product.description}
+                </p>
+              </div>
+              
+              <div className="pt-4 border-t">
+                <h2 className="font-semibold mb-2">Características</h2>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Categoria</p>
+                    <p className="font-medium capitalize">{product.category}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Subcategoria</p>
+                    <p className="font-medium capitalize">{product.subcategory}</p>
+                  </div>
+                  {product.sex && (
+                    <div>
+                      <p className="text-sm text-muted-foreground">Sexo</p>
+                      <p className="font-medium">{product.sex === 'male' ? 'Macho' : 'Fêmea'}</p>
+                    </div>
+                  )}
+                  {product.age && (
+                    <div>
+                      <p className="text-sm text-muted-foreground">Idade</p>
+                      <p className="font-medium">{product.age}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Add to Cart */}
+              <div className="pt-6 border-t">
+                <div className="flex gap-4 mb-4">
+                  <div className="w-20">
+                    <label htmlFor="quantity" className="text-sm font-medium mb-1 block">Qtd</label>
+                    <select 
+                      id="quantity"
+                      className="w-full h-10 rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      value={quantity}
+                      onChange={(e) => setQuantity(parseInt(e.target.value))}
+                    >
+                      {[1, 2, 3, 4, 5].map((num) => (
+                        <option key={num} value={num}>{num}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="flex-1">
+                    <Button 
+                      className="w-full h-10 mt-6"
+                      onClick={handleAddToCart}
+                      disabled={!product.available}
+                    >
+                      <ShoppingCart className="mr-2 h-4 w-4" /> Adicionar ao Carrinho
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="bg-muted/50 p-3 rounded-md text-sm flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-serpente-600 mt-0.5 flex-shrink-0" />
+                  <p className="text-muted-foreground">
+                    Todos os animais são registrados no IBAMA e possuem documentação legal completa.
+                    Para adquirir um animal, é necessário estar cadastrado no sistema oficial.
+                    <Link to="/contato" className="text-serpente-600 hover:underline ml-1">Saiba mais</Link>
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Payment Dialog */}
-      <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Finalizar Compra</DialogTitle>
-            <DialogDescription>
-              Você está comprando o produto: <strong>{product.name}</strong>
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 py-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold mb-2">
-                {formatPrice(product.price)}
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Clique no botão abaixo para prosseguir para o pagamento.
-              </p>
-            </div>
-          </div>
-          
-          <DialogFooter className="flex-col sm:flex-row gap-2">
-            <DialogClose asChild>
-              <Button variant="outline">Cancelar</Button>
-            </DialogClose>
-            <Button onClick={handleExternalPayment} className="flex-1">
-              <CircleDollarSign className="mr-2 h-4 w-4" />
-              Prosseguir para Pagamento
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </WebsiteLayout>
   );
 };

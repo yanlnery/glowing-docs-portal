@@ -1,35 +1,76 @@
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Brain, BookOpen, Award, Check, Clock, ChevronRight } from 'lucide-react';
+import WaitlistForm from '@/components/WaitlistForm';
 
-import React from "react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Check, ChevronRight, ExternalLink } from "lucide-react";
+const Academy = () => {
+  const navigate = useNavigate();
+  const [isWaitlistDialogOpen, setIsWaitlistDialogOpen] = useState(false);
+  
+  useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+  }, []);
 
-export default function Academy() {
+  const handleWaitlistSubmit = (data: any) => {
+    // Store in localStorage for demonstration purposes
+    const waitlistEntry = {
+      ...data,
+      date: new Date().toISOString()
+    };
+
+    // Get current waitlist entries or initialize empty array
+    const currentEntries = JSON.parse(localStorage.getItem('waitlist') || '[]');
+    localStorage.setItem('waitlist', JSON.stringify([...currentEntries, waitlistEntry]));
+    
+    setIsWaitlistDialogOpen(false);
+    navigate('/confirmacao-inscricao');
+  };
+
   return (
-    <div>
-      {/* Hero Section with Updated Background Image */}
-      <section className="relative py-24 text-white">
-        <div className="absolute inset-0 bg-black/70 z-0">
+    <div className="container py-12 px-4 sm:px-6">
+      {/* Hero Section */}
+      <div className="flex flex-col lg:flex-row items-center gap-8 mb-16">
+        <div className="flex-1">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
+            PS Academy: Aprenda com Especialistas em Répteis
+          </h1>
+          <p className="text-lg text-muted-foreground mb-8">
+            Desenvolva habilidades e conhecimentos para cuidar, criar e reproduzir répteis com nossa plataforma de educação especializada.
+          </p>
+          <Button 
+            size="lg" 
+            className="bg-serpente-600 hover:bg-serpente-700 text-white"
+            onClick={() => setIsWaitlistDialogOpen(true)}
+          >
+            Entrar para a Lista de Espera
+            <ChevronRight className="ml-2 h-4 w-4" />
+          </Button>
+          <p className="text-sm text-muted-foreground mt-4">
+            Seja notificado quando abrirmos novas vagas para nossos cursos.
+          </p>
+        </div>
+        <div className="flex-1">
           <img 
-            src="/lovable-uploads/e045c67b-a1d3-4a76-9c84-7a52ef1a076f.png" 
-            alt="Pet Serpentes Academy" 
-            className="w-full h-full object-cover opacity-50"
+            src="/lovable-uploads/481f8f82-22b1-407d-9e88-623e453faf6a.png" 
+            alt="PS Academy" 
+            className="rounded-lg shadow-lg border dark:border-gray-800" 
+            loading="lazy"
           />
         </div>
-        <div className="container relative z-10 px-4 sm:px-6 flex flex-col items-center">
-          <div className="max-w-3xl text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">Pet Serpentes Academy</h1>
-            <p className="text-xl text-white/80 mb-8">
-              A plataforma educacional definitiva para criadores e entusiastas de répteis no Brasil
-            </p>
-            <Button size="lg" className="min-h-[44px]">
-              Conheça nossos cursos <ChevronRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </section>
-      
-      {/* Features Section */}
+      </div>
+
+      {/* Features */}
       <section className="py-16 bg-background">
         <div className="container px-4 sm:px-6">
           <div className="flex flex-col items-center mb-16 text-center">
@@ -74,100 +115,16 @@ export default function Academy() {
           </div>
         </div>
       </section>
-      
-      {/* Pricing Plans - UPDATED TO REMOVE PROFESSIONAL PLAN */}
-      <section className="py-16 bg-muted/30">
+
+      {/* Course Preview */}
+      <section className="py-16 bg-background">
         <div className="container px-4 sm:px-6">
           <div className="flex flex-col items-center mb-16 text-center">
             <div className="docs-section-title">
-              <h2 className="text-3xl font-bold">Escolha seu Plano</h2>
+              <h2 className="text-3xl font-bold">Cursos em Destaque</h2>
             </div>
             <p className="text-muted-foreground max-w-2xl mt-4">
-              Invista em seu conhecimento com um plano que se adapta às suas necessidades
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* Free Plan */}
-            <div className="docs-card-gradient p-6 border rounded-lg shadow-sm hover:shadow-md transition-all">
-              <h3 className="text-2xl font-bold mb-2">Gratuito</h3>
-              <div className="mb-6">
-                <span className="text-3xl font-bold">R$0</span>
-                <span className="text-muted-foreground">/mês</span>
-              </div>
-              
-              <div className="space-y-4 mb-8">
-                <div className="flex items-start">
-                  <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
-                  <span>Artigos educacionais básicos</span>
-                </div>
-                <div className="flex items-start">
-                  <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
-                  <span>Acesso à comunidade</span>
-                </div>
-                <div className="flex items-start">
-                  <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
-                  <span>1 webinar mensal</span>
-                </div>
-              </div>
-              
-              <Button variant="outline" className="w-full min-h-[44px]" asChild>
-                <Link to="/lista-de-espera">Começar Grátis</Link>
-              </Button>
-            </div>
-            
-            {/* Premium Plan with Most Popular Tag */}
-            <div className="docs-card-gradient p-6 border rounded-lg shadow-sm hover:shadow-md transition-all relative">
-              <div className="absolute -top-4 left-0 right-0 flex justify-center">
-                <span className="bg-serpente-600 text-white text-xs px-3 py-1 rounded-full uppercase font-bold tracking-wider">Mais Popular</span>
-              </div>
-              
-              <h3 className="text-2xl font-bold mb-2">Premium</h3>
-              <div className="mb-6">
-                <span className="text-3xl font-bold">R$27</span>
-                <span className="text-muted-foreground">/mês</span>
-              </div>
-              
-              <div className="space-y-4 mb-8">
-                <div className="flex items-start">
-                  <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
-                  <span>Todos os cursos disponíveis</span>
-                </div>
-                <div className="flex items-start">
-                  <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
-                  <span>Certificados de conclusão</span>
-                </div>
-                <div className="flex items-start">
-                  <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
-                  <span>Acesso a eventos exclusivos</span>
-                </div>
-                <div className="flex items-start">
-                  <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
-                  <span>Suporte prioritário</span>
-                </div>
-                <div className="flex items-start">
-                  <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
-                  <span>Desconto em produtos</span>
-                </div>
-              </div>
-              
-              <Button className="w-full min-h-[44px]" asChild>
-                <Link to="/confirmacao-inscricao">Assinar Agora</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      {/* Testimonials */}
-      <section className="py-16 bg-background">
-        <div className="container px-4 sm:px-6">
-          <div className="flex flex-col items-center mb-12 text-center">
-            <div className="docs-section-title">
-              <h2 className="text-3xl font-bold">O que dizem nossos alunos</h2>
-            </div>
-            <p className="text-muted-foreground max-w-2xl mt-4">
-              Depoimentos de quem já faz parte da Pet Serpentes Academy
+              Explore nossos cursos mais populares e avançados
             </p>
           </div>
           
@@ -175,109 +132,173 @@ export default function Academy() {
             <div className="docs-card p-6 border rounded-lg">
               <div className="flex items-center mb-4">
                 <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mr-3">
-                  <span className="text-lg font-bold">M</span>
+                  <span className="text-lg font-bold">C1</span>
                 </div>
                 <div>
-                  <h4 className="font-bold">Marcos Silva</h4>
-                  <p className="text-sm text-muted-foreground">Criador há 2 anos</p>
+                  <h4 className="font-bold">Cursos de Criação de Répteis</h4>
+                  <p className="text-sm text-muted-foreground">Aprenda a criar e cuidar de répteis</p>
                 </div>
               </div>
               <p className="italic text-muted-foreground">
-                "Os cursos da Academy me ajudaram a entender muito melhor sobre o comportamento da minha Jiboia. O suporte da equipe é incrível!"
+                "Aprenda a criar e cuidar de répteis de forma eficaz com nossos cursos de criação."
               </p>
             </div>
             
             <div className="docs-card p-6 border rounded-lg">
               <div className="flex items-center mb-4">
                 <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mr-3">
-                  <span className="text-lg font-bold">C</span>
+                  <span className="text-lg font-bold">C2</span>
                 </div>
                 <div>
-                  <h4 className="font-bold">Carolina Mendes</h4>
-                  <p className="text-sm text-muted-foreground">Veterinária</p>
+                  <h4 className="font-bold">Cursos de Manejo de Répteis</h4>
+                  <p className="text-sm text-muted-foreground">Aprenda a manter e cuidar de répteis</p>
                 </div>
               </div>
               <p className="italic text-muted-foreground">
-                "Como profissional da área, encontrei conteúdos de altíssima qualidade. Recomendo para todos os interessados em herpetologia."
+                "Aprenda a manter e cuidar de répteis de forma eficaz com nossos cursos de manejo."
               </p>
             </div>
             
             <div className="docs-card p-6 border rounded-lg">
               <div className="flex items-center mb-4">
                 <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mr-3">
-                  <span className="text-lg font-bold">R</span>
+                  <span className="text-lg font-bold">C3</span>
                 </div>
                 <div>
-                  <h4 className="font-bold">Rafael Almeida</h4>
-                  <p className="text-sm text-muted-foreground">Estudante de Biologia</p>
+                  <h4 className="font-bold">Cursos de Herpetologia</h4>
+                  <p className="text-sm text-muted-foreground">Aprenda sobre herpetologia</p>
                 </div>
               </div>
               <p className="italic text-muted-foreground">
-                "A comunidade é sensacional! Aprendi muito sobre manejo e ambientação adequada para répteis. Vale cada centavo."
+                "Aprenda sobre herpetologia de forma eficaz com nossos cursos de herpetologia."
               </p>
             </div>
           </div>
         </div>
       </section>
-      
-      {/* CTA Section */}
-      <section className="py-12 bg-serpente-600 text-white">
-        <div className="container px-4 sm:px-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-            <div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-2">Pronto para começar sua jornada?</h2>
-              <p className="text-white/80">Junte-se aos mais de 500 entusiastas que já fazem parte da Academy</p>
-            </div>
-            <Button size="lg" variant="outline" className="bg-white text-serpente-600 hover:bg-white/90 border-none" asChild>
-              <Link to="/confirmacao-inscricao">Assinar Agora</Link>
-            </Button>
-          </div>
+
+      {/* Pricing */}
+      <div className="mb-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold mb-4">Planos de Assinatura</h2>
+          <p className="max-w-2xl mx-auto text-muted-foreground">
+            Escolha o plano que melhor atende às suas necessidades e objetivos.
+          </p>
         </div>
-      </section>
-      
-      {/* FAQ Section */}
-      <section className="py-16 bg-background">
-        <div className="container px-4 sm:px-6">
-          <div className="flex flex-col items-center mb-12 text-center">
-            <div className="docs-section-title">
-              <h2 className="text-3xl font-bold">Perguntas Frequentes</h2>
+
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          {/* Premium Plan */}
+          <Card className="bg-white dark:bg-gray-800 border-serpente-200 dark:border-serpente-800">
+            <CardHeader>
+              <CardTitle>Plano Premium</CardTitle>
+              <div className="mt-4">
+                <span className="text-3xl font-bold">R$9,90</span>
+                <span className="text-muted-foreground ml-1">/mês</span>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-green-600" />
+                  <span>Acesso a todos os cursos básicos</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-green-600" />
+                  <span>Comunidade de discussão</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-green-600" />
+                  <span>Certificados de conclusão</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-green-600" />
+                  <span>Atualizações de conteúdo</span>
+                </li>
+              </ul>
+            </CardContent>
+            <CardFooter>
+              <Button className="w-full" onClick={() => setIsWaitlistDialogOpen(true)}>
+                Entrar para Lista de Espera
+              </Button>
+            </CardFooter>
+          </Card>
+
+          {/* Professional Plan */}
+          <Card className="bg-serpente-50 dark:bg-serpente-900/10 border-serpente-200 dark:border-serpente-800 relative overflow-hidden">
+            <div className="absolute top-0 right-0">
+              <div className="bg-serpente-600 text-white text-xs px-3 py-1 rotate-45 translate-x-2 translate-y-3">
+                Popular
+              </div>
             </div>
-            <p className="text-muted-foreground max-w-2xl mt-4">
-              Tire suas dúvidas sobre a Pet Serpentes Academy
-            </p>
-          </div>
-          
-          <div className="max-w-3xl mx-auto space-y-6">
-            <div className="docs-card p-6 border rounded-lg">
-              <h3 className="text-xl font-bold mb-2">Como funciona a assinatura?</h3>
-              <p className="text-muted-foreground">
-                Após a assinatura, você terá acesso imediato a todos os cursos e materiais da plataforma. A cobrança é mensal e você pode cancelar a qualquer momento.
-              </p>
-            </div>
-            
-            <div className="docs-card p-6 border rounded-lg">
-              <h3 className="text-xl font-bold mb-2">Posso assistir às aulas no celular?</h3>
-              <p className="text-muted-foreground">
-                Sim! Nossa plataforma é totalmente responsiva e você pode acessar os conteúdos de qualquer dispositivo: computador, tablet ou smartphone.
-              </p>
-            </div>
-            
-            <div className="docs-card p-6 border rounded-lg">
-              <h3 className="text-xl font-bold mb-2">Os cursos têm certificado?</h3>
-              <p className="text-muted-foreground">
-                Sim, todos os assinantes do plano Premium recebem certificados de conclusão dos cursos, que podem ser baixados diretamente na plataforma.
-              </p>
-            </div>
-            
-            <div className="docs-card p-6 border rounded-lg">
-              <h3 className="text-xl font-bold mb-2">Como funciona o suporte?</h3>
-              <p className="text-muted-foreground">
-                Os assinantes Premium têm acesso ao suporte via chat e e-mail com tempo de resposta de até 24 horas. Além disso, podem tirar dúvidas diretamente nos fóruns da comunidade.
-              </p>
-            </div>
-          </div>
+            <CardHeader>
+              <CardTitle>Plano Professional</CardTitle>
+              <div className="mt-4">
+                <span className="text-3xl font-bold">R$17,90</span>
+                <span className="text-muted-foreground ml-1">/mês</span>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-green-600" />
+                  <span>Tudo do Plano Premium</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-green-600" />
+                  <span>Cursos avançados e especializados</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-green-600" />
+                  <span>Mentorias com especialistas mensais</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-green-600" />
+                  <span>Downloads de materiais exclusivos</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-green-600" />
+                  <span>Acesso antecipado a novos conteúdos</span>
+                </li>
+              </ul>
+            </CardContent>
+            <CardFooter>
+              <Button 
+                className="w-full bg-serpente-600 hover:bg-serpente-700"
+                onClick={() => setIsWaitlistDialogOpen(true)}
+              >
+                Entrar para Lista de Espera
+              </Button>
+            </CardFooter>
+          </Card>
         </div>
-      </section>
+      </div>
+
+      {/* CTA */}
+      <div className="bg-serpente-100 dark:bg-serpente-900/20 rounded-2xl p-8 text-center">
+        <h2 className="text-2xl font-bold mb-4">Pronto para elevar seus conhecimentos?</h2>
+        <p className="max-w-2xl mx-auto mb-6 text-muted-foreground">
+          Junte-se à nossa lista de espera e seja o primeiro a saber quando as matrículas estiverem abertas. Vagas limitadas!
+        </p>
+        <Button 
+          size="lg" 
+          className="bg-serpente-600 hover:bg-serpente-700"
+          onClick={() => setIsWaitlistDialogOpen(true)}
+        >
+          Entrar para Lista de Espera
+        </Button>
+      </div>
+
+      {/* Waitlist Dialog */}
+      <Dialog open={isWaitlistDialogOpen} onOpenChange={setIsWaitlistDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <WaitlistForm 
+            onSubmit={handleWaitlistSubmit} 
+            onCancel={() => setIsWaitlistDialogOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
-}
+};
+
+export default Academy;

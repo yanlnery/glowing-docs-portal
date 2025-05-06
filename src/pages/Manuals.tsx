@@ -1,60 +1,120 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Download, FileText, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
-const manuals = [
-  {
-    id: 1,
-    title: "Manual de Criação de Boídeos",
-    description: "Guia completo para criação e reprodução de serpentes da família Boidae.",
-    pages: 32,
-    image: "https://images.unsplash.com/photo-1633527316352-52177079b3f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
-    pdfUrl: "#"
-  },
-  {
-    id: 2,
-    title: "Manual de Criação de Cobra d'Água",
-    description: "Técnicas e cuidados específicos para a criação de Erythrolamprus miliaris em cativeiro.",
-    pages: 28,
-    image: "https://images.unsplash.com/photo-1557178985-891076b318dd?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
-    pdfUrl: "#"
-  },
-  {
-    id: 3,
-    title: "Manual de Criação de Iguanas",
-    description: "Habitat, alimentação e reprodução de iguanas em ambiente controlado.",
-    pages: 45,
-    image: "https://images.unsplash.com/photo-1598445609092-7c7d80d816dd?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
-    pdfUrl: "#"
-  },
-  {
-    id: 4,
-    title: "Manual de Criação de Jabutis",
-    description: "Guia detalhado para manejo de quelônios terrestres brasileiros.",
-    pages: 36,
-    image: "https://images.unsplash.com/photo-1591824438708-ce405f36ba3d?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
-    pdfUrl: "#"
-  },
-  {
-    id: 5,
-    title: "Manual de Criação de Diploglossus",
-    description: "Práticas recomendadas para a criação da Cobra-de-vidro (Diploglossus fasciatus).",
-    pages: 24,
-    image: "https://images.unsplash.com/photo-1550172268-9a48af98ac5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
-    pdfUrl: "#"
-  },
-  {
-    id: 6,
-    title: "Manual de Criação de Teiús",
-    description: "Técnicas profissionais para o manejo de Tupinambis spp. em cativeiro.",
-    pages: 40,
-    image: "https://images.unsplash.com/photo-1597284902002-b783970afd73?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
-    pdfUrl: "#"
-  }
-];
+interface Manual {
+  id: string;
+  title: string;
+  description: string;
+  pages: number;
+  image: string;
+  category: string;
+  pdfUrl: string;
+}
 
 export default function Manuals() {
+  const [manuals, setManuals] = useState<Manual[]>([]);
+  const [filteredManuals, setFilteredManuals] = useState<Manual[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+    
+    // Load manuals from localStorage
+    try {
+      const savedManuals = JSON.parse(localStorage.getItem('manuals') || '[]');
+      setManuals(savedManuals);
+      setFilteredManuals(savedManuals);
+    } catch (error) {
+      console.error("Failed to load manuals:", error);
+      setManuals([]);
+      setFilteredManuals([]);
+    }
+  }, []);
+  
+  // Default example manuals if none are in localStorage
+  const defaultManuals = [
+    {
+      id: "1",
+      title: "Manual de Criação de Boídeos",
+      description: "Guia completo para criação e reprodução de serpentes da família Boidae.",
+      pages: 32,
+      image: "https://images.unsplash.com/photo-1633527316352-52177079b3f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
+      category: "serpente",
+      pdfUrl: "#"
+    },
+    {
+      id: "2",
+      title: "Manual de Criação de Cobra d'Água",
+      description: "Técnicas e cuidados específicos para a criação de Erythrolamprus miliaris em cativeiro.",
+      pages: 28,
+      image: "https://images.unsplash.com/photo-1557178985-891076b318dd?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
+      category: "serpente",
+      pdfUrl: "#"
+    },
+    {
+      id: "3",
+      title: "Manual de Criação de Iguanas",
+      description: "Habitat, alimentação e reprodução de iguanas em ambiente controlado.",
+      pages: 45,
+      image: "https://images.unsplash.com/photo-1598445609092-7c7d80d816dd?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
+      category: "lagarto",
+      pdfUrl: "#"
+    },
+    {
+      id: "4",
+      title: "Manual de Criação de Jabutis",
+      description: "Guia detalhado para manejo de quelônios terrestres brasileiros.",
+      pages: 36,
+      image: "https://images.unsplash.com/photo-1591824438708-ce405f36ba3d?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
+      category: "quelonio",
+      pdfUrl: "#"
+    },
+    {
+      id: "5",
+      title: "Manual de Criação de Diploglossus",
+      description: "Práticas recomendadas para a criação da Cobra-de-vidro (Diploglossus fasciatus).",
+      pages: 24,
+      image: "https://images.unsplash.com/photo-1550172268-9a48af98ac5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
+      category: "lagarto",
+      pdfUrl: "#"
+    },
+    {
+      id: "6",
+      title: "Manual de Criação de Teiús",
+      description: "Técnicas profissionais para o manejo de Tupinambis spp. em cativeiro.",
+      pages: 40,
+      image: "https://images.unsplash.com/photo-1597284902002-b783970afd73?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
+      category: "lagarto",
+      pdfUrl: "#"
+    }
+  ];
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+    
+    if (!query.trim()) {
+      setFilteredManuals(manuals);
+      return;
+    }
+    
+    const filtered = manuals.filter(manual => 
+      manual.title.toLowerCase().includes(query) || 
+      manual.description.toLowerCase().includes(query) ||
+      manual.category.toLowerCase().includes(query)
+    );
+    
+    setFilteredManuals(filtered);
+  };
+
+  // If no manuals are found in localStorage, show default ones
+  const displayedManuals = filteredManuals.length > 0 ? filteredManuals : 
+                          (manuals.length === 0 ? defaultManuals : []);
+
   return (
     <div className="container px-4 py-12 sm:px-6">
       <div className="flex flex-col items-center mb-12 text-center">
@@ -70,23 +130,26 @@ export default function Manuals() {
       <div className="mb-8 flex justify-center">
         <div className="relative w-full max-w-md">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <input
+          <Input
             type="text"
             placeholder="Buscar manual..."
             className="h-10 w-full rounded-md border border-input pl-10 pr-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            value={searchQuery}
+            onChange={handleSearch}
           />
         </div>
       </div>
       
       {/* Manuals Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {manuals.map((manual) => (
+        {displayedManuals.map((manual) => (
           <div key={manual.id} className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md flex flex-col">
             <div className="relative h-48 overflow-hidden">
               <img 
                 src={manual.image}
                 alt={manual.title} 
                 className="w-full h-full object-cover object-center"
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
                 <div className="p-4">
@@ -110,6 +173,26 @@ export default function Manuals() {
           </div>
         ))}
       </div>
+      
+      {displayedManuals.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">
+            Nenhum manual encontrado para sua pesquisa.
+          </p>
+          {searchQuery && (
+            <Button 
+              variant="outline" 
+              className="mt-4"
+              onClick={() => {
+                setSearchQuery('');
+                setFilteredManuals(manuals);
+              }}
+            >
+              Limpar Busca
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

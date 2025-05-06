@@ -1,11 +1,23 @@
-
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Award, Calendar, CreditCard, Shield, Book, Brain, Syringe, Users, Video } from "lucide-react";
+import { ArrowRight, Award, Calendar, CreditCard, Shield, Book, Brain, Syringe, Users, HelpCircle } from "lucide-react";
 import HeroCarousel from "@/components/HeroCarousel";
+import { productService } from "@/services/productService";
+import { Product } from "@/types/product";
 
 export default function Home() {
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  
+  useEffect(() => {
+    // Load featured products from the product service
+    const products = productService.getAvailableProducts().filter(
+      product => product.featured && product.available
+    ).slice(0, 3); // Get up to 3 featured products
+    
+    setFeaturedProducts(products);
+  }, []);
+
   return (
     <div className="flex flex-col w-full">
       {/* Hero Carousel Section */}
@@ -26,74 +38,36 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mt-8">
-            {/* Species Card 1 - Epicrates crassus */}
-            <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
-              <div className="relative h-48 sm:h-64 overflow-hidden">
-                <img 
-                  src="/lovable-uploads/c1a72b2c-2c6e-4822-9c71-13485444c48a.png" 
-                  alt="Epicrates crassus" 
-                  className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                  <span className="inline-block bg-serpente-600 text-white text-xs px-2 py-1 rounded">Disponível</span>
+            {featuredProducts.length > 0 ? (
+              featuredProducts.map((product) => (
+                <div key={product.id} className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
+                  <div className="relative h-48 sm:h-64 overflow-hidden">
+                    <img 
+                      src={product.images && product.images.length > 0 ? product.images[0].url : "/placeholder.svg"} 
+                      alt={product.name} 
+                      className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                      <span className="inline-block bg-serpente-600 text-white text-xs px-2 py-1 rounded">Disponível</span>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-bold text-lg mb-1"><em>{product.speciesName}</em></h3>
+                    <p className="text-muted-foreground text-sm mb-3">{product.name}</p>
+                    <div className="flex justify-end items-center">
+                      <Button variant="outline" size="sm" className="min-h-[44px] w-full sm:w-auto" asChild>
+                        <Link to={`/produtos/${product.id}`}>Ver Detalhes</Link>
+                      </Button>
+                    </div>
+                  </div>
                 </div>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-12">
+                <p className="text-muted-foreground">Nenhum animal em destaque disponível no momento.</p>
               </div>
-              <div className="p-4">
-                <h3 className="font-bold text-lg mb-1"><em>Epicrates crassus</em></h3>
-                <p className="text-muted-foreground text-sm mb-3">Jiboia Arco-íris do Cerrado</p>
-                <div className="flex justify-end items-center">
-                  <Button variant="outline" size="sm" className="min-h-[44px] w-full sm:w-auto" asChild>
-                    <Link to="/especies-criadas/epicrates-crassus">Ver Detalhes</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
-            
-            {/* Species Card 2 - Salvator merianae */}
-            <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
-              <div className="relative h-48 sm:h-64 overflow-hidden">
-                <img 
-                  src="/lovable-uploads/921c3722-02d0-419b-b003-caa6b5de021d.png" 
-                  alt="Salvator merianae" 
-                  className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                  <span className="inline-block bg-serpente-600 text-white text-xs px-2 py-1 rounded">Disponível</span>
-                </div>
-              </div>
-              <div className="p-4">
-                <h3 className="font-bold text-lg mb-1"><em>Salvator merianae</em></h3>
-                <p className="text-muted-foreground text-sm mb-3">Teiú</p>
-                <div className="flex justify-end items-center">
-                  <Button variant="outline" size="sm" className="min-h-[44px] w-full sm:w-auto" asChild>
-                    <Link to="/especies-criadas/salvator-merianae">Ver Detalhes</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
-            
-            {/* Species Card 3 - Corallus batesii */}
-            <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
-              <div className="relative h-48 sm:h-64 overflow-hidden">
-                <img 
-                  src="/lovable-uploads/c1a72b2c-2c6e-4822-9c71-13485444c48a.png" 
-                  alt="Corallus batesii" 
-                  className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                  <span className="inline-block bg-serpente-600 text-white text-xs px-2 py-1 rounded">Disponível</span>
-                </div>
-              </div>
-              <div className="p-4">
-                <h3 className="font-bold text-lg mb-1"><em>Corallus batesii</em></h3>
-                <p className="text-muted-foreground text-sm mb-3">Jiboia Esmeralda</p>
-                <div className="flex justify-end items-center">
-                  <Button variant="outline" size="sm" className="min-h-[44px] w-full sm:w-auto" asChild>
-                    <Link to="/especies-criadas/corallus-batesii">Ver Detalhes</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
           
           <div className="flex justify-center mt-8 sm:mt-10">
@@ -104,7 +78,7 @@ export default function Home() {
         </div>
       </section>
       
-      {/* About Section - UPDATED WITH ADJUSTED IMAGE POSITION */}
+      {/* About Section */}
       <section className="py-16 bg-muted/30 snake-pattern-bg">
         <div className="container px-4 sm:px-6">
           <div className="flex flex-col lg:flex-row gap-12 items-center">
@@ -225,10 +199,10 @@ export default function Home() {
               </Button>
             </div>
             
-            {/* Card 3: Descubra seu Animal Ideal */}
+            {/* Card 3: Descubra seu Animal Ideal - CHANGED ICON */}
             <div className="docs-card-gradient p-6 rounded-lg border hover:shadow-md transition-all group">
               <div className="h-16 w-16 rounded-full bg-serpente-100 text-serpente-600 flex items-center justify-center mb-6 group-hover:bg-serpente-200 transition-colors dark:bg-serpente-900/50">
-                <Brain className="h-8 w-8" />
+                <HelpCircle className="h-8 w-8" />
               </div>
               <h3 className="font-bold text-xl mb-4">Descubra seu Animal Ideal</h3>
               <p className="text-muted-foreground mb-6 min-h-[80px]">

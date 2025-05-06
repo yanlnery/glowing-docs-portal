@@ -2,49 +2,41 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/layouts/AdminLayout';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import { 
-  ResponsiveContainer, 
+  Card,
+  CardContent, 
+  CardHeader, 
+  CardTitle,
+  CardDescription
+} from '@/components/ui/card';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { format, parseISO, subDays, isAfter } from 'date-fns';
+import { 
+  CartIcon, 
   BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  Tooltip, 
-  Legend,
-  PieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
-  CartesianGrid 
-} from 'recharts';
-import { ShoppingCart, Users, CreditCard, Activity } from 'lucide-react';
-import { format, subDays, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
-import { pt } from 'date-fns/locale';
+  PieChart, 
+  LineChart, 
+  Calendar, 
+  Clock, 
+  ExternalLink
+} from 'lucide-react';
+import { PieChart as RechartsPie, Pie, BarChart as RechartsBar, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 
-type ProductAnalytics = {
-  productId: string;
-  productName: string;
-  views: number;
-  addedToCart: number;
-  purchased: number;
-};
-
-type CartActivity = {
+// Define types for analytics data
+interface CartAnalyticsEntry {
   timestamp: string;
   action: string;
   productId: string;
@@ -52,461 +44,285 @@ type CartActivity = {
   quantity: number;
   price: number;
   referrer: string;
-};
-
-type CheckoutData = {
-  timestamp: string;
-  paymentMethod: 'credit-card' | 'pix';
-  totalAmount: number;
-  items: {
-    id: string;
-    name: string;
-    price: number;
-    quantity: number;
-  }[];
-};
+}
 
 const ShoppingCartAnalytics = () => {
-  const [productAnalytics, setProductAnalytics] = useState<ProductAnalytics[]>([]);
-  const [cartActivities, setCartActivities] = useState<CartActivity[]>([]);
-  const [checkouts, setCheckouts] = useState<CheckoutData[]>([]);
+  const [analyticsData, setAnalyticsData] = useState<CartAnalyticsEntry[]>([]);
+  const [timeFilter, setTimeFilter] = useState('all');
   
-  const [visitCount, setVisitCount] = useState(0);
-  const [addToCartCount, setAddToCartCount] = useState(0);
-  const [checkoutCount, setCheckoutCount] = useState(0);
-  const [conversionRate, setConversionRate] = useState(0);
+  // Colors for charts
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
   
-  // Generate daily analytics data for the past 7 days
-  const [dailyData, setDailyData] = useState<any[]>([]);
-
   useEffect(() => {
-    // Scroll to top when component mounts
-    window.scrollTo(0, 0);
-    
-    // In a real app, this would fetch data from your API
-    // For now, we'll generate mock data or use localStorage data
-    
-    // Try to get actual cart analytics from localStorage
-    const storedAnalytics = localStorage.getItem('cartAnalytics');
-    const parsedAnalytics = storedAnalytics ? JSON.parse(storedAnalytics) : [];
-    
-    // If we have real data, use it - otherwise generate mock data
-    if (parsedAnalytics.length > 0) {
-      setCartActivities(parsedAnalytics);
-      
-      // Extract checkouts from analytics data
-      const checkoutData = parsedAnalytics.filter((item: any) => item.items);
-      setCheckouts(checkoutData);
-      
-      // Generate product analytics from the cart activities
-      const products: Record<string, ProductAnalytics> = {};
-      
-      parsedAnalytics.forEach((activity: CartActivity) => {
-        if (!activity.productId || activity.productId === 'all') return;
-        
-        if (!products[activity.productId]) {
-          products[activity.productId] = {
-            productId: activity.productId,
-            productName: activity.productName || 'Unknown Product',
-            views: 0,
-            addedToCart: 0,
-            purchased: 0
-          };
-        }
-        
-        if (activity.action === 'view_product') {
-          products[activity.productId].views++;
-        } else if (activity.action === 'add_to_cart') {
-          products[activity.productId].addedToCart += activity.quantity;
-        } else if (activity.action === 'checkout' || activity.action === 'purchase') {
-          products[activity.productId].purchased += activity.quantity;
-        }
-      });
-      
-      setProductAnalytics(Object.values(products));
-    } else {
-      generateMockData();
-    }
+    loadAnalytics();
   }, []);
   
-  // When we have cart activities, generate derived data
-  useEffect(() => {
-    if (cartActivities.length === 0) return;
-    
-    // Count metrics
-    let views = 0;
-    let adds = 0;
-    
-    cartActivities.forEach(activity => {
-      if (activity.action === 'view_product') views++;
-      if (activity.action === 'add_to_cart') adds++;
-    });
-    
-    setVisitCount(views);
-    setAddToCartCount(adds);
-    setCheckoutCount(checkouts.length);
-    
-    // Calculate conversion rate (checkout / view)
-    const rate = views > 0 ? (checkouts.length / views) * 100 : 0;
-    setConversionRate(parseFloat(rate.toFixed(2)));
-    
-    // Generate daily data for the past 7 days
-    generateDailyData();
-  }, [cartActivities, checkouts]);
+  const loadAnalytics = () => {
+    try {
+      const data = JSON.parse(localStorage.getItem('cartAnalytics') || '[]') as CartAnalyticsEntry[];
+      setAnalyticsData(data);
+    } catch (error) {
+      console.error("Failed to load cart analytics:", error);
+      setAnalyticsData([]);
+    }
+  };
   
-  const generateMockData = () => {
-    // Generate mock product analytics
-    const mockProducts: ProductAnalytics[] = [
-      {
-        productId: 'p1',
-        productName: 'Corn Snake',
-        views: 120,
-        addedToCart: 30,
-        purchased: 15
-      },
-      {
-        productId: 'p2',
-        productName: 'Ball Python',
-        views: 200,
-        addedToCart: 50,
-        purchased: 25
-      },
-      {
-        productId: 'p3',
-        productName: 'California King Snake',
-        views: 80,
-        addedToCart: 20,
-        purchased: 10
-      },
-      {
-        productId: 'p4',
-        productName: 'Milk Snake',
-        views: 150,
-        addedToCart: 40,
-        purchased: 20
+  const getFilteredData = () => {
+    if (timeFilter === 'all') {
+      return analyticsData;
+    }
+    
+    const cutoffDate = subDays(new Date(), parseInt(timeFilter));
+    return analyticsData.filter(entry => {
+      try {
+        return isAfter(parseISO(entry.timestamp), cutoffDate);
+      } catch {
+        return false;
       }
-    ];
-    
-    setProductAnalytics(mockProducts);
-    
-    // Generate mock cart activities
-    const activities: CartActivity[] = [];
-    const actions = ['view_product', 'add_to_cart', 'remove_from_cart', 'checkout'];
-    
-    // Generate activities for the past 7 days
-    for (let i = 0; i < 100; i++) {
-      const daysAgo = Math.floor(Math.random() * 7);
-      const date = new Date();
-      date.setDate(date.getDate() - daysAgo);
-      
-      const productIndex = Math.floor(Math.random() * mockProducts.length);
-      const product = mockProducts[productIndex];
-      const action = actions[Math.floor(Math.random() * actions.length)];
-      
-      activities.push({
-        timestamp: date.toISOString(),
-        action,
-        productId: product.productId,
-        productName: product.productName,
-        quantity: Math.floor(Math.random() * 3) + 1,
-        price: Math.floor(Math.random() * 200) + 50,
-        referrer: Math.random() > 0.5 ? 'direct' : 'catalog'
-      });
-    }
-    
-    setCartActivities(activities);
-    
-    // Generate mock checkouts
-    const mockCheckouts: CheckoutData[] = [];
-    for (let i = 0; i < 10; i++) {
-      const daysAgo = Math.floor(Math.random() * 7);
-      const date = new Date();
-      date.setDate(date.getDate() - daysAgo);
-      
-      mockCheckouts.push({
-        timestamp: date.toISOString(),
-        paymentMethod: Math.random() > 0.5 ? 'credit-card' : 'pix',
-        totalAmount: Math.floor(Math.random() * 1000) + 100,
-        items: [
-          {
-            id: mockProducts[Math.floor(Math.random() * mockProducts.length)].productId,
-            name: mockProducts[Math.floor(Math.random() * mockProducts.length)].productName,
-            price: Math.floor(Math.random() * 200) + 50,
-            quantity: Math.floor(Math.random() * 3) + 1
-          }
-        ]
-      });
-    }
-    
-    setCheckouts(mockCheckouts);
-    setVisitCount(120);
-    setAddToCartCount(40);
-    setCheckoutCount(10);
-    setConversionRate(8.33);
-    
-    // Generate daily data
-    generateDailyData();
+    });
   };
   
-  const generateDailyData = () => {
-    // Generate data for the past 7 days
-    const data = [];
-    for (let i = 6; i >= 0; i--) {
-      const date = subDays(new Date(), i);
-      const dayStart = startOfDay(date);
-      const dayEnd = endOfDay(date);
-      
-      // Count activities for this day
-      let views = 0;
-      let adds = 0;
-      let checkoutsCount = 0;
-      
-      cartActivities.forEach(activity => {
-        const activityDate = new Date(activity.timestamp);
-        if (isWithinInterval(activityDate, { start: dayStart, end: dayEnd })) {
-          if (activity.action === 'view_product') views++;
-          if (activity.action === 'add_to_cart') adds++;
-        }
-      });
-      
-      // Fix: Use checkouts state instead of this.checkouts
-      checkouts.forEach(checkout => {
-        const checkoutDate = new Date(checkout.timestamp);
-        if (isWithinInterval(checkoutDate, { start: dayStart, end: dayEnd })) {
-          checkoutsCount++;
-        }
-      });
-      
-      data.push({
-        date: format(date, 'dd/MM', { locale: pt }),
-        views,
-        adds,
-        checkouts: checkoutsCount,
-        conversionRate: views > 0 ? (checkoutsCount / views) * 100 : 0
-      });
+  const filteredData = getFilteredData();
+  
+  // Calculate metrics
+  const totalCartVisits = filteredData.filter(entry => entry.action === 'view_cart').length;
+  const totalAddToCart = filteredData.filter(entry => entry.action === 'add_to_cart').length;
+  const totalProducts = filteredData.filter(entry => entry.action === 'add_to_cart')
+    .reduce((sum, entry) => sum + entry.quantity, 0);
+  
+  // Most added products
+  const productCounts = filteredData
+    .filter(entry => entry.action === 'add_to_cart')
+    .reduce((acc: {[key: string]: number}, entry) => {
+      const productName = entry.productName || 'Unknown Product';
+      acc[productName] = (acc[productName] || 0) + entry.quantity;
+      return acc;
+    }, {});
+  
+  const topProducts = Object.entries(productCounts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+  
+  // Referrers
+  const referrerCounts = filteredData
+    .reduce((acc: {[key: string]: number}, entry) => {
+      const referrer = entry.referrer || 'direct';
+      acc[referrer] = (acc[referrer] || 0) + 1;
+      return acc;
+    }, {});
+  
+  const topReferrers = Object.entries(referrerCounts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+  
+  // Format date for display
+  const formatDateTime = (dateString: string) => {
+    try {
+      return format(parseISO(dateString), 'dd/MM/yyyy HH:mm:ss');
+    } catch {
+      return dateString;
     }
-    
-    setDailyData(data);
   };
   
-  const formatDate = (dateString: string) => {
-    return format(new Date(dateString), 'dd/MM/yyyy HH:mm', { locale: pt });
-  };
-  
-  const formatCurrency = (value: number) => {
+  // Format price
+  const formatPrice = (price: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
-    }).format(value);
+    }).format(price);
   };
-  
-  // COLORS for charts
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex flex-wrap items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold">Análise do Carrinho de Compras</h1>
-        </div>
-        
-        {/* Dashboard stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Visualizações</p>
-                  <p className="text-2xl font-bold">{visitCount}</p>
-                </div>
-                <div className="p-2 bg-blue-100 rounded-full text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
-                  <Users className="h-6 w-6" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+    <AdminLayout requiredRole="admin">
+      <div className="p-6">
+        <div className="flex flex-col gap-8">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Análise do Carrinho de Compras</h1>
+            <p className="text-muted-foreground">
+              Monitore o comportamento dos usuários e as interações com o carrinho de compras
+            </p>
+          </div>
           
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Adições ao Carrinho</p>
-                  <p className="text-2xl font-bold">{addToCartCount}</p>
-                </div>
-                <div className="p-2 bg-green-100 rounded-full text-green-600 dark:bg-green-900/20 dark:text-green-400">
-                  <ShoppingCart className="h-6 w-6" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="flex justify-end">
+            <Select
+              value={timeFilter}
+              onValueChange={setTimeFilter}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filtrar por período" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todo o período</SelectItem>
+                <SelectItem value="1">Últimas 24 horas</SelectItem>
+                <SelectItem value="7">Últimos 7 dias</SelectItem>
+                <SelectItem value="30">Últimos 30 dias</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Checkouts</p>
-                  <p className="text-2xl font-bold">{checkoutCount}</p>
-                </div>
-                <div className="p-2 bg-purple-100 rounded-full text-purple-600 dark:bg-purple-900/20 dark:text-purple-400">
-                  <CreditCard className="h-6 w-6" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Metrics Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Visualizações do Carrinho</CardTitle>
+                <CartIcon className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{totalCartVisits}</div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Adições ao Carrinho</CardTitle>
+                <CartIcon className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{totalAddToCart}</div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total de Produtos</CardTitle>
+                <BarChart className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{totalProducts}</div>
+              </CardContent>
+            </Card>
+          </div>
           
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Taxa de Conversão</p>
-                  <p className="text-2xl font-bold">{conversionRate}%</p>
-                </div>
-                <div className="p-2 bg-amber-100 rounded-full text-amber-600 dark:bg-amber-900/20 dark:text-amber-400">
-                  <Activity className="h-6 w-6" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        
-        {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Top Products Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Produtos Mais Adicionados</CardTitle>
+                <CardDescription>Top 5 produtos adicionados ao carrinho</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {topProducts.length > 0 ? (
+                  <div className="w-full h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RechartsBar
+                        data={topProducts}
+                        margin={{ top: 5, right: 20, left: 20, bottom: 60 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" angle={-45} textAnchor="end" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="count" fill="#8884d8" name="Quantidade" />
+                      </RechartsBar>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <div className="flex justify-center items-center h-[300px] bg-muted/30 rounded-lg">
+                    <p className="text-muted-foreground">Sem dados suficientes</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            
+            {/* Referrers Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Fontes de Tráfego</CardTitle>
+                <CardDescription>De onde os usuários chegam ao carrinho</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {topReferrers.length > 0 ? (
+                  <div className="w-full h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RechartsPie>
+                        <Pie
+                          data={topReferrers}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="count"
+                        >
+                          {topReferrers.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </RechartsPie>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <div className="flex justify-center items-center h-[300px] bg-muted/30 rounded-lg">
+                    <p className="text-muted-foreground">Sem dados suficientes</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Recent Activities */}
           <Card>
             <CardHeader>
-              <CardTitle>Atividade Diária</CardTitle>
-              <CardDescription>Visualizações, adições e checkouts nos últimos 7 dias</CardDescription>
+              <CardTitle>Atividades Recentes</CardTitle>
+              <CardDescription>Últimas interações com o carrinho</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={dailyData}
-                    margin={{
-                      top: 5, right: 30, left: 20, bottom: 5,
-                    }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="views" name="Visualizações" fill="#0088FE" />
-                    <Bar dataKey="adds" name="Adições" fill="#00C49F" />
-                    <Bar dataKey="checkouts" name="Checkouts" fill="#FFBB28" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Distribuição de Produtos</CardTitle>
-              <CardDescription>Produtos mais visualizados e adicionados ao carrinho</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={productAnalytics}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="addedToCart"
-                      nameKey="productName"
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    >
-                      {productAnalytics.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              {filteredData.length === 0 ? (
+                <div className="text-center py-8 bg-muted/30 rounded-lg">
+                  <p className="text-muted-foreground">Nenhuma atividade registrada no período selecionado.</p>
+                </div>
+              ) : (
+                <div className="border rounded-lg overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Data/Hora</TableHead>
+                        <TableHead>Ação</TableHead>
+                        <TableHead>Produto</TableHead>
+                        <TableHead>Quantidade</TableHead>
+                        <TableHead>Preço</TableHead>
+                        <TableHead>Origem</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredData.slice(0, 10).map((entry, index) => (
+                        <TableRow key={index}>
+                          <TableCell>
+                            <div className="flex items-center">
+                              <Clock className="h-4 w-4 mr-1 text-muted-foreground" />
+                              {formatDateTime(entry.timestamp)}
+                            </div>
+                          </TableCell>
+                          <TableCell>{
+                            entry.action === 'add_to_cart' ? 'Adição ao Carrinho' :
+                            entry.action === 'remove_from_cart' ? 'Remoção do Carrinho' :
+                            entry.action === 'update_quantity' ? 'Atualização de Quantidade' :
+                            entry.action === 'view_cart' ? 'Visualização do Carrinho' :
+                            entry.action
+                          }</TableCell>
+                          <TableCell>{entry.productName || '-'}</TableCell>
+                          <TableCell>{entry.quantity || '-'}</TableCell>
+                          <TableCell>{entry.price ? formatPrice(entry.price) : '-'}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center">
+                              <ExternalLink className="h-4 w-4 mr-1 text-muted-foreground" />
+                              {entry.referrer || 'Acesso direto'}
+                            </div>
+                          </TableCell>
+                        </TableRow>
                       ))}
-                    </Pie>
-                    <Tooltip formatter={(value, name) => [`${value}`, `${name}`]} />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
-        
-        {/* Product Analytics Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Análise de Produtos</CardTitle>
-            <CardDescription>Desempenho de produtos por visualizações, adições e compras</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Produto</TableHead>
-                    <TableHead className="text-right">Visualizações</TableHead>
-                    <TableHead className="text-right">Adições ao Carrinho</TableHead>
-                    <TableHead className="text-right">Compras</TableHead>
-                    <TableHead className="text-right">Taxa de Conversão</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {productAnalytics.map((product) => (
-                    <TableRow key={product.productId}>
-                      <TableCell className="font-medium">{product.productName}</TableCell>
-                      <TableCell className="text-right">{product.views}</TableCell>
-                      <TableCell className="text-right">{product.addedToCart}</TableCell>
-                      <TableCell className="text-right">{product.purchased}</TableCell>
-                      <TableCell className="text-right">
-                        {product.views > 0 ? `${((product.purchased / product.views) * 100).toFixed(1)}%` : '0%'}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* Recent Checkouts */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Checkouts Recentes</CardTitle>
-            <CardDescription>Pedidos concluídos recentemente</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Data</TableHead>
-                    <TableHead>Método de Pagamento</TableHead>
-                    <TableHead className="text-right">Valor</TableHead>
-                    <TableHead>Itens</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {checkouts.slice(0, 5).map((checkout, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{formatDate(checkout.timestamp)}</TableCell>
-                      <TableCell>
-                        {checkout.paymentMethod === 'credit-card' ? 'Cartão de Crédito' : 'PIX'}
-                      </TableCell>
-                      <TableCell className="text-right">{formatCurrency(checkout.totalAmount)}</TableCell>
-                      <TableCell>
-                        {checkout.items && checkout.items.map((item, i) => (
-                          <div key={i} className="text-sm text-muted-foreground">
-                            {item.name} x {item.quantity}
-                          </div>
-                        ))}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </AdminLayout>
   );

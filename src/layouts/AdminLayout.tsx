@@ -24,6 +24,7 @@ interface NavItem {
   href: string;
   icon: React.ElementType;
   badge?: boolean;
+  requiredRole?: 'admin' | 'editor' | 'viewer';
 }
 
 interface AdminLayoutProps {
@@ -55,12 +56,15 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, requiredRole = 'vie
   const navigation: NavItem[] = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: Home },
     { name: 'Produtos', href: '/admin/products', icon: Package },
-    { name: 'Configurações', href: '/admin/settings', icon: Settings },
+    { name: 'Manuais', href: '/admin/manuals', icon: FileText, requiredRole: 'admin' },
+    { name: 'Lista de Espera', href: '/admin/waitlist', icon: Users, requiredRole: 'admin', badge: true },
+    { name: 'Analytics Carrinho', href: '/admin/cart-analytics', icon: ShoppingCart, requiredRole: 'admin' },
+    { name: 'Configurações', href: '/admin/settings', icon: Settings, requiredRole: 'admin' },
   ];
 
   const filteredNav = navigation.filter(item => {
-    if (item.name !== 'Configurações') return true;
-    return user?.role === requiredRole;
+    if (!item.requiredRole) return true;
+    return user?.role === 'admin' || user?.role === item.requiredRole;
   });
 
   const isActive = (path: string) => location.pathname === path;
@@ -100,6 +104,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, requiredRole = 'vie
                 src="/lovable-uploads/7cf1001e-0989-475f-aaf5-fb56c4fb22a4.png" 
                 alt="PET SERPENTES" 
                 className="h-8 w-8 mr-2" 
+                loading="lazy"
               />
               <span className="text-xl font-semibold">Admin</span>
             </div>
