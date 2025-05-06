@@ -1,15 +1,17 @@
 
-import React, { useEffect, useState } from 'react';
-import AdminLayout from '@/layouts/AdminLayout';
-import { productService } from '@/services/productService';
-import { Product } from '@/types/product';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { CircleDollarSign, Package, ShoppingCart, AlertCircle } from 'lucide-react';
+import AdminLayout from '@/layouts/AdminLayout';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { productService } from '@/services/productService';
+import { Product, ProductStatus } from '@/types/product';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Package, DollarSign, BarChart as BarChartIcon, Settings as SettingsIcon } from 'lucide-react';
 
 const Dashboard = () => {
-  const [productStats, setProductStats] = useState({
+  const [products, setProducts] = useState<Product[]>([]);
+  const [statsData, setStatsData] = useState({
     total: 0,
     available: 0,
     unavailable: 0,
@@ -17,111 +19,143 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // Fetch products for the dashboard
+    const allProducts = productService.getAllProducts();
+    setProducts(allProducts);
     
-    // Get products and calculate stats
-    const products = productService.getAll();
-    setProductStats({
-      total: products.length,
-      available: products.filter(p => p.status === 'disponivel').length,
-      unavailable: products.filter(p => p.status === 'indisponivel').length,
-      sold: products.filter(p => p.status === 'vendido').length
+    // Calculate stats
+    const available = allProducts.filter(p => p.status === 'disponivel').length;
+    const unavailable = allProducts.filter(p => p.status === 'indisponivel').length;
+    const sold = allProducts.filter(p => p.status === 'vendido').length;
+    
+    setStatsData({
+      total: allProducts.length,
+      available,
+      unavailable,
+      sold
     });
   }, []);
+
+  // Generate data for charts
+  const generateCategoryData = () => {
+    const categoryMap: Record<string, number> = {};
+    
+    products.forEach(product => {
+      if (categoryMap[product.category]) {
+        categoryMap[product.category]++;
+      } else {
+        categoryMap[product.category] = 1;
+      }
+    });
+    
+    return Object.keys(categoryMap).map(category => ({
+      name: category.charAt(0).toUpperCase() + category.slice(1),
+      quantidade: categoryMap[category]
+    }));
+  };
+
+  const generateStatusData = () => {
+    const statusMap: Record<string, number> = {};
+    
+    products.forEach(product => {
+      if (statusMap[product.status]) {
+        statusMap[product.status]++;
+      } else {
+        statusMap[product.status] = 1;
+      }
+    });
+    
+    return Object.keys(statusMap).map(status => {
+      let label = status;
+      if (status === 'disponivel') label = 'Disponível';
+      if (status === 'indisponivel') label = 'Indisponível';
+      if (status === 'vendido') label = 'Vendido';
+      
+      return {
+        name: label,
+        quantidade: statusMap[status]
+      };
+    });
+  };
 
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Dashboard</h1>
-          <Button asChild>
-            <Link to="/admin/products/new">Adicionar Produto</Link>
-          </Button>
+          <div className="flex gap-2">
+            <Link to="/admin/products" className="bg-serpente-600 hover:bg-serpente-700 text-white font-medium px-4 py-2 rounded-lg flex items-center">
+              <Package className="h-4 w-4 mr-2" />
+              Ver Produtos
+            </Link>
+            <Link to="/admin/settings" className="bg-gray-600 hover:bg-gray-700 text-white font-medium px-4 py-2 rounded-lg flex items-center">
+              <SettingsIcon className="h-4 w-4 mr-2" />
+              Configurações
+            </Link>
+          </div>
         </div>
 
-        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total de Produtos
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">Total de Animais</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-between">
-                <div className="text-2xl font-bold">{productStats.total}</div>
-                <Package className="h-8 w-8 text-muted-foreground" />
-              </div>
+              <div className="text-3xl font-bold">{statsData.total}</div>
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Disponíveis
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">Disponíveis</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-between">
-                <div className="text-2xl font-bold">{productStats.available}</div>
-                <CircleDollarSign className="h-8 w-8 text-green-500" />
-              </div>
+              <div className="text-3xl font-bold text-green-600">{statsData.available}</div>
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Vendidos
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">Vendidos</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-between">
-                <div className="text-2xl font-bold">{productStats.sold}</div>
-                <ShoppingCart className="h-8 w-8 text-blue-500" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Indisponíveis
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div className="text-2xl font-bold">{productStats.unavailable}</div>
-                <AlertCircle className="h-8 w-8 text-yellow-500" />
-              </div>
+              <div className="text-3xl font-bold text-blue-600">{statsData.sold}</div>
             </CardContent>
           </Card>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Ações Rápidas</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            <Button asChild variant="outline" className="h-24 flex flex-col">
-              <Link to="/admin/products" className="space-y-2">
-                <Package className="h-6 w-6" />
-                <span>Gerenciar Produtos</span>
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="h-24 flex flex-col">
-              <Link to="/admin/products?status=disponivel" className="space-y-2">
-                <CircleDollarSign className="h-6 w-6" />
-                <span>Ver Disponíveis</span>
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="h-24 flex flex-col">
-              <Link to="/admin/settings" className="space-y-2">
-                <Settings className="h-6 w-6" />
-                <span>Configurações</span>
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
+        <Tabs defaultValue="categories">
+          <TabsList>
+            <TabsTrigger value="categories">Categorias</TabsTrigger>
+            <TabsTrigger value="status">Status</TabsTrigger>
+          </TabsList>
+          <TabsContent value="categories" className="p-4 bg-white rounded-lg border mt-2">
+            <h3 className="text-lg font-medium mb-4">Distribuição por Categorias</h3>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={generateCategoryData()}>
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="quantidade" fill="#8884d8" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </TabsContent>
+          <TabsContent value="status" className="p-4 bg-white rounded-lg border mt-2">
+            <h3 className="text-lg font-medium mb-4">Distribuição por Status</h3>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={generateStatusData()}>
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="quantidade" fill="#82ca9d" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </AdminLayout>
   );
