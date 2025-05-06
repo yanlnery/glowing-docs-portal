@@ -125,11 +125,10 @@ const ShoppingCartAnalytics = () => {
       
       setProductAnalytics(Object.values(products));
     } else {
-      // Generate mock data
       generateMockData();
     }
   }, []);
-
+  
   // When we have cart activities, generate derived data
   useEffect(() => {
     if (cartActivities.length === 0) return;
@@ -260,7 +259,7 @@ const ShoppingCartAnalytics = () => {
       // Count activities for this day
       let views = 0;
       let adds = 0;
-      let checkouts = 0;
+      let checkoutsCount = 0;
       
       cartActivities.forEach(activity => {
         const activityDate = new Date(activity.timestamp);
@@ -270,10 +269,11 @@ const ShoppingCartAnalytics = () => {
         }
       });
       
-      this.checkouts.forEach(checkout => {
+      // Fix: Use checkouts state instead of this.checkouts
+      checkouts.forEach(checkout => {
         const checkoutDate = new Date(checkout.timestamp);
         if (isWithinInterval(checkoutDate, { start: dayStart, end: dayEnd })) {
-          checkouts++;
+          checkoutsCount++;
         }
       });
       
@@ -281,8 +281,8 @@ const ShoppingCartAnalytics = () => {
         date: format(date, 'dd/MM', { locale: pt }),
         views,
         adds,
-        checkouts,
-        conversionRate: views > 0 ? (checkouts / views) * 100 : 0
+        checkouts: checkoutsCount,
+        conversionRate: views > 0 ? (checkoutsCount / views) * 100 : 0
       });
     }
     
@@ -304,7 +304,7 @@ const ShoppingCartAnalytics = () => {
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
   return (
-    <AdminLayout requiredRole="viewer">
+    <AdminLayout>
       <div className="space-y-6">
         <div className="flex flex-wrap items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">Análise do Carrinho de Compras</h1>

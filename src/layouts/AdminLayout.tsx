@@ -1,18 +1,30 @@
-
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Navigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
-import { Home, Package, Settings, LogOut, Menu, X } from 'lucide-react';
+import { 
+  Home, 
+  Package, 
+  Settings, 
+  LogOut, 
+  Menu, 
+  X, 
+  Users,
+  ClipboardList, 
+  ShoppingCart,
+  FileText,
+  ListChecks
+} from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
+  requiredRole?: 'admin' | 'editor' | 'viewer';
 }
 
-const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
-  const { isAuthenticated, logout, isLoading } = useAuth();
+const AdminLayout: React.FC<AdminLayoutProps> = ({ children, requiredRole = 'viewer' }) => {
+  const { isAuthenticated, logout, isLoading, user, waitlistCount } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
@@ -37,6 +49,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { name: 'Produtos', href: '/admin/products', icon: Package },
     { name: 'Configurações', href: '/admin/settings', icon: Settings },
   ];
+
+  const filteredNav = navigation.filter(item => item.name !== 'Configurações' || user.role === requiredRole);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -79,8 +93,20 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               <span className="text-xl font-semibold">Admin</span>
             </div>
 
+            {user && (
+              <div className="mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                <div className="text-sm text-gray-600 dark:text-gray-400">Logado como:</div>
+                <div className="font-medium flex items-center gap-2">
+                  {user.username}
+                  <Badge variant={user.role === 'admin' ? 'default' : (user.role === 'editor' ? 'secondary' : 'outline')}>
+                    {user.role === 'admin' ? 'Administrador' : (user.role === 'editor' ? 'Editor' : 'Visualizador')}
+                  </Badge>
+                </div>
+              </div>
+            )}
+
             <nav className="space-y-1">
-              {navigation.map((item) => {
+              {filteredNav.map((item) => {
                 const active = isActive(item.href);
                 return (
                   <Link
@@ -94,7 +120,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     onClick={() => setSidebarOpen(false)}
                   >
                     <item.icon className={`mr-3 flex-shrink-0 h-5 w-5 ${active ? 'text-serpente-600 dark:text-serpente-300' : ''}`} />
-                    {item.name}
+                    <span className="flex-1">{item.name}</span>
+                    {item.badge && waitlistCount > 0 && (
+                      <Badge variant="destructive" className="ml-auto">
+                        {waitlistCount}
+                      </Badge>
+                    )}
                   </Link>
                 );
               })}
