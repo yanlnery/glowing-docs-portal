@@ -76,7 +76,7 @@ const ProductForm = () => {
 
   useEffect(() => {
     if (isEditMode && id) {
-      const productData = productService.getProductById(id);
+      const productData = productService.getById(id);
       if (productData) {
         setProduct(productData);
         setImageList(productData.images || []);
@@ -170,13 +170,13 @@ const ProductForm = () => {
     
     try {
       if (isEditMode && id) {
-        productService.updateProduct(id, formData);
+        productService.update(id, formData);
         toast({
           title: "Sucesso",
           description: "Produto atualizado com sucesso!",
         });
       } else {
-        productService.addProduct(formData);
+        productService.create(formData);
         toast({
           title: "Sucesso",
           description: "Produto criado com sucesso!",
@@ -213,7 +213,7 @@ const ProductForm = () => {
           {isEditMode && (
             <Button variant="destructive" onClick={() => {
               if (window.confirm('Tem certeza que deseja excluir este produto?')) {
-                productService.deleteProduct(id as string);
+                productService.delete(id as string);
                 toast({
                   title: "Produto excluído",
                   description: "O produto foi removido com sucesso.",

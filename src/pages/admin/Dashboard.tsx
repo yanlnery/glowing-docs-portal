@@ -20,7 +20,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     // Fetch products for the dashboard
-    const allProducts = productService.getAllProducts();
+    const allProducts = productService.getAll();
     setProducts(allProducts);
     
     // Calculate stats
