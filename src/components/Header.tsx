@@ -14,11 +14,14 @@ import { cn } from "@/lib/utils";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Menu, X, ShoppingCart, User, Book, Box, FileText, Users, Phone, Syringe } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useCartStore } from "@/stores/cartStore";
+import { Badge } from "@/components/ui/badge";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const isMobile = useIsMobile();
+  const cartQuantity = useCartStore(state => state.getCartQuantity());
   
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -78,9 +81,14 @@ export default function Header() {
                 <span className="sr-only">Área do Cliente</span>
               </Link>
             </Button>
-            <Button variant="ghost" size="icon" asChild>
+            <Button variant="ghost" size="icon" asChild className="relative">
               <Link to="/carrinho">
                 <ShoppingCart size={20} />
+                {cartQuantity > 0 && (
+                  <Badge className="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center text-xs">
+                    {cartQuantity}
+                  </Badge>
+                )}
                 <span className="sr-only">Carrinho</span>
               </Link>
             </Button>
@@ -133,6 +141,9 @@ export default function Header() {
                   <Link to="/carrinho" onClick={() => setIsMenuOpen(false)}>
                     <ShoppingCart size={16} className="mr-2" />
                     Carrinho
+                    {cartQuantity > 0 && (
+                      <Badge className="ml-2">{cartQuantity}</Badge>
+                    )}
                   </Link>
                 </Button>
               </div>
