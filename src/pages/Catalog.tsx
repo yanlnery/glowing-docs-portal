@@ -32,17 +32,32 @@ const Catalog = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Scroll to top when component mounts
     window.scrollTo(0, 0);
     loadProducts();
   }, []);
 
   const loadProducts = () => {
     setIsLoading(true);
-    // Get only available and visible products
-    const availableProducts = productService.getAvailableProducts();
-    setProducts(availableProducts);
-    applyFilters(availableProducts, searchQuery, categoryFilter, subcategoryFilter);
-    setIsLoading(false);
+    try {
+      // Get only available and visible products
+      const availableProducts = productService.getAvailableProducts();
+      
+      if (!availableProducts || availableProducts.length === 0) {
+        console.log("No available products found");
+      } else {
+        console.log(`Found ${availableProducts.length} available products`);
+      }
+      
+      setProducts(availableProducts);
+      applyFilters(availableProducts, searchQuery, categoryFilter, subcategoryFilter);
+    } catch (error) {
+      console.error("Error loading products:", error);
+      setProducts([]);
+      setFilteredProducts([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const applyFilters = (
@@ -51,6 +66,11 @@ const Catalog = () => {
     category: ProductCategory | 'all',
     subcategory: ProductSubcategory | 'all'
   ) => {
+    if (!productList || productList.length === 0) {
+      setFilteredProducts([]);
+      return;
+    }
+    
     let result = [...productList];
     
     // Apply search filter
@@ -73,6 +93,7 @@ const Catalog = () => {
       result = result.filter(product => product.subcategory === subcategory);
     }
     
+    console.log(`Applied filters: ${result.length} products remain after filtering`);
     setFilteredProducts(result);
   };
 
@@ -165,6 +186,13 @@ const Catalog = () => {
         {isLoading ? (
           <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-serpente-600"></div>
+          </div>
+        ) : products.length === 0 ? (
+          <div className="text-center py-12">
+            <h3 className="text-xl font-semibold mb-2">Nenhum produto cadastrado</h3>
+            <p className="text-muted-foreground mb-4">
+              Não há animais disponíveis no momento.
+            </p>
           </div>
         ) : filteredProducts.length === 0 ? (
           <div className="text-center py-12">

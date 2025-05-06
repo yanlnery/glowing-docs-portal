@@ -19,6 +19,9 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+    
     // Fetch products for the dashboard
     const allProducts = productService.getAll();
     setProducts(allProducts);
