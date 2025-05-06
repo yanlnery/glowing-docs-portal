@@ -1,12 +1,20 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+type UserRole = 'admin' | 'editor' | 'viewer';
+
+type UserType = {
+  username: string;
+  role: UserRole;
+};
+
 type AuthContextType = {
   isAuthenticated: boolean;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
-  user: { username: string } | null;
+  user: UserType | null;
   isLoading: boolean;
+  waitlistCount: number;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -18,8 +26,9 @@ const ADMIN_PASSWORD = "petSerpentes2023"; // This should be hashed in productio
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [user, setUser] = useState<{ username: string } | null>(null);
+  const [user, setUser] = useState<UserType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [waitlistCount, setWaitlistCount] = useState(0);
 
   useEffect(() => {
     // Check if user is logged in from localStorage
@@ -34,6 +43,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem('adminUser');
       }
     }
+    
+    // Load waitlist count
+    try {
+      const waitlist = JSON.parse(localStorage.getItem('waitlist') || '[]');
+      setWaitlistCount(waitlist.length);
+    } catch (error) {
+      console.error("Failed to load waitlist", error);
+    }
+    
     setIsLoading(false);
   }, []);
 
@@ -41,7 +59,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // This is a simple authentication method
     // In production, you should use a secure authentication system
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      const userData = { username };
+      // Default role is admin for this demo
+      const userData = { username, role: 'admin' as UserRole };
       setUser(userData);
       setIsAuthenticated(true);
       localStorage.setItem('adminUser', JSON.stringify(userData));
@@ -57,7 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, user, isLoading }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout, user, isLoading, waitlistCount }}>
       {children}
     </AuthContext.Provider>
   );

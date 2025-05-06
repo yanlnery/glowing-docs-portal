@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Navigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,6 +18,13 @@ import {
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+
+interface NavItem {
+  name: string;
+  href: string;
+  icon: React.ElementType;
+  badge?: boolean;
+}
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -44,13 +52,16 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, requiredRole = 'vie
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
-  const navigation = [
+  const navigation: NavItem[] = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: Home },
     { name: 'Produtos', href: '/admin/products', icon: Package },
     { name: 'Configurações', href: '/admin/settings', icon: Settings },
   ];
 
-  const filteredNav = navigation.filter(item => item.name !== 'Configurações' || user.role === requiredRole);
+  const filteredNav = navigation.filter(item => {
+    if (item.name !== 'Configurações') return true;
+    return user?.role === requiredRole;
+  });
 
   const isActive = (path: string) => location.pathname === path;
 
