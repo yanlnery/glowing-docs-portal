@@ -22,13 +22,15 @@ export default function MainLayout({ children, fullWidth = false }: MainLayoutPr
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <Sidebar />
       
-      <main className={cn("flex-1", !fullWidth && "md:pl-64")}>
-        <div className={cn(fullWidth ? "w-full" : "docs-container py-6")}>
-          {children}
-        </div>
-      </main>
+      <div className="flex flex-1">
+        <Sidebar />
+        <main className={cn("flex-1", !fullWidth && "md:pl-64")}>
+          <div className={cn(fullWidth ? "w-full" : "docs-container py-6")}>
+            {children}
+          </div>
+        </main>
+      </div>
       
       <Footer />
     </div>

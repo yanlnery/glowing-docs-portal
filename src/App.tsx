@@ -58,26 +58,27 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Home />} />
-            <Route path="/catalogo" element={<Catalog />} />
-            <Route path="/produtos/:id" element={<ProductDetail />} />
-            <Route path="/especies" element={<Species />} />
-            <Route path="/especies/:id" element={<SpeciesDetail />} />
-            <Route path="/especies-criadas/:slug" element={<SpeciesDetail />} />
-            <Route path="/manuais" element={<Manuals />} />
-            <Route path="/sobre" element={<About />} />
-            <Route path="/educacao" element={<Education />} />
-            <Route path="/academy" element={<Academy />} />
-            <Route path="/lista-de-espera" element={<WaitlistForm />} />
+            {/* Public Routes - All wrapped with WebsiteLayout */}
+            <Route path="/" element={<WebsiteLayout><Home /></WebsiteLayout>} />
+            <Route path="/catalogo" element={<WebsiteLayout><Catalog /></WebsiteLayout>} />
+            <Route path="/produtos/:id" element={<WebsiteLayout><ProductDetail /></WebsiteLayout>} />
+            <Route path="/especies" element={<WebsiteLayout><Species /></WebsiteLayout>} />
+            <Route path="/especies/:id" element={<WebsiteLayout><SpeciesDetail /></WebsiteLayout>} />
+            <Route path="/especies-criadas/:slug" element={<WebsiteLayout><SpeciesDetail /></WebsiteLayout>} />
+            <Route path="/manuais" element={<WebsiteLayout><Manuals /></WebsiteLayout>} />
+            <Route path="/sobre" element={<WebsiteLayout><About /></WebsiteLayout>} />
+            <Route path="/educacao" element={<WebsiteLayout><Education /></WebsiteLayout>} />
+            <Route path="/academy" element={<WebsiteLayout><Academy /></WebsiteLayout>} />
+            <Route path="/lista-de-espera" element={<WebsiteLayout><WaitlistForm /></WebsiteLayout>} />
             <Route path="/confirmacao-inscricao" element={<WebsiteLayout><WaitlistConfirmationPage /></WebsiteLayout>} />
-            <Route path="/contato" element={<Contact />} />
-            <Route path="/area-cliente" element={<ClientArea />} />
-            <Route path="/carrinho" element={<CartPage />} />
+            <Route path="/contato" element={<WebsiteLayout><Contact /></WebsiteLayout>} />
+            <Route path="/area-cliente" element={<WebsiteLayout><ClientArea /></WebsiteLayout>} />
+            <Route path="/carrinho" element={<WebsiteLayout><CartPage /></WebsiteLayout>} />
+            
             {/* Quiz Routes */}
-            <Route path="/quiz" element={<Quiz />} />
-            <Route path="/manuais-de-criacao" element={<Manuals />} />
-            <Route path="/ps-academy" element={<Academy />} />
+            <Route path="/quiz" element={<WebsiteLayout><Quiz /></WebsiteLayout>} />
+            <Route path="/manuais-de-criacao" element={<WebsiteLayout><Manuals /></WebsiteLayout>} />
+            <Route path="/ps-academy" element={<WebsiteLayout><Academy /></WebsiteLayout>} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<Login />} />
@@ -91,12 +92,12 @@ const App = () => (
             <Route path="/admin/cart-analytics" element={<ShoppingCartAnalytics />} />
             
             {/* Legacy routes - keeping for backward compatibility */}
-            <Route path="/getting-started" element={<Home />} />
-            <Route path="/api" element={<Home />} />
-            <Route path="/examples" element={<Home />} />
+            <Route path="/getting-started" element={<WebsiteLayout><Home /></WebsiteLayout>} />
+            <Route path="/api" element={<WebsiteLayout><Home /></WebsiteLayout>} />
+            <Route path="/examples" element={<WebsiteLayout><Home /></WebsiteLayout>} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
+            <Route path="*" element={<WebsiteLayout><NotFound /></WebsiteLayout>} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
