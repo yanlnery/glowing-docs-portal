@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Phone, Mail, MessageSquare, Instagram, Facebook, Youtube } from "lucide-react";
+import { Phone, Mail, MessageSquare, Instagram, Youtube } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 export default function Contact() {
@@ -42,6 +42,16 @@ export default function Contact() {
         subject: "",
         message: ""
       });
+      
+      // Store the contact form submission in localStorage for admin panel
+      const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
+      submissions.push({
+        ...formData,
+        id: Date.now().toString(),
+        date: new Date().toISOString()
+      });
+      localStorage.setItem('contactSubmissions', JSON.stringify(submissions));
+      
     }, 1500);
   };
 
@@ -142,7 +152,7 @@ export default function Contact() {
                 <div>
                   <h3 className="font-medium">Telefone</h3>
                   <p className="text-muted-foreground">
-                    <a href="tel:+552199999999" className="hover:text-serpente-600 transition-colors">+55 21 99999-9999</a>
+                    <a href="tel:+5521967802174" className="hover:text-serpente-600 transition-colors">+55 21 96780-2174</a>
                   </p>
                 </div>
               </div>
@@ -162,7 +172,7 @@ export default function Contact() {
                 <div>
                   <h3 className="font-medium">WhatsApp</h3>
                   <p className="text-muted-foreground">
-                    <a href="https://wa.me/5521999999999" className="hover:text-serpente-600 transition-colors">Fale pelo WhatsApp</a>
+                    <a href="https://wa.me/message/PQ7BIYW7H5ARK1" className="hover:text-serpente-600 transition-colors">Fale pelo WhatsApp</a>
                   </p>
                 </div>
               </div>
@@ -172,25 +182,31 @@ export default function Contact() {
               <h3 className="font-medium mb-3">Redes Sociais</h3>
               <div className="flex space-x-4">
                 <a 
-                  href="https://instagram.com" 
+                  href="https://www.instagram.com/petserpentes/" 
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="h-10 w-10 bg-card border rounded-full flex items-center justify-center hover:bg-accent transition-colors"
                   aria-label="Instagram"
                 >
                   <Instagram className="h-5 w-5" />
                 </a>
                 <a 
-                  href="https://facebook.com" 
-                  className="h-10 w-10 bg-card border rounded-full flex items-center justify-center hover:bg-accent transition-colors"
-                  aria-label="Facebook"
-                >
-                  <Facebook className="h-5 w-5" />
-                </a>
-                <a 
-                  href="https://youtube.com" 
+                  href="https://www.youtube.com/@PETSerpentes" 
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="h-10 w-10 bg-card border rounded-full flex items-center justify-center hover:bg-accent transition-colors"
                   aria-label="YouTube"
                 >
                   <Youtube className="h-5 w-5" />
+                </a>
+                <a 
+                  href="https://wa.me/message/PQ7BIYW7H5ARK1" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="h-10 w-10 bg-card border rounded-full flex items-center justify-center hover:bg-accent transition-colors"
+                  aria-label="WhatsApp"
+                >
+                  <MessageSquare className="h-5 w-5" />
                 </a>
               </div>
             </div>

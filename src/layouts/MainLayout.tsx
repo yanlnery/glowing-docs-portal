@@ -1,8 +1,6 @@
 
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import Sidebar from '@/components/Sidebar';
 import { cn } from '@/lib/utils';
 
@@ -20,9 +18,7 @@ export default function MainLayout({ children, fullWidth = false }: MainLayoutPr
   }, [location]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
+    <div className="min-h-screen flex flex-col">      
       <div className="flex flex-1">
         <Sidebar />
         <main className={cn("flex-1", !fullWidth && "md:pl-64")}>
@@ -31,8 +27,6 @@ export default function MainLayout({ children, fullWidth = false }: MainLayoutPr
           </div>
         </main>
       </div>
-      
-      <Footer />
     </div>
   );
 }

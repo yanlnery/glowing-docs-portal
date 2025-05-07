@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -31,6 +32,8 @@ import Settings from "./pages/admin/Settings";
 import WaitlistAdmin from "./pages/admin/WaitlistAdmin";
 import ManualsAdmin from "./pages/admin/ManualsAdmin";
 import ShoppingCartAnalytics from "./pages/admin/ShoppingCartAnalytics";
+import ContactSubmissions from "./pages/admin/ContactSubmissions";
+import SpeciesAdmin from "./pages/admin/SpeciesAdmin";
 
 // Create a confirmation page for waitlist registration
 const WaitlistConfirmationPage = () => (
@@ -89,6 +92,8 @@ const App = () => (
             <Route path="/admin/settings" element={<Settings />} />
             <Route path="/admin/waitlist" element={<WaitlistAdmin />} />
             <Route path="/admin/manuals" element={<ManualsAdmin />} />
+            <Route path="/admin/contact-submissions" element={<ContactSubmissions />} />
+            <Route path="/admin/species" element={<SpeciesAdmin />} />
             <Route path="/admin/cart-analytics" element={<ShoppingCartAnalytics />} />
             
             {/* Legacy routes - keeping for backward compatibility */}

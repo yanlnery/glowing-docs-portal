@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Mail, MapPin, Phone, Twitter, Youtube } from "lucide-react";
+import { Instagram, Mail, MapPin, Phone, Youtube, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Footer() {
@@ -22,14 +22,14 @@ export default function Footer() {
               Criadouro especializado em répteis e aves, devidamente registrado no IBAMA e INEA.
             </p>
             <div className="flex space-x-3">
-              <a href="https://facebook.com" className="hover:text-white transition-colors" aria-label="Facebook">
-                <Facebook size={20} />
-              </a>
-              <a href="https://instagram.com" className="hover:text-white transition-colors" aria-label="Instagram">
+              <a href="https://www.instagram.com/petserpentes/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" aria-label="Instagram">
                 <Instagram size={20} />
               </a>
-              <a href="https://youtube.com" className="hover:text-white transition-colors" aria-label="Youtube">
+              <a href="https://www.youtube.com/@PETSerpentes" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" aria-label="Youtube">
                 <Youtube size={20} />
+              </a>
+              <a href="https://wa.me/message/PQ7BIYW7H5ARK1" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" aria-label="WhatsApp">
+                <MessageSquare size={20} />
               </a>
             </div>
           </div>
