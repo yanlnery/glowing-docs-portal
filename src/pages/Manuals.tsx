@@ -1,7 +1,9 @@
+
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Download, FileText, Search, Upload } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import WebsiteLayout from "@/layouts/WebsiteLayout";
 
 interface Manual {
   id: string;
@@ -126,85 +128,87 @@ export default function Manuals() {
   };
 
   return (
-    <div className="container px-4 py-12 sm:px-6">
-      <div className="flex flex-col items-center mb-12 text-center">
-        <div className="docs-section-title">
-          <h1 className="text-4xl font-bold">Manuais de Criação</h1>
+    <WebsiteLayout>
+      <div className="container px-4 py-12 sm:px-6">
+        <div className="flex flex-col items-center mb-12 text-center">
+          <div className="docs-section-title">
+            <h1 className="text-4xl font-bold">Manuais de Criação</h1>
+          </div>
+          <p className="text-muted-foreground max-w-2xl mt-4">
+            Conteúdo técnico e prático para criadores de répteis certificados
+          </p>
         </div>
-        <p className="text-muted-foreground max-w-2xl mt-4">
-          Conteúdo técnico e prático para criadores de répteis certificados
-        </p>
-      </div>
-      
-      {/* Search */}
-      <div className="mb-8 flex justify-center">
-        <div className="relative w-full max-w-md">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder="Buscar manual..."
-            className="h-10 w-full rounded-md border border-input pl-10 pr-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            value={searchQuery}
-            onChange={handleSearch}
-          />
+        
+        {/* Search */}
+        <div className="mb-8 flex justify-center">
+          <div className="relative w-full max-w-md">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Buscar manual..."
+              className="h-10 w-full rounded-md border border-input pl-10 pr-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              value={searchQuery}
+              onChange={handleSearch}
+            />
+          </div>
         </div>
-      </div>
-      
-      {/* Manuals Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {displayedManuals.map((manual) => (
-          <div key={manual.id} className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md flex flex-col">
-            <div className="relative h-48 overflow-hidden">
-              <img 
-                src={manual.image}
-                alt={manual.title} 
-                className="w-full h-full object-cover object-center"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
-                <div className="p-4">
-                  <span className="inline-flex items-center gap-1 bg-white/90 text-serpente-800 text-xs px-2 py-1 rounded">
-                    <FileText className="h-3 w-3" /> {manual.pages} páginas
-                  </span>
+        
+        {/* Manuals Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {displayedManuals.map((manual) => (
+            <div key={manual.id} className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md flex flex-col">
+              <div className="relative h-48 overflow-hidden">
+                <img 
+                  src={manual.image}
+                  alt={manual.title} 
+                  className="w-full h-full object-cover object-center"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
+                  <div className="p-4">
+                    <span className="inline-flex items-center gap-1 bg-white/90 text-serpente-800 text-xs px-2 py-1 rounded">
+                      <FileText className="h-3 w-3" /> {manual.pages} páginas
+                    </span>
+                  </div>
                 </div>
               </div>
+              <div className="p-4 flex-grow">
+                <h3 className="font-bold text-lg mb-2">{manual.title}</h3>
+                <p className="text-muted-foreground text-sm mb-4">{manual.description}</p>
+              </div>
+              <div className="p-4 pt-0 mt-auto">
+                <Button 
+                  className="w-full" 
+                  variant="outline" 
+                  onClick={() => handleDownload(manual.pdfUrl, manual.title)}
+                >
+                  <Download className="mr-2 h-4 w-4" /> Baixar PDF
+                </Button>
+              </div>
             </div>
-            <div className="p-4 flex-grow">
-              <h3 className="font-bold text-lg mb-2">{manual.title}</h3>
-              <p className="text-muted-foreground text-sm mb-4">{manual.description}</p>
-            </div>
-            <div className="p-4 pt-0 mt-auto">
-              <Button 
-                className="w-full" 
-                variant="outline" 
-                onClick={() => handleDownload(manual.pdfUrl, manual.title)}
-              >
-                <Download className="mr-2 h-4 w-4" /> Baixar PDF
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
-      
-      {displayedManuals.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">
-            Nenhum manual encontrado para sua pesquisa.
-          </p>
-          {searchQuery && (
-            <Button 
-              variant="outline" 
-              className="mt-4"
-              onClick={() => {
-                setSearchQuery('');
-                setFilteredManuals(manuals);
-              }}
-            >
-              Limpar Busca
-            </Button>
-          )}
+          ))}
         </div>
-      )}
-    </div>
+        
+        {displayedManuals.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">
+              Nenhum manual encontrado para sua pesquisa.
+            </p>
+            {searchQuery && (
+              <Button 
+                variant="outline" 
+                className="mt-4"
+                onClick={() => {
+                  setSearchQuery('');
+                  setFilteredManuals(manuals);
+                }}
+              >
+                Limpar Busca
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
+    </WebsiteLayout>
   );
 }
