@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
 import ThemeToggle from "@/components/ThemeToggle";
-import { Menu, X, ShoppingCart, User, Book, Box, FileText, Users, Phone, Syringe } from "lucide-react";
+import { Menu, X, ShoppingCart, User, Book, Box, FileText, Users, Phone, Syringe, Home } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useCartStore } from "@/stores/cartStore";
 import { Badge } from "@/components/ui/badge";
@@ -28,13 +28,13 @@ export default function Header() {
   };
   
   const menuItems = [
-    { title: "Início", path: "/" },
-    { title: "P. S. Academy", path: "/academy" },
-    { title: "Animais Disponíveis", path: "/catalogo" },
-    { title: "Espécies Criadas", path: "/especies" },
-    { title: "Manuais de Criação", path: "/manuais" },
-    { title: "Quem Somos", path: "/sobre" },
-    { title: "Contato", path: "/contato" },
+    { title: "Início", path: "/", icon: <Home size={16} className="mr-2" /> },
+    { title: "P. S. Academy", path: "/academy", icon: <Book size={16} className="mr-2" /> },
+    { title: "Animais Disponíveis", path: "/catalogo", icon: <Syringe size={16} className="mr-2" /> },
+    { title: "Espécies Criadas", path: "/especies", icon: <FileText size={16} className="mr-2" /> },
+    { title: "Manuais de Criação", path: "/manuais", icon: <Book size={16} className="mr-2" /> },
+    { title: "Quem Somos", path: "/sobre", icon: <Users size={16} className="mr-2" /> },
+    { title: "Contato", path: "/contato", icon: <Phone size={16} className="mr-2" /> },
   ];
   
   return (
@@ -109,7 +109,7 @@ export default function Header() {
       
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="fixed inset-0 top-16 z-50 bg-black md:hidden">
+        <div className="fixed inset-0 top-16 z-50 bg-background/95 backdrop-blur md:hidden">
           <nav className="container py-8">
             <ul className="flex flex-col space-y-4">
               {menuItems.map((item) => (
@@ -117,19 +117,20 @@ export default function Header() {
                   <Link
                     to={item.path}
                     className={cn(
-                      "flex w-full rounded-md p-4 text-base font-medium text-white min-h-[44px] items-center",
+                      "flex w-full rounded-md p-4 text-base font-medium text-foreground min-h-[44px] items-center",
                       isActive(item.path) 
                         ? "bg-accent text-accent-foreground" 
                         : "hover:bg-accent/50"
                     )}
                     onClick={() => setIsMenuOpen(false)}
                   >
+                    {item.icon}
                     {item.title}
                   </Link>
                 </li>
               ))}
             </ul>
-            <div className="mt-8 flex items-center justify-between border-t border-white/20 pt-4">
+            <div className="mt-8 flex items-center justify-between border-t border-border pt-4">
               <div className="flex items-center gap-4">
                 <Button variant="outline" size="sm" className="min-h-[44px]" asChild>
                   <Link to="/area-cliente" onClick={() => setIsMenuOpen(false)}>

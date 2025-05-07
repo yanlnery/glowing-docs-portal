@@ -28,7 +28,7 @@ export interface Product {
   id: string;
   name: string;
   speciesName: string;
-  speciesId?: string; // Optional for backwards compatibility
+  speciesId?: string;
   description: string;
   price: number;
   category: ProductCategory;
@@ -36,10 +36,10 @@ export interface Product {
   featured: boolean;
   isNew: boolean;
   available: boolean;
-  status?: ProductStatus; // For backward compatibility
-  visible?: boolean; // For backward compatibility
-  order?: number; // For backward compatibility
-  paymentLink?: string; // For backward compatibility
+  status?: ProductStatus;
+  visible?: boolean;
+  order?: number;
+  paymentLink?: string;
   images?: ProductImage[];
   details?: ProductDetail[];
   createdAt: string;
