@@ -1,14 +1,10 @@
 
 import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Outlet } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
-interface WebsiteLayoutProps {
-  children: React.ReactNode;
-}
-
-export default function WebsiteLayout({ children }: WebsiteLayoutProps) {
+export default function WebsiteLayout() {
   const location = useLocation();
   
   // Scroll to top when location changes
@@ -20,7 +16,7 @@ export default function WebsiteLayout({ children }: WebsiteLayoutProps) {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1">
-        {children}
+        <Outlet />
       </main>
       <Footer />
     </div>
