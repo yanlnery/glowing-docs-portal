@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '@/layouts/AdminLayout';
@@ -145,6 +144,7 @@ const ProductForm = () => {
     const newImages: ProductImage[] = imageFiles.map((file, index) => ({
       id: `new-image-${Date.now()}-${index}`,
       url: URL.createObjectURL(file),
+      filename: file.name, // Add the filename property
       alt: `Image of ${values.name}`
     }));
     
@@ -166,6 +166,7 @@ const ProductForm = () => {
       isNew: values.isNew,
       visible: values.visible,
       order: values.order,
+      available: values.visible || false, // Add the available property based on visible
     };
     
     try {
