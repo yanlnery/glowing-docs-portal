@@ -1,34 +1,41 @@
+export type ProductCategory = 'serpente' | 'lagarto' | 'quelonio';
+export type ProductSubcategory =
+  | 'colubrideos'
+  | 'boideos'
+  | 'pequenos'
+  | 'grandes'
+  | 'terrestres'
+  | 'aquaticos';
 
-export type ProductImage = {
+export interface ProductImage {
   id: string;
   url: string;
-  alt: string;
-};
+  filename: string;
+  altText?: string;
+}
 
-export type ProductCategory = 'serpente' | 'lagarto' | 'quelonio';
+export interface ProductDetail {
+  id: string;
+  label: string;
+  value: string;
+}
 
-export type ProductSubcategory = 'boideos' | 'colubrideos' | 'pequenos' | 'grandes' | 'aquaticos' | 'terrestres';
-
-export type ProductStatus = 'disponivel' | 'indisponivel' | 'vendido';
-
-export type Product = {
+export interface Product {
   id: string;
   name: string;
-  speciesId: string; // Reference to the species ID
-  speciesName: string; // Full species name
+  speciesName: string;
+  description: string;
+  price: number;
   category: ProductCategory;
   subcategory: ProductSubcategory;
-  status: ProductStatus;
-  price: number;
-  paymentLink: string;
-  images: ProductImage[];
-  description: string;
   featured: boolean;
   isNew: boolean;
-  visible: boolean;
-  order: number;
+  available: boolean;
+  images?: ProductImage[];
+  details?: ProductDetail[];
   createdAt: string;
   updatedAt: string;
-};
+  meta?: Record<string, any>;
+}
 
 export type ProductFormData = Omit<Product, 'id' | 'createdAt' | 'updatedAt'>;

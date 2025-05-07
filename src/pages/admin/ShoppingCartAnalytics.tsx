@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select";
 import { format, parseISO, subDays, isAfter } from 'date-fns';
 import { 
-  CartIcon, 
+  ShoppingCart, 
   BarChart, 
   PieChart, 
   LineChart, 
@@ -167,7 +167,7 @@ const ShoppingCartAnalytics = () => {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Visualizações do Carrinho</CardTitle>
-                <CartIcon className="h-4 w-4 text-muted-foreground" />
+                <ShoppingCart className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{totalCartVisits}</div>
@@ -177,7 +177,7 @@ const ShoppingCartAnalytics = () => {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Adições ao Carrinho</CardTitle>
-                <CartIcon className="h-4 w-4 text-muted-foreground" />
+                <ShoppingCart className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{totalAddToCart}</div>
