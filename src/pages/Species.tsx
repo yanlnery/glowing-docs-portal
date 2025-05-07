@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -35,7 +36,7 @@ export default function Species() {
       // Fallback to the default hardcoded species
       setSpeciesList([
         {
-          id: 1,
+          id: "1",
           name: "Boa constrictor constrictor",
           commonName: "Jiboia Amazônica",
           type: "serpente",
@@ -43,7 +44,7 @@ export default function Species() {
           slug: "boa-constrictor-constrictor"
         },
         {
-          id: 2,
+          id: "2",
           name: "Boa constrictor amarali",
           commonName: "Jiboia do Cerrado",
           type: "serpente",
@@ -51,7 +52,7 @@ export default function Species() {
           slug: "boa-constrictor-amarali"
         },
         {
-          id: 3,
+          id: "3",
           name: "Boa atlantica",
           commonName: "Jiboia da Mata Atlântica",
           type: "serpente",
@@ -59,7 +60,7 @@ export default function Species() {
           slug: "boa-atlantica"
         },
         {
-          id: 4,
+          id: "4",
           name: "Epicrates cenchria",
           commonName: "Jiboia Arco-íris da Amazônia",
           type: "serpente",
@@ -67,7 +68,7 @@ export default function Species() {
           slug: "epicrates-cenchria"
         },
         {
-          id: 5,
+          id: "5",
           name: "Epicrates assisi",
           commonName: "Jiboia Arco-íris da Caatinga",
           type: "serpente",
@@ -75,7 +76,7 @@ export default function Species() {
           slug: "epicrates-assisi"
         },
         {
-          id: 6,
+          id: "6",
           name: "Epicrates crassus",
           commonName: "Jiboia Arco-íris do Cerrado",
           type: "serpente",
@@ -83,7 +84,7 @@ export default function Species() {
           slug: "epicrates-crassus"
         },
         {
-          id: 7,
+          id: "7",
           name: "Epicrates maurus",
           commonName: "Jiboia Arco-íris do Norte",
           type: "serpente",
@@ -91,7 +92,7 @@ export default function Species() {
           slug: "epicrates-maurus"
         },
         {
-          id: 8,
+          id: "8",
           name: "Corallus batesii",
           commonName: "Jiboia Esmeralda",
           type: "serpente",
@@ -99,7 +100,7 @@ export default function Species() {
           slug: "corallus-batesii"
         },
         {
-          id: 9,
+          id: "9",
           name: "Corallus hortulana",
           commonName: "Suaçuboia",
           type: "serpente",
@@ -107,7 +108,7 @@ export default function Species() {
           slug: "corallus-hortulana"
         },
         {
-          id: 10,
+          id: "10",
           name: "Erythrolamprus miliaris",
           commonName: "Cobra d'água",
           type: "serpente",
@@ -115,7 +116,7 @@ export default function Species() {
           slug: "erythrolamprus-miliaris"
         },
         {
-          id: 11,
+          id: "11",
           name: "Spilotes pullatus",
           commonName: "Caninana",
           type: "serpente",
@@ -123,7 +124,7 @@ export default function Species() {
           slug: "spilotes-pullatus"
         },
         {
-          id: 12,
+          id: "12",
           name: "Spilotes sulphureus",
           commonName: "Caninana de Fogo",
           type: "serpente",
@@ -131,7 +132,7 @@ export default function Species() {
           slug: "spilotes-sulphureus"
         },
         {
-          id: 13,
+          id: "13",
           name: "Salvator teguixin",
           commonName: "Teiú Dourado",
           type: "lagarto",
@@ -139,7 +140,7 @@ export default function Species() {
           slug: "salvator-teguixin"
         },
         {
-          id: 14,
+          id: "14",
           name: "Salvator merianae",
           commonName: "Teiú",
           type: "lagarto",
@@ -147,7 +148,7 @@ export default function Species() {
           slug: "salvator-merianae"
         },
         {
-          id: 15,
+          id: "15",
           name: "Iguana iguana",
           commonName: "Iguana",
           type: "lagarto",
@@ -155,7 +156,7 @@ export default function Species() {
           slug: "iguana-iguana"
         },
         {
-          id: 16,
+          id: "16",
           name: "Diploglossus lessonae",
           commonName: "Lagarto Coral",
           type: "lagarto",
@@ -163,7 +164,7 @@ export default function Species() {
           slug: "diploglossus-lessonae"
         },
         {
-          id: 17,
+          id: "17",
           name: "Polychrus marmoratus",
           commonName: "Lagarto Preguiça",
           type: "lagarto",
@@ -171,7 +172,7 @@ export default function Species() {
           slug: "polychrus-marmoratus"
         },
         {
-          id: 18,
+          id: "18",
           name: "Thecadactylus rapicauda",
           commonName: "Lagartixa Rabo de Nabo",
           type: "lagarto",
@@ -179,7 +180,7 @@ export default function Species() {
           slug: "thecadactylus-rapicauda"
         },
         {
-          id: 19,
+          id: "19",
           name: "Chelonoidis carbonaria",
           commonName: "Jabuti Piranga",
           type: "quelonio",
@@ -187,7 +188,7 @@ export default function Species() {
           slug: "chelonoidis-carbonaria"
         },
         {
-          id: 20,
+          id: "20",
           name: "Chelonoidis denticulata",
           commonName: "Jabuti Tinga",
           type: "quelonio",
@@ -195,7 +196,7 @@ export default function Species() {
           slug: "chelonoidis-denticulata"
         },
         {
-          id: 21,
+          id: "21",
           name: "Crocodilurus amazonicus",
           commonName: "Jacarerana",
           type: "lagarto",

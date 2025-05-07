@@ -22,16 +22,28 @@ import {
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 
+// Define proper interfaces for our form data and errors
+interface CheckoutFormData {
+  fullName: string;
+  cpf: string;
+  cep: string;
+  address: string;
+}
+
+interface FormErrors {
+  [key: string]: string;
+}
+
 const CartPage = () => {
   const { items, removeFromCart, clearCart } = useCartStore();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CheckoutFormData>({
     fullName: '',
     cpf: '',
     cep: '',
     address: ''
   });
-  const [formErrors, setFormErrors] = useState({});
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
   
   useEffect(() => {
     // Record cart view for analytics
@@ -67,7 +79,7 @@ const CartPage = () => {
     }).format(price);
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -76,7 +88,7 @@ const CartPage = () => {
   };
 
   const validateForm = () => {
-    const errors = {};
+    const errors: FormErrors = {};
     if (!formData.fullName) errors.fullName = "Nome completo é obrigatório";
     if (!formData.cpf) errors.cpf = "CPF é obrigatório";
     if (!formData.cep) errors.cep = "CEP é obrigatório";
