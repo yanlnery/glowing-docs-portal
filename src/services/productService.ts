@@ -29,6 +29,11 @@ export const productService = {
     }
   },
 
+  // Alias for getById for backward compatibility
+  getProductById: (id: string): Product | null => {
+    return productService.getById(id);
+  },
+
   // Create new product
   create: (productData: ProductFormData): Product => {
     try {
@@ -98,12 +103,12 @@ export const productService = {
     try {
       const products = productService.getAll();
       return products
-        .filter(product => product.visible && product.status === 'disponivel')
+        .filter(product => (product.visible || product.available) && (product.status === 'disponivel' || product.available))
         .sort((a, b) => {
           // Sort by featured first, then by order
           if (a.featured && !b.featured) return -1;
           if (!a.featured && b.featured) return 1;
-          return a.order - b.order;
+          return (a.order || 0) - (b.order || 0);
         });
     } catch (error) {
       console.error("Failed to get available products", error);
@@ -116,8 +121,8 @@ export const productService = {
     try {
       const products = productService.getAll();
       return products
-        .filter(product => product.visible && product.featured && product.status === 'disponivel')
-        .sort((a, b) => a.order - b.order);
+        .filter(product => (product.visible || product.available) && product.featured && (product.status === 'disponivel' || product.available))
+        .sort((a, b) => (a.order || 0) - (b.order || 0));
     } catch (error) {
       console.error("Failed to get featured products", error);
       return [];
