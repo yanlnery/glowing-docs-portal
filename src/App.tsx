@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -61,8 +62,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<WebsiteLayout />}>
-              <Route index element={<Home />} />
+            <Route element={<WebsiteLayout />}>
+              <Route path="/" element={<Home />} />
               <Route path="catalogo" element={<Catalog />} />
               <Route path="produtos/:id" element={<ProductDetail />} />
               <Route path="especies" element={<Species />} />

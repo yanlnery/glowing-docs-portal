@@ -41,6 +41,13 @@ export const productService = {
       // Process images to ensure proper persistence
       const processedImages = productData.images?.map(image => {
         // If the image already has a proper URL format (not blob:), keep it as is
+        if (typeof image === 'string') {
+          return { 
+            url: image,
+            alt: productData.name || 'Product image'
+          };
+        }
+        
         if (image.url && !image.url.startsWith('blob:')) {
           return image;
         }
@@ -50,7 +57,7 @@ export const productService = {
         return {
           ...image,
           url: image.url || '/placeholder.svg',
-          alt: image.alt || productData.name
+          alt: image.alt || productData.name || 'Product image'
         };
       }) || [];
       
@@ -83,6 +90,14 @@ export const productService = {
       
       // Process images to ensure proper persistence
       const processedImages = productData.images?.map(image => {
+        // Handle string image URLs (for backward compatibility)
+        if (typeof image === 'string') {
+          return { 
+            url: image,
+            alt: productData.name || products[productIndex].name || 'Product image'
+          };
+        }
+        
         // If the image already has a proper URL format (not blob:), keep it as is
         if (image.url && !image.url.startsWith('blob:')) {
           return image;
@@ -92,7 +107,7 @@ export const productService = {
         return {
           ...image,
           url: image.url || '/placeholder.svg',
-          alt: image.alt || productData.name || ''
+          alt: image.alt || productData.name || products[productIndex].name || 'Product image'
         };
       });
       
@@ -135,6 +150,78 @@ export const productService = {
   getAvailableProducts: (): Product[] => {
     try {
       const products = productService.getAll();
+      
+      if (products.length === 0) {
+        console.log("No available products found");
+        
+        // Return dummy products for demonstration if no real products exist
+        return [
+          {
+            id: "1",
+            name: "Boa Constrictor Amarali",
+            speciesName: "Boa constrictor amarali",
+            description: "Filhote de Boa Amarali nascido em cativeiro, bem adaptada e se alimentando regularmente.",
+            price: 950,
+            available: true,
+            visible: true,
+            featured: true,
+            status: "disponivel",
+            category: "serpente",
+            subcategory: "boideos",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            images: [
+              { 
+                url: "https://images.unsplash.com/photo-1472396961693-142e6e269027",
+                alt: "Boa Constrictor Amarali" 
+              }
+            ]
+          },
+          {
+            id: "2",
+            name: "Python Regius (Piton-Real)",
+            speciesName: "Python regius",
+            description: "Exemplar adulto de Python Regius, saudável e de temperamento dócil.",
+            price: 1500,
+            available: true,
+            visible: true,
+            featured: false,
+            status: "disponivel",
+            category: "serpente",
+            subcategory: "boideos",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            images: [
+              { 
+                url: "https://images.unsplash.com/photo-1466721591366-2d5fba72006d", 
+                alt: "Python Regius" 
+              }
+            ]
+          },
+          {
+            id: "3",
+            name: "Jabuti-piranga",
+            speciesName: "Chelonoidis carbonaria",
+            description: "Filhote de Jabuti-piranga com registro e documentação completa.",
+            price: 650,
+            available: true,
+            visible: true,
+            featured: true,
+            status: "disponivel",
+            category: "quelonio",
+            subcategory: "terrestres",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            images: [
+              { 
+                url: "https://images.unsplash.com/photo-1493962853295-0fd70327578a", 
+                alt: "Jabuti-piranga" 
+              }
+            ]
+          }
+        ];
+      }
+      
       return products
         .filter(product => (product.visible || product.available) && (product.status === 'disponivel' || product.available))
         .sort((a, b) => {
@@ -153,6 +240,55 @@ export const productService = {
   getFeaturedProducts: (): Product[] => {
     try {
       const products = productService.getAll();
+      
+      if (products.length === 0 || !products.some(p => p.featured)) {
+        // Return dummy featured products for demonstration
+        return [
+          {
+            id: "1",
+            name: "Boa Constrictor Amarali",
+            speciesName: "Boa constrictor amarali",
+            description: "Filhote de Boa Amarali nascido em cativeiro.",
+            price: 950,
+            available: true,
+            visible: true,
+            featured: true,
+            status: "disponivel",
+            category: "serpente",
+            subcategory: "boideos",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            images: [
+              { 
+                url: "https://images.unsplash.com/photo-1472396961693-142e6e269027", 
+                alt: "Boa Constrictor Amarali" 
+              }
+            ]
+          },
+          {
+            id: "3",
+            name: "Jabuti-piranga",
+            speciesName: "Chelonoidis carbonaria",
+            description: "Filhote de Jabuti-piranga com registro legal.",
+            price: 650,
+            available: true,
+            visible: true,
+            featured: true,
+            status: "disponivel",
+            category: "quelonio",
+            subcategory: "terrestres",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            images: [
+              { 
+                url: "https://images.unsplash.com/photo-1493962853295-0fd70327578a",
+                alt: "Jabuti-piranga" 
+              }
+            ]
+          }
+        ];
+      }
+      
       return products
         .filter(product => (product.visible || product.available) && product.featured && (product.status === 'disponivel' || product.available))
         .sort((a, b) => (a.order || 0) - (b.order || 0));
