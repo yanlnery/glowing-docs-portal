@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { toast } from '@/components/ui/use-toast';
 
 // Define proper interfaces for our form data and errors
 interface CheckoutFormData {
@@ -48,20 +49,24 @@ const CartPage = () => {
   useEffect(() => {
     // Record cart view for analytics
     const recordCartView = () => {
-      const now = new Date().toISOString();
-      const analyticsData = JSON.parse(localStorage.getItem('cartAnalytics') || '[]');
-      
-      analyticsData.push({
-        timestamp: now,
-        action: 'view_cart',
-        productId: '',
-        productName: '',
-        quantity: 0,
-        price: 0,
-        referrer: document.referrer || 'direct'
-      });
-      
-      localStorage.setItem('cartAnalytics', JSON.stringify(analyticsData));
+      try {
+        const now = new Date().toISOString();
+        const analyticsData = JSON.parse(localStorage.getItem('cartAnalytics') || '[]');
+        
+        analyticsData.push({
+          timestamp: now,
+          action: 'view_cart',
+          productId: '',
+          productName: '',
+          quantity: 0,
+          price: 0,
+          referrer: document.referrer || 'direct'
+        });
+        
+        localStorage.setItem('cartAnalytics', JSON.stringify(analyticsData));
+      } catch (error) {
+        console.error("Error recording cart view:", error);
+      }
     };
     
     recordCartView();
@@ -81,10 +86,10 @@ const CartPage = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value
-    });
+    }));
   };
 
   const validateForm = () => {
@@ -101,25 +106,46 @@ const CartPage = () => {
   const handleCheckout = () => {
     if (!validateForm()) return;
 
-    // Prepare the WhatsApp message with the product name and customer information
-    const productNames = items.map(item => item.product.name).join(", ");
-    
-    const message = encodeURIComponent(
-      `Olá! Tenho interesse em adquirir o animal ${productNames}.\n` +
-      `Seguem meus dados para prosseguir com a emissão de documentos e envio:\n` +
-      `Nome: ${formData.fullName}\n` +
-      `CPF: ${formData.cpf}\n` +
-      `CEP: ${formData.cep}\n` +
-      `Endereço completo: ${formData.address}\n\n` +
-      `Aguardo retorno com informações sobre o frete e disponibilidade.`
-    );
+    try {
+      // Prepare the WhatsApp message with the product details and customer information
+      const productInfo = items.map(item => {
+        return `🐍 Espécie: ${item.product.speciesName || "Não especificado"}\n📦 Código do animal: ${item.product.id}\n💰 Valor: ${formatPrice(item.product.price)}`;
+      }).join('\n\n');
+      
+      const message = encodeURIComponent(
+        `Olá! Tenho interesse em adquirir o animal abaixo:\n\n` +
+        `${productInfo}\n\n` +
+        `Segue meus dados para emissão dos documentos:\n\n` +
+        `👤 Nome completo: ${formData.fullName}\n` +
+        `📄 CPF: ${formData.cpf}\n` +
+        `🏠 Endereço completo: ${formData.address}\n` +
+        `📍 CEP: ${formData.cep}\n\n` +
+        `Fico no aguardo da confirmação de disponibilidade e valor do frete. Obrigado!`
+      );
 
-    // Redirect to WhatsApp with the pre-filled message
-    window.open(`https://wa.me/message/PQ7BIYW7H5ARK1?text=${message}`, '_blank');
-    
-    // Close dialog and clear cart
-    setIsDialogOpen(false);
-    clearCart();
+      // Close dialog and clear cart
+      setIsDialogOpen(false);
+      
+      // Show success message
+      toast({
+        title: "Pedido enviado",
+        description: "Você será redirecionado para o WhatsApp para finalizar seu pedido.",
+        duration: 3000,
+      });
+      
+      // Redirect to WhatsApp with the pre-filled message
+      setTimeout(() => {
+        window.open(`https://wa.me/message/PQ7BIYW7H5ARK1?text=${message}`, '_blank');
+        clearCart();
+      }, 1500);
+    } catch (error) {
+      console.error("Error during checkout:", error);
+      toast({
+        title: "Erro ao processar pedido",
+        description: "Ocorreu um erro ao processar seu pedido. Por favor, tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
   
   return (

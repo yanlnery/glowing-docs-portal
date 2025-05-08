@@ -1,4 +1,3 @@
-
 import { Product, ProductFormData } from "@/types/product";
 
 // In a real application, this would be connected to a backend
@@ -38,8 +37,26 @@ export const productService = {
   create: (productData: ProductFormData): Product => {
     try {
       const products = productService.getAll();
+      
+      // Process images to ensure proper persistence
+      const processedImages = productData.images?.map(image => {
+        // If the image already has a proper URL format (not blob:), keep it as is
+        if (image.url && !image.url.startsWith('blob:')) {
+          return image;
+        }
+        
+        // For demo purposes, we'll use a placeholder image if it's a blob URL
+        // In a real app, you'd upload to a storage service like S3
+        return {
+          ...image,
+          url: image.url || '/placeholder.svg',
+          alt: image.alt || productData.name
+        };
+      }) || [];
+      
       const newProduct: Product = {
         ...productData,
+        images: processedImages,
         id: crypto.randomUUID(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -64,9 +81,25 @@ export const productService = {
         throw new Error(`Product with ID ${id} not found`);
       }
       
+      // Process images to ensure proper persistence
+      const processedImages = productData.images?.map(image => {
+        // If the image already has a proper URL format (not blob:), keep it as is
+        if (image.url && !image.url.startsWith('blob:')) {
+          return image;
+        }
+        
+        // For demo purposes, we'll use a placeholder image if it's a blob URL
+        return {
+          ...image,
+          url: image.url || '/placeholder.svg',
+          alt: image.alt || productData.name || ''
+        };
+      });
+      
       const updatedProduct = {
         ...products[productIndex],
         ...productData,
+        images: processedImages || products[productIndex].images,
         updatedAt: new Date().toISOString(),
       };
       
