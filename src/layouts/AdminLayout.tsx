@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Navigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,7 +13,7 @@ import {
   ClipboardList, 
   ShoppingCart,
   FileText,
-  ListChecks
+  Image
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -29,10 +28,10 @@ interface NavItem {
 
 interface AdminLayoutProps {
   children: React.ReactNode;
-  requiredRole?: 'admin' | 'editor' | 'viewer';
+  requiredRole?: 'admin' | 'editor' | 'viewer'; // This prop seems unused as logic relies on user.role
 }
 
-const AdminLayout: React.FC<AdminLayoutProps> = ({ children, requiredRole = 'viewer' }) => {
+const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const { isAuthenticated, logout, isLoading, user, waitlistCount } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -56,6 +55,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, requiredRole = 'vie
   const navigation: NavItem[] = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: Home },
     { name: 'Produtos', href: '/admin/products', icon: Package },
+    { name: 'Gestão de Espécies', href: '/admin/species', icon: ClipboardList, requiredRole: 'admin' },
+    { name: 'Carrossel da Home', href: '/admin/carousel', icon: Image, requiredRole: 'admin' },
     { name: 'Manuais', href: '/admin/manuals', icon: FileText, requiredRole: 'admin' },
     { name: 'Lista de Espera', href: '/admin/waitlist', icon: Users, requiredRole: 'admin', badge: true },
     { name: 'Analytics Carrinho', href: '/admin/cart-analytics', icon: ShoppingCart, requiredRole: 'admin' },
@@ -64,7 +65,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, requiredRole = 'vie
 
   const filteredNav = navigation.filter(item => {
     if (!item.requiredRole) return true;
-    return user?.role === 'admin' || user?.role === item.requiredRole;
+    // Ensure user and user.role exist before accessing
+    return user?.role === 'admin' || (user?.role && user.role === item.requiredRole);
   });
 
   const isActive = (path: string) => location.pathname === path;
@@ -137,7 +139,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, requiredRole = 'vie
                   >
                     <item.icon className={`mr-3 flex-shrink-0 h-5 w-5 ${active ? 'text-serpente-600 dark:text-serpente-300' : ''}`} />
                     <span className="flex-1">{item.name}</span>
-                    {item.badge && waitlistCount > 0 && (
+                    {item.name === 'Lista de Espera' && item.badge && waitlistCount > 0 && ( // Ensure badge is shown for correct item
                       <Badge variant="destructive" className="ml-auto">
                         {waitlistCount}
                       </Badge>
