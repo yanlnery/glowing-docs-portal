@@ -1,20 +1,21 @@
-
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useCartStore } from '@/stores/cartStore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star, ShoppingCart, ArrowLeft, CheckCircle } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { productService } from '@/services/productService';
+import { Product } from '@/types/product';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const { addToCart } = useCartStore();
-  
+  const navigate = useNavigate();
+
   useEffect(() => {
     window.scrollTo(0, 0);
     
@@ -70,6 +71,7 @@ const ProductDetail = () => {
   };
   
   const handleAddToCart = () => {
+    if (!product) return;
     try {
       addToCart(product);
       
@@ -77,8 +79,8 @@ const ProductDetail = () => {
         title: "Produto adicionado ao carrinho",
         description: `${product.name} foi adicionado ao seu carrinho.`,
         action: (
-          <Button variant="outline" size="sm" asChild>
-            <Link to="/carrinho">Ver Carrinho</Link>
+          <Button variant="outline" size="sm" onClick={() => navigate('/carrinho')}>
+            Ver Carrinho
           </Button>
         ),
       });
@@ -124,9 +126,9 @@ const ProductDetail = () => {
             {/* Thumbnail Gallery */}
             {product.images && product.images.length > 1 && (
               <div className="grid grid-cols-4 gap-2">
-                {product.images.map((image: any, index: number) => (
+                {product.images.map((image, index) => (
                   <div 
-                    key={index} 
+                    key={image.id || index} 
                     className={`aspect-square bg-muted rounded-md overflow-hidden cursor-pointer border-2 ${
                       selectedImage === image.url ? 'border-serpente-500' : 'border-transparent'
                     }`}
@@ -134,7 +136,7 @@ const ProductDetail = () => {
                   >
                     <img 
                       src={image.url} 
-                      alt={`${product.name} - imagem ${index + 1}`} 
+                      alt={image.alt || `${product.name} - imagem ${index + 1}`} 
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />
@@ -174,9 +176,9 @@ const ProductDetail = () => {
               <div className="text-3xl font-bold text-serpente-600">
                 {formatPrice(product.price)}
               </div>
-              {product.oldPrice > 0 && (
+              {product.meta?.oldPrice && product.meta.oldPrice > 0 && (
                 <div className="text-sm text-muted-foreground line-through">
-                  {formatPrice(product.oldPrice)}
+                  {formatPrice(product.meta.oldPrice)}
                 </div>
               )}
             </div>
@@ -199,16 +201,16 @@ const ProductDetail = () => {
                   <p className="text-sm text-muted-foreground">Subcategoria</p>
                   <p className="font-medium capitalize">{product.subcategory}</p>
                 </div>
-                {product.sex && (
+                {product.meta?.sex && (
                   <div>
                     <p className="text-sm text-muted-foreground">Sexo</p>
-                    <p className="font-medium">{product.sex === 'male' ? 'Macho' : 'Fêmea'}</p>
+                    <p className="font-medium">{product.meta.sex === 'male' ? 'Macho' : 'Fêmea'}</p>
                   </div>
                 )}
-                {product.age && (
+                {product.meta?.age && (
                   <div>
                     <p className="text-sm text-muted-foreground">Idade</p>
-                    <p className="font-medium">{product.age}</p>
+                    <p className="font-medium">{product.meta.age}</p>
                   </div>
                 )}
               </div>

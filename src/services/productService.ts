@@ -27,7 +27,7 @@ const ensureProductImage = (
   const url = img.url || '/placeholder.svg'; // Provide a fallback URL if missing
   const filename = img.filename || url.split('/').pop() || 'unknown_image.jpg';
   const id = img.id || crypto.randomUUID();
-  const alt = img.alt || img.altText || defaultAltText; // Prioritize alt, then altText, then default
+  const alt = img.alt || (img as any).altText || defaultAltText; // Kept altText for potential backward compatibility from data
 
   return { id, url, filename, alt };
 };
@@ -45,7 +45,6 @@ export const productService = {
     }
   },
 
-  // Get product by ID
   getById: (id: string): Product | null => {
     try {
       const products = productService.getAll();
@@ -56,12 +55,10 @@ export const productService = {
     }
   },
 
-  // Alias for getById for backward compatibility
   getProductById: (id: string): Product | null => {
     return productService.getById(id);
   },
 
-  // Create new product
   create: (productData: ProductFormData): Product => {
     try {
       const products = productService.getAll();
@@ -97,32 +94,40 @@ export const productService = {
         throw new Error(`Product with ID ${id} not found`);
       }
       
-      let processedImages: ProductImage[] | undefined = undefined;
-      if (productData.images) {
-        processedImages = productData.images.map(imageInput =>
-          ensureProductImage(imageInput as string | Partial<ProductImage>, productData.name || products[productIndex].name || 'Product image')
-        );
-      }
-      
-      const updatedProductData = { ...productData };
-      if (processedImages) {
-        updatedProductData.images = processedImages;
-      } else if (productData.hasOwnProperty('images') && productData.images === null) {
-        // If images is explicitly set to null (or empty array handled by map), allow it.
-         updatedProductData.images = [];
+      const existingProduct = products[productIndex];
+      // Destructure images from productData to handle them separately
+      const { images: incomingImages, ...restOfProductData } = productData;
+
+      let finalImages: ProductImage[] | undefined = existingProduct.images; // Default to existing images
+
+      // Check if 'images' property was part of the productData payload
+      if (productData.hasOwnProperty('images')) {
+        if (Array.isArray(incomingImages) && incomingImages.length > 0) {
+          // If a new array of images is provided, process them
+          finalImages = incomingImages.map(imageInput =>
+            ensureProductImage(
+              imageInput as string | Partial<ProductImage>,
+              restOfProductData.name || existingProduct.name || 'Product image' // Use updated or existing name for alt text
+            )
+          );
+        } else if (incomingImages === null || (Array.isArray(incomingImages) && incomingImages.length === 0)) {
+          // If images is explicitly set to null or an empty array, clear them
+          finalImages = [];
+        }
+        // If 'images' was in productData but was undefined, finalImages remains existingProduct.images (no change)
+        // This case is implicitly handled as incomingImages would be undefined.
       }
 
-
-      const finalProduct: Product = {
-        ...products[productIndex],
-        ...updatedProductData,
-        images: processedImages !== undefined ? processedImages : products[productIndex].images,
+      const updatedProduct: Product = {
+        ...existingProduct,    // Start with the existing product
+        ...restOfProductData,  // Apply other changes from productData (excluding its 'images' property)
+        images: finalImages,    // Set the processed images
         updatedAt: new Date().toISOString(),
       };
       
-      products[productIndex] = finalProduct;
+      products[productIndex] = updatedProduct;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-      return finalProduct;
+      return updatedProduct;
     } catch (error) {
       console.error(`Failed to update product with ID ${id}`, error);
       throw new Error(`Failed to update product with ID ${id}`);
@@ -148,13 +153,12 @@ export const productService = {
     }
   },
 
-  // Get available products for the public site
   getAvailableProducts: (): Product[] => {
     try {
       const products = productService.getAll();
       
       if (products.length === 0) {
-        console.log("No available products found");
+        console.log("No available products found from localStorage, returning dummy products.");
         
         // Return dummy products for demonstration if no real products exist
         return [
@@ -240,12 +244,12 @@ export const productService = {
     }
   },
 
-  // Get featured products
   getFeaturedProducts: (): Product[] => {
     try {
       const products = productService.getAll();
       
       if (products.length === 0 || !products.some(p => p.featured)) {
+        console.log("No actual featured products found, returning dummy featured products.");
         // Return dummy featured products for demonstration
         return [
           {
@@ -271,7 +275,7 @@ export const productService = {
             ]
           },
           {
-            id: "dummy-featured-3", // Matching dummy-3 from available if it's featured
+            id: "dummy-featured-3", 
             name: "Jabuti-piranga",
             speciesName: "Chelonoidis carbonaria",
             description: "Filhote de Jabuti-piranga com registro legal.",
@@ -304,4 +308,3 @@ export const productService = {
     }
   }
 };
-
