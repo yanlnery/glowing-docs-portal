@@ -1,9 +1,37 @@
-import { Product, ProductFormData } from "@/types/product";
+
+import { Product, ProductFormData, ProductImage, ProductCategory, ProductSubcategory, ProductStatus } from "@/types/product";
 
 // In a real application, this would be connected to a backend
 // For now, we'll use localStorage to persist data
 
 const STORAGE_KEY = "pet_serpentes_products";
+
+// Helper function to ensure an image object conforms to ProductImage type
+const ensureProductImage = (
+  img: string | Partial<ProductImage>, // Can receive a URL string or a partial image object
+  defaultAltText: string
+): ProductImage => {
+  if (typeof img === 'string') {
+    // If img is just a URL string
+    const url = img;
+    const filename = url.split('/').pop() || 'unknown_image.jpg';
+    return {
+      id: crypto.randomUUID(),
+      url,
+      filename,
+      alt: defaultAltText,
+    };
+  }
+
+  // If img is an object, ensure all required fields are present
+  const url = img.url || '/placeholder.svg'; // Provide a fallback URL if missing
+  const filename = img.filename || url.split('/').pop() || 'unknown_image.jpg';
+  const id = img.id || crypto.randomUUID();
+  const alt = img.alt || img.altText || defaultAltText; // Prioritize alt, then altText, then default
+
+  return { id, url, filename, alt };
+};
+
 
 export const productService = {
   // Get all products
@@ -38,28 +66,9 @@ export const productService = {
     try {
       const products = productService.getAll();
       
-      // Process images to ensure proper persistence
-      const processedImages = productData.images?.map(image => {
-        // If the image already has a proper URL format (not blob:), keep it as is
-        if (typeof image === 'string') {
-          return { 
-            url: image,
-            alt: productData.name || 'Product image'
-          };
-        }
-        
-        if (image.url && !image.url.startsWith('blob:')) {
-          return image;
-        }
-        
-        // For demo purposes, we'll use a placeholder image if it's a blob URL
-        // In a real app, you'd upload to a storage service like S3
-        return {
-          ...image,
-          url: image.url || '/placeholder.svg',
-          alt: image.alt || productData.name || 'Product image'
-        };
-      }) || [];
+      const processedImages: ProductImage[] = productData.images?.map(imageInput =>
+        ensureProductImage(imageInput as string | Partial<ProductImage>, productData.name || 'Product image')
+      ) || [];
       
       const newProduct: Product = {
         ...productData,
@@ -88,39 +97,32 @@ export const productService = {
         throw new Error(`Product with ID ${id} not found`);
       }
       
-      // Process images to ensure proper persistence
-      const processedImages = productData.images?.map(image => {
-        // Handle string image URLs (for backward compatibility)
-        if (typeof image === 'string') {
-          return { 
-            url: image,
-            alt: productData.name || products[productIndex].name || 'Product image'
-          };
-        }
-        
-        // If the image already has a proper URL format (not blob:), keep it as is
-        if (image.url && !image.url.startsWith('blob:')) {
-          return image;
-        }
-        
-        // For demo purposes, we'll use a placeholder image if it's a blob URL
-        return {
-          ...image,
-          url: image.url || '/placeholder.svg',
-          alt: image.alt || productData.name || products[productIndex].name || 'Product image'
-        };
-      });
+      let processedImages: ProductImage[] | undefined = undefined;
+      if (productData.images) {
+        processedImages = productData.images.map(imageInput =>
+          ensureProductImage(imageInput as string | Partial<ProductImage>, productData.name || products[productIndex].name || 'Product image')
+        );
+      }
       
-      const updatedProduct = {
+      const updatedProductData = { ...productData };
+      if (processedImages) {
+        updatedProductData.images = processedImages;
+      } else if (productData.hasOwnProperty('images') && productData.images === null) {
+        // If images is explicitly set to null (or empty array handled by map), allow it.
+         updatedProductData.images = [];
+      }
+
+
+      const finalProduct: Product = {
         ...products[productIndex],
-        ...productData,
-        images: processedImages || products[productIndex].images,
+        ...updatedProductData,
+        images: processedImages !== undefined ? processedImages : products[productIndex].images,
         updatedAt: new Date().toISOString(),
       };
       
-      products[productIndex] = updatedProduct;
+      products[productIndex] = finalProduct;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-      return updatedProduct;
+      return finalProduct;
     } catch (error) {
       console.error(`Failed to update product with ID ${id}`, error);
       throw new Error(`Failed to update product with ID ${id}`);
@@ -157,7 +159,7 @@ export const productService = {
         // Return dummy products for demonstration if no real products exist
         return [
           {
-            id: "1",
+            id: "dummy-1",
             name: "Boa Constrictor Amarali",
             speciesName: "Boa constrictor amarali",
             description: "Filhote de Boa Amarali nascido em cativeiro, bem adaptada e se alimentando regularmente.",
@@ -165,20 +167,21 @@ export const productService = {
             available: true,
             visible: true,
             featured: true,
-            status: "disponivel",
-            category: "serpente",
-            subcategory: "boideos",
+            isNew: false,
+            status: "disponivel" as ProductStatus,
+            category: "serpente" as ProductCategory,
+            subcategory: "boideos" as ProductSubcategory,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             images: [
-              { 
-                url: "https://images.unsplash.com/photo-1472396961693-142e6e269027",
-                alt: "Boa Constrictor Amarali" 
-              }
+              ensureProductImage(
+                "https://images.unsplash.com/photo-1472396961693-142e6e269027",
+                "Boa Constrictor Amarali"
+              )
             ]
           },
           {
-            id: "2",
+            id: "dummy-2",
             name: "Python Regius (Piton-Real)",
             speciesName: "Python regius",
             description: "Exemplar adulto de Python Regius, saudável e de temperamento dócil.",
@@ -186,20 +189,21 @@ export const productService = {
             available: true,
             visible: true,
             featured: false,
-            status: "disponivel",
-            category: "serpente",
-            subcategory: "boideos",
+            isNew: false,
+            status: "disponivel" as ProductStatus,
+            category: "serpente" as ProductCategory,
+            subcategory: "boideos" as ProductSubcategory,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             images: [
-              { 
-                url: "https://images.unsplash.com/photo-1466721591366-2d5fba72006d", 
-                alt: "Python Regius" 
-              }
+              ensureProductImage(
+                "https://images.unsplash.com/photo-1466721591366-2d5fba72006d",
+                "Python Regius"
+              )
             ]
           },
           {
-            id: "3",
+            id: "dummy-3",
             name: "Jabuti-piranga",
             speciesName: "Chelonoidis carbonaria",
             description: "Filhote de Jabuti-piranga com registro e documentação completa.",
@@ -207,16 +211,17 @@ export const productService = {
             available: true,
             visible: true,
             featured: true,
-            status: "disponivel",
-            category: "quelonio",
-            subcategory: "terrestres",
+            isNew: false,
+            status: "disponivel" as ProductStatus,
+            category: "quelonio" as ProductCategory,
+            subcategory: "terrestres" as ProductSubcategory,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             images: [
-              { 
-                url: "https://images.unsplash.com/photo-1493962853295-0fd70327578a", 
-                alt: "Jabuti-piranga" 
-              }
+              ensureProductImage(
+                "https://images.unsplash.com/photo-1493962853295-0fd70327578a",
+                "Jabuti-piranga"
+              )
             ]
           }
         ];
@@ -225,7 +230,6 @@ export const productService = {
       return products
         .filter(product => (product.visible || product.available) && (product.status === 'disponivel' || product.available))
         .sort((a, b) => {
-          // Sort by featured first, then by order
           if (a.featured && !b.featured) return -1;
           if (!a.featured && b.featured) return 1;
           return (a.order || 0) - (b.order || 0);
@@ -245,7 +249,7 @@ export const productService = {
         // Return dummy featured products for demonstration
         return [
           {
-            id: "1",
+            id: "dummy-featured-1",
             name: "Boa Constrictor Amarali",
             speciesName: "Boa constrictor amarali",
             description: "Filhote de Boa Amarali nascido em cativeiro.",
@@ -253,20 +257,21 @@ export const productService = {
             available: true,
             visible: true,
             featured: true,
-            status: "disponivel",
-            category: "serpente",
-            subcategory: "boideos",
+            isNew: false,
+            status: "disponivel" as ProductStatus,
+            category: "serpente" as ProductCategory,
+            subcategory: "boideos" as ProductSubcategory,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             images: [
-              { 
-                url: "https://images.unsplash.com/photo-1472396961693-142e6e269027", 
-                alt: "Boa Constrictor Amarali" 
-              }
+              ensureProductImage(
+                "https://images.unsplash.com/photo-1472396961693-142e6e269027",
+                "Boa Constrictor Amarali"
+              )
             ]
           },
           {
-            id: "3",
+            id: "dummy-featured-3", // Matching dummy-3 from available if it's featured
             name: "Jabuti-piranga",
             speciesName: "Chelonoidis carbonaria",
             description: "Filhote de Jabuti-piranga com registro legal.",
@@ -274,16 +279,17 @@ export const productService = {
             available: true,
             visible: true,
             featured: true,
-            status: "disponivel",
-            category: "quelonio",
-            subcategory: "terrestres",
+            isNew: false,
+            status: "disponivel" as ProductStatus,
+            category: "quelonio" as ProductCategory,
+            subcategory: "terrestres" as ProductSubcategory,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             images: [
-              { 
-                url: "https://images.unsplash.com/photo-1493962853295-0fd70327578a",
-                alt: "Jabuti-piranga" 
-              }
+              ensureProductImage(
+                "https://images.unsplash.com/photo-1493962853295-0fd70327578a",
+                "Jabuti-piranga"
+              )
             ]
           }
         ];
@@ -298,3 +304,4 @@ export const productService = {
     }
   }
 };
+
