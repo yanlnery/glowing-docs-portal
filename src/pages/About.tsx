@@ -1,19 +1,21 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Shield, Award, Calendar, Users, BookOpen, Flag, Heart } from "lucide-react";
+import { Shield, BookOpen, Flag, Heart } from "lucide-react";
 
 export default function About() {
+  const newBiography = [
+    "O Pet Serpentes & Companhia é conduzido por Yan Nery, professor e biólogo apaixonado por herpetologia desde criança. Yan cresceu como aquarista entusiasta, sempre entre aquários e terrários, montando desde pequenos aquários até sistemas marinhos complexos, como também terrários bioativos, o que moldou sua curiosidade e respeito pela vida selvagem.",
+    "Em 2023, Yan assumiu a frente do criadouro, dando continuidade ao trabalho iniciado por Daniel Leirião em 2015, quando o empreendimento nasceu como um criadouro de aves exóticas. A partir de 2019, os répteis passaram a fazer parte do manejo legalizado, e hoje representam o foco principal da operação.",
+    "Localizado no Rio de Janeiro e com certificação do IBAMA e INEA-RJ, o criadouro se dedica à criação responsável, à promoção do bem-estar animal e à disseminação de conhecimento sobre espécies nativas. Atuamos com ética, transparência e compromisso com a educação ambiental e científica, incluindo parcerias com escolas públicas e apoio a pesquisas acadêmicas.",
+    "Nosso propósito vai além da comercialização: queremos ser referência nacional em bem-estar animal, desenvolvendo recintos naturais e espaçosos que simulem o habitat das espécies — elevando o padrão do setor."
+  ];
+
   return (
     <div>
-      {/* Hero Section */}
+      {/* Hero Section - Background image removed */}
       <section className="relative bg-serpente-900 text-white">
-        <div className="absolute inset-0 opacity-30" style={{ 
-          backgroundImage: `url('/lovable-uploads/8353d3e8-d19d-4821-8a00-892cf9ac6bae.png')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}></div>
+        {/* The div with background image and opacity-30 has been removed */}
         <div className="container relative z-10 px-4 py-24 sm:px-6">
           <div className="max-w-2xl">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">Nossa História</h1>
@@ -24,7 +26,7 @@ export default function About() {
         </div>
       </section>
       
-      {/* Founder Story - UPDATED IMAGE */}
+      {/* Founder Story - Updated subtitle and biography */}
       <section className="py-16 bg-background">
         <div className="container px-4 sm:px-6">
           <div className="flex flex-col lg:flex-row gap-12 items-center">
@@ -39,12 +41,12 @@ export default function About() {
               <div className="docs-section-title">
                 <h2 className="text-3xl font-bold">Yan Nery</h2>
               </div>
-              <p className="text-muted-foreground mb-6">CEO e Biólogo especialista</p>
+              <p className="text-muted-foreground mb-6">CEO e Biólogo</p> {/* Removed "especialista" */}
               
               <div className="space-y-4 text-lg">
-                <p>
-                  Desde os 5 anos de idade, Yan já era fascinado pelo mundo aquático como aquarista. Graduado em Biologia com licenciatura, hoje soma mais de 5 anos de experiência no manejo e criação de répteis e outros grupos de animais. Seu trabalho se destaca pela promoção do bem-estar animal, conservação e educação ambiental.
-                </p>
+                {newBiography.map((paragraph, index) => (
+                  <p key={index}>{paragraph}</p>
+                ))}
               </div>
               
               <div className="flex flex-wrap gap-3 mt-6">
@@ -53,13 +55,11 @@ export default function About() {
                   Biólogo
                 </span>
                 <span className="inline-flex items-center text-xs bg-muted px-2.5 py-1 rounded-full">
-                  <Users className="h-3 w-3 mr-1" />
-                  Pesquisador
-                </span>
-                <span className="inline-flex items-center text-xs bg-muted px-2.5 py-1 rounded-full">
-                  <Heart className="h-3 w-3 mr-1" />
+                  {/* Using Heart as a generic "Creator" icon if Users icon was for something else */}
+                  <Heart className="h-3 w-3 mr-1" /> 
                   Criador
                 </span>
+                 {/* Removed "Pesquisador" tag as it's not directly mentioned in the new bio summary as a primary current role like "CEO e Biólogo" or "Criador" */}
               </div>
             </div>
           </div>

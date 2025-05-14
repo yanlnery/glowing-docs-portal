@@ -18,6 +18,16 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
+// Helper function to convert File to Base64 Data URL
+const fileToDataUrl = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
+  });
+};
+
 const ProductForm = () => {
   const { id } = useParams<{ id: string }>();
   const isEditMode = Boolean(id);
@@ -25,7 +35,6 @@ const ProductForm = () => {
   const { toast } = useToast();
   
   const [loading, setLoading] = useState(false);
-  const [product, setProduct] = useState<Product | null>(null);
   const [imageList, setImageList] = useState<ProductImage[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
@@ -77,23 +86,22 @@ const ProductForm = () => {
     if (isEditMode && id) {
       const productData = productService.getById(id);
       if (productData) {
-        setProduct(productData);
         setImageList(productData.images || []);
         
         form.reset({
           name: productData.name,
-          speciesId: productData.speciesId,
+          speciesId: productData.speciesId || "", // Ensure speciesId is a string
           speciesName: productData.speciesName,
           category: productData.category,
           subcategory: productData.subcategory,
-          status: productData.status,
+          status: productData.status || "disponivel", // Default status if undefined
           price: productData.price,
           paymentLink: productData.paymentLink,
           description: productData.description,
           featured: productData.featured,
           isNew: productData.isNew,
-          visible: productData.visible,
-          order: productData.order,
+          visible: productData.visible ?? true, // Default to true if undefined
+          order: productData.order || 0, // Default order if undefined
         });
       } else {
         toast({
@@ -110,21 +118,22 @@ const ProductForm = () => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
       
-      const newImageFiles = [...imageFiles, ...filesArray];
-      setImageFiles(newImageFiles);
+      const currentImageFiles = [...imageFiles, ...filesArray];
+      setImageFiles(currentImageFiles);
       
       const newImageUrls = filesArray.map(file => URL.createObjectURL(file));
-      setImagePreviewUrls([...imagePreviewUrls, ...newImageUrls]);
+      setImagePreviewUrls(prevUrls => [...prevUrls, ...newImageUrls]); // Use functional update for preview URLs
     }
   };
 
   const removeImage = (index: number) => {
-    // Remove from preview
     const newPreviewUrls = [...imagePreviewUrls];
-    newPreviewUrls.splice(index, 1);
+    const removedPreviewUrl = newPreviewUrls.splice(index, 1)[0];
     setImagePreviewUrls(newPreviewUrls);
     
-    // Remove from files list
+    // Revoke object URL to free up memory
+    URL.revokeObjectURL(removedPreviewUrl);
+    
     const newImageFiles = [...imageFiles];
     newImageFiles.splice(index, 1);
     setImageFiles(newImageFiles);
@@ -136,20 +145,40 @@ const ProductForm = () => {
     setImageList(newImageList);
   };
 
-  const onSubmit = (values: FormValues) => {
+  const onSubmit = async (values: FormValues) => {
     setLoading(true);
     
-    // In a real implementation, we would upload images to a server and get URLs back
-    // For now, we'll simulate this by using placeholder URLs
-    const newImages: ProductImage[] = imageFiles.map((file, index) => ({
-      id: `new-image-${Date.now()}-${index}`,
-      url: URL.createObjectURL(file),
-      filename: file.name, // Add the filename property
-      alt: `Image of ${values.name}`
-    }));
+    let newProcessedImages: ProductImage[] = [];
+    if (imageFiles.length > 0) {
+      const newImageDataPromises = imageFiles.map(async (file) => {
+        try {
+          const dataUrl = await fileToDataUrl(file);
+          return {
+            id: crypto.randomUUID(),
+            url: dataUrl,
+            filename: file.name,
+            alt: `Imagem de ${values.name}`
+          };
+        } catch (error) {
+          console.error("Erro ao converter arquivo para data URL:", error);
+          toast({ title: "Erro de Imagem", description: `Falha ao processar ${file.name}. Tente novamente.`, variant: "destructive" });
+          return null; 
+        }
+      });
+
+      const results = await Promise.all(newImageDataPromises);
+      newProcessedImages = results.filter(img => img !== null) as ProductImage[];
+
+      // If any image conversion failed, stop submission
+      if (newProcessedImages.length !== imageFiles.length) {
+        setLoading(false);
+        return;
+      }
+    }
     
-    // Combine existing and new images
-    const allImages = [...imageList, ...newImages];
+    const allImages = [...imageList, ...newProcessedImages];
+    
+    const isAvailable = values.status === 'vendido' ? false : (values.visible ?? true);
     
     const formData: ProductFormData = {
       name: values.name,
@@ -166,7 +195,7 @@ const ProductForm = () => {
       isNew: values.isNew,
       visible: values.visible,
       order: values.order,
-      available: values.visible || false, // Add the available property based on visible
+      available: isAvailable,
     };
     
     try {
@@ -182,16 +211,17 @@ const ProductForm = () => {
           title: "Sucesso",
           description: "Produto criado com sucesso!",
         });
-        form.reset();
+        form.reset(); // Reset form for new product entry
         setImagePreviewUrls([]);
         setImageFiles([]);
         setImageList([]);
       }
       navigate('/admin/products');
     } catch (error) {
+      console.error("Erro ao salvar produto:", error);
       toast({
         title: "Erro",
-        description: "Ocorreu um erro ao salvar o produto",
+        description: (error instanceof Error && error.message) || "Ocorreu um erro ao salvar o produto",
         variant: "destructive"
       });
     } finally {
@@ -211,10 +241,10 @@ const ProductForm = () => {
             <h1 className="text-2xl font-bold">{isEditMode ? 'Editar Produto' : 'Novo Produto'}</h1>
           </div>
           
-          {isEditMode && (
+          {isEditMode && id && ( // Ensure id is present for delete
             <Button variant="destructive" onClick={() => {
               if (window.confirm('Tem certeza que deseja excluir este produto?')) {
-                productService.delete(id as string);
+                productService.delete(id); // id is guaranteed by isEditMode && id
                 toast({
                   title: "Produto excluído",
                   description: "O produto foi removido com sucesso.",
@@ -288,7 +318,7 @@ const ProductForm = () => {
                             <FormLabel>Categoria</FormLabel>
                             <Select 
                               onValueChange={field.onChange} 
-                              defaultValue={field.value}
+                              value={field.value} // Use value for controlled component
                             >
                               <FormControl>
                                 <SelectTrigger>
@@ -314,7 +344,7 @@ const ProductForm = () => {
                             <FormLabel>Subcategoria</FormLabel>
                             <Select 
                               onValueChange={field.onChange} 
-                              defaultValue={field.value}
+                              value={field.value} // Use value for controlled component
                             >
                               <FormControl>
                                 <SelectTrigger>
@@ -345,7 +375,7 @@ const ProductForm = () => {
                             <FormLabel>Status</FormLabel>
                             <Select 
                               onValueChange={field.onChange} 
-                              defaultValue={field.value}
+                              value={field.value} // Use value for controlled component
                             >
                               <FormControl>
                                 <SelectTrigger>
@@ -374,7 +404,7 @@ const ProductForm = () => {
                                 type="number" 
                                 placeholder="0.00" 
                                 {...field}
-                                onChange={(e) => field.onChange(e.target.value)}
+                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)} // Ensure number
                               />
                             </FormControl>
                             <FormDescription>
@@ -393,7 +423,7 @@ const ProductForm = () => {
                         <FormItem>
                           <FormLabel>Link de Pagamento</FormLabel>
                           <FormControl>
-                            <Input placeholder="https://..." {...field} />
+                            <Input placeholder="https://..." {...field} value={field.value || ''} />
                           </FormControl>
                           <FormDescription>
                             Link do C6 Bank ou outro gateway para pagamento direto
@@ -414,7 +444,7 @@ const ProductForm = () => {
                               type="number" 
                               placeholder="0" 
                               {...field}
-                              onChange={(e) => field.onChange(e.target.value)}
+                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)} // Ensure number
                             />
                           </FormControl>
                           <FormDescription>
@@ -515,18 +545,19 @@ const ProductForm = () => {
                       
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {imageList.map((image, index) => (
-                          <div key={image.id} className="relative group aspect-square">
+                          <div key={image.id || `existing-${index}`} className="relative group aspect-square">
                             <img 
                               src={image.url}
-                              alt={image.alt}
+                              alt={image.alt || 'Imagem do produto'}
                               className="w-full h-full object-cover rounded-md"
                             />
                             <button
                               type="button"
                               onClick={() => removeExistingImage(index)}
-                              className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity text-xs z-10"
+                              aria-label="Remover imagem existente"
                             >
-                              <X className="h-4 w-4" />
+                              <X className="h-3 w-3" />
                             </button>
                           </div>
                         ))}
@@ -543,6 +574,7 @@ const ProductForm = () => {
                                 type="button"
                                 onClick={() => removeImage(index)}
                                 className="bg-red-600 text-white rounded-full p-1"
+                                aria-label="Remover nova imagem"
                               >
                                 <X className="h-4 w-4" />
                               </button>
@@ -550,10 +582,11 @@ const ProductForm = () => {
                           </div>
                         ))}
                         
-                        <label className="border-2 border-dashed border-gray-300 rounded-md flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors aspect-square">
+                        <label htmlFor="image-upload" className="border-2 border-dashed border-gray-300 rounded-md flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors aspect-square p-2 text-center">
                           <Upload className="h-6 w-6 text-gray-400" />
-                          <span className="mt-2 text-sm text-gray-500">Adicionar foto</span>
+                          <span className="mt-2 text-sm text-gray-500">Adicionar foto(s)</span>
                           <input 
+                            id="image-upload"
                             type="file" 
                             className="hidden" 
                             accept="image/*" 
@@ -565,7 +598,7 @@ const ProductForm = () => {
                       
                       <Alert>
                         <AlertDescription>
-                          Recomendamos imagens no formato quadrado, de preferência com 800x800 pixels.
+                          Recomendamos imagens no formato quadrado, de preferência com 800x800 pixels. As imagens são salvas como Data URLs no localStorage.
                         </AlertDescription>
                       </Alert>
                     </div>
@@ -574,12 +607,12 @@ const ProductForm = () => {
               </CardContent>
             </Card>
             
-            <div className="flex justify-end">
+            <div className="flex justify-end space-x-2">
               <Button
                 type="button"
                 variant="outline"
-                className="mr-2"
                 onClick={() => navigate('/admin/products')}
+                disabled={loading}
               >
                 Cancelar
               </Button>
