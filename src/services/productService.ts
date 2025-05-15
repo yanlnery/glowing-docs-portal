@@ -1,4 +1,3 @@
-
 import { Product, ProductFormData, ProductImage, ProductCategory, ProductSubcategory, ProductStatus } from "@/types/product";
 
 // In a real application, this would be connected to a backend
@@ -192,84 +191,9 @@ export const productService = {
     try {
       const products = productService.getAll();
       
-      if (products.length === 0) {
-        console.log("No available products found from localStorage, returning dummy products.");
-        
-        // Return dummy products for demonstration if no real products exist
-        return [
-          {
-            id: "dummy-1",
-            name: "Boa Constrictor Amarali",
-            speciesName: "Boa constrictor amarali",
-            description: "Filhote de Boa Amarali nascido em cativeiro, bem adaptada e se alimentando regularmente.",
-            price: 950,
-            available: true,
-            visible: true,
-            featured: true,
-            isNew: false,
-            status: "disponivel" as ProductStatus,
-            category: "serpente" as ProductCategory,
-            subcategory: "boideos" as ProductSubcategory,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            images: [
-              ensureProductImage(
-                "https://images.unsplash.com/photo-1472396961693-142e6e269027",
-                "Boa Constrictor Amarali"
-              )
-            ]
-          },
-          {
-            id: "dummy-2",
-            name: "Python Regius (Piton-Real)",
-            speciesName: "Python regius",
-            description: "Exemplar adulto de Python Regius, saudável e de temperamento dócil.",
-            price: 1500,
-            available: true,
-            visible: true,
-            featured: false,
-            isNew: false,
-            status: "disponivel" as ProductStatus,
-            category: "serpente" as ProductCategory,
-            subcategory: "boideos" as ProductSubcategory,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            images: [
-              ensureProductImage(
-                "https://images.unsplash.com/photo-1466721591366-2d5fba72006d",
-                "Python Regius"
-              )
-            ]
-          },
-          {
-            id: "dummy-3",
-            name: "Jabuti-piranga",
-            speciesName: "Chelonoidis carbonaria",
-            description: "Filhote de Jabuti-piranga com registro e documentação completa.",
-            price: 650,
-            available: true,
-            visible: true,
-            featured: true,
-            isNew: false,
-            status: "disponivel" as ProductStatus,
-            category: "quelonio" as ProductCategory,
-            subcategory: "terrestres" as ProductSubcategory,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            images: [
-              ensureProductImage(
-                "https://images.unsplash.com/photo-1493962853295-0fd70327578a",
-                "Jabuti-piranga"
-              )
-            ]
-          }
-        ];
-      }
-      
-      // UPDATED: Now only filtering by visibility, regardless of status
+      // Filter by visibility, regardless of status
       return products
         .filter(product => 
-          // Product must be visible to appear in the catalog, regardless of status
           product.visible === true
         )
         .sort((a, b) => {
@@ -287,61 +211,9 @@ export const productService = {
     try {
       const products = productService.getAll();
       
-      if (products.length === 0 || !products.some(p => p.featured)) {
-        console.log("No actual featured products found, returning dummy featured products.");
-        // Return dummy featured products for demonstration
-        return [
-          {
-            id: "dummy-featured-1",
-            name: "Boa Constrictor Amarali",
-            speciesName: "Boa constrictor amarali",
-            description: "Filhote de Boa Amarali nascido em cativeiro.",
-            price: 950,
-            available: true,
-            visible: true,
-            featured: true,
-            isNew: false,
-            status: "disponivel" as ProductStatus,
-            category: "serpente" as ProductCategory,
-            subcategory: "boideos" as ProductSubcategory,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            images: [
-              ensureProductImage(
-                "https://images.unsplash.com/photo-1472396961693-142e6e269027",
-                "Boa Constrictor Amarali"
-              )
-            ]
-          },
-          {
-            id: "dummy-featured-3", 
-            name: "Jabuti-piranga",
-            speciesName: "Chelonoidis carbonaria",
-            description: "Filhote de Jabuti-piranga com registro legal.",
-            price: 650,
-            available: true,
-            visible: true,
-            featured: true,
-            isNew: false,
-            status: "disponivel" as ProductStatus,
-            category: "quelonio" as ProductCategory,
-            subcategory: "terrestres" as ProductSubcategory,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            images: [
-              ensureProductImage(
-                "https://images.unsplash.com/photo-1493962853295-0fd70327578a",
-                "Jabuti-piranga"
-              )
-            ]
-          }
-        ];
-      }
-      
-      // UPDATED: Now only filtering by visibility and featured flag, regardless of status
+      // Filter by visibility and featured flag, regardless of status
       return products
         .filter(product => 
-          // Product must be visible and featured to appear in the featured section
           product.visible === true && product.featured === true
         )
         .sort((a, b) => (a.order || 0) - (b.order || 0));

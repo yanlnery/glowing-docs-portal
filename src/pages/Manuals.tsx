@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Download, FileText, Search, Upload } from "lucide-react";
@@ -20,23 +19,9 @@ export default function Manuals() {
   const [filteredManuals, setFilteredManuals] = useState<Manual[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   
-  useEffect(() => {
-    // Scroll to top when component mounts
-    window.scrollTo(0, 0);
-    
-    // Load manuals from localStorage
-    try {
-      const savedManuals = JSON.parse(localStorage.getItem('manuals') || '[]');
-      setManuals(savedManuals);
-      setFilteredManuals(savedManuals);
-    } catch (error) {
-      console.error("Failed to load manuals:", error);
-      setManuals([]);
-      setFilteredManuals([]);
-    }
-  }, []);
-  
-  // Default example manuals if none are in localStorage
+  // Default example manuals - these will NOT be used as a fallback for display anymore.
+  // They could be used for an initial seeding if localStorage is completely empty,
+  // but the admin panel should be the source of truth.
   const defaultManuals = [
     {
       id: "1",
@@ -94,12 +79,38 @@ export default function Manuals() {
     }
   ];
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    try {
+      const savedManualsString = localStorage.getItem('manuals');
+      // If 'manuals' key doesn't exist or is an empty array string, initialize as empty array.
+      // The admin panel is responsible for populating this.
+      const savedManuals = savedManualsString ? JSON.parse(savedManualsString) : [];
+      
+      if (savedManualsString === null) {
+        console.log("Nenhum manual encontrado no localStorage. A lista estará vazia até que sejam adicionados pelo painel.");
+        // Optional: One-time seeding if absolutely necessary for a first-time setup without admin interaction
+        // localStorage.setItem('manuals', JSON.stringify(defaultManuals));
+        // setManuals(defaultManuals);
+        // setFilteredManuals(defaultManuals);
+      } else {
+        setManuals(savedManuals);
+        setFilteredManuals(savedManuals);
+      }
+
+    } catch (error) {
+      console.error("Failed to load manuals from localStorage:", error);
+      setManuals([]);
+      setFilteredManuals([]);
+    }
+  }, []);
+  
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
     
     if (!query.trim()) {
-      setFilteredManuals(manuals);
+      setFilteredManuals(manuals); // Show all loaded manuals if search is empty
       return;
     }
     
@@ -112,9 +123,9 @@ export default function Manuals() {
     setFilteredManuals(filtered);
   };
 
-  // If no manuals are found in localStorage, show default ones
-  const displayedManuals = filteredManuals.length > 0 ? filteredManuals : 
-                          (manuals.length === 0 ? defaultManuals : []);
+  // displayedManuals will now directly be filteredManuals.
+  // If localStorage was empty or parsing failed, filteredManuals will be empty.
+  const displayedManuals = filteredManuals;
 
   const handleDownload = (pdfUrl: string, title: string) => {
     // Create an anchor element and set its attributes
@@ -152,42 +163,48 @@ export default function Manuals() {
       </div>
       
       {/* Manuals Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {displayedManuals.map((manual) => (
-          <div key={manual.id} className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md flex flex-col">
-            <div className="relative h-48 overflow-hidden">
-              <img 
-                src={manual.image}
-                alt={manual.title} 
-                className="w-full h-full object-cover object-center"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
-                <div className="p-4">
-                  <span className="inline-flex items-center gap-1 bg-white/90 text-serpente-800 text-xs px-2 py-1 rounded">
-                    <FileText className="h-3 w-3" /> {manual.pages} páginas
-                  </span>
+      {manuals.length === 0 && !searchQuery ? ( // Check raw manuals length if no search query
+         <div className="text-center py-12">
+          <p className="text-muted-foreground">
+            Nenhum manual cadastrado no momento. Utilize o painel administrativo para adicionar novos manuais.
+          </p>
+        </div>
+      ) : displayedManuals.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {displayedManuals.map((manual) => (
+            <div key={manual.id} className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md flex flex-col">
+              <div className="relative h-48 overflow-hidden">
+                <img 
+                  src={manual.image}
+                  alt={manual.title} 
+                  className="w-full h-full object-cover object-center"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
+                  <div className="p-4">
+                    <span className="inline-flex items-center gap-1 bg-white/90 text-serpente-800 text-xs px-2 py-1 rounded">
+                      <FileText className="h-3 w-3" /> {manual.pages} páginas
+                    </span>
+                  </div>
                 </div>
               </div>
+              <div className="p-4 flex-grow">
+                <h3 className="font-bold text-lg mb-2">{manual.title}</h3>
+                <p className="text-muted-foreground text-sm mb-4">{manual.description}</p>
+              </div>
+              <div className="p-4 pt-0 mt-auto">
+                <Button 
+                  className="w-full" 
+                  variant="outline" 
+                  onClick={() => handleDownload(manual.pdfUrl, manual.title)}
+                >
+                  <Download className="mr-2 h-4 w-4" /> Baixar PDF
+                </Button>
+              </div>
             </div>
-            <div className="p-4 flex-grow">
-              <h3 className="font-bold text-lg mb-2">{manual.title}</h3>
-              <p className="text-muted-foreground text-sm mb-4">{manual.description}</p>
-            </div>
-            <div className="p-4 pt-0 mt-auto">
-              <Button 
-                className="w-full" 
-                variant="outline" 
-                onClick={() => handleDownload(manual.pdfUrl, manual.title)}
-              >
-                <Download className="mr-2 h-4 w-4" /> Baixar PDF
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
-      
-      {displayedManuals.length === 0 && (
+          ))}
+        </div>
+      ) : ( // This case means manuals might exist, but search query cleared them all
         <div className="text-center py-12">
           <p className="text-muted-foreground">
             Nenhum manual encontrado para sua pesquisa.
@@ -198,7 +215,7 @@ export default function Manuals() {
               className="mt-4"
               onClick={() => {
                 setSearchQuery('');
-                setFilteredManuals(manuals);
+                setFilteredManuals(manuals); // Reset to all loaded manuals
               }}
             >
               Limpar Busca
