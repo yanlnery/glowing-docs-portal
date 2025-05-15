@@ -27,7 +27,7 @@ interface Species {
   name: string; // Scientific Name
   description: string;
   characteristics: string[];
-  curiosities: string[];
+  curiosities: string[]; // Mantido como 'curiosities' para consistência com o código existente
   image: string;
   order: number;
   type: string;
@@ -51,7 +51,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Boa constrictor constrictor"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Grande porte", "constritora", "noturna", "alimenta-se de roedores"],
-    curiosidades: ["Pode viver até 30 anos em cativeiro", "É ovovivípara"],
+    curiosities: ["Pode viver até 30 anos em cativeiro", "É ovovivípara"],
     order: 1
   },
   {
@@ -63,7 +63,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Boa constrictor amarali"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Constritora", "terrestre", "noturna", "alimenta-se de roedores"],
-    curiosidades: ["Coloração mais clara", "adapta-se bem a ambientes secos"],
+    curiosities: ["Coloração mais clara", "adapta-se bem a ambientes secos"],
     order: 2
   },
   {
@@ -75,7 +75,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Boa atlantica"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Endêmica da Mata Atlântica", "semi-arborícola"],
-    curiosidades: ["Escamas menores", "adapta-se bem a ambientes úmidos"],
+    curiosities: ["Escamas menores", "adapta-se bem a ambientes úmidos"],
     order: 3
   },
   {
@@ -87,7 +87,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Epicrates cenchria"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Colorida", "iridescente", "semi-arborícola", "noturna"],
-    curiosidades: ["Muito procurada por sua beleza", "especialmente em programas de educação ambiental"],
+    curiosities: ["Muito procurada por sua beleza", "especialmente em programas de educação ambiental"],
     order: 4
   },
   {
@@ -99,7 +99,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Epicrates assisi"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Adaptada ao semiárido", "terrestre"],
-    curiosidades: ["Dócil e ideal para manuseio em atividades educativas"],
+    curiosities: ["Dócil e ideal para manuseio em atividades educativas"],
     order: 5
   },
   {
@@ -111,7 +111,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Epicrates crassus"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Constritora", "terrestre"],
-    curiosidades: ["Possui coloração mais opaca e se adapta bem ao clima seco"],
+    curiosities: ["Possui coloração mais opaca e se adapta bem ao clima seco"],
     order: 6
   },
   {
@@ -123,7 +123,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Epicrates maurus"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Escura", "terrestre"],
-    curiosidades: ["Pouco conhecida no mercado", "mas com manejo simples"],
+    curiosities: ["Pouco conhecida no mercado", "mas com manejo simples"],
     order: 7
   },
   {
@@ -135,7 +135,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Corallus batesii"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Verde vibrante", "arborícola", "noturna"],
-    curiosidades: ["Alta sensibilidade ao estresse", "exige manejo especializado"],
+    curiosities: ["Alta sensibilidade ao estresse", "exige manejo especializado"],
     order: 8
   },
   {
@@ -147,7 +147,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Corallus hortulana"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Arborícola", "defensiva"],
-    curiosidades: ["Ocorre em todo o Brasil e possui comportamento mais tímido"],
+    curiosities: ["Ocorre em todo o Brasil e possui comportamento mais tímido"],
     order: 9
   },
   {
@@ -159,7 +159,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Erythrolamprus miliaris"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Semi-aquática", "ativa durante o dia"],
-    curiosidades: ["Alimenta-se de peixes e anfíbio", "são super interativas"],
+    curiosities: ["Alimenta-se de peixes e anfíbio", "são super interativas"],
     order: 10
   },
   {
@@ -171,7 +171,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Spilotes pullatus"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Ágil", "diurna", "defensiva"],
-    curiosidades: ["Pode atingir grande tamanho", "tem comportamento defensivo imponente"],
+    curiosities: ["Pode atingir grande tamanho", "tem comportamento defensivo imponente"],
     order: 11
   },
   {
@@ -183,7 +183,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Spilotes sulphureus"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Coloração chamativa", "ativa", "diurna", "semi-arborícola"],
-    curiosidades: ["Muito veloz", "exige recintos com espaço e enriquecimento"],
+    curiosities: ["Muito veloz", "exige recintos com espaço e enriquecimento"],
     order: 12
   },
   {
@@ -195,7 +195,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Salvator teguixin"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Onívoro", "terrestre", "escamas laranjas e pretas"],
-    curiosidades: ["Bastante ativo", "comportamento semelhante ao merianae"],
+    curiosities: ["Bastante ativo", "comportamento semelhante ao merianae"],
     order: 13
   },
   {
@@ -207,7 +207,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Salvator merianae"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Onívoro", "terrestre", "robusto"],
-    curiosidades: ["Um dos lagartos mais criados legalmente no Brasil"],
+    curiosities: ["Um dos lagartos mais criados legalmente no Brasil"],
     order: 14
   },
   {
@@ -219,7 +219,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Iguana iguana"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Herbívora", "arborícola", "territorial"],
-    curiosidades: ["Exige muita luz solar e calor", "comportamento pode variar muito"],
+    curiosities: ["Exige muita luz solar e calor", "comportamento pode variar muito"],
     order: 15
   },
   {
@@ -231,7 +231,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Diploglossus lessonae"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Terrestre", "insetívoro", "corpo cilíndrico"],
-    curiosidades: ["Pouco conhecido", "se movimenta com rapidez"],
+    curiosities: ["Pouco conhecido", "se movimenta com rapidez"],
     order: 16
   },
   {
@@ -243,7 +243,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Polychrus marmoratus"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Arborícola", "insetívoro", "movimentos lentos"],
-    curiosidades: ["Se camufla com facilidade", "comportamento muito calmo"],
+    curiosities: ["Se camufla com facilidade", "comportamento muito calmo"],
     order: 17
   },
   {
@@ -255,7 +255,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Thecadactylus rapicauda"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Noturna", "arborícola", "adesiva"],
-    curiosidades: ["Vocaliza em situações de estresse", "excelente em paredes lisas"],
+    curiosities: ["Vocaliza em situações de estresse", "excelente em paredes lisas"],
     order: 18
   },
   {
@@ -267,7 +267,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Chelonoidis carbonaria"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Terrestre", "herbívoro", "manchas laranjas, amarelas ou vermelhas"],
-    curiosidades: ["Bastante comum em cativeiro", "vive muito tempo"],
+    curiosities: ["Bastante comum em cativeiro", "vive muito tempo"],
     order: 19
   },
   {
@@ -279,7 +279,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Chelonoidis denticulata"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Terrestre", "herbívoro", "maior que o piranga"],
-    curiosidades: ["Preferência por ambientes mais úmidos e sombreados"],
+    curiosities: ["Preferência por ambientes mais úmidos e sombreados"],
     order: 20
   },
   {
@@ -291,7 +291,7 @@ const defaultPlantelSpecies: Species[] = [
     slug: generateSlug("Crocodilurus amazonicus"),
     description: "Descrição detalhada a ser preenchida.",
     characteristics: ["Semiaquático", "cauda achatada", "ágil"],
-    curiosidades: ["Vive em igarapés e margens de rios", "exige ambiente misto"],
+    curiosities: ["Vive em igarapés e margens de rios", "exige ambiente misto"],
     order: 21
   }
 ];
@@ -312,10 +312,15 @@ export default function SpeciesAdmin() {
     if (savedSpecies) {
       const parsedSpecies: Species[] = JSON.parse(savedSpecies);
       // Ensure order is consistent if loading from localStorage
-      parsedSpecies.sort((a, b) => a.order - b.order);
-      setSpecies(parsedSpecies);
+      // And ensure 'curiosities' field exists for older data if necessary
+      const normalizedSpecies = parsedSpecies.map(s => ({
+        ...s,
+        curiosities: s.curiosities || (s as any).curiosidades || [''] // Fallback for older data
+      })).sort((a, b) => a.order - b.order);
+      setSpecies(normalizedSpecies);
     } else {
       // Use the new default plantel data if nothing in localStorage
+      // Ensure default data is sorted by order as well
       const sortedDefaultSpecies = [...defaultPlantelSpecies].sort((a,b) => a.order - b.order);
       setSpecies(sortedDefaultSpecies);
       localStorage.setItem('speciesList', JSON.stringify(sortedDefaultSpecies));
@@ -329,7 +334,7 @@ export default function SpeciesAdmin() {
       commonName: '',
       description: 'Descrição detalhada a ser preenchida.',
       characteristics: [''],
-      curiosities: [''],
+      curiosities: [''], // Ensure this uses 'curiosities'
       image: '',
       type: 'serpente',
       slug: '',
@@ -402,11 +407,11 @@ export default function SpeciesAdmin() {
 
   const handleCuriosityChange = (index: number, value: string) => {
     if (currentSpecies) {
-      const updatedCuriosities = [...currentSpecies.curiosities];
+      const updatedCuriosities = [...currentSpecies.curiosities]; // Ensure this uses 'curiosities'
       updatedCuriosities[index] = value;
       setCurrentSpecies({
         ...currentSpecies,
-        curiosities: updatedCuriosities
+        curiosities: updatedCuriosities // Ensure this uses 'curiosities'
       });
     }
   };
@@ -415,17 +420,17 @@ export default function SpeciesAdmin() {
     if (currentSpecies) {
       setCurrentSpecies({
         ...currentSpecies,
-        curiosities: [...currentSpecies.curiosities, '']
+        curiosities: [...currentSpecies.curiosities, ''] // Ensure this uses 'curiosities'
       });
     }
   };
 
   const handleRemoveCuriosity = (index: number) => {
-    if (currentSpecies && currentSpecies.curiosities.length > 1) {
-      const updatedCuriosities = currentSpecies.curiosities.filter((_, i) => i !== index);
+    if (currentSpecies && currentSpecies.curiosities.length > 1) { // Ensure this uses 'curiosities'
+      const updatedCuriosities = currentSpecies.curiosities.filter((_, i) => i !== index); // Ensure this uses 'curiosities'
       setCurrentSpecies({
         ...currentSpecies,
-        curiosities: updatedCuriosities
+        curiosities: updatedCuriosities // Ensure this uses 'curiosities'
       });
     }
   };
