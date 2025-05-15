@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -136,7 +137,7 @@ function App() {
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-                {/* Admin Routes - Agora com proteção específica para admin */}
+                {/* Admin Routes - Independent from client auth */}
                 <Route path="/admin" element={<AdminLogin />} />
                 <Route element={<AdminProtectedRoute />}>
                   <Route path="/admin/dashboard" element={<Dashboard />} />

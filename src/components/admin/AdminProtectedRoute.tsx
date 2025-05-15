@@ -8,9 +8,11 @@ const AdminProtectedRoute: React.FC = () => {
   const location = useLocation();
 
   if (!isAdminLoggedIn) {
+    // If not admin logged in, redirect to admin login page
     return <Navigate to="/admin" state={{ from: location }} replace />;
   }
 
+  // If admin is logged in, render the child routes
   return <Outlet />;
 };
 

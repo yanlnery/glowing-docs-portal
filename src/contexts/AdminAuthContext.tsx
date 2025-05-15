@@ -3,8 +3,8 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
 
-// Defina o nome de usuário e senha do administrador aqui
-// Idealmente, isso deveria vir de variáveis de ambiente, mas para simplicidade:
+// Define the admin username and password here
+// Ideally, this should come from environment variables, but for simplicity:
 const ADMIN_USERNAME = "admin";
 const ADMIN_PASSWORD = "serpentes2024";
 
@@ -22,8 +22,9 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [adminLoginLoading, setAdminLoginLoading] = useState<boolean>(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   
-  // Verificar se há uma sessão de administrador salva
+  // Verify if there is a saved admin session
   useEffect(() => {
     const adminSession = localStorage.getItem('admin_session');
     if (adminSession) {
@@ -31,28 +32,33 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const session = JSON.parse(adminSession);
         if (session.isAdmin && session.expiresAt > Date.now()) {
           setIsAdminLoggedIn(true);
+          
+          // If admin is logged in and we're on the admin login page, redirect to dashboard
+          if (location.pathname === '/admin') {
+            navigate('/admin/dashboard');
+          }
         } else {
-          // Se expirado, limpa a sessão
+          // If expired, clear the session
           localStorage.removeItem('admin_session');
         }
       } catch (error) {
         localStorage.removeItem('admin_session');
       }
     }
-  }, []);
+  }, [navigate, location.pathname]);
 
   const adminLogin = async (username: string, password: string): Promise<boolean> => {
     setAdminLoginLoading(true);
     
     try {
-      // Simular um atraso para parecer uma verificação real
+      // Simulate a delay to appear like a real verification
       await new Promise(resolve => setTimeout(resolve, 800));
       
       if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-        // Criar uma sessão de administrador válida por 24 horas
+        // Create an admin session valid for 24 hours
         const adminSession = {
           isAdmin: true,
-          expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 horas
+          expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
         };
         
         localStorage.setItem('admin_session', JSON.stringify(adminSession));

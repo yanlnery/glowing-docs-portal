@@ -14,6 +14,7 @@ const Login = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    // If already logged in as admin, redirect to dashboard
     if (isAdminLoggedIn) {
       navigate('/admin/dashboard');
     }

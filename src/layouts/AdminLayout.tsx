@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Navigate, useLocation, Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Button } from '@/components/ui/button';
 import { 
   Home, 
@@ -34,23 +34,14 @@ interface AdminLayoutProps {
 }
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
-  const { isAuthenticated, logout, isLoading, user, profile } = useAuth();
+  const { isAdminLoggedIn, adminLogout } = useAdminAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   // Temporary placeholder for waitlist count until implemented
   const waitlistCount = 0;
 
-  // If still loading auth state, show loading
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-serpente-600"></div>
-      </div>
-    );
-  }
-
-  // Redirect to login if not authenticated
-  if (!isAuthenticated) {
+  // If not logged in as admin, redirect to admin login
+  if (!isAdminLoggedIn) {
     return <Navigate to="/admin" replace />;
   }
 
@@ -78,8 +69,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   const isActive = (path: string) => location.pathname === path;
   
-  // Get user display name from profile
-  const displayName = profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : user?.email?.split('@')[0] || 'Usuário';
+  // Display name for admin
+  const displayName = "Administrador";
 
   return (
     <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
@@ -124,17 +115,15 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               <span className="text-xl font-semibold">Admin</span>
             </div>
 
-            {user && (
-              <div className="mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-                <div className="text-sm text-gray-600 dark:text-gray-400">Logado como:</div>
-                <div className="font-medium flex items-center gap-2">
-                  {displayName}
-                  <Badge variant={userRole === 'admin' ? 'default' : (userRole === 'editor' ? 'secondary' : 'outline')}>
-                    {userRole === 'admin' ? 'Administrador' : (userRole === 'editor' ? 'Editor' : 'Visualizador')}
-                  </Badge>
-                </div>
+            <div className="mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="text-sm text-gray-600 dark:text-gray-400">Logado como:</div>
+              <div className="font-medium flex items-center gap-2">
+                {displayName}
+                <Badge variant="default">
+                  Administrador
+                </Badge>
               </div>
-            )}
+            </div>
 
             <nav className="space-y-1">
               {filteredNav.map((item) => {
@@ -166,7 +155,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               <Button
                 variant="ghost"
                 className="w-full justify-start text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                onClick={logout}
+                onClick={adminLogout}
               >
                 <LogOut className="mr-2 h-5 w-5" />
                 Sair
