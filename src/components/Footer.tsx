@@ -60,10 +60,10 @@ export default function Footer() {
                 <Link to="/contato" className="hover:text-white transition-colors">Contato</Link>
               </li>
               <li>
-                <Link to="/termos" className="hover:text-white transition-colors">Termos de Uso</Link>
+                <Link to="/termos-de-uso" className="hover:text-white transition-colors">Termos de Uso</Link>
               </li>
               <li>
-                <Link to="/privacidade" className="hover:text-white transition-colors">Política de Privacidade</Link>
+                <Link to="/politica-de-privacidade" className="hover:text-white transition-colors">Política de Privacidade</Link>
               </li>
             </ul>
           </div>
