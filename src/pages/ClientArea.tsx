@@ -117,7 +117,7 @@ export default function ClientArea() {
     return (
       <div className="container px-4 py-12 sm:px-6 text-center">
         <div className="flex flex-col items-center justify-center min-h-[50vh]">
-          <Alert variant="warning" className="max-w-lg">
+          <Alert variant="default" className="max-w-lg"> {/* Changed from "warning" to "default" */}
             <AlertTriangle className="h-5 w-5" />
             <AlertTitle>Dados de perfil não encontrados</AlertTitle>
             <AlertDescription>
