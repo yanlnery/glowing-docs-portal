@@ -107,15 +107,11 @@ export default function Footer() {
           </div>
         </div>
         
-        {/* Bottom Bar */}
-        <div className="pt-8 mt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center">
-          <p className="text-sm text-white/50 mb-4 sm:mb-0">
+        {/* Bottom Bar - Removed images */}
+        <div className="pt-8 mt-8 border-t border-white/10 flex justify-center">
+          <p className="text-sm text-white/50">
             © {new Date().getFullYear()} Pet Serpentes & Companhia. Todos os direitos reservados.
           </p>
-          <div className="flex items-center">
-            <img src="https://via.placeholder.com/40x20" alt="IBAMA" className="h-8 mx-1" />
-            <img src="https://via.placeholder.com/40x20" alt="INEA" className="h-8 mx-1" />
-          </div>
         </div>
       </div>
     </footer>

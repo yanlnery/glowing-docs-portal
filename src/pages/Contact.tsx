@@ -27,7 +27,16 @@ export default function Contact() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
+    // Store the contact form submission in localStorage for admin panel
+    const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
+    submissions.push({
+      ...formData,
+      id: Date.now().toString(),
+      date: new Date().toISOString()
+    });
+    localStorage.setItem('contactSubmissions', JSON.stringify(submissions));
+    
+    // Simulate email sending (in a real scenario, this would be an API call)
     setTimeout(() => {
       toast({
         title: "Mensagem enviada!",
@@ -42,16 +51,6 @@ export default function Contact() {
         subject: "",
         message: ""
       });
-      
-      // Store the contact form submission in localStorage for admin panel
-      const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
-      submissions.push({
-        ...formData,
-        id: Date.now().toString(),
-        date: new Date().toISOString()
-      });
-      localStorage.setItem('contactSubmissions', JSON.stringify(submissions));
-      
     }, 1500);
   };
 

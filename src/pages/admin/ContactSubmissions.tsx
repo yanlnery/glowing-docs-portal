@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Eye, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { toast } from '@/components/ui/use-toast';
 
 interface ContactSubmission {
   id: string;
@@ -38,6 +39,11 @@ export default function ContactSubmissions() {
     const updatedSubmissions = submissions.filter(submission => submission.id !== id);
     setSubmissions(updatedSubmissions);
     localStorage.setItem('contactSubmissions', JSON.stringify(updatedSubmissions));
+    
+    toast({
+      title: "Mensagem removida",
+      description: "A mensagem foi excluída com sucesso.",
+    });
   };
 
   const handleViewSubmission = (submission: ContactSubmission) => {

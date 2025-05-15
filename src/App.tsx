@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,6 +21,7 @@ import Quiz from "./pages/Quiz";
 import WaitlistForm from "./pages/WaitlistForm";
 import CartPage from "./pages/CartPage";
 import { Button } from "@/components/ui/button";
+import { useSettings } from "./hooks/useSettings";
 
 // Admin pages
 import { AuthProvider } from "./contexts/AuthContext";
@@ -51,6 +53,12 @@ const WaitlistConfirmationPage = () => (
   </div>
 );
 
+// Function for conditional Academy route based on settings
+const AcademyRoute = () => {
+  const { isAcademyVisible } = useSettings();
+  return isAcademyVisible ? <Academy /> : <Navigate to="/" replace />;
+};
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -72,7 +80,7 @@ const App = () => (
               <Route path="manuais" element={<Manuals />} />
               <Route path="sobre" element={<About />} />
               <Route path="educacao" element={<Education />} />
-              <Route path="academy" element={<Academy />} />
+              <Route path="academy" element={<AcademyRoute />} />
               <Route path="lista-de-espera" element={<WaitlistForm />} />
               <Route path="confirmacao-inscricao" element={<WaitlistConfirmationPage />} />
               <Route path="contato" element={<Contact />} />

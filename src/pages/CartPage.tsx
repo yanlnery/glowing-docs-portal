@@ -121,14 +121,14 @@ const CartPage = () => {
         `Gostaria de confirmar o pedido e combinar os detalhes do envio.`
       );
 
-      // Mark all purchased items as unavailable
+      // Mark all purchased items as unavailable but still visible
       items.forEach(item => {
         try {
           productService.update(item.product.id, {
             ...item.product,
             available: false,
             status: 'indisponivel',
-            visible: false
+            visible: true  // Mantém visível, mas indisponível
           });
         } catch (error) {
           console.error(`Failed to update product status for ${item.product.id}`, error);
