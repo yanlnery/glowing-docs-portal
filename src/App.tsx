@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -61,62 +60,64 @@ const AcademyRoute = () => {
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            {/* Public Routes */}
-            <Route element={<WebsiteLayout />}>
-              <Route path="/" element={<Home />} />
-              <Route path="catalogo" element={<Catalog />} />
-              <Route path="produtos/:id" element={<ProductDetail />} />
-              <Route path="especies" element={<Species />} />
-              <Route path="especies/:id" element={<SpeciesDetail />} />
-              <Route path="especies-criadas/:slug" element={<SpeciesDetail />} />
-              <Route path="manuais" element={<Manuals />} />
-              <Route path="sobre" element={<About />} />
-              <Route path="educacao" element={<Education />} />
-              <Route path="academy" element={<AcademyRoute />} />
-              <Route path="lista-de-espera" element={<WaitlistForm />} />
-              <Route path="confirmacao-inscricao" element={<WaitlistConfirmationPage />} />
-              <Route path="contato" element={<Contact />} />
-              <Route path="area-cliente" element={<ClientArea />} />
-              <Route path="carrinho" element={<CartPage />} />
-              <Route path="quiz" element={<Quiz />} />
-              <Route path="manuais-de-criacao" element={<Manuals />} />
-              <Route path="ps-academy" element={<Academy />} />
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              {/* Public Routes */}
+              <Route element={<WebsiteLayout />}>
+                <Route path="/" element={<Home />} />
+                <Route path="catalogo" element={<Catalog />} />
+                <Route path="produtos/:id" element={<ProductDetail />} />
+                <Route path="especies" element={<Species />} />
+                <Route path="especies/:id" element={<SpeciesDetail />} />
+                <Route path="especies-criadas/:slug" element={<SpeciesDetail />} />
+                <Route path="manuais" element={<Manuals />} />
+                <Route path="sobre" element={<About />} />
+                <Route path="educacao" element={<Education />} />
+                <Route path="academy" element={<AcademyRoute />} />
+                <Route path="lista-de-espera" element={<WaitlistForm />} />
+                <Route path="confirmacao-inscricao" element={<WaitlistConfirmationPage />} />
+                <Route path="contato" element={<Contact />} />
+                <Route path="area-cliente" element={<ClientArea />} />
+                <Route path="carrinho" element={<CartPage />} />
+                <Route path="quiz" element={<Quiz />} />
+                <Route path="manuais-de-criacao" element={<Manuals />} />
+                <Route path="ps-academy" element={<Academy />} />
+                
+                {/* Legacy routes - keeping for backward compatibility */}
+                <Route path="getting-started" element={<Home />} />
+                <Route path="api" element={<Home />} />
+                <Route path="examples" element={<Home />} />
+                
+                {/* 404 Route */}
+                <Route path="*" element={<NotFound />} />
+              </Route>
               
-              {/* Legacy routes - keeping for backward compatibility */}
-              <Route path="getting-started" element={<Home />} />
-              <Route path="api" element={<Home />} />
-              <Route path="examples" element={<Home />} />
-              
-              {/* 404 Route */}
-              <Route path="*" element={<NotFound />} />
-            </Route>
-            
-            {/* Admin Routes */}
-            <Route path="/admin" element={<Login />} />
-            <Route path="/admin/dashboard" element={<Dashboard />} />
-            <Route path="/admin/products" element={<ProductList />} />
-            <Route path="/admin/products/new" element={<ProductForm />} />
-            <Route path="/admin/products/edit/:id" element={<ProductForm />} />
-            <Route path="/admin/settings" element={<Settings />} />
-            <Route path="/admin/waitlist" element={<WaitlistAdmin />} />
-            <Route path="/admin/manuals" element={<ManualsAdmin />} />
-            <Route path="/admin/contact-submissions" element={<ContactSubmissions />} />
-            <Route path="/admin/species" element={<SpeciesAdmin />} />
-            <Route path="/admin/carousel" element={<AdminCarousel />} />
-            <Route path="/admin/cart-analytics" element={<ShoppingCartAnalytics />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+              {/* Admin Routes */}
+              <Route path="/admin" element={<Login />} />
+              <Route path="/admin/dashboard" element={<Dashboard />} />
+              <Route path="/admin/products" element={<ProductList />} />
+              <Route path="/admin/products/new" element={<ProductForm />} />
+              <Route path="/admin/products/edit/:id" element={<ProductForm />} />
+              <Route path="/admin/settings" element={<Settings />} />
+              <Route path="/admin/waitlist" element={<WaitlistAdmin />} />
+              <Route path="/admin/manuals" element={<ManualsAdmin />} />
+              <Route path="/admin/contact-submissions" element={<ContactSubmissions />} />
+              <Route path="/admin/species" element={<SpeciesAdmin />} />
+              <Route path="/admin/carousel" element={<AdminCarousel />} />
+              <Route path="/admin/cart-analytics" element={<ShoppingCartAnalytics />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;

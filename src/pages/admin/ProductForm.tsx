@@ -178,8 +178,6 @@ const ProductForm = () => {
     
     const allImages = [...imageList, ...newProcessedImages];
     
-    const isAvailable = values.status === 'vendido' ? false : (values.visible ?? true);
-    
     const formData: ProductFormData = {
       name: values.name,
       speciesId: values.speciesId,
@@ -193,9 +191,9 @@ const ProductForm = () => {
       description: values.description,
       featured: values.featured,
       isNew: values.isNew,
-      visible: values.visible,
+      visible: values.visible, // Use the exact visible value from form
       order: values.order,
-      available: isAvailable,
+      available: values.status === 'disponivel', // Only available if status is disponivel
     };
     
     try {
@@ -388,6 +386,9 @@ const ProductForm = () => {
                                 <SelectItem value="vendido">Vendido</SelectItem>
                               </SelectContent>
                             </Select>
+                            <FormDescription>
+                              Define se o produto está disponível para compra
+                            </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -527,7 +528,7 @@ const ProductForm = () => {
                           <div className="space-y-0.5">
                             <FormLabel>Visível no site</FormLabel>
                             <FormDescription>
-                              Mostrar este animal no catálogo público
+                              Controle se este produto aparece na loja, independente do status
                             </FormDescription>
                           </div>
                           <FormControl>

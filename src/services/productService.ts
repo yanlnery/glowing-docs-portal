@@ -1,4 +1,3 @@
-
 import { Product, ProductFormData, ProductImage, ProductCategory, ProductSubcategory, ProductStatus } from "@/types/product";
 
 // In a real application, this would be connected to a backend
@@ -231,8 +230,12 @@ export const productService = {
         ];
       }
       
+      // Atualizado para respeitar estritamente a visibilidade e status
       return products
-        .filter(product => (product.visible || product.available) && (product.status === 'disponivel' || product.available))
+        .filter(product => 
+          // Produto deve estar visível E ter status disponível para aparecer na loja
+          product.visible && product.status === 'disponivel'
+        )
         .sort((a, b) => {
           if (a.featured && !b.featured) return -1;
           if (!a.featured && b.featured) return 1;
@@ -299,8 +302,12 @@ export const productService = {
         ];
       }
       
+      // Atualizado para respeitar estritamente a visibilidade e status
       return products
-        .filter(product => (product.visible || product.available) && product.featured && (product.status === 'disponivel' || product.available))
+        .filter(product => 
+          // Produto deve estar visível, marcado como destacado E ter status disponível
+          product.visible && product.featured && product.status === 'disponivel'
+        )
         .sort((a, b) => (a.order || 0) - (b.order || 0));
     } catch (error) {
       console.error("Failed to get featured products", error);

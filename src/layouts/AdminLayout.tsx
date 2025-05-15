@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Navigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,7 +14,8 @@ import {
   ClipboardList, 
   ShoppingCart,
   FileText,
-  Image
+  Image,
+  MessageSquare
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -28,7 +30,7 @@ interface NavItem {
 
 interface AdminLayoutProps {
   children: React.ReactNode;
-  requiredRole?: 'admin' | 'editor' | 'viewer'; // This prop seems unused as logic relies on user.role
+  requiredRole?: 'admin' | 'editor' | 'viewer';
 }
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
@@ -55,6 +57,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const navigation: NavItem[] = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: Home },
     { name: 'Produtos', href: '/admin/products', icon: Package },
+    { name: 'Mensagens', href: '/admin/contact-submissions', icon: MessageSquare },
     { name: 'Gestão de Espécies', href: '/admin/species', icon: ClipboardList, requiredRole: 'admin' },
     { name: 'Carrossel da Home', href: '/admin/carousel', icon: Image, requiredRole: 'admin' },
     { name: 'Manuais', href: '/admin/manuals', icon: FileText, requiredRole: 'admin' },
@@ -65,7 +68,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   const filteredNav = navigation.filter(item => {
     if (!item.requiredRole) return true;
-    // Ensure user and user.role exist before accessing
     return user?.role === 'admin' || (user?.role && user.role === item.requiredRole);
   });
 
@@ -93,11 +95,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         ></div>
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - make sure it's always visible and properly positioned */}
       <div 
-        className={`fixed md:static z-30 w-64 h-full transition-transform duration-300 transform 
-                  ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
-                  md:translate-x-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700`}
+        className="fixed md:relative z-30 w-64 h-full transition-transform duration-300 transform 
+                  md:translate-x-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"
+        style={{ 
+          transform: sidebarOpen || window.innerWidth >= 768 ? 'translateX(0)' : 'translateX(-100%)',
+          visibility: 'visible' // Ensure sidebar is always visible in DOM for pages that might hide it
+        }}
       >
         <ScrollArea className="h-full">
           <div className="p-4">
@@ -139,7 +144,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                   >
                     <item.icon className={`mr-3 flex-shrink-0 h-5 w-5 ${active ? 'text-serpente-600 dark:text-serpente-300' : ''}`} />
                     <span className="flex-1">{item.name}</span>
-                    {item.name === 'Lista de Espera' && item.badge && waitlistCount > 0 && ( // Ensure badge is shown for correct item
+                    {item.name === 'Lista de Espera' && item.badge && waitlistCount > 0 && (
                       <Badge variant="destructive" className="ml-auto">
                         {waitlistCount}
                       </Badge>
@@ -164,7 +169,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden ml-0 md:ml-64">
         <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 dark:bg-gray-900">
           {children}
         </main>
