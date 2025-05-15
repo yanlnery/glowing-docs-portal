@@ -31,7 +31,8 @@ import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 
 // Admin pages
-import { AuthProvider, useAuth } from "./contexts/AuthContext"; 
+import { AuthProvider } from "./contexts/AuthContext"; 
+import { useAuth } from "./hooks/useAuth"; // Updated import
 import { AdminAuthProvider } from "./contexts/AdminAuthContext";
 import AdminLogin from "./pages/admin/Login"; 
 import Dashboard from "./pages/admin/Dashboard";
@@ -72,7 +73,7 @@ const queryClient = new QueryClient();
 
 // Protected Route for Client Area
 const ProtectedClientRoute = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth(); // Uses updated import
   const location = useLocation();
 
   if (isLoading) {

@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -42,15 +41,19 @@ const SignupPage: React.FC = () => {
 
     if (error) {
       toast({ title: 'Erro no Cadastro', description: error.message, variant: 'destructive' });
-    } else if (data.user?.identities?.length === 0) {
-      // This can happen if email confirmation is required and user already exists but not confirmed
+    } else if (data?.user?.identities?.length === 0) {
       toast({ title: 'Erro no Cadastro', description: "Este e-mail já pode estar cadastrado mas não confirmado. Tente fazer login ou recuperar senha.", variant: 'destructive' });
     }
      else {
-      toast({ title: 'Cadastro bem-sucedido!', description: 'Confirme seu e-mail para continuar.' });
-      // Supabase might require email confirmation. If so, user won't be logged in immediately.
-      // For now, navigate to login page.
-      navigate('/login');
+      const isEmailConfirmationRequired = data?.user?.email_confirmed_at === null && data?.session === null;
+
+      if (isEmailConfirmationRequired) {
+        toast({ title: 'Cadastro realizado!', description: 'Enviamos um e-mail de confirmação para você. Por favor, verifique sua caixa de entrada e spam.' });
+        navigate('/login');
+      } else {
+        toast({ title: 'Cadastro bem-sucedido!', description: 'Você já pode fazer login.' });
+        navigate('/login');
+      }
     }
   };
 

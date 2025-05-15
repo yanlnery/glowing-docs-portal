@@ -1,37 +1,39 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks/useAuth'; // Updated import
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/integrations/supabase/client'; // Direct import for onAuthStateChange
+import { supabase } from '@/integrations/supabase/client';
 
 const ResetPasswordPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const { updatePassword, isLoading } = useAuth();
+  const { updatePassword, isLoading } = useAuth(); // uses updated import
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [hasSession, setHasSession] = useState(false);
+  const [hasSession, setHasSession] = useState(false); // This state can be used to conditionally render the form
 
   useEffect(() => {
-    // Supabase handles the token from the URL fragment and establishes a session
-    // for password recovery. We need to listen for this specific event.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY") {
-        setHasSession(true);
+        setHasSession(true); 
+      }
+      // If the session becomes null or user logs out, it means recovery is no longer active
+      if (!session) {
+        setHasSession(false);
       }
     });
-    // Check if already in recovery mode (e.g. page refresh)
+    
+    // Check current session on mount to see if already in recovery mode
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session?.user?.aud === 'authenticated') { // Check if it's a full session or recovery
-         // This logic might need refinement based on how Supabase specific recovery session is identified
-      }
+        // A password recovery "session" doesn't give full access, it's specific for `updateUser`
+        // We can assume if there is a session and the current URL indicates password recovery,
+        // it's likely a recovery context. Or rely on PASSWORD_RECOVERY event.
+        // For now, the PASSWORD_RECOVERY event is the most reliable indicator.
     });
-
 
     return () => {
       subscription?.unsubscribe();
@@ -55,13 +57,14 @@ const ResetPasswordPage: React.FC = () => {
       toast({ title: 'Erro ao Redefinir Senha', description: error.message, variant: 'destructive' });
     } else {
       toast({ title: 'Senha Redefinida!', description: 'Sua senha foi alterada com sucesso. Faça login com sua nova senha.' });
+      // It's good practice to also sign the user out after password update to ensure clean session
+      await supabase.auth.signOut(); 
       navigate('/login');
     }
   };
   
-  // This page is only accessible if Supabase has initiated a password recovery session
-  // For now, we'll show the form, but ideally, it should only appear if a recovery token is active.
-  // The useEffect above attempts to detect this.
+  // Conditionally render the form only if `hasSession` is true, or show a message.
+  // For simplicity, we'll keep showing the form, but this logic can be expanded.
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-muted/30 py-12">

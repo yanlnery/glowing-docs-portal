@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -16,7 +15,7 @@ import { Menu, X, ShoppingCart, User, Book, Box, FileText, Users, Phone, Syringe
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useCartStore } from "@/stores/cartStore";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/contexts/AuthContext"; // Import useAuth
+import { useAuth } from "@/hooks/useAuth"; // Updated import
 import { useToast } from "@/components/ui/use-toast";
 
 export default function Header() {
@@ -24,7 +23,7 @@ export default function Header() {
   const location = useLocation();
   const isMobile = useIsMobile();
   const cartQuantity = useCartStore(state => state.getCartQuantity());
-  const { isAuthenticated, logout, user } = useAuth(); // Get auth state and functions
+  const { isAuthenticated, logout, user } = useAuth(); // uses updated import
   const navigate = useNavigate();
   const { toast } = useToast();
   
