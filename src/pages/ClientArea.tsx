@@ -5,7 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   User, 
   ShoppingBag, 
-  LogOut
+  LogOut,
+  AlertTriangle
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
@@ -13,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { ProfileForm } from "@/components/client/ProfileForm";
 import { AddressForm } from "@/components/client/AddressForm";
 import { OrdersList } from "@/components/client/OrdersList";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function ClientArea() {
   const { user, profile, logout, isLoading: authLoading } = useAuth();
@@ -20,6 +22,8 @@ export default function ClientArea() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("profile");
   const [isLoadingData, setIsLoadingData] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadAttempts, setLoadAttempts] = useState(0);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -28,6 +32,28 @@ export default function ClientArea() {
     }
   }, [user, authLoading, navigate]);
   
+  // Add an effect to handle retry logic and timeout
+  useEffect(() => {
+    // If we're still loading after 10 seconds, show an error
+    let timeoutId: number;
+    
+    if (authLoading && !loadError) {
+      timeoutId = window.setTimeout(() => {
+        setLoadError("Tempo limite excedido ao carregar seus dados de perfil. Por favor, tente novamente.");
+      }, 10000);
+    }
+    
+    return () => {
+      if (timeoutId) window.clearTimeout(timeoutId);
+    };
+  }, [authLoading, loadError]);
+  
+  const handleRetryLoading = () => {
+    setLoadError(null);
+    setLoadAttempts(prev => prev + 1);
+    window.location.reload();
+  };
+
   const handleLogout = async () => {
     const { error } = await logout();
     if (error) {
@@ -38,12 +64,77 @@ export default function ClientArea() {
     }
   };
   
+  // Show loading state
   if (authLoading || isLoadingData) {
-    return <div className="container px-4 py-12 sm:px-6 text-center">Carregando dados do cliente...</div>;
+    return (
+      <div className="container px-4 py-12 sm:px-6">
+        <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
+          <div className="w-16 h-16 border-4 border-serpente-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <h2 className="text-xl font-semibold mb-2">Carregando dados do cliente...</h2>
+          <p className="text-muted-foreground">Por favor, aguarde enquanto buscamos suas informações.</p>
+        </div>
+      </div>
+    );
   }
 
-  if (!user || !profile) {
-    return <div className="container px-4 py-12 sm:px-6 text-center">Usuário não autenticado. Redirecionando para login...</div>;
+  // Show error state
+  if (loadError) {
+    return (
+      <div className="container px-4 py-12 sm:px-6">
+        <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
+          <Alert variant="destructive" className="max-w-lg">
+            <AlertTriangle className="h-5 w-5" />
+            <AlertTitle>Erro ao carregar dados</AlertTitle>
+            <AlertDescription>
+              {loadError}
+              <div className="mt-4 flex justify-center">
+                <Button onClick={handleRetryLoading}>Tentar novamente</Button>
+                <Button variant="outline" onClick={handleLogout} className="ml-2">Fazer logout</Button>
+              </div>
+            </AlertDescription>
+          </Alert>
+        </div>
+      </div>
+    );
+  }
+
+  // Show not authenticated state and redirect
+  if (!user) {
+    return (
+      <div className="container px-4 py-12 sm:px-6 text-center">
+        <div className="flex flex-col items-center justify-center min-h-[50vh]">
+          <AlertTriangle className="h-16 w-16 text-yellow-500 mb-4" />
+          <h2 className="text-2xl font-semibold mb-2">Usuário não autenticado</h2>
+          <p className="text-muted-foreground mb-6">Redirecionando para a página de login...</p>
+          <Button onClick={() => navigate("/login")}>Ir para Login</Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Profile might be null even if user is authenticated (in case of data fetch issues)
+  if (!profile) {
+    return (
+      <div className="container px-4 py-12 sm:px-6 text-center">
+        <div className="flex flex-col items-center justify-center min-h-[50vh]">
+          <Alert variant="warning" className="max-w-lg">
+            <AlertTriangle className="h-5 w-5" />
+            <AlertTitle>Dados de perfil não encontrados</AlertTitle>
+            <AlertDescription>
+              Não foi possível carregar seu perfil. Isso pode ocorrer se:
+              <ul className="list-disc list-inside mt-2 text-left">
+                <li>Seu cadastro não foi finalizado corretamente</li>
+                <li>Houve um problema de conexão com o servidor</li>
+              </ul>
+              <div className="mt-4 flex justify-center">
+                <Button onClick={handleRetryLoading}>Tentar novamente</Button>
+                <Button variant="outline" onClick={handleLogout} className="ml-2">Fazer logout</Button>
+              </div>
+            </AlertDescription>
+          </Alert>
+        </div>
+      </div>
+    );
   }
 
   return (
