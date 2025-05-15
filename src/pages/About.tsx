@@ -1,137 +1,159 @@
 
 import React from 'react';
+import { Leaf, BookOpen, Award, Heart } from 'lucide-react';
 
 const About = () => {
+  const historiaText = {
+    title: "Nossa História",
+    subtitle: "Conheça a trajetória e a missão do Pet Serpentes & Companhia",
+    paragraphs: [
+      "O Pet Serpentes & Companhia é conduzido por Yan Nery, professor e biólogo apaixonado por herpetologia desde criança. Yan cresceu como aquarista entusiasta, sempre entre aquários e terrários, montando desde pequenos aquários até sistemas marinhos complexos, como também terrários bioativos, o que moldou sua curiosidade e respeito pela vida selvagem.",
+      "Em 2023, Yan assumiu a frente do criadouro, dando continuidade ao trabalho iniciado por Daniel Leirião em 2015, quando o empreendimento nasceu como um criadouro de aves exóticas. A partir de 2019, os répteis passaram a fazer parte do manejo legalizado, e hoje representam o foco principal da operação.",
+      "Localizado no Rio de Janeiro e com certificação do IBAMA e INEA-RJ, o criadouro se dedica à criação responsável, à promoção do bem-estar animal e à disseminação de conhecimento sobre espécies nativas. Atuamos com ética, transparência e compromisso com a educação ambiental e científica, incluindo parcerias com escolas públicas e apoio a pesquisas acadêmicas.",
+      "Nosso propósito vai além da comercialização: queremos ser referência nacional em bem-estar animal, desenvolvendo recintos naturais e espaçosos que simulem o habitat das espécies — elevando o padrão do setor."
+    ],
+    ceo: "Yan Nery",
+    ceoTitle: "CEO e Biólogo"
+  };
+
+  const missaoItens = [
+    {
+      icon: <Leaf size={40} className="mb-4 text-serpente-500" />,
+      title: "Conservação",
+      text: "Promovemos práticas sustentáveis de criação que contribuem para a conservação das espécies."
+    },
+    {
+      icon: <BookOpen size={40} className="mb-4 text-serpente-500" />,
+      title: "Educação",
+      text: "Compartilhamos conhecimento para formar tutores mais conscientes e promover a posse responsável no Brasil."
+    },
+    {
+      icon: <Award size={40} className="mb-4 text-serpente-500" />,
+      title: "Excelência",
+      text: "Asseguramos os mais altos padrões de qualidade no manejo, reprodução e venda de répteis para criadores responsáveis."
+    },
+    {
+      icon: <Heart size={40} className="mb-4 text-serpente-500" />,
+      title: "Bem-estar Animal",
+      text: "Garantimos ambiente, alimentação e estímulos adequados para o desenvolvimento saudável de cada animal."
+    }
+  ];
+
+  const trajetoriaItens = [
+    {
+      year: "2012",
+      title: "Fundação do Criadouro",
+      text: "Pet Serpentes inicia oficialmente o criadouro com apenas 10 espécimes e obtém os primeiros registros junto aos órgãos ambientais."
+    },
+    {
+      year: "2015",
+      title: "Expansão do Plantel",
+      text: "O criadouro se expande para mais de 50 animais de diversas espécies e começa a realizar as primeiras vendas comerciais."
+    },
+    {
+      year: "2018",
+      title: "Início do Programa Educacional",
+      text: "Lançamento do primeiro material educativo voltado para escolas e universidades, promovendo o conhecimento sobre répteis."
+    },
+    {
+      year: "2020",
+      title: "Lançamento da Pet Serpentes Academy",
+      text: "Criação da plataforma online com cursos e conteúdos exclusivos para entusiastas e criadores de répteis."
+    },
+    {
+      year: "2023",
+      title: "Expansão Nacional",
+      text: "O criadouro alcança reconhecimento nacional, realizando vendas para todo o Brasil e firmando parcerias com instituições de pesquisa."
+    }
+  ];
+
   return (
-    <div className="container px-4 py-12 sm:px-6 mx-auto">
-      {/* Title section - updated to match Manuals page style */}
-      <div className="flex flex-col items-center mb-12 text-center">
-        <div className="docs-section-title">
-          <h1 className="text-4xl font-bold">Quem Somos</h1>
-        </div>
-        <p className="text-muted-foreground max-w-2xl mt-4">
-          Conheça a história e a equipe por trás do Pet Serpentes & Companhia
-        </p>
-      </div>
+    <div className="bg-gray-900 text-gray-100 py-12 md:py-20">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start mb-16">
-        <div>
-          <h2 className="text-2xl font-bold mb-4">Nossa História</h2>
-          
-          <div className="prose dark:prose-invert max-w-none">
-            <p>
-              O Pet Serpentes & Companhia é conduzido por Yan Nery, professor e biólogo apaixonado por herpetologia desde criança. Yan cresceu como aquarista entusiasta, sempre entre aquários e terrários, montando desde pequenos aquários até sistemas marinhos complexos, como também terrários bioativos, o que moldou sua curiosidade e respeito pela vida selvagem.
-            </p>
-            <p>
-              Em 2023, Yan assumiu a frente do criadouro, dando continuidade ao trabalho iniciado por Daniel Leirião em 2015, quando o empreendimento nasceu como um criadouro de aves exóticas. A partir de 2019, os répteis passaram a fazer parte do manejo legalizado, e hoje representam o foco principal da operação.
-            </p>
-            <p>
-              Localizado no Rio de Janeiro e com certificação do IBAMA e INEA-RJ, o criadouro se dedica à criação responsável, à promoção do bem-estar animal e à disseminação de conhecimento sobre espécies nativas. Atuamos com ética, transparência e compromisso com a educação ambiental e científica, incluindo parcerias com escolas públicas e apoio a pesquisas acadêmicas.
-            </p>
-            <p>
-              Nosso propósito vai além da comercialização: queremos ser referência nacional em bem-estar animal, desenvolvendo recintos naturais e espaçosos que simulem o habitat das espécies — elevando o padrão do setor.
-            </p>
+        {/* Nossa História Section */}
+        <section className="mb-16 md:mb-24">
+          <div className="flex items-center mb-4">
+            <span className="w-1 h-8 bg-serpente-500 rounded mr-3"></span>
+            <h2 className="text-3xl md:text-4xl font-bold text-white">{historiaText.title}</h2>
           </div>
-        </div>
-        
-        <div>
-          <img 
-            src="/lovable-uploads/d71c2fb7-1bfe-41ba-8db3-d2d0b4279365.png" 
-            alt="Instalações do Pet Serpentes" 
-            className="w-full h-auto rounded-lg shadow-lg" 
-          />
-        </div>
-      </div>
-
-      <div className="mb-16">
-        <h2 className="text-2xl font-bold mb-8 text-center">Nossa Equipe</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="text-center">
-            <div className="relative mx-auto w-40 h-40 mb-4 overflow-hidden rounded-full">
+          <p className="text-gray-400 mb-8 text-lg">{historiaText.subtitle}</p>
+          
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+            <div className="order-1 md:order-1">
               <img 
-                src="/lovable-uploads/6dcc0ef5-dc47-4f3c-9020-54ecc65ed390.png" 
-                alt="Yan Nery" 
-                className="w-full h-full object-cover"
+                src="/lovable-uploads/d71c2fb7-1bfe-41ba-8db3-d2d0b4279365.png" 
+                alt="Yan Nery no Pet Serpentes & Companhia" 
+                className="w-full h-auto rounded-lg shadow-lg object-cover" 
               />
             </div>
-            <h3 className="text-xl font-semibold">Yan Nery</h3>
-            <p className="text-serpente-600">CEO e Biólogo</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Fundador e biólogo especialista em herpetologia, com ampla experiência em manejo de répteis e difusão do conhecimento científico.
-            </p>
-          </div>
-          
-          <div className="text-center">
-            <div className="relative mx-auto w-40 h-40 mb-4 overflow-hidden rounded-full bg-muted flex items-center justify-center">
-              <img 
-                src="/lovable-uploads/d7cd39f5-e491-4eb3-a10d-6cf8ad24669a.png" 
-                alt="Dara Nery" 
-                className="w-full h-full object-cover"
-              />
+            <div className="order-2 md:order-2 prose prose-invert max-w-none text-gray-300">
+              <h3 className="text-xl font-semibold text-white">{historiaText.ceo}</h3>
+              <p className="text-sm text-serpente-400 mb-4">{historiaText.ceoTitle}</p>
+              {historiaText.paragraphs.map((p, index) => (
+                <p key={index} className="mb-4 leading-relaxed">{p}</p>
+              ))}
             </div>
-            <h3 className="text-xl font-semibold">Dara Nery</h3>
-            <p className="text-serpente-600">Diretora de Operações</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Responsável pela gestão operacional e administrativa do criadouro, garantindo o bem-estar de todos os animais.
-            </p>
           </div>
-          
-          <div className="text-center">
-            <div className="relative mx-auto w-40 h-40 mb-4 overflow-hidden rounded-full bg-muted flex items-center justify-center">
-              <img 
-                src="/lovable-uploads/764f832e-e068-449d-80be-7d670575665f.png" 
-                alt="Equipe Técnica" 
-                className="w-full h-full object-cover" 
-              />
+        </section>
+
+        {/* Nossa Missão Section */}
+        <section className="mb-16 md:mb-24">
+          <div className="text-center mb-12">
+            <div className="inline-block relative mb-2">
+              <h2 className="text-3xl md:text-4xl font-bold text-white">Nossa Missão</h2>
+              <span className="block w-24 h-1 bg-serpente-500 mx-auto mt-2"></span>
             </div>
-            <h3 className="text-xl font-semibold">Equipe Técnica</h3>
-            <p className="text-serpente-600">Suporte e Manejo</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Nossa equipe técnica é formada por profissionais especializados no manejo e cuidado de répteis e aves exóticas.
-            </p>
+            <p className="text-gray-400 mt-2 text-lg">Trabalhamos com pilares fundamentais que orientam todas as nossas atividades.</p>
           </div>
-        </div>
-      </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {missaoItens.map((item, index) => (
+              <div key={index} className="bg-gray-800 p-6 rounded-lg shadow-lg text-center hover:shadow-serpente-500/30 transition-shadow duration-300">
+                <div className="flex justify-center">{item.icon}</div>
+                <h3 className="text-xl font-semibold text-white mb-2">{item.title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{item.text}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
-      <div className="mb-16">
-        <h2 className="text-2xl font-bold mb-8 text-center">Nossos Valores</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-card border rounded-lg p-6 shadow-sm">
-            <h3 className="text-xl font-semibold mb-3">Bem-estar animal</h3>
-            <p>
-              Todos os nossos animais são criados em condições que priorizam seu bem-estar, com recintos amplos e adequados às necessidades de cada espécie.
-            </p>
+        {/* Nossa Trajetória Section */}
+        <section>
+          <div className="text-center mb-12">
+            <div className="inline-block relative mb-2">
+              <h2 className="text-3xl md:text-4xl font-bold text-white">Nossa Trajetória</h2>
+              <span className="block w-24 h-1 bg-serpente-500 mx-auto mt-2"></span>
+            </div>
+            <p className="text-gray-400 mt-2 text-lg">Conheça os principais marcos na história do Pet Serpentes & Companhia.</p>
           </div>
           
-          <div className="bg-card border rounded-lg p-6 shadow-sm">
-            <h3 className="text-xl font-semibold mb-3">Educação Ambiental</h3>
-            <p>
-              Acreditamos que o conhecimento é a chave para a conservação. Por isso, promovemos iniciativas educacionais sobre a importância das diferentes espécies.
-            </p>
-          </div>
-          
-          <div className="bg-card border rounded-lg p-6 shadow-sm">
-            <h3 className="text-xl font-semibold mb-3">Sustentabilidade</h3>
-            <p>
-              Adotamos práticas sustentáveis em todas as nossas operações, desde a alimentação dos animais até o descarte responsável de resíduos.
-            </p>
-          </div>
-        </div>
-      </div>
+          <div className="relative">
+            {/* Central line */}
+            <div className="hidden md:block absolute top-0 bottom-0 left-1/2 w-0.5 bg-gray-700 transform -translate-x-1/2"></div>
+            
+            {trajetoriaItens.map((item, index) => (
+              <div key={index} className={`mb-12 md:flex ${index % 2 === 0 ? 'md:flex-row-reverse' : ''} items-center w-full`}>
+                <div className="md:w-1/2"></div> {/* Spacer for timeline alignment */}
+                <div className={`md:w-1/2 ${index % 2 === 0 ? 'md:pl-8 lg:pl-12' : 'md:pr-8 lg:pr-12 md:text-right'} relative`}>
+                  {/* Dot on the line */}
+                  <div className="hidden md:block absolute top-1/2 -mt-2.5 transform -translate-y-1/2 z-10">
+                    <div className={`w-5 h-5 rounded-full bg-serpente-500 border-4 border-gray-900 ${index % 2 === 0 ? 'md:-ml-[calc(50%+0.625rem)]' : 'md:-mr-[calc(50%+0.625rem)] md:left-auto md:right-0' } `}></div>
+                  </div>
+                   {/* Mobile line */}
+                  <div className="md:hidden absolute top-0 left-0 w-0.5 h-full bg-gray-700 -ml-2.5"></div>
+                  <div className="md:hidden absolute top-4 left-0 w-5 h-5 rounded-full bg-serpente-500 border-4 border-gray-900 transform -translate-x-1/2 -ml-0.5"></div>
 
-      <div className="bg-serpente-50 dark:bg-serpente-950/30 rounded-xl p-8 text-center">
-        <h2 className="text-2xl font-bold mb-4">Visite Nosso Criadouro</h2>
-        <p className="max-w-2xl mx-auto mb-6">
-          Agende uma visita ao nosso criadouro para conhecer de perto nosso trabalho e os animais que criamos com tanto carinho e dedicação.
-        </p>
-        <a 
-          href="/contato" 
-          className="inline-block bg-serpente-600 hover:bg-serpente-700 text-white font-medium px-6 py-3 rounded-lg transition-colors"
-        >
-          Agendar Visita
-        </a>
+                  <div className="bg-gray-800 p-6 rounded-lg shadow-lg ml-4 md:ml-0">
+                    <p className="text-sm font-semibold text-serpente-400 mb-1">{item.year}</p>
+                    <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
+                    <p className="text-gray-400 text-sm leading-relaxed">{item.text}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
       </div>
     </div>
   );
