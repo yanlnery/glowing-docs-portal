@@ -4,27 +4,24 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { getCarouselImages, CarouselImage } from "@/services/carouselService"; // Import service
-
-// const carouselImages = [ ... ] // Remove hardcoded array
+import { getCarouselImages, CarouselImage as CarouselImageDataType } from "@/services/carouselService";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"; // Import shadcn/ui Carousel components
 
 export default function HeroCarousel() {
-  const [carouselImagesData, setCarouselImagesData] = useState<CarouselImage[]>([]);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [carouselImagesData, setCarouselImagesData] = useState<CarouselImageDataType[]>([]);
   
   useEffect(() => {
     setCarouselImagesData(getCarouselImages());
   }, []);
 
-  // Auto-advance the carousel
-  useEffect(() => {
-    if (carouselImagesData.length === 0) return;
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % carouselImagesData.length);
-    }, 5000);
-    
-    return () => clearInterval(interval);
-  }, [carouselImagesData]);
+  // Auto-advance can be added with Embla plugins if needed later.
+  // For now, focusing on swipe functionality provided by shadcn/ui Carousel.
 
   if (carouselImagesData.length === 0) {
     return (
@@ -35,63 +32,54 @@ export default function HeroCarousel() {
   }
 
   return (
-    <div className="relative h-[70vh] overflow-hidden">
-      {/* Image Carousel */}
-      {carouselImagesData.map((image, index) => (
-        <div
-          key={image.id || index} // Use image.id if available
-          className={cn(
-            "absolute inset-0 transition-opacity duration-1000",
-            index === currentImageIndex ? "opacity-100" : "opacity-0"
-          )}
-          style={{
-            backgroundImage: `url(${image.url})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent z-10"></div>
-        </div>
-      ))}
-
-      {/* Content */}
-      <div className="container relative z-20 flex flex-col items-start justify-center h-full py-10 px-4 sm:px-6">
-        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-4 max-w-2xl animate-slide-in pt-6 sm:pt-0">
-          {carouselImagesData[currentImageIndex]?.title || "Bem-vindo"}
-        </h1>
-        <p className="text-md md:text-xl text-white/90 max-w-xl mb-8 animate-fade-in">
-          {carouselImagesData[currentImageIndex]?.subtitle || "Conheça nossos animais"}
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center sm:items-start">
-          <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[44px] w-full sm:w-auto" asChild>
-            <Link to="/catalogo">
-              Animais Disponíveis <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-          <Button variant="outline" size="lg" className="bg-white/10 border-white/20 text-white hover:bg-white/20 min-h-[44px] w-full sm:w-auto" asChild>
-            <Link to="/sobre">
-              Conheça nossa História
-            </Link>
-          </Button>
-        </div>
-      </div>
-
-      {/* Carousel Indicators */}
-      <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2 z-20">
-        {carouselImagesData.map((_, index) => (
-          <button
-            key={`indicator-${index}`}
-            className={cn(
-              "w-3 h-3 rounded-full focus:outline-none transition-all",
-              index === currentImageIndex
-                ? "bg-white scale-110"
-                : "bg-white/40 hover:bg-white/60"
-            )}
-            onClick={() => setCurrentImageIndex(index)}
-            aria-label={`Go to slide ${index + 1}`}
-          />
+    <Carousel
+      className="relative h-[70vh] w-full"
+      opts={{
+        loop: true,
+      }}
+    >
+      <CarouselContent className="h-full">
+        {carouselImagesData.map((image, index) => (
+          <CarouselItem key={image.id || index} className="h-full">
+            <div
+              className="relative w-full h-full"
+              style={{
+                backgroundImage: `url(${image.url})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent z-10"></div>
+              {/* Content per slide */}
+              <div className="container relative z-20 flex flex-col items-start justify-center h-full py-10 px-4 sm:px-6">
+                <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-4 max-w-2xl animate-slide-in pt-6 sm:pt-0">
+                  {image.title || "Bem-vindo"}
+                </h1>
+                <p className="text-md md:text-xl text-white/90 max-w-xl mb-8 animate-fade-in">
+                  {image.subtitle || "Conheça nossos animais"}
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center sm:items-start">
+                  <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[44px] w-full sm:w-auto" asChild>
+                    <Link to="/catalogo">
+                      Animais Disponíveis <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                  <Button variant="outline" size="lg" className="bg-white/10 border-white/20 text-white hover:bg-white/20 min-h-[44px] w-full sm:w-auto" asChild>
+                    <Link to="/sobre">
+                      Conheça nossa História
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CarouselItem>
         ))}
-      </div>
-    </div>
+      </CarouselContent>
+      <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-30 text-white bg-black/30 hover:bg-black/50 border-none" />
+      <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-30 text-white bg-black/30 hover:bg-black/50 border-none" />
+      
+      {/* Optional: Custom indicators if needed, embla API can provide current slide index */}
+      {/* For simplicity, default embla indicators (if any) or nav buttons are primary */}
+    </Carousel>
   );
 }
