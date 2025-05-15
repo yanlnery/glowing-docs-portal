@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -29,8 +30,8 @@ import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 
 // Admin pages
-import { AuthProvider, useAuth } from "./contexts/AuthContext"; // useAuth imported
-import AdminLogin from "./pages/admin/Login"; // Renamed to avoid confusion
+import { AuthProvider, useAuth } from "./contexts/AuthContext"; 
+import AdminLogin from "./pages/admin/Login"; 
 import Dashboard from "./pages/admin/Dashboard";
 import ProductList from "./pages/admin/ProductList";
 import ProductForm from "./pages/admin/ProductForm";
@@ -86,11 +87,12 @@ const ProtectedClientRoute = () => {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <Router>
+      <Router> {/* Router now wraps AuthProvider */}
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            {/* Routes remain inside AuthProvider so they can access auth context */}
             <Routes>
               {/* Public Routes */}
               <Route element={<WebsiteLayout />}>
@@ -148,11 +150,12 @@ function App() {
               <Route path="/admin/carousel" element={<AdminCarousel />} />
               <Route path="/admin/cart-analytics" element={<ShoppingCartAnalytics />} />
             </Routes>
-          </Router>
-        </TooltipProvider>
-      </AuthProvider>
+          </TooltipProvider>
+        </AuthProvider>
+      </Router>
     </QueryClientProvider>
   );
 }
 
 export default App;
+
