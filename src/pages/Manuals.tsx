@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, FileText, Search } from "lucide-react"; // Removed Upload as it's not used here
+import { Download, FileText, Search, Upload } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 interface Manual {
@@ -12,7 +12,7 @@ interface Manual {
   image: string;
   category: string;
   pdfUrl: string;
-  pdfFile?: File; // This might be relevant if manuals are created client-side then stored
+  pdfFile?: File;
 }
 
 export default function Manuals() {
@@ -21,31 +21,85 @@ export default function Manuals() {
   const [searchQuery, setSearchQuery] = useState('');
   
   useEffect(() => {
+    // Scroll to top when component mounts
     window.scrollTo(0, 0);
+    
+    // Load manuals from localStorage
     try {
-      const savedManualsString = localStorage.getItem('manuals');
-      const savedManuals = savedManualsString ? JSON.parse(savedManualsString) : [];
+      const savedManuals = JSON.parse(localStorage.getItem('manuals') || '[]');
       setManuals(savedManuals);
       setFilteredManuals(savedManuals);
-      if (savedManuals.length === 0) {
-        console.log("Nenhum manual encontrado no localStorage.");
-      }
     } catch (error) {
-      console.error("Falha ao carregar manuais do localStorage:", error);
+      console.error("Failed to load manuals:", error);
       setManuals([]);
       setFilteredManuals([]);
     }
   }, []);
   
-  // REMOVED: defaultManuals array and logic to fall back to it.
-  // The component will now show an empty state if no manuals are in localStorage.
+  // Default example manuals if none are in localStorage
+  const defaultManuals = [
+    {
+      id: "1",
+      title: "Manual de Criação de Boídeos",
+      description: "Guia completo para criação e reprodução de serpentes da família Boidae.",
+      pages: 32,
+      image: "https://images.unsplash.com/photo-1633527316352-52177079b3f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
+      category: "serpente",
+      pdfUrl: "/manuals/boideos-manual.pdf"
+    },
+    {
+      id: "2",
+      title: "Manual de Criação de Cobra d'Água",
+      description: "Técnicas e cuidados específicos para a criação de Erythrolamprus miliaris em cativeiro.",
+      pages: 28,
+      image: "https://images.unsplash.com/photo-1557178985-891076b318dd?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
+      category: "serpente",
+      pdfUrl: "/manuals/cobra-agua-manual.pdf"
+    },
+    {
+      id: "3",
+      title: "Manual de Criação de Iguanas",
+      description: "Habitat, alimentação e reprodução de iguanas em ambiente controlado.",
+      pages: 45,
+      image: "https://images.unsplash.com/photo-1598445609092-7c7d80d816dd?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
+      category: "lagarto",
+      pdfUrl: "/manuals/iguanas-manual.pdf"
+    },
+    {
+      id: "4",
+      title: "Manual de Criação de Jabutis",
+      description: "Guia detalhado para manejo de quelônios terrestres brasileiros.",
+      pages: 36,
+      image: "https://images.unsplash.com/photo-1591824438708-ce405f36ba3d?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
+      category: "quelonio",
+      pdfUrl: "/manuals/jabutis-manual.pdf"
+    },
+    {
+      id: "5",
+      title: "Manual de Criação de Diploglossus",
+      description: "Práticas recomendadas para a criação da Cobra-de-vidro (Diploglossus fasciatus).",
+      pages: 24,
+      image: "https://images.unsplash.com/photo-1550172268-9a48af98ac5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
+      category: "lagarto",
+      pdfUrl: "/manuals/diploglossus-manual.pdf"
+    },
+    {
+      id: "6",
+      title: "Manual de Criação de Teiús",
+      description: "Técnicas profissionais para o manejo de Tupinambis spp. em cativeiro.",
+      pages: 40,
+      image: "https://images.unsplash.com/photo-1597284902002-b783970afd73?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80",
+      category: "lagarto",
+      pdfUrl: "/manuals/teius-manual.pdf"
+    }
+  ];
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
     
     if (!query.trim()) {
-      setFilteredManuals(manuals); // Show all loaded manuals
+      setFilteredManuals(manuals);
       return;
     }
     
@@ -58,10 +112,12 @@ export default function Manuals() {
     setFilteredManuals(filtered);
   };
 
-  // Use filteredManuals directly. If manuals from localStorage is empty, filteredManuals will also be empty.
-  const displayedManuals = filteredManuals;
+  // If no manuals are found in localStorage, show default ones
+  const displayedManuals = filteredManuals.length > 0 ? filteredManuals : 
+                          (manuals.length === 0 ? defaultManuals : []);
 
   const handleDownload = (pdfUrl: string, title: string) => {
+    // Create an anchor element and set its attributes
     const link = document.createElement('a');
     link.href = pdfUrl;
     link.download = title.replace(/\s+/g, '-').toLowerCase() + '.pdf';
@@ -96,64 +152,58 @@ export default function Manuals() {
       </div>
       
       {/* Manuals Grid */}
-      {manuals.length === 0 ? (
-        <div className="text-center py-12">
-          <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
-          <h3 className="mt-2 text-lg font-medium">Nenhum manual cadastrado</h3>
-          <p className="text-sm text-muted-foreground">
-            Ainda não há manuais disponíveis. Volte em breve!
-          </p>
-        </div>
-      ) : displayedManuals.length === 0 && searchQuery ? (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">
-            Nenhum manual encontrado para "{searchQuery}".
-          </p>
-          <Button 
-            variant="outline" 
-            className="mt-4"
-            onClick={() => {
-              setSearchQuery('');
-              setFilteredManuals(manuals);
-            }}
-          >
-            Limpar Busca
-          </Button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {displayedManuals.map((manual) => (
-            <div key={manual.id} className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md flex flex-col">
-              <div className="relative h-48 overflow-hidden">
-                <img 
-                  src={manual.image}
-                  alt={manual.title} 
-                  className="w-full h-full object-cover object-center"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
-                  <div className="p-4">
-                    <span className="inline-flex items-center gap-1 bg-white/90 text-serpente-800 text-xs px-2 py-1 rounded">
-                      <FileText className="h-3 w-3" /> {manual.pages} páginas
-                    </span>
-                  </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {displayedManuals.map((manual) => (
+          <div key={manual.id} className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md flex flex-col">
+            <div className="relative h-48 overflow-hidden">
+              <img 
+                src={manual.image}
+                alt={manual.title} 
+                className="w-full h-full object-cover object-center"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
+                <div className="p-4">
+                  <span className="inline-flex items-center gap-1 bg-white/90 text-serpente-800 text-xs px-2 py-1 rounded">
+                    <FileText className="h-3 w-3" /> {manual.pages} páginas
+                  </span>
                 </div>
               </div>
-              <div className="p-4 flex-grow">
-                <h3 className="font-bold text-lg mb-2">{manual.title}</h3>
-                <p className="text-muted-foreground text-sm mb-4">{manual.description}</p>
-              </div>
-              <div className="p-4 pt-0 mt-auto">
-                <Button 
-                  className="w-full" 
-                  variant="outline" 
-                  onClick={() => handleDownload(manual.pdfUrl, manual.title)}
-                >
-                  <Download className="mr-2 h-4 w-4" /> Baixar PDF
-                </Button>
-              </div>
             </div>
-          ))}
+            <div className="p-4 flex-grow">
+              <h3 className="font-bold text-lg mb-2">{manual.title}</h3>
+              <p className="text-muted-foreground text-sm mb-4">{manual.description}</p>
+            </div>
+            <div className="p-4 pt-0 mt-auto">
+              <Button 
+                className="w-full" 
+                variant="outline" 
+                onClick={() => handleDownload(manual.pdfUrl, manual.title)}
+              >
+                <Download className="mr-2 h-4 w-4" /> Baixar PDF
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      {displayedManuals.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">
+            Nenhum manual encontrado para sua pesquisa.
+          </p>
+          {searchQuery && (
+            <Button 
+              variant="outline" 
+              className="mt-4"
+              onClick={() => {
+                setSearchQuery('');
+                setFilteredManuals(manuals);
+              }}
+            >
+              Limpar Busca
+            </Button>
+          )}
         </div>
       )}
     </div>
