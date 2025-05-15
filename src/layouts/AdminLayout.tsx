@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Navigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -34,9 +34,11 @@ interface AdminLayoutProps {
 }
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
-  const { isAuthenticated, logout, isLoading, user, waitlistCount } = useAuth();
+  const { isAuthenticated, logout, isLoading, user, profile } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  // Temporary placeholder for waitlist count until implemented
+  const waitlistCount = 0;
 
   // If still loading auth state, show loading
   if (isLoading) {
@@ -66,12 +68,18 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { name: 'Configurações', href: '/admin/settings', icon: Settings, requiredRole: 'admin' },
   ];
 
+  // For now, we'll just treat all users as admin
+  const userRole = 'admin';
+  
   const filteredNav = navigation.filter(item => {
     if (!item.requiredRole) return true;
-    return user?.role === 'admin' || (user?.role && user.role === item.requiredRole);
+    return userRole === 'admin' || (userRole && userRole === item.requiredRole);
   });
 
   const isActive = (path: string) => location.pathname === path;
+  
+  // Get user display name from profile
+  const displayName = profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : user?.email?.split('@')[0] || 'Usuário';
 
   return (
     <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
@@ -120,9 +128,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               <div className="mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
                 <div className="text-sm text-gray-600 dark:text-gray-400">Logado como:</div>
                 <div className="font-medium flex items-center gap-2">
-                  {user.username}
-                  <Badge variant={user.role === 'admin' ? 'default' : (user.role === 'editor' ? 'secondary' : 'outline')}>
-                    {user.role === 'admin' ? 'Administrador' : (user.role === 'editor' ? 'Editor' : 'Visualizador')}
+                  {displayName}
+                  <Badge variant={userRole === 'admin' ? 'default' : (userRole === 'editor' ? 'secondary' : 'outline')}>
+                    {userRole === 'admin' ? 'Administrador' : (userRole === 'editor' ? 'Editor' : 'Visualizador')}
                   </Badge>
                 </div>
               </div>

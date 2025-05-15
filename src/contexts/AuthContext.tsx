@@ -1,7 +1,9 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import type { AuthChangeEvent, Session, User, Subscription } from '@supabase/supabase-js'; // Added Subscription
+import type { AuthChangeEvent, Session, User } from '@supabase/supabase-js'; 
 import type { Profile } from '@/types/client';
+import { useNavigate } from 'react-router-dom';
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -15,7 +17,6 @@ type AuthContextType = {
   updatePassword: (password: string) => Promise<{ error: any, data: any }>;
   updateProfile: (updatedProfileData: Partial<Profile>) => Promise<{ error: any, data: Profile | null }>;
   isLoading: boolean;
-  // waitlistCount can be removed or handled differently if not relevant for client auth
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,6 +26,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<Profile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchInitialSession = async () => {
@@ -39,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     fetchInitialSession();
 
-    const { data: authListenerData } = supabase.auth.onAuthStateChange( // Renamed for clarity
+    const { data: authListenerData } = supabase.auth.onAuthStateChange(
       async (event: AuthChangeEvent, currentSession: Session | null) => {
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
@@ -55,10 +57,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
-    const authSubscription = authListenerData?.subscription; // Extract subscription
-
     return () => {
-      authSubscription?.unsubscribe(); // Corrected unsubscribe call
+      authListenerData?.subscription?.unsubscribe();
     };
   }, []);
 
@@ -68,6 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       .select('*')
       .eq('id', userId)
       .single();
+    
     if (error) {
       console.error('Error fetching profile:', error);
       setProfile(null);

@@ -1,152 +1,32 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   User, 
   ShoppingBag, 
-  CheckCircle,
-  AlertCircle,
   LogOut
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import type { Profile, Address, Order } from "@/types/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import { ProfileForm } from "@/components/client/ProfileForm";
+import { AddressForm } from "@/components/client/AddressForm";
+import { OrdersList } from "@/components/client/OrdersList";
 
 export default function ClientArea() {
-  const { user, profile: authProfile, logout, updateProfile, isLoading: authLoading } = useAuth();
+  const { user, profile, logout, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-
   const [activeTab, setActiveTab] = useState("profile");
-  
-  // Profile state
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-
-  // Address state
-  const [currentAddress, setCurrentAddress] = useState<Partial<Address>>({}); // For editing/adding
-  const [street, setStreet] = useState('');
-  const [numberVal, setNumberVal] = useState(''); // 'number' is reserved
-  const [complement, setComplement] = useState('');
-  const [neighborhood, setNeighborhood] = useState('');
-  const [city, setCity] = useState('');
-  const [stateVal, setStateVal] = useState(''); // 'state' is reserved
-  const [zipcode, setZipcode] = useState('');
-  
-  // Orders state
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [isLoadingData, setIsLoadingData] = useState(false);
 
   useEffect(() => {
-    if (user && authProfile) {
-      setFirstName(authProfile.first_name || '');
-      setLastName(authProfile.last_name || '');
-      setPhone(authProfile.phone || '');
-      setEmail(user.email || '');
-      fetchClientData();
-    } else if (!authLoading && !user) {
-      // If not loading and no user, redirect to login (though ProtectedRoute should handle this)
+    if (!authLoading && !user) {
+      // If not loading and no user, redirect to login
       navigate('/login');
     }
-  }, [user, authProfile, authLoading, navigate]);
-
-  const fetchClientData = async () => {
-    if (!user) return;
-    setIsLoadingData(true);
-    
-    const { data: addressData, error: addressError } = await supabase
-      .from('addresses')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('is_default', { ascending: false });
-
-    if (addressError) {
-      toast({ title: "Erro ao buscar endereços", description: addressError.message, variant: "destructive" });
-    } else if (addressData && addressData.length > 0) {
-      const defaultAddress = addressData.find(a => a.is_default) || addressData[0];
-      setCurrentAddress(defaultAddress); // Initialize form with the first/default address
-      setStreet(defaultAddress.street);
-      setNumberVal(defaultAddress.number); // Uses numberVal state
-      setComplement(defaultAddress.complement || '');
-      setNeighborhood(defaultAddress.neighborhood);
-      setCity(defaultAddress.city);
-      setStateVal(defaultAddress.state); // Uses stateVal state
-      setZipcode(defaultAddress.zipcode);
-    } else {
-      setCurrentAddress({ user_id: user.id, is_default: true }); // Prepare for new address
-    }
-
-    const { data: orderData, error: orderError } = await supabase
-      .from('orders')
-      .select('*, order_items ( * )')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
-
-    if (orderError) {
-      toast({ title: "Erro ao buscar pedidos", description: orderError.message, variant: "destructive" });
-    } else {
-      setOrders(orderData as Order[]);
-    }
-    setIsLoadingData(false);
-  };
-
-  const handleProfileUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const { error } = await updateProfile({
-      first_name: firstName,
-      last_name: lastName,
-      phone: phone,
-    });
-    if (error) {
-      toast({ title: "Erro ao atualizar perfil", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Perfil atualizado!", description: "Suas informações foram salvas." });
-    }
-  };
-
-  const handleAddressUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) return;
-
-    const addressPayload: Omit<Address, 'id' | 'created_at' | 'updated_at'> = { // More specific type
-      user_id: user.id,
-      street,
-      number: numberVal, // Uses numberVal state
-      complement,
-      neighborhood,
-      city,
-      state: stateVal, // Uses stateVal state
-      zipcode,
-      is_default: currentAddress.is_default !== undefined ? currentAddress.is_default : true,
-    };
-
-    let error;
-    if (currentAddress.id) {
-      const { error: updateError } = await supabase
-        .from('addresses')
-        .update({ ...addressPayload, updated_at: new Date().toISOString() })
-        .eq('id', currentAddress.id);
-      error = updateError;
-    } else {
-      const { error: insertError } = await supabase
-        .from('addresses')
-        .insert(addressPayload as Address); // Cast might be needed if types aren't perfect
-      error = insertError;
-    }
-
-    if (error) {
-      toast({ title: "Erro ao atualizar endereço", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Endereço atualizado!", description: "Seu endereço foi salvo." });
-      fetchClientData(); // Refresh data
-    }
-  };
+  }, [user, authLoading, navigate]);
   
   const handleLogout = async () => {
     const { error } = await logout();
@@ -162,8 +42,7 @@ export default function ClientArea() {
     return <div className="container px-4 py-12 sm:px-6 text-center">Carregando dados do cliente...</div>;
   }
 
-  if (!user || !authProfile) {
-     // This should ideally be handled by ProtectedRoute, but as a fallback:
+  if (!user || !profile) {
     return <div className="container px-4 py-12 sm:px-6 text-center">Usuário não autenticado. Redirecionando para login...</div>;
   }
 
@@ -174,7 +53,7 @@ export default function ClientArea() {
           <h1 className="text-4xl font-bold">Área do Cliente</h1>
         </div>
         <p className="text-muted-foreground max-w-2xl mt-4">
-          Gerencie seus pedidos, acesse documentos e atualize suas informações
+          Gerencie seus pedidos e atualize suas informações
         </p>
       </div>
       
@@ -186,7 +65,7 @@ export default function ClientArea() {
               <div className="bg-serpente-100 dark:bg-serpente-900/50 h-20 w-20 rounded-full flex items-center justify-center mb-4">
                 <User className="h-10 w-10 text-serpente-600" />
               </div>
-              <h2 className="text-xl font-bold">{authProfile.first_name} {authProfile.last_name}</h2>
+              <h2 className="text-xl font-bold">{profile.first_name} {profile.last_name}</h2>
               <p className="text-sm text-muted-foreground">{user.email}</p>
             </div>
             
@@ -218,71 +97,11 @@ export default function ClientArea() {
             <TabsContent value="profile">
               <div className="bg-card border rounded-lg p-6 shadow-sm">
                 <h2 className="text-2xl font-bold mb-6">Informações Pessoais</h2>
-                <form onSubmit={handleProfileUpdate} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="firstName">Nome</Label>
-                      <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="lastName">Sobrenome</Label>
-                      <Input id="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">E-mail</Label>
-                      <Input id="email" type="email" value={email} readOnly disabled className="bg-muted/50" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Telefone</Label>
-                      <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(XX) XXXXX-XXXX"/>
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <Button type="submit" disabled={authLoading}>
-                      {authLoading ? "Salvando..." : "Salvar Informações Pessoais"}
-                    </Button>
-                  </div>
-                </form>
+                <ProfileForm profile={profile} />
                 
                 <div className="pt-4 border-t mt-6">
                   <h3 className="text-lg font-semibold mb-4">Endereço Principal</h3>
-                  <form onSubmit={handleAddressUpdate} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2 md:col-span-2">
-                        <Label htmlFor="street">Rua</Label>
-                        <Input id="street" value={street} onChange={e => setStreet(e.target.value)} />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="number">Número</Label>
-                        <Input id="number" value={numberVal} onChange={e => setNumberVal(e.target.value)} /> 
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="complement">Complemento</Label>
-                        <Input id="complement" value={complement} onChange={e => setComplement(e.target.value)} />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="neighborhood">Bairro</Label>
-                        <Input id="neighborhood" value={neighborhood} onChange={e => setNeighborhood(e.target.value)} />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="city">Cidade</Label>
-                        <Input id="city" value={city} onChange={e => setCity(e.target.value)} />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="state">Estado (UF)</Label>
-                        <Input id="state" value={stateVal} onChange={e => setStateVal(e.target.value)} maxLength={2} />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="zipcode">CEP</Label>
-                        <Input id="zipcode" value={zipcode} onChange={e => setZipcode(e.target.value)} />
-                      </div>
-                    </div>
-                    <div className="flex justify-end">
-                      <Button type="submit" disabled={authLoading}>
-                        {authLoading ? "Salvando..." : (currentAddress.id ? "Atualizar Endereço" : "Salvar Endereço")}
-                      </Button>
-                    </div>
-                  </form>
+                  <AddressForm />
                 </div>
                 
                 <div className="pt-4 border-t mt-6">
@@ -298,47 +117,7 @@ export default function ClientArea() {
             <TabsContent value="orders">
               <div className="bg-card border rounded-lg p-6 shadow-sm">
                 <h2 className="text-2xl font-bold mb-6">Meus Pedidos</h2>
-                <div className="space-y-4">
-                  {orders.map((order) => (
-                    <div key={order.id} className="border rounded-lg p-4 hover:bg-accent/5 transition-colors">
-                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="font-semibold">Pedido #{order.id.substring(0,8)}</span>
-                            {order.status === "delivered" ? (
-                              <span className="inline-flex items-center text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full dark:bg-green-900/30 dark:text-green-400">
-                                <CheckCircle className="h-3 w-3 mr-1" /> Entregue
-                              </span>
-                            ) : order.status === "processing" || order.status === "shipped" ? (
-                               <span className="inline-flex items-center text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full dark:bg-blue-900/30 dark:text-blue-400">
-                                <AlertCircle className="h-3 w-3 mr-1" /> {order.status === "processing" ? "Processando" : "Enviado"}
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded-full dark:bg-amber-900/30 dark:text-amber-400">
-                                <AlertCircle className="h-3 w-3 mr-1" /> {order.status === "pending" ? "Pendente" : "Cancelado"}
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-sm text-muted-foreground mb-2">Data: {new Date(order.created_at).toLocaleDateString()}</p>
-                          <p className="text-sm">Itens: {order.order_items?.map(item => `${item.product_name} (x${item.quantity})`).join(", ") || "N/A"}</p>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <span className="font-semibold">R$ {parseFloat(order.total_amount).toFixed(2)}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {orders.length === 0 && !isLoadingData && (
-                    <div className="text-center py-12">
-                      <ShoppingBag className="mx-auto h-12 w-12 text-muted-foreground opacity-50" />
-                      <h3 className="mt-4 text-lg font-medium">Nenhum pedido encontrado</h3>
-                      <p className="text-muted-foreground">
-                        Você ainda não realizou nenhum pedido.
-                      </p>
-                    </div>
-                  )}
-                </div>
+                <OrdersList />
               </div>
             </TabsContent>
           </Tabs>
