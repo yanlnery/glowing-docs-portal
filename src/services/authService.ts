@@ -1,18 +1,17 @@
-
 import { supabase } from '@/integrations/supabase/client';
-import type { AuthError, UserResponse as SupabaseUserResponse, Session, AuthResponse } from '@supabase/supabase-js'; // UserResponse renamed to SupabaseUserResponse
+import type { AuthError, User, Session, AuthResponse, UserResponse } from '@supabase/supabase-js';
 
-// Corrected return type for loginService
-export const loginService = async (email: string, password: string): Promise<{ data: { user: SupabaseUserResponse['data']['user'], session: Session | null } | null, error: AuthError | null }> => {
+// loginService já parece correto, signInWithPassword retorna user e session
+export const loginService = async (email: string, password: string): Promise<{ data: { user: User | null, session: Session | null } | null, error: AuthError | null }> => {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  // Ensure data structure matches: data.user and data.session
   return { data: data ? { user: data.user, session: data.session } : null, error };
 };
 
-// Corrected return type for signupService
-export const signupService = async (payload: { email: string, password: string, options?: { data: any } }): Promise<{ data: SupabaseUserResponse['data'] | null, error: AuthError | null }> => {
+// signupService deve usar AuthResponse['data'] que contém user e session
+export const signupService = async (payload: { email: string, password: string, options?: { data: any } }): Promise<{ data: AuthResponse['data'] | null, error: AuthError | null }> => {
   const response: AuthResponse = await supabase.auth.signUp(payload);
-  return { data: response.data.user ? { user: response.data.user, session: response.data.session } : null, error: response.error };
+  // response.data já é { user, session }
+  return { data: response.data, error: response.error };
 };
 
 export const logoutService = async (): Promise<{ error: AuthError | null }> => {
@@ -26,9 +25,9 @@ export const requestPasswordResetService = async (email: string): Promise<{ data
   });
 };
 
-// Corrected return type for updatePasswordService
-export const updatePasswordService = async (password: string): Promise<{ data: SupabaseUserResponse['data'] | null, error: AuthError | null }> => {
-  const response: AuthResponse = await supabase.auth.updateUser({ password });
-  // updateUser response for password only contains user, not session.
-  return { data: response.data.user ? { user: response.data.user } : null, error: response.error };
+// updatePasswordService deve usar UserResponse['data'] que contém apenas user
+export const updatePasswordService = async (password: string): Promise<{ data: UserResponse['data'] | null, error: AuthError | null }> => {
+  const response: UserResponse = await supabase.auth.updateUser({ password });
+  // response.data é { user }
+  return { data: response.data, error: response.error };
 };

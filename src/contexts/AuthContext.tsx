@@ -1,7 +1,6 @@
-
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import type { AuthChangeEvent, Session, User, AuthError, UserResponse as SupabaseUserResponse } from '@supabase/supabase-js'; // Renamed to avoid conflict
+import type { AuthChangeEvent, Session, User, AuthError, UserResponse, AuthResponse } from '@supabase/supabase-js'; // Adicionado AuthResponse
 import type { Profile } from '@/types/client';
 import type { PostgrestError } from '@supabase/supabase-js';
 
@@ -22,15 +21,15 @@ export type AuthContextType = {
   user: User | null;
   profile: Profile | null;
   session: Session | null;
-  login: (email: string, password: string) => Promise<{ error: AuthError | null }>;
-  signup: (payload: { email: string, password: string, options?: { data: any } }) => Promise<{ error: AuthError | null, data: SupabaseUserResponse['data'] | null }>; // Adjusted type
+  login: (email: string, password: string) => Promise<{ error: AuthError | null, data: { user: User | null, session: Session | null } | null }>; // Ajustado para clareza
+  signup: (payload: { email: string, password: string, options?: { data: any } }) => Promise<{ error: AuthError | null, data: AuthResponse['data'] | null }>; // Usa AuthResponse['data']
   logout: () => Promise<{ error: AuthError | null }>;
   requestPasswordReset: (email: string) => Promise<{ error: AuthError | null, data: {} | null }>;
-  updatePassword: (password: string) => Promise<{ error: AuthError | null, data: SupabaseUserResponse['data'] | null }>; // Adjusted type
+  updatePassword: (password: string) => Promise<{ error: AuthError | null, data: UserResponse['data'] | null }>; // Usa UserResponse['data']
   updateProfile: (updatedProfileData: Partial<Profile>) => Promise<{ error: PostgrestError | null, data: Profile | null }>;
   isLoading: boolean;
-  authError: AuthError | null; // Changed from profileError to a more generic authError
-  profileError: PostgrestError | null; // Specific error for profile operations
+  authError: AuthError | null;
+  profileError: PostgrestError | null;
   refreshProfile: () => Promise<void>;
 };
 
@@ -99,21 +98,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
     
-    // Fetch initial session separately AFTER listener is set up
-    // to correctly trigger 'INITIAL_SESSION' if session exists
-     const fetchInitialSession = async () => {
+    const fetchInitialSession = async () => {
       try {
-        // getSession doesn't trigger INITIAL_SESSION, it just gets current state
-        // The listener above will handle setting user/profile based on this initial state
-        // if it leads to SIGNED_IN or INITIAL_SESSION event by Supabase internally
         const { data: { session: currentSession } } = await supabase.auth.getSession();
-        // If there's no session, or if onAuthStateChange handles it, we might not need to do much here
-        // except potentially stop loading if no authUser is found and no event will fire to do so.
         if (!currentSession?.user) {
             setIsLoading(false);
         }
-        // if currentSession exists, onAuthStateChange should fire with INITIAL_SESSION or SIGNED_IN
-        // and handle user/profile loading & setIsLoading(false)
       } catch (error) {
         setAuthError(error as AuthError);
         setIsLoading(false);
@@ -150,18 +140,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { data, error } = await loginService(email, password);
     if (error) setAuthError(error);
     // onAuthStateChange will handle setting user, session, profile and setIsLoading(false)
-    return { error };
+    return { error, data }; // data already includes user and session
   };
 
   const signup = async (payload: { email: string, password: string, options?: { data: any } }) => {
     setIsLoading(true);
     setAuthError(null);
-    const { data, error } = await signupService(payload);
+    const { data, error } = await signupService(payload); // data is AuthResponse['data']
     if (error) setAuthError(error);
-    // onAuthStateChange or further user action (email confirmation) handles next steps.
-    // setIsLoading(false) will be handled by onAuthStateChange or if error
-    if (error || (!data?.user && !data?.session)) setIsLoading(false);
-    return { error, data: data ? { user: data.user, session: data.session } : null };
+    
+    // data can be { user, session } or null.
+    // If there's an error, or if data is null, or if data.user is null (which implies data.session is also null or irrelevant)
+    if (error || !data?.user) {
+      setIsLoading(false);
+    }
+    // onAuthStateChange will handle setting user, session, profile and setIsLoading(false) in successful cases
+    return { error, data };
   };
 
   const logout = async () => {
@@ -188,12 +182,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updatePassword = async (password: string) => {
     setIsLoading(true);
     setAuthError(null);
-    const { data, error } = await updatePasswordService(password);
+    const { data, error } = await updatePasswordService(password); // data is UserResponse['data']
     if (error) setAuthError(error);
+    
+    if (error || !data?.user) {
+      setIsLoading(false);
+    }
     // onAuthStateChange handles USER_UPDATED and setIsLoading(false)
-    // if error, ensure loading is false
-    if (error || !data?.user) setIsLoading(false);
-    return { error, data: data ? { user: data.user } : null };
+    return { error, data };
   };
 
   const updateProfile = async (updatedProfileData: Partial<Profile>) => {

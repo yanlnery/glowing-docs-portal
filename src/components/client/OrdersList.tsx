@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { ShoppingBag, CheckCircle, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/components/ui/use-toast";
 import type { Order } from "@/types/client";
 
