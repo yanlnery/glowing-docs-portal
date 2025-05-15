@@ -266,11 +266,11 @@ export const productService = {
         ];
       }
       
-      // Atualizado para respeitar estritamente a visibilidade e status
+      // UPDATED: Now only filtering by visibility, regardless of status
       return products
         .filter(product => 
-          // Produto deve estar visível E ter status disponível para aparecer na loja
-          product.visible && product.status === 'disponivel'
+          // Product must be visible to appear in the catalog, regardless of status
+          product.visible === true
         )
         .sort((a, b) => {
           if (a.featured && !b.featured) return -1;
@@ -338,11 +338,11 @@ export const productService = {
         ];
       }
       
-      // Atualizado para respeitar estritamente a visibilidade e status
+      // UPDATED: Now only filtering by visibility and featured flag, regardless of status
       return products
         .filter(product => 
-          // Produto deve estar visível, marcado como destacado E ter status disponível
-          product.visible && product.featured && product.status === 'disponivel'
+          // Product must be visible and featured to appear in the featured section
+          product.visible === true && product.featured === true
         )
         .sort((a, b) => (a.order || 0) - (b.order || 0));
     } catch (error) {

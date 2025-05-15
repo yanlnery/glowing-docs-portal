@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { productService } from '@/services/productService';
@@ -5,7 +6,7 @@ import { Product, ProductCategory, ProductSubcategory } from '@/types/product';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, Filter, Star, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, Filter, Star, ChevronDown, ChevronUp, AlertCircle } from 'lucide-react';
 import {
   Card,
   CardHeader,
@@ -38,17 +39,17 @@ const Catalog = () => {
   const loadProducts = () => {
     setIsLoading(true);
     try {
-      // Get only available and visible products
-      const availableProducts = productService.getAvailableProducts();
+      // Get visible products, regardless of availability status
+      const visibleProducts = productService.getAvailableProducts();
       
-      if (!availableProducts || availableProducts.length === 0) {
-        console.log("No available products found");
+      if (!visibleProducts || visibleProducts.length === 0) {
+        console.log("No visible products found");
       } else {
-        console.log(`Found ${availableProducts.length} available products`);
+        console.log(`Found ${visibleProducts.length} visible products`);
       }
       
-      setProducts(availableProducts);
-      applyFilters(availableProducts, searchQuery, categoryFilter, subcategoryFilter);
+      setProducts(visibleProducts);
+      applyFilters(visibleProducts, searchQuery, categoryFilter, subcategoryFilter);
     } catch (error) {
       console.error("Error loading products:", error);
       setProducts([]);
@@ -303,6 +304,12 @@ const Catalog = () => {
                       Novidade
                     </Badge>
                   )}
+                  {/* New badge for unavailable products */}
+                  {product.status === 'indisponivel' && (
+                    <Badge variant="secondary" className="bg-red-100 hover:bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                      <AlertCircle className="h-3 w-3 mr-1 inline" /> Indisponível
+                    </Badge>
+                  )}
                 </div>
               </div>
               
@@ -319,9 +326,14 @@ const Catalog = () => {
               </CardContent>
               
               <CardFooter className="pt-0 mt-auto">
-                <Button variant="outline" className="w-full" asChild>
+                <Button 
+                  variant={product.status === 'indisponivel' ? "secondary" : "outline"} 
+                  className="w-full" 
+                  asChild
+                  disabled={product.status === 'indisponivel'}
+                >
                   <Link to={`/produtos/${product.id}`}>
-                    Ver Detalhes
+                    {product.status === 'indisponivel' ? 'Esgotado' : 'Ver Detalhes'}
                   </Link>
                 </Button>
               </CardFooter>
