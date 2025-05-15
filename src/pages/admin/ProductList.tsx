@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import AdminLayout from '@/layouts/AdminLayout';
@@ -60,11 +59,10 @@ const ProductList = () => {
     window.scrollTo(0, 0);
     loadProducts();
     
-    // Check for status filter in URL params
     const params = new URLSearchParams(location.search);
     const status = params.get('status');
-    if (status && ['disponivel', 'indisponivel', 'vendido'].includes(status)) {
-      setStatusFilter(status as ProductStatus);
+    if (status && ['disponivel', 'indisponivel', 'vendido', 'all'].includes(status)) {
+      setStatusFilter(status as ProductStatus | 'all');
     }
   }, [location.search]);
 
@@ -167,6 +165,45 @@ const ProductList = () => {
     }
   };
 
+  const getStatusText = (status?: ProductStatus) => {
+    switch (status) {
+      case 'disponivel':
+        return 'Disponível';
+      case 'indisponivel':
+        return 'Indisponível';
+      case 'vendido':
+        return 'Vendido';
+      default:
+        return 'Status Desconhecido';
+    }
+  };
+
+  const handleSetStatus = (id: string, newStatus: ProductStatus) => {
+    if (newStatus === 'vendido') {
+      toast({
+        title: "Ação não recomendada",
+        description: "Para marcar como 'Vendido', utilize o formulário de edição ou o processo de pedido.",
+        variant: "destructive",
+      });
+      return;
+    }
+    try {
+      productService.update(id, { status: newStatus });
+      loadProducts();
+      toast({
+        title: "Status do produto atualizado",
+        description: `Produto marcado como ${getStatusText(newStatus)}.`,
+        variant: "default",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao atualizar status",
+        description: "Não foi possível atualizar o status do produto.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleDeleteProduct = (id: string) => {
     setDeleteProductId(id);
   };
@@ -201,7 +238,7 @@ const ProductList = () => {
     setDeleteProductId(null);
   };
 
-  const getStatusIcon = (status: ProductStatus) => {
+  const getStatusIcon = (status?: ProductStatus) => {
     switch (status) {
       case 'disponivel':
         return <CheckCircle className="h-5 w-5 text-green-500" />;
@@ -209,17 +246,8 @@ const ProductList = () => {
         return <AlertCircle className="h-5 w-5 text-yellow-500" />;
       case 'vendido':
         return <XCircle className="h-5 w-5 text-red-500" />;
-    }
-  };
-
-  const getStatusText = (status: ProductStatus) => {
-    switch (status) {
-      case 'disponivel':
-        return 'Disponível';
-      case 'indisponivel':
-        return 'Indisponível';
-      case 'vendido':
-        return 'Vendido';
+      default:
+        return <AlertCircle className="h-5 w-5 text-gray-400" />;
     }
   };
 
@@ -364,7 +392,7 @@ const ProductList = () => {
                                 </Link>
                               </DropdownMenuItem>
                               <DropdownMenuItem 
-                                onClick={() => handleToggleVisibility(product.id, product.visible)}
+                                onClick={() => handleToggleVisibility(product.id, product.visible ?? true)}
                               >
                                 {product.visible ? (
                                   <>
@@ -384,6 +412,20 @@ const ProductList = () => {
                                 <Star className="mr-2 h-4 w-4" />
                                 {product.featured ? 'Remover destaque' : 'Destacar'}
                               </DropdownMenuItem>
+
+                              {(product.status === 'indisponivel' || product.status === 'vendido') && (
+                                <DropdownMenuItem onClick={() => handleSetStatus(product.id, 'disponivel')}>
+                                  <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
+                                  Marcar Disponível
+                                </DropdownMenuItem>
+                              )}
+                              {product.status === 'disponivel' && (
+                                <DropdownMenuItem onClick={() => handleSetStatus(product.id, 'indisponivel')}>
+                                  <AlertCircle className="mr-2 h-4 w-4 text-yellow-500" />
+                                  Marcar Indisponível
+                                </DropdownMenuItem>
+                              )}
+                              
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
                                 className="text-red-600 focus:text-red-500"

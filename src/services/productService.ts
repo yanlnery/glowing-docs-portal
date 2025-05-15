@@ -95,7 +95,22 @@ export const productService = {
       
       const existingProduct = products[productIndex];
       // Destructure images from productData to handle them separately
-      const { images: incomingImages, ...restOfProductData } = productData;
+      const { images: incomingImages, ...restOfProductDataFromInput } = productData;
+
+      let processedProductData = { ...restOfProductDataFromInput };
+
+      // If status is being updated, ensure 'available' is consistent
+      // and also ensure status is one of the valid ProductStatus types
+      if (processedProductData.hasOwnProperty('status') && processedProductData.status !== undefined) {
+        const validStatuses: ProductStatus[] = ['disponivel', 'indisponivel', 'vendido'];
+        if (validStatuses.includes(processedProductData.status as ProductStatus)) {
+            processedProductData.available = processedProductData.status === 'disponivel';
+        } else {
+            // Handle invalid status if necessary, or rely on type checking
+            console.warn(`Invalid status provided: ${processedProductData.status}. Status not changed.`);
+            delete processedProductData.status; // Or revert to existingProduct.status
+        }
+      }
 
       let finalImages: ProductImage[] | undefined = existingProduct.images; // Default to existing images
 
@@ -106,20 +121,18 @@ export const productService = {
           finalImages = incomingImages.map(imageInput =>
             ensureProductImage(
               imageInput as string | Partial<ProductImage>,
-              restOfProductData.name || existingProduct.name || 'Product image' // Use updated or existing name for alt text
+              processedProductData.name || existingProduct.name || 'Product image' // Use updated or existing name for alt text
             )
           );
         } else if (incomingImages === null || (Array.isArray(incomingImages) && incomingImages.length === 0)) {
           // If images is explicitly set to null or an empty array, clear them
           finalImages = [];
         }
-        // If 'images' was in productData but was undefined, finalImages remains existingProduct.images (no change)
-        // This case is implicitly handled as incomingImages would be undefined.
       }
 
       const updatedProduct: Product = {
         ...existingProduct,    // Start with the existing product
-        ...restOfProductData,  // Apply other changes from productData (excluding its 'images' property)
+        ...processedProductData,  // Apply other changes from processedProductData
         images: finalImages,    // Set the processed images
         updatedAt: new Date().toISOString(),
       };
