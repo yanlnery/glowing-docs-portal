@@ -41,29 +41,29 @@ const About = () => {
 
   const trajetoriaItens = [
     {
-      year: "2012",
-      title: "Fundação do Criadouro",
-      text: "Pet Serpentes inicia oficialmente o criadouro com apenas 10 espécimes e obtém os primeiros registros junto aos órgãos ambientais."
-    },
-    {
       year: "2015",
-      title: "Expansão do Plantel",
-      text: "O criadouro se expande para mais de 50 animais de diversas espécies e começa a realizar as primeiras vendas comerciais."
+      title: "Fundação do Criadouro Araranguá",
+      text: "Início do criadouro sob o nome \"Criadouro Araranguá\", com foco exclusivo em aves exóticas legalizadas."
     },
     {
-      year: "2018",
-      title: "Início do Programa Educacional",
-      text: "Lançamento do primeiro material educativo voltado para escolas e universidades, promovendo o conhecimento sobre répteis."
+      year: "2019",
+      title: "Nascimento da Pet Serpentes & Companhia",
+      text: "O criadouro passa a se chamar oficialmente \"Pet Serpentes & Companhia LTDA\" e inicia a criação de serpentes legalizadas."
     },
     {
-      year: "2020",
-      title: "Lançamento da Pet Serpentes Academy",
-      text: "Criação da plataforma online com cursos e conteúdos exclusivos para entusiastas e criadores de répteis."
+      year: "2022",
+      title: "Diversificação: Lagartos e Quelônios",
+      text: "A operação se expande com a inclusão de novas espécies no manejo legalizado, como lagartos (Tupinambis, Iguanas) e quelônios."
     },
     {
       year: "2023",
-      title: "Expansão Nacional",
-      text: "O criadouro alcança reconhecimento nacional, realizando vendas para todo o Brasil e firmando parcerias com instituições de pesquisa."
+      title: "Nova Direção: Yan Nery assume o Criadouro",
+      text: "Yan Nery assume a liderança do criadouro, promovendo modernização, foco em bem-estar animal e projetos educacionais."
+    },
+    {
+      year: "2025",
+      title: "Visão de Futuro",
+      text: "Em processo de crescimento e transformação, a Pet Serpentes segue com o objetivo de se tornar referência nacional em bem-estar animal, estrutura de manejo e educação ambiental."
     }
   ];
 
