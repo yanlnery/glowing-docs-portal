@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { productService } from '@/services/productService';
@@ -209,7 +208,7 @@ const Catalog = () => {
                 
                 {/* Subcategory Dropdown */}
                 {category.subcategories.length > 0 && openDropdown === category.id && (
-                  <div className="absolute z-10 mt-1 w-48 rounded-md bg-background shadow-lg ring-1 ring-black ring-opacity-5">
+                  <div className="absolute z-10 mt-1 w-full min-w-[220px] sm:w-56 rounded-md bg-background shadow-lg ring-1 ring-black ring-opacity-5 dark:ring-white/20">
                     <div className="py-1">
                       <button
                         onClick={() => handleFilterClick(category.id as ProductCategory, 'all')}
