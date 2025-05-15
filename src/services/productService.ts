@@ -1,3 +1,4 @@
+
 import { Product, ProductFormData, ProductImage, ProductCategory, ProductSubcategory, ProductStatus } from "@/types/product";
 
 // In a real application, this would be connected to a backend
@@ -66,10 +67,23 @@ export const productService = {
         ensureProductImage(imageInput as string | Partial<ProductImage>, productData.name || 'Product image')
       ) || [];
       
+      // Ensure status and available are aligned
+      let status = productData.status || 'disponivel';
+      let available = status === 'disponivel';
+      
+      if (productData.hasOwnProperty('available')) {
+        // If available is explicitly set, use it to set status
+        available = !!productData.available;
+        status = available ? 'disponivel' : 'indisponivel';
+      }
+      
       const newProduct: Product = {
         ...productData,
         images: processedImages,
         id: crypto.randomUUID(),
+        status,
+        available,
+        visible: productData.visible !== undefined ? productData.visible : true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
@@ -99,17 +113,26 @@ export const productService = {
 
       let processedProductData = { ...restOfProductDataFromInput };
 
-      // If status is being updated, ensure 'available' is consistent
-      // and also ensure status is one of the valid ProductStatus types
-      if (processedProductData.hasOwnProperty('status') && processedProductData.status !== undefined) {
+      // Handle status and available fields to ensure they're consistent
+      if (processedProductData.hasOwnProperty('status')) {
         const validStatuses: ProductStatus[] = ['disponivel', 'indisponivel', 'vendido'];
-        if (validStatuses.includes(processedProductData.status as ProductStatus)) {
-            processedProductData.available = processedProductData.status === 'disponivel';
+        const newStatus = processedProductData.status;
+        
+        if (validStatuses.includes(newStatus as ProductStatus)) {
+          // Update available based on new status
+          processedProductData.available = newStatus === 'disponivel';
+          console.log(`Updating product ${id} with status: ${newStatus}, available: ${processedProductData.available}`);
         } else {
-            // Handle invalid status if necessary, or rely on type checking
-            console.warn(`Invalid status provided: ${processedProductData.status}. Status not changed.`);
-            delete processedProductData.status; // Or revert to existingProduct.status
+          console.warn(`Invalid status provided: ${newStatus}. Status not changed.`);
+          delete processedProductData.status;
         }
+      } 
+      // If available is explicitly set but status is not
+      else if (processedProductData.hasOwnProperty('available')) {
+        const isAvailable = !!processedProductData.available;
+        // Set status based on available
+        processedProductData.status = isAvailable ? 'disponivel' : 'indisponivel';
+        console.log(`Updating product ${id} with available: ${isAvailable}, status: ${processedProductData.status}`);
       }
 
       let finalImages: ProductImage[] | undefined = existingProduct.images; // Default to existing images

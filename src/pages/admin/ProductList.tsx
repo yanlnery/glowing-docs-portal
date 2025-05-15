@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import AdminLayout from '@/layouts/AdminLayout';
@@ -13,7 +14,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import {
   Edit, Trash2, EyeOff, Eye, Star, Clock, 
   Search, Plus, Filter, CheckCircle, XCircle, 
@@ -51,6 +52,7 @@ const ProductList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<ProductStatus | 'all'>('all');
   const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState<{[key: string]: boolean}>({});
   const { toast } = useToast();
   const location = useLocation();
   const navigate = useNavigate();
@@ -102,7 +104,7 @@ const ProductList = () => {
       if (!a.featured && b.featured) return 1;
       
       // Then sort by order
-      return a.order - b.order;
+      return (a.order || 0) - (b.order || 0);
     });
     
     setFilteredProducts(result);
@@ -130,9 +132,14 @@ const ProductList = () => {
   };
 
   const handleToggleVisibility = (id: string, currentVisible: boolean) => {
+    if (isProcessing[id]) return;
+    
     try {
+      setIsProcessing(prev => ({ ...prev, [id]: true }));
+      
       productService.update(id, { visible: !currentVisible });
       loadProducts();
+      
       toast({
         title: "Visibilidade atualizada",
         description: `Produto ${!currentVisible ? 'visível' : 'oculto'} no site`,
@@ -144,13 +151,20 @@ const ProductList = () => {
         description: "Não foi possível atualizar o produto",
         variant: "destructive",
       });
+    } finally {
+      setIsProcessing(prev => ({ ...prev, [id]: false }));
     }
   };
 
   const handleToggleFeatured = (id: string, currentFeatured: boolean) => {
+    if (isProcessing[id]) return;
+    
     try {
+      setIsProcessing(prev => ({ ...prev, [id]: true }));
+      
       productService.update(id, { featured: !currentFeatured });
       loadProducts();
+      
       toast({
         title: "Status de destaque atualizado",
         description: `Produto ${!currentFeatured ? 'destacado' : 'removido dos destaques'}`,
@@ -162,6 +176,8 @@ const ProductList = () => {
         description: "Não foi possível atualizar o produto",
         variant: "destructive",
       });
+    } finally {
+      setIsProcessing(prev => ({ ...prev, [id]: false }));
     }
   };
 
@@ -179,6 +195,8 @@ const ProductList = () => {
   };
 
   const handleSetStatus = (id: string, newStatus: ProductStatus) => {
+    if (isProcessing[id]) return;
+    
     if (newStatus === 'vendido') {
       toast({
         title: "Ação não recomendada",
@@ -187,20 +205,27 @@ const ProductList = () => {
       });
       return;
     }
+    
     try {
+      setIsProcessing(prev => ({ ...prev, [id]: true }));
+      
       productService.update(id, { status: newStatus });
       loadProducts();
+      
       toast({
         title: "Status do produto atualizado",
         description: `Produto marcado como ${getStatusText(newStatus)}.`,
         variant: "default",
       });
     } catch (error) {
+      console.error("Erro ao atualizar status:", error);
       toast({
         title: "Erro ao atualizar status",
         description: "Não foi possível atualizar o status do produto.",
         variant: "destructive",
       });
+    } finally {
+      setIsProcessing(prev => ({ ...prev, [id]: false }));
     }
   };
 
@@ -354,11 +379,21 @@ const ProductList = () => {
                           </div>
                         </TableCell>
                         <TableCell className="hidden sm:table-cell">
-                          {product.visible ? (
-                            <Eye className="h-5 w-5 text-green-500" />
-                          ) : (
-                            <EyeOff className="h-5 w-5 text-gray-400" />
-                          )}
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleToggleVisibility(product.id, product.visible ?? true)}
+                            disabled={isProcessing[product.id]}
+                          >
+                            {product.visible ? (
+                              <Eye className="h-5 w-5 text-green-500" />
+                            ) : (
+                              <EyeOff className="h-5 w-5 text-gray-400" />
+                            )}
+                            <span className="sr-only">
+                              {product.visible ? 'Ocultar' : 'Mostrar'}
+                            </span>
+                          </Button>
                         </TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
@@ -393,6 +428,7 @@ const ProductList = () => {
                               </DropdownMenuItem>
                               <DropdownMenuItem 
                                 onClick={() => handleToggleVisibility(product.id, product.visible ?? true)}
+                                disabled={isProcessing[product.id]}
                               >
                                 {product.visible ? (
                                   <>
@@ -408,19 +444,27 @@ const ProductList = () => {
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => handleToggleFeatured(product.id, product.featured)}
+                                disabled={isProcessing[product.id]}
                               >
                                 <Star className="mr-2 h-4 w-4" />
                                 {product.featured ? 'Remover destaque' : 'Destacar'}
                               </DropdownMenuItem>
 
-                              {(product.status === 'indisponivel' || product.status === 'vendido') && (
-                                <DropdownMenuItem onClick={() => handleSetStatus(product.id, 'disponivel')}>
+                              {product.status !== 'disponivel' && (
+                                <DropdownMenuItem 
+                                  onClick={() => handleSetStatus(product.id, 'disponivel')}
+                                  disabled={isProcessing[product.id]}
+                                >
                                   <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
                                   Marcar Disponível
                                 </DropdownMenuItem>
                               )}
-                              {product.status === 'disponivel' && (
-                                <DropdownMenuItem onClick={() => handleSetStatus(product.id, 'indisponivel')}>
+                              
+                              {product.status !== 'indisponivel' && (
+                                <DropdownMenuItem 
+                                  onClick={() => handleSetStatus(product.id, 'indisponivel')}
+                                  disabled={isProcessing[product.id]}
+                                >
                                   <AlertCircle className="mr-2 h-4 w-4 text-yellow-500" />
                                   Marcar Indisponível
                                 </DropdownMenuItem>
@@ -430,6 +474,7 @@ const ProductList = () => {
                               <DropdownMenuItem
                                 className="text-red-600 focus:text-red-500"
                                 onClick={() => handleDeleteProduct(product.id)}
+                                disabled={isProcessing[product.id]}
                               >
                                 <Trash2 className="mr-2 h-4 w-4" />
                                 Excluir
