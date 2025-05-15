@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCartStore } from '@/stores/cartStore';
@@ -22,6 +21,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/use-toast';
+import { productService } from '@/services/productService';
 
 // Define proper interfaces for our form data and errors
 interface CheckoutFormData {
@@ -108,20 +108,32 @@ const CartPage = () => {
 
     try {
       // Prepare the WhatsApp message with the product details and customer information
-      const productInfo = items.map(item => {
-        return `🐍 Espécie: ${item.product.speciesName || "Não especificado"}\n📦 Código do animal: ${item.product.id}\n💰 Valor: ${formatPrice(item.product.price)}`;
-      }).join('\n\n');
+      const productsList = items.map(item => {
+        return `${item.product.name} (${item.product.speciesName || "Não especificado"}) - ${formatPrice(item.product.price)}`;
+      }).join('\n');
       
       const message = encodeURIComponent(
-        `Olá! Tenho interesse em adquirir o animal abaixo:\n\n` +
-        `${productInfo}\n\n` +
-        `Segue meus dados para emissão dos documentos:\n\n` +
-        `👤 Nome completo: ${formData.fullName}\n` +
-        `📄 CPF: ${formData.cpf}\n` +
-        `🏠 Endereço completo: ${formData.address}\n` +
-        `📍 CEP: ${formData.cep}\n\n` +
-        `Fico no aguardo da confirmação de disponibilidade e valor do frete. Obrigado!`
+        `Olá! Acabei de finalizar uma compra no site Pet Serpentes.\n\n` +
+        `Nome do comprador: ${formData.fullName}\n` +
+        `Animal adquirido: ${items.map(item => item.product.name).join(', ')}\n` +
+        `ID da espécie: ${items.map(item => item.product.speciesName || "Não especificado").join(', ')}\n` +
+        `Preço: ${formatPrice(total)}\n\n` +
+        `Gostaria de confirmar o pedido e combinar os detalhes do envio.`
       );
+
+      // Mark all purchased items as unavailable
+      items.forEach(item => {
+        try {
+          productService.update(item.product.id, {
+            ...item.product,
+            available: false,
+            status: 'indisponivel',
+            visible: false
+          });
+        } catch (error) {
+          console.error(`Failed to update product status for ${item.product.id}`, error);
+        }
+      });
 
       // Close dialog and clear cart
       setIsDialogOpen(false);
