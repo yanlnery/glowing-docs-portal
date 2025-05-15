@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,6 +19,8 @@ import NotFound from "./pages/NotFound";
 import Quiz from "./pages/Quiz";
 import WaitlistForm from "./pages/WaitlistForm";
 import CartPage from "./pages/CartPage";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage"; // Nova importação
+import TermsOfUsePage from "./pages/TermsOfUsePage"; // Nova importação
 import { Button } from "@/components/ui/button";
 import { useSettings } from "./hooks/useSettings";
 
@@ -111,6 +112,8 @@ function App() {
                   <Route path="lista-de-espera" element={<WaitlistForm />} />
                   <Route path="confirmacao-inscricao" element={<WaitlistConfirmationPage />} />
                   <Route path="contato" element={<Contact />} />
+                  <Route path="politica-de-privacidade" element={<PrivacyPolicyPage />} /> {/* Nova rota */}
+                  <Route path="termos-de-uso" element={<TermsOfUsePage />} /> {/* Nova rota */}
                   
                   {/* Protected Client Route */}
                   <Route element={<ProtectedClientRoute />}>
