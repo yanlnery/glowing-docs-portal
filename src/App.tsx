@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,9 +23,15 @@ import CartPage from "./pages/CartPage";
 import { Button } from "@/components/ui/button";
 import { useSettings } from "./hooks/useSettings";
 
+// Auth pages
+import LoginPage from "./pages/auth/LoginPage";
+import SignupPage from "./pages/auth/SignupPage";
+import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
+
 // Admin pages
-import { AuthProvider } from "./contexts/AuthContext";
-import Login from "./pages/admin/Login";
+import { AuthProvider, useAuth } from "./contexts/AuthContext"; // useAuth imported
+import AdminLogin from "./pages/admin/Login"; // Renamed to avoid confusion
 import Dashboard from "./pages/admin/Dashboard";
 import ProductList from "./pages/admin/ProductList";
 import ProductForm from "./pages/admin/ProductForm";
@@ -60,6 +67,23 @@ const AcademyRoute = () => {
 
 const queryClient = new QueryClient();
 
+// Protected Route for Client Area
+const ProtectedClientRoute = () => {
+  const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
+
+  if (isLoading) {
+    // You can show a loader here
+    return <div className="flex justify-center items-center h-screen">Carregando...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  return <Outlet />;
+};
+
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -84,7 +108,12 @@ function App() {
                 <Route path="lista-de-espera" element={<WaitlistForm />} />
                 <Route path="confirmacao-inscricao" element={<WaitlistConfirmationPage />} />
                 <Route path="contato" element={<Contact />} />
-                <Route path="area-cliente" element={<ClientArea />} />
+                
+                {/* Protected Client Route */}
+                <Route element={<ProtectedClientRoute />}>
+                  <Route path="area-cliente" element={<ClientArea />} />
+                </Route>
+                
                 <Route path="carrinho" element={<CartPage />} />
                 <Route path="quiz" element={<Quiz />} />
                 <Route path="manuais-de-criacao" element={<Manuals />} />
@@ -99,8 +128,15 @@ function App() {
                 <Route path="*" element={<NotFound />} />
               </Route>
               
-              {/* Admin Routes */}
-              <Route path="/admin" element={<Login />} />
+              {/* Auth Routes */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+              {/* Admin Routes - Consider how admin auth will work now */}
+              <Route path="/admin" element={<AdminLogin />} /> 
+              {/* Admin routes below might need protection with admin-specific logic */}
               <Route path="/admin/dashboard" element={<Dashboard />} />
               <Route path="/admin/products" element={<ProductList />} />
               <Route path="/admin/products/new" element={<ProductForm />} />

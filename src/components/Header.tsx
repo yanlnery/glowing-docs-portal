@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -12,16 +12,21 @@ import {
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
 import ThemeToggle from "@/components/ThemeToggle";
-import { Menu, X, ShoppingCart, User, Book, Box, FileText, Users, Phone, Syringe, Home } from "lucide-react";
+import { Menu, X, ShoppingCart, User, Book, Box, FileText, Users, Phone, Syringe, Home, LogOut } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useCartStore } from "@/stores/cartStore";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext"; // Import useAuth
+import { useToast } from "@/components/ui/use-toast";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const isMobile = useIsMobile();
   const cartQuantity = useCartStore(state => state.getCartQuantity());
+  const { isAuthenticated, logout, user } = useAuth(); // Get auth state and functions
+  const navigate = useNavigate();
+  const { toast } = useToast();
   
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -36,6 +41,17 @@ export default function Header() {
     { title: "Quem Somos", path: "/sobre", icon: <Users size={16} className="mr-2" /> },
     { title: "Contato", path: "/contato", icon: <Phone size={16} className="mr-2" /> },
   ];
+
+  const handleLogout = async () => {
+    const { error } = await logout();
+    if (error) {
+      toast({ title: "Erro ao Sair", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Logout realizado", description: "Você foi desconectado." });
+      navigate("/");
+    }
+    if (isMenuOpen) setIsMenuOpen(false);
+  };
   
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -75,12 +91,27 @@ export default function Header() {
         {/* Right-side Actions */}
         <div className="flex items-center gap-2">
           <div className="hidden md:flex items-center gap-2">
-            <Button variant="ghost" size="icon" asChild>
-              <Link to="/area-cliente">
-                <User size={20} />
-                <span className="sr-only">Área do Cliente</span>
-              </Link>
-            </Button>
+            {isAuthenticated ? (
+              <>
+                <Button variant="ghost" size="icon" asChild>
+                  <Link to="/area-cliente">
+                    <User size={20} />
+                    <span className="sr-only">Área do Cliente</span>
+                  </Link>
+                </Button>
+                <Button variant="ghost" size="icon" onClick={handleLogout} title="Sair">
+                  <LogOut size={20} />
+                  <span className="sr-only">Sair</span>
+                </Button>
+              </>
+            ) : (
+              <Button variant="ghost" size="icon" asChild>
+                <Link to="/login">
+                  <User size={20} />
+                  <span className="sr-only">Login / Área do Cliente</span>
+                </Link>
+              </Button>
+            )}
             <Button variant="ghost" size="icon" asChild className="relative">
               <Link to="/carrinho">
                 <ShoppingCart size={20} />
@@ -132,12 +163,27 @@ export default function Header() {
             </ul>
             <div className="mt-8 flex items-center justify-between border-t border-border pt-4">
               <div className="flex items-center gap-4">
-                <Button variant="outline" size="sm" className="min-h-[44px]" asChild>
-                  <Link to="/area-cliente" onClick={() => setIsMenuOpen(false)}>
-                    <User size={16} className="mr-2" />
-                    Área do Cliente
-                  </Link>
-                </Button>
+                {isAuthenticated ? (
+                  <>
+                    <Button variant="outline" size="sm" className="min-h-[44px]" asChild>
+                      <Link to="/area-cliente" onClick={() => setIsMenuOpen(false)}>
+                        <User size={16} className="mr-2" />
+                        Área do Cliente
+                      </Link>
+                    </Button>
+                    <Button variant="outline" size="sm" className="min-h-[44px]" onClick={handleLogout}>
+                      <LogOut size={16} className="mr-2" />
+                      Sair
+                    </Button>
+                  </>
+                ) : (
+                  <Button variant="outline" size="sm" className="min-h-[44px]" asChild>
+                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                      <User size={16} className="mr-2" />
+                      Login
+                    </Link>
+                  </Button>
+                )}
                 <Button variant="outline" size="sm" className="min-h-[44px]" asChild>
                   <Link to="/carrinho" onClick={() => setIsMenuOpen(false)}>
                     <ShoppingCart size={16} className="mr-2" />
