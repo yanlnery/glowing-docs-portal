@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Table,
@@ -25,7 +24,7 @@ import { useToast } from '@/components/ui/use-toast';
 interface Species {
   id: string;
   commonName: string;
-  name: string;
+  name: string; // Scientific Name
   description: string;
   characteristics: string[];
   curiosities: string[];
@@ -34,6 +33,269 @@ interface Species {
   type: string;
   slug: string;
 }
+
+const generateSlug = (name: string) => {
+  return name
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '');
+};
+
+const defaultPlantelSpecies: Species[] = [
+  {
+    id: "1",
+    name: "Boa constrictor constrictor",
+    commonName: "Jiboia Amazônica",
+    type: "serpente",
+    image: "",
+    slug: generateSlug("Boa constrictor constrictor"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Grande porte", "constritora", "noturna", "alimenta-se de roedores"],
+    curiosidades: ["Pode viver até 30 anos em cativeiro", "É ovovivípara"],
+    order: 1
+  },
+  {
+    id: "2",
+    name: "Boa constrictor amarali",
+    commonName: "Jiboia do Cerrado",
+    type: "serpente",
+    image: "",
+    slug: generateSlug("Boa constrictor amarali"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Constritora", "terrestre", "noturna", "alimenta-se de roedores"],
+    curiosidades: ["Coloração mais clara", "adapta-se bem a ambientes secos"],
+    order: 2
+  },
+  {
+    id: "3",
+    name: "Boa atlantica",
+    commonName: "Jiboia da Mata Atlântica",
+    type: "serpente",
+    image: "",
+    slug: generateSlug("Boa atlantica"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Endêmica da Mata Atlântica", "semi-arborícola"],
+    curiosidades: ["Escamas menores", "adapta-se bem a ambientes úmidos"],
+    order: 3
+  },
+  {
+    id: "4",
+    name: "Epicrates cenchria",
+    commonName: "Jiboia Arco-íris da Amazônia",
+    type: "serpente",
+    image: "",
+    slug: generateSlug("Epicrates cenchria"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Colorida", "iridescente", "semi-arborícola", "noturna"],
+    curiosidades: ["Muito procurada por sua beleza", "especialmente em programas de educação ambiental"],
+    order: 4
+  },
+  {
+    id: "5",
+    name: "Epicrates assisi",
+    commonName: "Jiboia Arco-íris da Caatinga",
+    type: "serpente",
+    image: "",
+    slug: generateSlug("Epicrates assisi"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Adaptada ao semiárido", "terrestre"],
+    curiosidades: ["Dócil e ideal para manuseio em atividades educativas"],
+    order: 5
+  },
+  {
+    id: "6",
+    name: "Epicrates crassus",
+    commonName: "Jiboia Arco-íris do Cerrado",
+    type: "serpente",
+    image: "",
+    slug: generateSlug("Epicrates crassus"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Constritora", "terrestre"],
+    curiosidades: ["Possui coloração mais opaca e se adapta bem ao clima seco"],
+    order: 6
+  },
+  {
+    id: "7",
+    name: "Epicrates maurus",
+    commonName: "Jiboia Arco-íris do Norte",
+    type: "serpente",
+    image: "",
+    slug: generateSlug("Epicrates maurus"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Escura", "terrestre"],
+    curiosidades: ["Pouco conhecida no mercado", "mas com manejo simples"],
+    order: 7
+  },
+  {
+    id: "8",
+    name: "Corallus batesii",
+    commonName: "Jiboia Esmeralda",
+    type: "serpente",
+    image: "",
+    slug: generateSlug("Corallus batesii"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Verde vibrante", "arborícola", "noturna"],
+    curiosidades: ["Alta sensibilidade ao estresse", "exige manejo especializado"],
+    order: 8
+  },
+  {
+    id: "9",
+    name: "Corallus hortulana",
+    commonName: "Suaçuboia",
+    type: "serpente",
+    image: "",
+    slug: generateSlug("Corallus hortulana"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Arborícola", "defensiva"],
+    curiosidades: ["Ocorre em todo o Brasil e possui comportamento mais tímido"],
+    order: 9
+  },
+  {
+    id: "10",
+    name: "Erythrolamprus miliaris",
+    commonName: "Cobra d’água",
+    type: "serpente",
+    image: "",
+    slug: generateSlug("Erythrolamprus miliaris"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Semi-aquática", "ativa durante o dia"],
+    curiosidades: ["Alimenta-se de peixes e anfíbio", "são super interativas"],
+    order: 10
+  },
+  {
+    id: "11",
+    name: "Spilotes pullatus",
+    commonName: "Caninana",
+    type: "serpente",
+    image: "",
+    slug: generateSlug("Spilotes pullatus"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Ágil", "diurna", "defensiva"],
+    curiosidades: ["Pode atingir grande tamanho", "tem comportamento defensivo imponente"],
+    order: 11
+  },
+  {
+    id: "12",
+    name: "Spilotes sulphureus",
+    commonName: "Caninana de Fogo",
+    type: "serpente",
+    image: "",
+    slug: generateSlug("Spilotes sulphureus"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Coloração chamativa", "ativa", "diurna", "semi-arborícola"],
+    curiosidades: ["Muito veloz", "exige recintos com espaço e enriquecimento"],
+    order: 12
+  },
+  {
+    id: "13",
+    name: "Salvator teguixin",
+    commonName: "Teiú Dourado",
+    type: "lagarto",
+    image: "",
+    slug: generateSlug("Salvator teguixin"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Onívoro", "terrestre", "escamas laranjas e pretas"],
+    curiosidades: ["Bastante ativo", "comportamento semelhante ao merianae"],
+    order: 13
+  },
+  {
+    id: "14",
+    name: "Salvator merianae",
+    commonName: "Teiú",
+    type: "lagarto",
+    image: "",
+    slug: generateSlug("Salvator merianae"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Onívoro", "terrestre", "robusto"],
+    curiosidades: ["Um dos lagartos mais criados legalmente no Brasil"],
+    order: 14
+  },
+  {
+    id: "15",
+    name: "Iguana iguana",
+    commonName: "Iguana",
+    type: "lagarto",
+    image: "",
+    slug: generateSlug("Iguana iguana"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Herbívora", "arborícola", "territorial"],
+    curiosidades: ["Exige muita luz solar e calor", "comportamento pode variar muito"],
+    order: 15
+  },
+  {
+    id: "16",
+    name: "Diploglossus lessonae",
+    commonName: "Lagarto Coral",
+    type: "lagarto",
+    image: "",
+    slug: generateSlug("Diploglossus lessonae"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Terrestre", "insetívoro", "corpo cilíndrico"],
+    curiosidades: ["Pouco conhecido", "se movimenta com rapidez"],
+    order: 16
+  },
+  {
+    id: "17",
+    name: "Polychrus marmoratus",
+    commonName: "Lagarto Preguiça",
+    type: "lagarto",
+    image: "",
+    slug: generateSlug("Polychrus marmoratus"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Arborícola", "insetívoro", "movimentos lentos"],
+    curiosidades: ["Se camufla com facilidade", "comportamento muito calmo"],
+    order: 17
+  },
+  {
+    id: "18",
+    name: "Thecadactylus rapicauda",
+    commonName: "Lagartixa Rabo de Nabo",
+    type: "lagarto",
+    image: "",
+    slug: generateSlug("Thecadactylus rapicauda"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Noturna", "arborícola", "adesiva"],
+    curiosidades: ["Vocaliza em situações de estresse", "excelente em paredes lisas"],
+    order: 18
+  },
+  {
+    id: "19",
+    name: "Chelonoidis carbonaria",
+    commonName: "Jabuti Piranga",
+    type: "quelonio",
+    image: "",
+    slug: generateSlug("Chelonoidis carbonaria"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Terrestre", "herbívoro", "manchas laranjas, amarelas ou vermelhas"],
+    curiosidades: ["Bastante comum em cativeiro", "vive muito tempo"],
+    order: 19
+  },
+  {
+    id: "20",
+    name: "Chelonoidis denticulata",
+    commonName: "Jabuti Tinga",
+    type: "quelonio",
+    image: "",
+    slug: generateSlug("Chelonoidis denticulata"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Terrestre", "herbívoro", "maior que o piranga"],
+    curiosidades: ["Preferência por ambientes mais úmidos e sombreados"],
+    order: 20
+  },
+  {
+    id: "21",
+    name: "Crocodilurus amazonicus",
+    commonName: "Jacarerana",
+    type: "lagarto",
+    image: "",
+    slug: generateSlug("Crocodilurus amazonicus"),
+    description: "Descrição detalhada a ser preenchida.",
+    characteristics: ["Semiaquático", "cauda achatada", "ágil"],
+    curiosidades: ["Vive em igarapés e margens de rios", "exige ambiente misto"],
+    order: 21
+  }
+];
+
 
 export default function SpeciesAdmin() {
   const [species, setSpecies] = useState<Species[]>([]);
@@ -48,42 +310,15 @@ export default function SpeciesAdmin() {
   useEffect(() => {
     const savedSpecies = localStorage.getItem('speciesList');
     if (savedSpecies) {
-      setSpecies(JSON.parse(savedSpecies));
+      const parsedSpecies: Species[] = JSON.parse(savedSpecies);
+      // Ensure order is consistent if loading from localStorage
+      parsedSpecies.sort((a, b) => a.order - b.order);
+      setSpecies(parsedSpecies);
     } else {
-      // Use the default data if nothing in localStorage
-      fetch('/api/species')
-        .then(response => response.json())
-        .catch(() => {
-          // Fallback to hardcoded data if API request fails
-          const defaultSpecies = [
-            {
-              id: '1',
-              name: 'Boa constrictor constrictor',
-              commonName: 'Jiboia Amazônica',
-              type: 'serpente',
-              image: '/lovable-uploads/764f832e-e068-449d-80be-7d670575665f.png',
-              slug: 'boa-constrictor-constrictor',
-              description: 'Uma das maiores serpentes do Brasil, podendo atingir até 4 metros de comprimento. Habita florestas úmidas da Amazônia.',
-              characteristics: ['Não-venenosa', 'Constritora', 'Noturna', 'Alimenta-se principalmente de roedores'],
-              curiosities: ['Pode viver até 30 anos em cativeiro', 'É ovovivípara, dando à luz filhotes já formados'],
-              order: 1
-            },
-            {
-              id: '2',
-              name: 'Epicrates cenchria',
-              commonName: 'Jiboia Arco-íris da Amazônia',
-              type: 'serpente',
-              image: '/lovable-uploads/f7bc5a30-657d-418c-8b25-7b0494f36029.png',
-              slug: 'epicrates-cenchria',
-              description: 'Uma serpente de médio porte conhecida por suas iridescências quando exposta à luz do sol.',
-              characteristics: ['Não-venenosa', 'Constritora', 'Coloração avermelhada com padrões circulares'],
-              curiosities: ['Seu nome vem do reflexo iridescente que sua pele produz sob a luz', 'Prefere habitats arbóreos'],
-              order: 2
-            }
-          ];
-          setSpecies(defaultSpecies);
-          localStorage.setItem('speciesList', JSON.stringify(defaultSpecies));
-        });
+      // Use the new default plantel data if nothing in localStorage
+      const sortedDefaultSpecies = [...defaultPlantelSpecies].sort((a,b) => a.order - b.order);
+      setSpecies(sortedDefaultSpecies);
+      localStorage.setItem('speciesList', JSON.stringify(sortedDefaultSpecies));
     }
   }, []);
 
@@ -92,7 +327,7 @@ export default function SpeciesAdmin() {
       id: Date.now().toString(),
       name: '',
       commonName: '',
-      description: '',
+      description: 'Descrição detalhada a ser preenchida.',
       characteristics: [''],
       curiosities: [''],
       image: '',
@@ -130,7 +365,7 @@ export default function SpeciesAdmin() {
     if (currentSpecies) {
       setCurrentSpecies({
         ...currentSpecies,
-        [name]: value
+        [name]: name === 'order' ? parseInt(value, 10) : value // Ensure order is a number
       });
     }
   };
@@ -198,46 +433,44 @@ export default function SpeciesAdmin() {
   const handleSaveSpecies = () => {
     if (!currentSpecies) return;
     
-    // Validate required fields
     if (!currentSpecies.name || !currentSpecies.commonName || !currentSpecies.description) {
       toast({
         title: "Erro de validação",
-        description: "Preencha todos os campos obrigatórios",
+        description: "Preencha todos os campos obrigatórios (Nome Popular, Nome Científico, Descrição).",
         variant: "destructive"
       });
       return;
     }
     
-    // Generate slug from scientific name if empty
     if (!currentSpecies.slug) {
-      const slug = currentSpecies.name
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^\w-]+/g, '');
-      currentSpecies.slug = slug;
+      currentSpecies.slug = generateSlug(currentSpecies.name);
     }
     
-    // If we have a new image, we would upload it to the server here
-    // For now, we'll just update the path directly
     if (imagePreview && imagePreview.startsWith('data:')) {
-      // In a real implementation, we would upload the file to a server
-      // and get back a URL. For now, we'll just use a placeholder.
+      // Placeholder for image upload logic
+      // For now, we'll assume the user uploads via another mechanism or image is already a URL
+      // If imageFile exists, it implies a new file was selected
       currentSpecies.image = imageFile 
-        ? `/lovable-uploads/${Date.now().toString()}.png` 
-        : '/lovable-uploads/764f832e-e068-449d-80be-7d670575665f.png';
+        ? `/lovable-uploads/${Date.now().toString()}-${imageFile.name}` // more unique name
+        : currentSpecies.image || ''; // keep existing or empty
+    } else if (!imagePreview && currentSpecies.image) {
+      // If preview is cleared but there was an image, it means user wants to remove it
+      // Or handle this based on specific UI indication for removal
     }
     
-    let updatedSpecies;
+    let updatedSpeciesList;
     if (isNewSpecies) {
-      // Add new species
-      updatedSpecies = [...species, currentSpecies];
+      const newSpeciesWithOrder = {
+        ...currentSpecies,
+        order: species.length > 0 ? Math.max(...species.map(s => s.order)) + 1 : 1,
+      };
+      updatedSpeciesList = [...species, newSpeciesWithOrder];
       toast({
         title: "Espécie cadastrada",
         description: `${currentSpecies.commonName} foi adicionada com sucesso!`
       });
     } else {
-      // Update existing species
-      updatedSpecies = species.map(s => 
+      updatedSpeciesList = species.map(s => 
         s.id === currentSpecies.id ? currentSpecies : s
       );
       toast({
@@ -246,20 +479,24 @@ export default function SpeciesAdmin() {
       });
     }
     
-    // Sort by order
-    updatedSpecies.sort((a, b) => a.order - b.order);
+    updatedSpeciesList.sort((a, b) => a.order - b.order);
     
-    // Save to state and localStorage
-    setSpecies(updatedSpecies);
-    localStorage.setItem('speciesList', JSON.stringify(updatedSpecies));
+    setSpecies(updatedSpeciesList);
+    localStorage.setItem('speciesList', JSON.stringify(updatedSpeciesList));
     
-    // Close the dialog
     setIsDialogOpen(false);
+    setImageFile(null); // Reset image file
   };
 
   const handleDeleteSpecies = (id: string) => {
-    if (confirm("Tem certeza que deseja excluir esta espécie?")) {
+    // Consider using a confirmation dialog from shadcn/ui
+    if (confirm("Tem certeza que deseja excluir esta espécie? Esta ação não pode ser desfeita.")) {
       const updatedSpecies = species.filter(s => s.id !== id);
+      
+      // Re-order remaining species if necessary, though simple removal might be fine.
+      // For this example, we'll just remove and rely on existing order numbers for sorting.
+      // If strict sequential order is needed after deletion, re-assign order numbers.
+      
       setSpecies(updatedSpecies);
       localStorage.setItem('speciesList', JSON.stringify(updatedSpecies));
       toast({
@@ -269,31 +506,25 @@ export default function SpeciesAdmin() {
     }
   };
 
-  const handleMoveUp = (index: number) => {
-    if (index === 0) return;
-    
-    const updatedSpecies = [...species];
-    const temp = updatedSpecies[index].order;
-    updatedSpecies[index].order = updatedSpecies[index - 1].order;
-    updatedSpecies[index - 1].order = temp;
-    
-    updatedSpecies.sort((a, b) => a.order - b.order);
-    setSpecies(updatedSpecies);
-    localStorage.setItem('speciesList', JSON.stringify(updatedSpecies));
-  };
+  const handleMove = (index: number, direction: 'up' | 'down') => {
+    const newSpecies = [...species];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
 
-  const handleMoveDown = (index: number) => {
-    if (index === species.length - 1) return;
+    if (targetIndex < 0 || targetIndex >= newSpecies.length) return;
+
+    // Swap order numbers
+    const tempOrder = newSpecies[index].order;
+    newSpecies[index].order = newSpecies[targetIndex].order;
+    newSpecies[targetIndex].order = tempOrder;
     
-    const updatedSpecies = [...species];
-    const temp = updatedSpecies[index].order;
-    updatedSpecies[index].order = updatedSpecies[index + 1].order;
-    updatedSpecies[index + 1].order = temp;
-    
-    updatedSpecies.sort((a, b) => a.order - b.order);
-    setSpecies(updatedSpecies);
-    localStorage.setItem('speciesList', JSON.stringify(updatedSpecies));
+    newSpecies.sort((a,b) => a.order - b.order);
+
+    setSpecies(newSpecies);
+    localStorage.setItem('speciesList', JSON.stringify(newSpecies));
   };
+  
+  const handleMoveUp = (index: number) => handleMove(index, 'up');
+  const handleMoveDown = (index: number) => handleMove(index, 'down');
 
   return (
     <div className="p-6">
@@ -312,53 +543,62 @@ export default function SpeciesAdmin() {
           {species.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-muted-foreground">Nenhuma espécie cadastrada.</p>
+              <Button onClick={openNewSpeciesDialog} className="mt-4">
+                Adicionar Primeira Espécie
+              </Button>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Ordem</TableHead>
-                  <TableHead>Imagem</TableHead>
+                  <TableHead className="w-[100px]">Ordem</TableHead>
+                  <TableHead className="w-[100px]">Imagem</TableHead>
                   <TableHead>Nome Popular</TableHead>
                   <TableHead>Nome Científico</TableHead>
                   <TableHead>Tipo</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
+                  <TableHead className="text-right w-[150px]">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {species.map((item, index) => (
                   <TableRow key={item.id}>
                     <TableCell>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1">
                         <span>{item.order}</span>
                         <div className="flex flex-col">
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-6 w-6" 
+                            className="h-5 w-5" 
                             onClick={() => handleMoveUp(index)}
                             disabled={index === 0}
                           >
-                            <ArrowUp className="h-4 w-4" />
+                            <ArrowUp className="h-3 w-3" />
                           </Button>
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-6 w-6" 
+                            className="h-5 w-5" 
                             onClick={() => handleMoveDown(index)}
                             disabled={index === species.length - 1}
                           >
-                            <ArrowDown className="h-4 w-4" />
+                            <ArrowDown className="h-3 w-3" />
                           </Button>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <img 
-                        src={item.image} 
-                        alt={item.commonName} 
-                        className="h-12 w-12 object-cover rounded"
-                      />
+                      {item.image ? (
+                        <img 
+                          src={item.image} 
+                          alt={item.commonName} 
+                          className="h-12 w-12 object-cover rounded"
+                        />
+                      ) : (
+                        <div className="h-12 w-12 bg-muted rounded flex items-center justify-center text-xs text-muted-foreground">
+                          Sem Img
+                        </div>
+                      )}
                     </TableCell>
                     <TableCell>{item.commonName}</TableCell>
                     <TableCell><em>{item.name}</em></TableCell>
@@ -371,18 +611,21 @@ export default function SpeciesAdmin() {
                       <div className="flex justify-end gap-2">
                         <Button 
                           variant="outline" 
-                          size="sm" 
+                          size="icon"
+                          className="h-8 w-8"
                           onClick={() => openEditSpeciesDialog(item)}
                         >
                           <Edit className="h-4 w-4" />
+                           <span className="sr-only">Editar</span>
                         </Button>
                         <Button 
                           variant="outline" 
-                          size="sm" 
-                          className="text-destructive hover:text-destructive" 
+                          size="icon" 
+                          className="text-destructive hover:text-destructive h-8 w-8" 
                           onClick={() => handleDeleteSpecies(item.id)}
                         >
                           <Trash2 className="h-4 w-4" />
+                          <span className="sr-only">Excluir</span>
                         </Button>
                       </div>
                     </TableCell>
@@ -395,7 +638,7 @@ export default function SpeciesAdmin() {
       </Card>
       
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto p-6">
           <DialogHeader>
             <DialogTitle>
               {isNewSpecies ? 'Adicionar Nova Espécie' : 'Editar Espécie'}
@@ -403,61 +646,60 @@ export default function SpeciesAdmin() {
           </DialogHeader>
           
           {currentSpecies && (
-            <div className="grid gap-6 py-4">
-              <div className="grid gap-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="commonName">Nome Popular*</Label>
-                    <Input 
-                      id="commonName" 
-                      name="commonName" 
-                      value={currentSpecies.commonName} 
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Nome Científico*</Label>
-                    <Input 
-                      id="name" 
-                      name="name" 
-                      value={currentSpecies.name} 
-                      onChange={handleInputChange}
-                    />
-                  </div>
+            <div className="grid gap-6 pt-4">
+              {/* Form fields */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="commonName">Nome Popular*</Label>
+                  <Input 
+                    id="commonName" 
+                    name="commonName" 
+                    value={currentSpecies.commonName} 
+                    onChange={handleInputChange}
+                  />
                 </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="type">Tipo</Label>
-                    <select 
-                      id="type" 
-                      name="type" 
-                      value={currentSpecies.type}
-                      onChange={handleInputChange}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      <option value="serpente">Serpente</option>
-                      <option value="lagarto">Lagarto</option>
-                      <option value="quelonio">Quelônio</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="slug">Slug (URL)</Label>
-                    <Input 
-                      id="slug" 
-                      name="slug" 
-                      value={currentSpecies.slug} 
-                      onChange={handleInputChange}
-                      placeholder="Gerado automaticamente se em branco"
-                    />
-                  </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="name">Nome Científico*</Label>
+                  <Input 
+                    id="name" 
+                    name="name" 
+                    value={currentSpecies.name} 
+                    onChange={handleInputChange}
+                  />
                 </div>
               </div>
               
-              <div className="space-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="type">Tipo</Label>
+                  <select 
+                    id="type" 
+                    name="type" 
+                    value={currentSpecies.type}
+                    onChange={handleInputChange}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="serpente">Serpente</option>
+                    <option value="lagarto">Lagarto</option>
+                    <option value="quelonio">Quelônio</option>
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="slug">Slug (URL)</Label>
+                  <Input 
+                    id="slug" 
+                    name="slug" 
+                    value={currentSpecies.slug} 
+                    onChange={handleInputChange}
+                    placeholder="Gerado do nome científico se vazio"
+                  />
+                </div>
+              </div>
+            
+              <div className="space-y-1.5">
                 <Label htmlFor="image">Imagem Principal</Label>
                 <div className="flex items-center gap-4">
-                  <div className="border rounded-lg overflow-hidden h-28 w-28 flex items-center justify-center bg-muted">
+                  <div className="border rounded-lg overflow-hidden h-28 w-28 flex items-center justify-center bg-muted shrink-0">
                     {imagePreview ? (
                       <img 
                         src={imagePreview} 
@@ -465,15 +707,17 @@ export default function SpeciesAdmin() {
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <span className="text-muted-foreground text-sm">Sem imagem</span>
+                      <div className="text-muted-foreground text-xs p-2 text-center">Sem imagem selecionada</div>
                     )}
                   </div>
                   
                   <div className="flex-1">
-                    <Label htmlFor="image-upload" className="cursor-pointer">
-                      <div className="flex items-center gap-2 p-2 border border-dashed rounded-md hover:bg-accent">
-                        <Upload className="h-4 w-4" />
-                        <span>Selecionar imagem</span>
+                    <Label htmlFor="image-upload" className="cursor-pointer block">
+                      <div className="flex items-center justify-center gap-2 p-3 border border-dashed rounded-md hover:bg-accent hover:border-primary transition-colors">
+                        <Upload className="h-5 w-5 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">
+                          {imageFile ? imageFile.name : 'Selecionar ou arrastar imagem'}
+                        </span>
                       </div>
                       <input 
                         id="image-upload" 
@@ -483,32 +727,43 @@ export default function SpeciesAdmin() {
                         onChange={handleImageChange}
                       />
                     </Label>
+                     {imagePreview && (
+                      <Button 
+                        variant="link" 
+                        size="sm" 
+                        className="mt-1 text-destructive" 
+                        onClick={() => { setImagePreview(null); setImageFile(null); if(currentSpecies) currentSpecies.image = '';}}
+                      >
+                        Remover imagem
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
               
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label htmlFor="description">Descrição Geral*</Label>
                 <Textarea 
                   id="description" 
                   name="description" 
-                  rows={3} 
+                  rows={4} 
                   value={currentSpecies.description} 
                   onChange={handleInputChange}
                 />
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <Label>Características</Label>
-                  <Button type="button" size="sm" onClick={handleAddCharacteristic}>
-                    <Plus className="h-4 w-4 mr-1" /> Adicionar
+                  <Label className="text-base font-medium">Características</Label>
+                  <Button type="button" variant="outline" size="sm" onClick={handleAddCharacteristic}>
+                    <Plus className="h-4 w-4 mr-1.5" /> Adicionar
                   </Button>
                 </div>
                 {currentSpecies.characteristics.map((characteristic, index) => (
                   <div key={index} className="flex items-center gap-2">
                     <Input 
                       value={characteristic} 
+                      placeholder={`Característica ${index + 1}`}
                       onChange={(e) => handleCharacteristicChange(index, e.target.value)} 
                     />
                     {currentSpecies.characteristics.length > 1 && (
@@ -516,6 +771,7 @@ export default function SpeciesAdmin() {
                         type="button" 
                         variant="ghost" 
                         size="icon"
+                        className="text-muted-foreground hover:text-destructive"
                         onClick={() => handleRemoveCharacteristic(index)}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -525,17 +781,18 @@ export default function SpeciesAdmin() {
                 ))}
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <Label>Curiosidades</Label>
-                  <Button type="button" size="sm" onClick={handleAddCuriosity}>
-                    <Plus className="h-4 w-4 mr-1" /> Adicionar
+                  <Label className="text-base font-medium">Curiosidades</Label>
+                  <Button type="button" variant="outline" size="sm" onClick={handleAddCuriosity}>
+                    <Plus className="h-4 w-4 mr-1.5" /> Adicionar
                   </Button>
                 </div>
                 {currentSpecies.curiosities.map((curiosity, index) => (
                   <div key={index} className="flex items-center gap-2">
                     <Input 
                       value={curiosity} 
+                      placeholder={`Curiosidade ${index + 1}`}
                       onChange={(e) => handleCuriosityChange(index, e.target.value)} 
                     />
                     {currentSpecies.curiosities.length > 1 && (
@@ -543,6 +800,7 @@ export default function SpeciesAdmin() {
                         type="button" 
                         variant="ghost" 
                         size="icon"
+                        className="text-muted-foreground hover:text-destructive"
                         onClick={() => handleRemoveCuriosity(index)}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -552,7 +810,7 @@ export default function SpeciesAdmin() {
                 ))}
               </div>
               
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label htmlFor="order">Ordem de exibição</Label>
                 <Input 
                   id="order" 
@@ -566,7 +824,7 @@ export default function SpeciesAdmin() {
             </div>
           )}
           
-          <DialogFooter>
+          <DialogFooter className="pt-6">
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
             <Button onClick={handleSaveSpecies}>
               {isNewSpecies ? 'Adicionar Espécie' : 'Salvar Alterações'}
