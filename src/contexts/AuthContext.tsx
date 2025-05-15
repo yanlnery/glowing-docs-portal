@@ -1,7 +1,6 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import type { AuthChangeEvent, Session, User } from '@supabase/supabase-js';
+import type { AuthChangeEvent, Session, User, Subscription } from '@supabase/supabase-js'; // Added Subscription
 import type { Profile } from '@/types/client';
 
 type AuthContextType = {
@@ -40,7 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     fetchInitialSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
+    const { data: authListenerData } = supabase.auth.onAuthStateChange( // Renamed for clarity
       async (event: AuthChangeEvent, currentSession: Session | null) => {
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
@@ -56,8 +55,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
+    const authSubscription = authListenerData?.subscription; // Extract subscription
+
     return () => {
-      authListener?.unsubscribe();
+      authSubscription?.unsubscribe(); // Corrected unsubscribe call
     };
   }, []);
 
@@ -89,7 +90,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signup = async (payload: { email: string, password: string, options?: { data: any } }) => {
     setIsLoading(true);
     const { error, data } = await supabase.auth.signUp(payload);
-     // Profile is created by trigger, fetchProfile will be called by onAuthStateChange
     setIsLoading(false);
     return { error, data };
   };
@@ -97,15 +97,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     setIsLoading(true);
     const { error } = await supabase.auth.signOut();
-    setProfile(null); // Clear profile on logout
+    setProfile(null); 
     setIsLoading(false);
     return { error };
   };
 
   const requestPasswordReset = async (email: string) => {
     setIsLoading(true);
-    // For password reset to work, you need to configure email templates in Supabase settings
-    // And setup a redirect URL. This URL should point to your reset password page.
     const redirectUrl = `${window.location.origin}/reset-password`;
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl,

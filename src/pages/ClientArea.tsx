@@ -1,11 +1,9 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   User, 
   ShoppingBag, 
-  ChevronRight,
   CheckCircle,
   AlertCircle,
   LogOut
@@ -14,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import type { Profile, Address, Order, OrderItem } from "@/types/client";
+import type { Profile, Address, Order } from "@/types/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -29,18 +27,16 @@ export default function ClientArea() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState(''); // Email from auth.user
+  const [email, setEmail] = useState('');
 
   // Address state
-  const [addresses, setAddresses] = useState<Address[]>([]);
   const [currentAddress, setCurrentAddress] = useState<Partial<Address>>({}); // For editing/adding
-  // For simplicity, we'll handle one address. Multiple address management can be added.
   const [street, setStreet] = useState('');
-  const [number, setNumberVal] = useState(''); // 'number' is reserved
+  const [numberVal, setNumberVal] = useState(''); // 'number' is reserved
   const [complement, setComplement] = useState('');
   const [neighborhood, setNeighborhood] = useState('');
   const [city, setCity] = useState('');
-  const [state, setStateVal] = useState(''); // 'state' is reserved
+  const [stateVal, setStateVal] = useState(''); // 'state' is reserved
   const [zipcode, setZipcode] = useState('');
   
   // Orders state
@@ -63,38 +59,32 @@ export default function ClientArea() {
   const fetchClientData = async () => {
     if (!user) return;
     setIsLoadingData(true);
-    // Fetch addresses
+    
     const { data: addressData, error: addressError } = await supabase
       .from('addresses')
       .select('*')
       .eq('user_id', user.id)
-      .order('is_default', { ascending: false }); // Get default first
+      .order('is_default', { ascending: false });
 
     if (addressError) {
       toast({ title: "Erro ao buscar endereços", description: addressError.message, variant: "destructive" });
     } else if (addressData && addressData.length > 0) {
-      setAddresses(addressData as Address[]);
       const defaultAddress = addressData.find(a => a.is_default) || addressData[0];
       setCurrentAddress(defaultAddress); // Initialize form with the first/default address
       setStreet(defaultAddress.street);
-      setNumberVal(defaultAddress.number);
+      setNumberVal(defaultAddress.number); // Uses numberVal state
       setComplement(defaultAddress.complement || '');
       setNeighborhood(defaultAddress.neighborhood);
       setCity(defaultAddress.city);
-      setStateVal(defaultAddress.state);
+      setStateVal(defaultAddress.state); // Uses stateVal state
       setZipcode(defaultAddress.zipcode);
     } else {
-      setAddresses([]);
       setCurrentAddress({ user_id: user.id, is_default: true }); // Prepare for new address
     }
 
-    // Fetch orders with items
     const { data: orderData, error: orderError } = await supabase
       .from('orders')
-      .select(`
-        *,
-        order_items ( * )
-      `)
+      .select('*, order_items ( * )')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
@@ -124,29 +114,29 @@ export default function ClientArea() {
     e.preventDefault();
     if (!user) return;
 
-    const addressPayload = {
+    const addressPayload: Omit<Address, 'id' | 'created_at' | 'updated_at'> = { // More specific type
       user_id: user.id,
       street,
-      number: numberVal,
+      number: numberVal, // Uses numberVal state
       complement,
       neighborhood,
       city,
-      state: stateVal,
+      state: stateVal, // Uses stateVal state
       zipcode,
       is_default: currentAddress.is_default !== undefined ? currentAddress.is_default : true,
     };
 
     let error;
-    if (currentAddress.id) { // Update existing address
+    if (currentAddress.id) {
       const { error: updateError } = await supabase
         .from('addresses')
         .update({ ...addressPayload, updated_at: new Date().toISOString() })
         .eq('id', currentAddress.id);
       error = updateError;
-    } else { // Insert new address
+    } else {
       const { error: insertError } = await supabase
         .from('addresses')
-        .insert(addressPayload);
+        .insert(addressPayload as Address); // Cast might be needed if types aren't perfect
       error = insertError;
     }
 
@@ -220,7 +210,7 @@ export default function ClientArea() {
         {/* Main Content */}
         <div className="lg:col-span-3">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-8"> {/* Updated to 2 cols */}
+            <TabsList className="grid w-full grid-cols-2 mb-8">
               <TabsTrigger value="profile">Perfil</TabsTrigger>
               <TabsTrigger value="orders">Pedidos</TabsTrigger>
             </TabsList>
@@ -264,7 +254,7 @@ export default function ClientArea() {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="number">Número</Label>
-                        <Input id="number" value={numberVal} onChange={e => setNumberVal(e.target.value)} />
+                        <Input id="number" value={numberVal} onChange={e => setNumberVal(e.target.value)} /> 
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="complement">Complemento</Label>
@@ -334,10 +324,6 @@ export default function ClientArea() {
                         </div>
                         <div className="flex items-center gap-4">
                           <span className="font-semibold">R$ {parseFloat(order.total_amount).toFixed(2)}</span>
-                          {/* Detalhes do pedido pode ser uma feature futura */}
-                          {/* <Button variant="outline" size="sm" className="whitespace-nowrap">
-                            Detalhes <ChevronRight className="ml-1 h-4 w-4" />
-                          </Button> */}
                         </div>
                       </div>
                     </div>
