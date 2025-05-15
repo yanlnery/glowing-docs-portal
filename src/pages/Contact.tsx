@@ -6,6 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Phone, Mail, MessageSquare, Instagram, Youtube } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import emailjs from 'emailjs-com';
+
+// Note: You'll need to create an EmailJS account and add these IDs for this to work:
+// Sign up at https://www.emailjs.com/
+const EMAILJS_SERVICE_ID = "pet_serpentes"; // Replace with your service ID
+const EMAILJS_TEMPLATE_ID = "contact_form"; // Replace with your template ID
+const EMAILJS_USER_ID = "YOUR_USER_ID"; // Replace with your user ID
 
 export default function Contact() {
   const { toast } = useToast();
@@ -23,27 +30,45 @@ export default function Contact() {
     setFormData(prev => ({ ...prev, [id]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Store the contact form submission in localStorage for admin panel
-    const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
-    submissions.push({
-      ...formData,
-      id: Date.now().toString(),
-      date: new Date().toISOString()
-    });
-    localStorage.setItem('contactSubmissions', JSON.stringify(submissions));
-    
-    // Simulate email sending (in a real scenario, this would be an API call)
-    setTimeout(() => {
+    try {
+      // Store the submission in localStorage for the admin panel
+      const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
+      const newSubmission = {
+        ...formData,
+        id: Date.now().toString(),
+        date: new Date().toISOString()
+      };
+      
+      submissions.push(newSubmission);
+      localStorage.setItem('contactSubmissions', JSON.stringify(submissions));
+      
+      // Send email using EmailJS
+      const templateParams = {
+        to_email: "contato@petserpentes.com.br",
+        from_name: formData.name,
+        from_email: formData.email,
+        phone: formData.phone || "Não informado",
+        subject: formData.subject,
+        message: formData.message
+      };
+      
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        templateParams,
+        EMAILJS_USER_ID
+      );
+      
       toast({
         title: "Mensagem enviada!",
         description: "Em breve entraremos em contato com você.",
         variant: "default",
       });
-      setIsSubmitting(false);
+      
       setFormData({
         name: "",
         email: "",
@@ -51,7 +76,16 @@ export default function Contact() {
         subject: "",
         message: ""
       });
-    }, 1500);
+    } catch (error) {
+      console.error("Error sending email:", error);
+      toast({
+        title: "Erro ao enviar mensagem",
+        description: "Houve um problema ao enviar sua mensagem. Por favor, tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -140,7 +174,7 @@ export default function Contact() {
           </div>
         </div>
         
-        {/* Contact Info - REMOVED ADDRESS AND MAP */}
+        {/* Contact Info */}
         <div className="order-1 lg:order-2">
           <div className="mb-8">
             <h2 className="text-2xl font-bold mb-6">Informações de Contato</h2>
