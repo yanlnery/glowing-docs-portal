@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -31,6 +30,7 @@ import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 
 // Admin pages
 import { AuthProvider, useAuth } from "./contexts/AuthContext"; 
+import { AdminAuthProvider } from "./contexts/AdminAuthContext";
 import AdminLogin from "./pages/admin/Login"; 
 import Dashboard from "./pages/admin/Dashboard";
 import ProductList from "./pages/admin/ProductList";
@@ -42,6 +42,7 @@ import ShoppingCartAnalytics from "./pages/admin/ShoppingCartAnalytics";
 import ContactSubmissions from "./pages/admin/ContactSubmissions";
 import SpeciesAdmin from "./pages/admin/SpeciesAdmin";
 import AdminCarousel from "./pages/admin/AdminCarousel";
+import AdminProtectedRoute from "./components/admin/AdminProtectedRoute";
 
 // Create a confirmation page for waitlist registration
 const WaitlistConfirmationPage = () => (
@@ -87,70 +88,72 @@ const ProtectedClientRoute = () => {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router> {/* Router now wraps AuthProvider */}
+      <Router>
         <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            {/* Routes remain inside AuthProvider so they can access auth context */}
-            <Routes>
-              {/* Public Routes */}
-              <Route element={<WebsiteLayout />}>
-                <Route path="/" element={<Home />} />
-                <Route path="catalogo" element={<Catalog />} />
-                <Route path="produtos/:id" element={<ProductDetail />} />
-                <Route path="especies" element={<Species />} />
-                <Route path="especies/:id" element={<SpeciesDetail />} />
-                <Route path="especies-criadas/:slug" element={<SpeciesDetail />} />
-                <Route path="manuais" element={<Manuals />} />
-                <Route path="sobre" element={<About />} />
-                <Route path="educacao" element={<Education />} />
-                <Route path="academy" element={<AcademyRoute />} />
-                <Route path="lista-de-espera" element={<WaitlistForm />} />
-                <Route path="confirmacao-inscricao" element={<WaitlistConfirmationPage />} />
-                <Route path="contato" element={<Contact />} />
-                
-                {/* Protected Client Route */}
-                <Route element={<ProtectedClientRoute />}>
-                  <Route path="area-cliente" element={<ClientArea />} />
+          <AdminAuthProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <Routes>
+                {/* Public Routes */}
+                <Route element={<WebsiteLayout />}>
+                  <Route path="/" element={<Home />} />
+                  <Route path="catalogo" element={<Catalog />} />
+                  <Route path="produtos/:id" element={<ProductDetail />} />
+                  <Route path="especies" element={<Species />} />
+                  <Route path="especies/:id" element={<SpeciesDetail />} />
+                  <Route path="especies-criadas/:slug" element={<SpeciesDetail />} />
+                  <Route path="manuais" element={<Manuals />} />
+                  <Route path="sobre" element={<About />} />
+                  <Route path="educacao" element={<Education />} />
+                  <Route path="academy" element={<AcademyRoute />} />
+                  <Route path="lista-de-espera" element={<WaitlistForm />} />
+                  <Route path="confirmacao-inscricao" element={<WaitlistConfirmationPage />} />
+                  <Route path="contato" element={<Contact />} />
+                  
+                  {/* Protected Client Route */}
+                  <Route element={<ProtectedClientRoute />}>
+                    <Route path="area-cliente" element={<ClientArea />} />
+                  </Route>
+                  
+                  <Route path="carrinho" element={<CartPage />} />
+                  <Route path="quiz" element={<Quiz />} />
+                  <Route path="manuais-de-criacao" element={<Manuals />} />
+                  <Route path="ps-academy" element={<Academy />} />
+                  
+                  {/* Legacy routes - keeping for backward compatibility */}
+                  <Route path="getting-started" element={<Home />} />
+                  <Route path="api" element={<Home />} />
+                  <Route path="examples" element={<Home />} />
+                  
+                  {/* 404 Route */}
+                  <Route path="*" element={<NotFound />} />
                 </Route>
                 
-                <Route path="carrinho" element={<CartPage />} />
-                <Route path="quiz" element={<Quiz />} />
-                <Route path="manuais-de-criacao" element={<Manuals />} />
-                <Route path="ps-academy" element={<Academy />} />
-                
-                {/* Legacy routes - keeping for backward compatibility */}
-                <Route path="getting-started" element={<Home />} />
-                <Route path="api" element={<Home />} />
-                <Route path="examples" element={<Home />} />
-                
-                {/* 404 Route */}
-                <Route path="*" element={<NotFound />} />
-              </Route>
-              
-              {/* Auth Routes */}
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<SignupPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/reset-password" element={<ResetPasswordPage />} />
+                {/* Auth Routes */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignupPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-              {/* Admin Routes - Consider how admin auth will work now */}
-              <Route path="/admin" element={<AdminLogin />} /> 
-              {/* Admin routes below might need protection with admin-specific logic */}
-              <Route path="/admin/dashboard" element={<Dashboard />} />
-              <Route path="/admin/products" element={<ProductList />} />
-              <Route path="/admin/products/new" element={<ProductForm />} />
-              <Route path="/admin/products/edit/:id" element={<ProductForm />} />
-              <Route path="/admin/settings" element={<Settings />} />
-              <Route path="/admin/waitlist" element={<WaitlistAdmin />} />
-              <Route path="/admin/manuals" element={<ManualsAdmin />} />
-              <Route path="/admin/contact-submissions" element={<ContactSubmissions />} />
-              <Route path="/admin/species" element={<SpeciesAdmin />} />
-              <Route path="/admin/carousel" element={<AdminCarousel />} />
-              <Route path="/admin/cart-analytics" element={<ShoppingCartAnalytics />} />
-            </Routes>
-          </TooltipProvider>
+                {/* Admin Routes - Agora com proteção específica para admin */}
+                <Route path="/admin" element={<AdminLogin />} />
+                <Route element={<AdminProtectedRoute />}>
+                  <Route path="/admin/dashboard" element={<Dashboard />} />
+                  <Route path="/admin/products" element={<ProductList />} />
+                  <Route path="/admin/products/new" element={<ProductForm />} />
+                  <Route path="/admin/products/edit/:id" element={<ProductForm />} />
+                  <Route path="/admin/settings" element={<Settings />} />
+                  <Route path="/admin/waitlist" element={<WaitlistAdmin />} />
+                  <Route path="/admin/manuals" element={<ManualsAdmin />} />
+                  <Route path="/admin/contact-submissions" element={<ContactSubmissions />} />
+                  <Route path="/admin/species" element={<SpeciesAdmin />} />
+                  <Route path="/admin/carousel" element={<AdminCarousel />} />
+                  <Route path="/admin/cart-analytics" element={<ShoppingCartAnalytics />} />
+                </Route>
+              </Routes>
+            </TooltipProvider>
+          </AdminAuthProvider>
         </AuthProvider>
       </Router>
     </QueryClientProvider>
@@ -158,4 +161,3 @@ function App() {
 }
 
 export default App;
-

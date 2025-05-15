@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
@@ -9,17 +9,21 @@ import { useToast } from '@/components/ui/use-toast';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { adminLogin, adminLoginLoading, isAdminLoggedIn } = useAdminAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  useEffect(() => {
+    if (isAdminLoggedIn) {
+      navigate('/admin/dashboard');
+    }
+  }, [isAdminLoggedIn, navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
 
     try {
-      const success = await login(username, password);
+      const success = await adminLogin(username, password);
       if (success) {
         toast({
           title: "Login realizado com sucesso",
@@ -41,8 +45,6 @@ const Login = () => {
         variant: "destructive",
       });
       console.error('Login error:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -97,9 +99,9 @@ const Login = () => {
           <Button
             type="submit"
             className="w-full"
-            disabled={isLoading}
+            disabled={adminLoginLoading}
           >
-            {isLoading ? 'Entrando...' : 'Entrar'}
+            {adminLoginLoading ? 'Entrando...' : 'Entrar'}
           </Button>
         </form>
       </div>

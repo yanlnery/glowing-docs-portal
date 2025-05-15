@@ -68,16 +68,15 @@ const About = () => {
   ];
 
   return (
-    <div className="bg-gray-900 text-gray-100 py-12 md:py-20">
+    <div className="bg-background text-foreground py-12 md:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Nossa História Section */}
+        {/* Nossa História Section - Com título e subtítulo centralizados */}
         <section className="mb-16 md:mb-24">
-          <div className="flex items-center mb-4">
-            <span className="w-1 h-8 bg-serpente-500 rounded mr-3"></span>
-            <h2 className="text-3xl md:text-4xl font-bold text-white">{historiaText.title}</h2>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">{historiaText.title}</h2>
+            <p className="text-muted-foreground mb-8 text-lg mx-auto max-w-2xl">{historiaText.subtitle}</p>
           </div>
-          <p className="text-gray-400 mb-8 text-lg">{historiaText.subtitle}</p>
           
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
             <div className="order-1 md:order-1">
@@ -87,9 +86,9 @@ const About = () => {
                 className="w-full h-auto rounded-lg shadow-lg object-cover" 
               />
             </div>
-            <div className="order-2 md:order-2 prose prose-invert max-w-none text-gray-300">
-              <h3 className="text-xl font-semibold text-white">{historiaText.ceo}</h3>
-              <p className="text-sm text-serpente-400 mb-4">{historiaText.ceoTitle}</p>
+            <div className="order-2 md:order-2 prose prose-invert max-w-none text-foreground">
+              <h3 className="text-xl font-semibold text-foreground">{historiaText.ceo}</h3>
+              <p className="text-sm text-primary mb-4">{historiaText.ceoTitle}</p>
               {historiaText.paragraphs.map((p, index) => (
                 <p key={index} className="mb-4 leading-relaxed">{p}</p>
               ))}
@@ -97,39 +96,33 @@ const About = () => {
           </div>
         </section>
 
-        {/* Nossa Missão Section */}
+        {/* Nossa Missão Section - Com título centralizado */}
         <section className="mb-16 md:mb-24">
           <div className="text-center mb-12">
-            <div className="inline-block relative mb-2">
-              <h2 className="text-3xl md:text-4xl font-bold text-white">Nossa Missão</h2>
-              <span className="block w-24 h-1 bg-serpente-500 mx-auto mt-2"></span>
-            </div>
-            <p className="text-gray-400 mt-2 text-lg">Trabalhamos com pilares fundamentais que orientam todas as nossas atividades.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Nossa Missão</h2>
+            <p className="text-muted-foreground mt-2 text-lg mx-auto max-w-2xl">Trabalhamos com pilares fundamentais que orientam todas as nossas atividades.</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {missaoItens.map((item, index) => (
-              <div key={index} className="bg-gray-800 p-6 rounded-lg shadow-lg text-center hover:shadow-serpente-500/30 transition-shadow duration-300">
+              <div key={index} className="bg-card p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow duration-300">
                 <div className="flex justify-center">{item.icon}</div>
-                <h3 className="text-xl font-semibold text-white mb-2">{item.title}</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">{item.text}</p>
+                <h3 className="text-xl font-semibold text-foreground mb-2">{item.title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{item.text}</p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Nossa Trajetória Section */}
+        {/* Nossa Trajetória Section - Com título centralizado */}
         <section>
           <div className="text-center mb-12">
-            <div className="inline-block relative mb-2">
-              <h2 className="text-3xl md:text-4xl font-bold text-white">Nossa Trajetória</h2>
-              <span className="block w-24 h-1 bg-serpente-500 mx-auto mt-2"></span>
-            </div>
-            <p className="text-gray-400 mt-2 text-lg">Conheça os principais marcos na história do Pet Serpentes & Companhia.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Nossa Trajetória</h2>
+            <p className="text-muted-foreground mt-2 text-lg mx-auto max-w-2xl">Conheça os principais marcos na história do Pet Serpentes & Companhia.</p>
           </div>
           
           <div className="relative">
             {/* Central line */}
-            <div className="hidden md:block absolute top-0 bottom-0 left-1/2 w-0.5 bg-gray-700 transform -translate-x-1/2"></div>
+            <div className="hidden md:block absolute top-0 bottom-0 left-1/2 w-0.5 bg-border transform -translate-x-1/2"></div>
             
             {trajetoriaItens.map((item, index) => (
               <div key={index} className={`mb-12 md:flex ${index % 2 === 0 ? 'md:flex-row-reverse' : ''} items-center w-full`}>
@@ -137,16 +130,16 @@ const About = () => {
                 <div className={`md:w-1/2 ${index % 2 === 0 ? 'md:pl-8 lg:pl-12' : 'md:pr-8 lg:pr-12 md:text-right'} relative`}>
                   {/* Dot on the line */}
                   <div className="hidden md:block absolute top-1/2 -mt-2.5 transform -translate-y-1/2 z-10">
-                    <div className={`w-5 h-5 rounded-full bg-serpente-500 border-4 border-gray-900 ${index % 2 === 0 ? 'md:-ml-[calc(50%+0.625rem)]' : 'md:-mr-[calc(50%+0.625rem)] md:left-auto md:right-0' } `}></div>
+                    <div className={`w-5 h-5 rounded-full bg-primary border-4 border-background ${index % 2 === 0 ? 'md:-ml-[calc(50%+0.625rem)]' : 'md:-mr-[calc(50%+0.625rem)] md:left-auto md:right-0' } `}></div>
                   </div>
                    {/* Mobile line */}
-                  <div className="md:hidden absolute top-0 left-0 w-0.5 h-full bg-gray-700 -ml-2.5"></div>
-                  <div className="md:hidden absolute top-4 left-0 w-5 h-5 rounded-full bg-serpente-500 border-4 border-gray-900 transform -translate-x-1/2 -ml-0.5"></div>
+                  <div className="md:hidden absolute top-0 left-0 w-0.5 h-full bg-border -ml-2.5"></div>
+                  <div className="md:hidden absolute top-4 left-0 w-5 h-5 rounded-full bg-primary border-4 border-background transform -translate-x-1/2 -ml-0.5"></div>
 
-                  <div className="bg-gray-800 p-6 rounded-lg shadow-lg ml-4 md:ml-0">
-                    <p className="text-sm font-semibold text-serpente-400 mb-1">{item.year}</p>
-                    <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
-                    <p className="text-gray-400 text-sm leading-relaxed">{item.text}</p>
+                  <div className="bg-card p-6 rounded-lg shadow-md ml-4 md:ml-0">
+                    <p className="text-sm font-semibold text-primary mb-1">{item.year}</p>
+                    <h3 className="text-xl font-bold text-foreground mb-2">{item.title}</h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed">{item.text}</p>
                   </div>
                 </div>
               </div>
