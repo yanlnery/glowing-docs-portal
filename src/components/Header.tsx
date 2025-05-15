@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,31 +15,42 @@ import { Menu, X, ShoppingCart, User, Book, Box, FileText, Users, Phone, Syringe
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useCartStore } from "@/stores/cartStore";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/hooks/useAuth"; // Updated import
+import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/components/ui/use-toast";
+import { useSettings } from "@/hooks/useSettings";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const isMobile = useIsMobile();
   const cartQuantity = useCartStore(state => state.getCartQuantity());
-  const { isAuthenticated, logout, user } = useAuth(); // uses updated import
+  const { isAuthenticated, logout, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+  const { isAcademyVisible } = useSettings();
+
   const isActive = (path: string) => {
     return location.pathname === path;
   };
   
-  const menuItems = [
+  const baseMenuItems = [
     { title: "Início", path: "/", icon: <Home size={16} className="mr-2" /> },
-    { title: "P. S. Academy", path: "/academy", icon: <Book size={16} className="mr-2" /> },
+    { title: "P. S. Academy", path: "/academy", icon: <Book size={16} className="mr-2" />, id: "academy" },
     { title: "Animais Disponíveis", path: "/catalogo", icon: <Syringe size={16} className="mr-2" /> },
     { title: "Espécies Criadas", path: "/especies", icon: <FileText size={16} className="mr-2" /> },
     { title: "Manuais de Criação", path: "/manuais", icon: <Book size={16} className="mr-2" /> },
     { title: "Quem Somos", path: "/sobre", icon: <Users size={16} className="mr-2" /> },
     { title: "Contato", path: "/contato", icon: <Phone size={16} className="mr-2" /> },
   ];
+
+  const menuItems = useMemo(() => {
+    return baseMenuItems.filter(item => {
+      if (item.id === "academy") {
+        return isAcademyVisible;
+      }
+      return true;
+    });
+  }, [isAcademyVisible]);
 
   const handleLogout = async () => {
     const { error } = await logout();

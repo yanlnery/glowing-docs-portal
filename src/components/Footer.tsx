@@ -1,9 +1,11 @@
-
 import { Link } from "react-router-dom";
 import { Instagram, Mail, MapPin, Phone, Youtube, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useSettings } from "@/hooks/useSettings"; // Import useSettings
 
 export default function Footer() {
+  const { isAcademyVisible } = useSettings(); // Get the visibility flag
+
   return (
     <footer className="bg-serpente-900 text-white/90">
       <div className="container mx-auto px-4 py-12">
@@ -41,9 +43,11 @@ export default function Footer() {
               <li>
                 <Link to="/" className="hover:text-white transition-colors">Início</Link>
               </li>
-              <li>
-                <Link to="/academy" className="hover:text-white transition-colors">P.S. Academy</Link>
-              </li>
+              {isAcademyVisible && (
+                <li>
+                  <Link to="/academy" className="hover:text-white transition-colors">P.S. Academy</Link>
+                </li>
+              )}
               <li>
                 <Link to="/catalogo" className="hover:text-white transition-colors">Animais Disponíveis</Link>
               </li>

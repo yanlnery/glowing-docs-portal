@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Leaf, BookOpen, Award, Heart } from 'lucide-react';
 
@@ -81,9 +80,9 @@ const About = () => {
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
             <div className="order-1 md:order-1">
               <img 
-                src="/lovable-uploads/d71c2fb7-1bfe-41ba-8db3-d2d0b4279365.png" 
-                alt="Yan Nery no Pet Serpentes & Companhia" 
-                className="w-full h-auto rounded-lg shadow-lg object-cover" 
+                src="/lovable-uploads/13113c77-f713-4585-9041-1766e67545b8.png" 
+                alt="Yan Nery, CEO e Biólogo do Pet Serpentes & Companhia" 
+                className="w-full h-auto rounded-lg shadow-lg object-cover aspect-[4/5] md:aspect-auto" 
               />
             </div>
             <div className="order-2 md:order-2 prose prose-invert max-w-none text-foreground">
