@@ -1,7 +1,10 @@
+
 import React, { useEffect, useState, useCallback } from "react";
 import { Manual } from "@/types/manual";
 import ManualsSearch from "@/components/manuals/ManualsSearch";
 import ManualsGrid from "@/components/manuals/ManualsGrid";
+
+const MANUALS_STORAGE_KEY = 'manuals';
 
 export default function Manuals() {
   const [manuals, setManuals] = useState<Manual[]>([]);
@@ -10,7 +13,7 @@ export default function Manuals() {
   
   const loadManuals = useCallback(() => {
     try {
-      const savedManualsString = localStorage.getItem('manuals');
+      const savedManualsString = localStorage.getItem(MANUALS_STORAGE_KEY);
       const loadedManuals = savedManualsString ? JSON.parse(savedManualsString) : [];
       
       if (savedManualsString === null) {
@@ -18,13 +21,13 @@ export default function Manuals() {
       }
       setManuals(loadedManuals);
       // Apply search query if it exists, otherwise show all loaded manuals
-      const query = searchQuery.toLowerCase();
-      if (!query.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      if (!query) {
         setFilteredManuals(loadedManuals);
       } else {
         const filtered = loadedManuals.filter((manual: Manual) => 
           manual.title.toLowerCase().includes(query) || 
-          (manual.description && manual.description.toLowerCase().includes(query)) || // Added check for description
+          (manual.description && manual.description.toLowerCase().includes(query)) ||
           manual.category.toLowerCase().includes(query)
         );
         setFilteredManuals(filtered);
@@ -42,7 +45,7 @@ export default function Manuals() {
     loadManuals();
 
     const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'manuals') {
+      if (event.key === MANUALS_STORAGE_KEY) {
         console.log("Manuals storage changed, reloading manuals...");
         loadManuals();
       }
@@ -51,14 +54,14 @@ export default function Manuals() {
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, [loadManuals]);
+  }, [loadManuals]); // loadManuals dependency will re-run this effect if loadManuals changes
   
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value.toLowerCase();
-    setSearchQuery(query); // This will trigger re-filtering via loadManuals if needed, or apply filter locally
+    setSearchQuery(query); 
     
     if (!query.trim()) {
-      setFilteredManuals(manuals); // Show all original manuals if query is cleared
+      setFilteredManuals(manuals); 
       return;
     }
     
@@ -85,10 +88,10 @@ export default function Manuals() {
   };
 
   return (
-    <div className="container px-4 py-8 sm:px-6 sm:py-12"> {/* Adjusted padding */}
-      <div className="flex flex-col items-center mb-8 sm:mb-12 text-center"> {/* Adjusted margin */}
+    <div className="container px-4 py-8 sm:px-6 sm:py-12">
+      <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">
         <div className="docs-section-title">
-          <h1 className="text-3xl sm:text-4xl font-bold text-balance">Manuais de Criação</h1> {/* Added text-balance, adjusted size */}
+          <h1 className="text-3xl sm:text-4xl font-bold text-balance">Manuais de Criação</h1>
         </div>
         <p className="text-muted-foreground max-w-2xl mt-3 sm:mt-4 text-sm sm:text-base">
           Conteúdo técnico e prático para criadores de répteis certificados
@@ -101,8 +104,8 @@ export default function Manuals() {
       />
       
       <ManualsGrid
-        manuals={manuals} // Pass original manuals for reference if needed by grid
-        displayedManuals={filteredManuals} // Pass filtered manuals for display
+        manuals={manuals}
+        displayedManuals={filteredManuals}
         searchQuery={searchQuery}
         onDownload={handleDownload}
         onClearSearch={handleClearSearch}
@@ -110,3 +113,4 @@ export default function Manuals() {
     </div>
   );
 }
+
