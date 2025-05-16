@@ -13,8 +13,10 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 
+const CAROUSEL_STORAGE_KEY = 'carouselImages'; // Defined in carouselService.ts
+
 export default function HeroCarousel() {
-  const [carouselImagesData, setCarouselImagesData] = useState<CarouselImageDef[]>([]);
+  const [carouselImagesData, setCarouselImagesData] = useState<CarouselImageDef[]>(getCarouselImages());
   const [api, setApi] = useState<CarouselApi>();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -23,7 +25,22 @@ export default function HeroCarousel() {
   );
 
   useEffect(() => {
+    // Initial load
     setCarouselImagesData(getCarouselImages());
+
+    // Listen for changes in localStorage
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === CAROUSEL_STORAGE_KEY) {
+        console.log("Carousel data changed in localStorage, reloading images...");
+        setCarouselImagesData(getCarouselImages());
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -37,10 +54,7 @@ export default function HeroCarousel() {
     
     const onPointerUp = () => {
       if (autoplayPlugin.current.options.stopOnInteraction) {
-        // Small delay to ensure click events on slides (if any) are processed
-        // Then restart autoplay without rewinding
         setTimeout(() => {
-            // Check if the interaction was on a focusable element inside the carousel
             if (api.rootNode().contains(document.activeElement)) {
                  // if interaction was on a focusable element inside carousel, let it be
             } else {
@@ -53,8 +67,11 @@ export default function HeroCarousel() {
     api.on("pointerUp", onPointerUp);
 
     return () => {
-      api.off("select", () => setCurrentImageIndex(api.selectedScrollSnap()));
-      api.off("pointerUp", onPointerUp);
+      // api.off("select", () => setCurrentImageIndex(api.selectedScrollSnap())); // This line is problematic, selectedScrollSnap might not be available on unmount
+      if (api) { // Check if api exists before calling off
+        api.off("select"); // Correct way to remove all listeners for "select"
+        api.off("pointerUp", onPointerUp);
+      }
     };
   }, [api]);
 
@@ -68,7 +85,7 @@ export default function HeroCarousel() {
   if (carouselImagesData.length === 0) {
     return (
       <div className="relative h-[60vh] md:h-[70vh] overflow-hidden flex items-center justify-center bg-gray-200 dark:bg-gray-800 px-4">
-        <p className="text-gray-500 dark:text-gray-400">Carregando carrossel...</p>
+        <p className="text-gray-500 dark:text-gray-400">Nenhuma imagem para exibir no carrossel. Adicione imagens no painel administrativo.</p>
       </div>
     );
   }
@@ -105,14 +122,14 @@ export default function HeroCarousel() {
         </Carousel>
 
         {/* Text Overlay: Adjusted padding and text sizes for mobile */}
-        <div className="absolute inset-0 z-20 flex flex-col items-start justify-end md:justify-center pb-20 md:pb-0 pointer-events-none"> {/* Increased pb slightly from pb-24 if needed, or ensure buttons are further down*/}
+        <div className="absolute inset-0 z-20 flex flex-col items-start justify-end md:justify-center pb-20 md:pb-0 pointer-events-none">
           <div className="container py-6 px-4 sm:px-6 pointer-events-auto">
              {currentSlideData && (
               <>
-                <h1 className="text-lg sm:text-xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-2xl animate-slide-in text-balance"> {/* Slightly reduced base text size */}
+                <h1 className="text-lg sm:text-xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-2xl animate-slide-in text-balance">
                   {currentSlideData.title || "Bem-vindo"}
                 </h1>
-                <p className="text-xs sm:text-sm md:text-lg text-white/90 max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance"> {/* Slightly reduced base text size and mb */}
+                <p className="text-xs sm:text-sm md:text-lg text-white/90 max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance">
                   {currentSlideData.subtitle || "Conheça nossos animais"}
                 </p>
               </>
@@ -139,7 +156,7 @@ export default function HeroCarousel() {
       </div>
 
       {/* Buttons Container: Ensured it's part of normal flow on mobile, with appropriate spacing */}
-      <div className="container px-4 sm:px-6 py-4 sm:py-6 md:absolute md:bottom-10 md:left-1/2 md:-translate-x-1/2 md:z-20 md:py-0 md:pointer-events-auto"> {/* py-4 for mobile */}
+      <div className="container px-4 sm:px-6 py-4 sm:py-6 md:absolute md:bottom-10 md:left-1/2 md:-translate-x-1/2 md:z-20 md:py-0 md:pointer-events-auto">
         <div className="flex flex-col sm:flex-row gap-3 w-full items-center justify-center md:justify-start">
           <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[48px] w-full sm:w-auto text-sm md:text-base" asChild>
             <Link to="/catalogo">
@@ -156,4 +173,3 @@ export default function HeroCarousel() {
     </div>
   );
 }
-

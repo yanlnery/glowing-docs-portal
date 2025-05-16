@@ -20,6 +20,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+const PRODUCTS_STORAGE_KEY = "pet_serpentes_products"; // Defined in productStorage.ts
+
 const Catalog = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
@@ -68,6 +70,7 @@ const Catalog = () => {
 
   const loadProducts = useCallback(() => {
     setIsLoading(true);
+    console.log("Loading products from storage...");
     try {
       const visibleProducts = productService.getAvailableProducts();
       setProducts(visibleProducts);
@@ -84,17 +87,17 @@ const Catalog = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     loadProducts();
-    // Removed storage event listener due to missing getLocalStorageKey method
-    // const handleStorageChange = (event: StorageEvent) => {
-    //   if (event.key === productService.getLocalStorageKey()) { // This line caused the error
-    //     console.log("Product storage changed, reloading products...");
-    //     loadProducts();
-    //   }
-    // };
-    // window.addEventListener('storage', handleStorageChange);
-    // return () => {
-    //   window.removeEventListener('storage', handleStorageChange);
-    // };
+    
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === PRODUCTS_STORAGE_KEY) {
+        console.log("Product storage changed, reloading products...");
+        loadProducts();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, [loadProducts]); // loadProducts will be called on initial mount and if its dependencies change
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -252,7 +255,7 @@ const Catalog = () => {
         <div className="text-center py-12 px-4">
           <h3 className="text-xl font-semibold mb-2">Nenhum produto cadastrado</h3>
           <p className="text-muted-foreground mb-4">
-            Não há animais disponíveis no momento.
+            Não há animais disponíveis no momento. Verifique o painel administrativo para adicionar produtos.
           </p>
         </div>
       ) : filteredProducts.length === 0 ? (
