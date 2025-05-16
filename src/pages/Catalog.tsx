@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { productService } from '@/services/productService';
 import { Product, ProductCategory, ProductSubcategory } from '@/types/product';
@@ -29,36 +29,7 @@ const Catalog = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Scroll to top when component mounts
-    window.scrollTo(0, 0);
-    loadProducts();
-  }, []);
-
-  const loadProducts = () => {
-    setIsLoading(true);
-    try {
-      // Get visible products, regardless of availability status
-      const visibleProducts = productService.getAvailableProducts();
-      
-      if (!visibleProducts || visibleProducts.length === 0) {
-        console.log("No visible products found");
-      } else {
-        console.log(`Found ${visibleProducts.length} visible products`);
-      }
-      
-      setProducts(visibleProducts);
-      applyFilters(visibleProducts, searchQuery, categoryFilter, subcategoryFilter);
-    } catch (error) {
-      console.error("Error loading products:", error);
-      setProducts([]);
-      setFilteredProducts([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const applyFilters = (
+  const applyFilters = useCallback((
     productList: Product[],
     query: string,
     category: ProductCategory | 'all',
@@ -77,7 +48,7 @@ const Catalog = () => {
       result = result.filter(product =>
         product.name.toLowerCase().includes(lowerQuery) ||
         product.speciesName.toLowerCase().includes(lowerQuery) ||
-        product.description.toLowerCase().includes(lowerQuery)
+        (product.description && product.description.toLowerCase().includes(lowerQuery))
       );
     }
     
@@ -93,7 +64,39 @@ const Catalog = () => {
     
     console.log(`Applied filters: ${result.length} products remain after filtering`);
     setFilteredProducts(result);
-  };
+  }, []);
+
+  const loadProducts = useCallback(() => {
+    setIsLoading(true);
+    try {
+      const visibleProducts = productService.getAvailableProducts();
+      setProducts(visibleProducts);
+      applyFilters(visibleProducts, searchQuery, categoryFilter, subcategoryFilter);
+    } catch (error) {
+      console.error("Error loading products:", error);
+      setProducts([]);
+      setFilteredProducts([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [applyFilters, searchQuery, categoryFilter, subcategoryFilter]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    loadProducts();
+
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === productService.getLocalStorageKey()) {
+        console.log("Product storage changed, reloading products...");
+        loadProducts();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [loadProducts]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -154,28 +157,27 @@ const Catalog = () => {
   ];
 
   return (
-    <div className="container px-4 py-12 sm:px-6">
-      <div className="text-center mb-10">
-        <h1 className="text-3xl sm:text-4xl font-bold mb-4">Catálogo de Animais</h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
+    <div className="container px-4 py-8 sm:px-6 sm:py-12">
+      <div className="text-center mb-8 sm:mb-10">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-3 sm:mb-4 text-balance">Catálogo de Animais</h1>
+        <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
           Explore nossa seleção de animais disponíveis para aquisição. Todos com procedência, documentação e saúde garantida.
         </p>
       </div>
 
       {/* Filters */}
-      <div className="bg-muted/30 rounded-lg p-4 mb-8">
-        <div className="flex flex-col gap-4">
+      <div className="bg-muted/30 rounded-lg p-3 sm:p-4 mb-6 sm:mb-8">
+        <div className="flex flex-col gap-3 sm:gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Buscar por nome ou espécie..."
-              className="pl-9"
+              className="pl-9 h-11 sm:h-10"
               value={searchQuery}
               onChange={handleSearch}
             />
           </div>
           
-          {/* Category Filters with Dropdowns */}
           <div className="flex flex-wrap gap-2">
             {filterCategories.map((category) => (
               <div key={category.id} className="relative">
@@ -196,7 +198,7 @@ const Catalog = () => {
                       toggleDropdown(category.id);
                     }
                   }}
-                  className="min-h-[44px] flex items-center gap-1"
+                  className="min-h-[44px] flex items-center gap-1 px-3"
                 >
                   {category.label}
                   {category.subcategories.length > 0 && (
@@ -208,11 +210,11 @@ const Catalog = () => {
                 
                 {/* Subcategory Dropdown */}
                 {category.subcategories.length > 0 && openDropdown === category.id && (
-                  <div className="absolute z-10 mt-1 w-full min-w-[220px] sm:w-56 rounded-md bg-background shadow-lg ring-1 ring-black ring-opacity-5 dark:ring-white/20">
+                  <div className="absolute z-10 mt-1 w-full min-w-[200px] sm:w-56 rounded-md bg-background shadow-lg ring-1 ring-black ring-opacity-5 dark:ring-white/20">
                     <div className="py-1">
                       <button
                         onClick={() => handleFilterClick(category.id as ProductCategory, 'all')}
-                        className={`block px-4 py-2 text-sm w-full text-left ${
+                        className={`block px-4 py-2.5 text-sm w-full text-left ${
                           categoryFilter === category.id && subcategoryFilter === 'all' 
                             ? 'bg-accent text-accent-foreground' 
                             : 'hover:bg-accent hover:text-accent-foreground'
@@ -224,7 +226,7 @@ const Catalog = () => {
                         <button
                           key={sub.id}
                           onClick={() => handleFilterClick(category.id as ProductCategory, sub.id as ProductSubcategory)}
-                          className={`block px-4 py-2 text-sm w-full text-left ${
+                          className={`block px-4 py-2.5 text-sm w-full text-left ${
                             categoryFilter === category.id && subcategoryFilter === sub.id 
                               ? 'bg-accent text-accent-foreground' 
                               : 'hover:bg-accent hover:text-accent-foreground'
@@ -265,14 +267,14 @@ const Catalog = () => {
             setCategoryFilter('all');
             setSubcategoryFilter('all');
             applyFilters(products, '', 'all', 'all');
-          }}>
+          }} className="min-h-[44px] px-6">
             Limpar Filtros
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {filteredProducts.map((product) => (
-            <Card key={product.id} className="flex flex-col h-full docs-card-gradient hover:shadow-md transition-shadow">
+            <Card key={product.id} className="flex flex-col h-full docs-card-gradient hover:shadow-lg transition-shadow duration-300">
               <div className="relative">
                 {product.images && product.images.length > 0 ? (
                   <div className="aspect-[4/3] overflow-hidden rounded-t-lg">
@@ -286,48 +288,46 @@ const Catalog = () => {
                 ) : (
                   <div className="aspect-[4/3] bg-muted flex items-center justify-center rounded-t-lg">
                     <div className="h-16 w-16 rounded-full bg-muted-foreground/10 flex items-center justify-center">
-                      <span className="text-muted-foreground">Sem imagem</span>
+                      <span className="text-muted-foreground text-xs text-center">Sem imagem</span>
                     </div>
                   </div>
                 )}
                 
-                {/* Badges */}
-                <div className="absolute top-2 left-2 flex flex-col gap-2">
+                <div className="absolute top-2 left-2 flex flex-col gap-1.5">
                   {product.featured && (
-                    <Badge variant="secondary" className="bg-yellow-100 hover:bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
+                    <Badge variant="secondary" className="bg-yellow-100 hover:bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 text-xs px-1.5 py-0.5">
                       <Star className="h-3 w-3 mr-1 inline" /> Destaque
                     </Badge>
                   )}
                   {product.isNew && (
-                    <Badge variant="secondary" className="bg-blue-100 hover:bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                    <Badge variant="secondary" className="bg-blue-100 hover:bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 text-xs px-1.5 py-0.5">
                       Novidade
                     </Badge>
                   )}
-                  {/* New badge for unavailable products */}
                   {product.status === 'indisponivel' && (
-                    <Badge variant="secondary" className="bg-red-100 hover:bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                    <Badge variant="secondary" className="bg-red-100 hover:bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 text-xs px-1.5 py-0.5">
                       <AlertCircle className="h-3 w-3 mr-1 inline" /> Indisponível
                     </Badge>
                   )}
                 </div>
               </div>
               
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">{product.name}</CardTitle>
+              <CardHeader className="p-3 sm:p-4 pb-2 sm:pb-3">
+                <CardTitle className="text-md sm:text-lg text-balance">{product.name}</CardTitle>
               </CardHeader>
               
-              <CardContent className="pb-3 pt-0">
-                <p className="text-sm text-muted-foreground italic mb-3">{product.speciesName}</p>
+              <CardContent className="p-3 sm:p-4 pt-0 pb-2 sm:pb-3">
+                <p className="text-xs sm:text-sm text-muted-foreground italic mb-2 sm:mb-3">{product.speciesName}</p>
                 
-                <div className="text-xl font-bold text-serpente-600">
+                <div className="text-lg sm:text-xl font-bold text-serpente-600">
                   {formatPrice(product.price)}
                 </div>
               </CardContent>
               
-              <CardFooter className="pt-0 mt-auto">
+              <CardFooter className="p-3 sm:p-4 pt-0 mt-auto">
                 <Button 
                   variant={product.status === 'indisponivel' ? "secondary" : "outline"} 
-                  className="w-full" 
+                  className="w-full min-h-[44px]"
                   asChild
                   disabled={product.status === 'indisponivel'}
                 >

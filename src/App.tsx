@@ -19,8 +19,8 @@ import NotFound from "./pages/NotFound";
 import Quiz from "./pages/Quiz";
 import WaitlistForm from "./pages/WaitlistForm";
 import CartPage from "./pages/CartPage";
-import PrivacyPolicyPage from "./pages/PrivacyPolicyPage"; // Nova importação
-import TermsOfUsePage from "./pages/TermsOfUsePage"; // Nova importação
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
+import TermsOfUsePage from "./pages/TermsOfUsePage";
 import { Button } from "@/components/ui/button";
 import { useSettings } from "./hooks/useSettings";
 
@@ -32,7 +32,7 @@ import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 
 // Admin pages
 import { AuthProvider } from "./contexts/AuthContext"; 
-import { useAuth } from "./hooks/useAuth"; // Updated import
+import { useAuth } from "./hooks/useAuth";
 import { AdminAuthProvider } from "./contexts/AdminAuthContext";
 import AdminLogin from "./pages/admin/Login"; 
 import Dashboard from "./pages/admin/Dashboard";
@@ -56,7 +56,7 @@ const WaitlistConfirmationPage = () => (
         Sua inscrição na lista de espera da Pet Serpentes Academy foi realizada com sucesso. 
         Entraremos em contato assim que novas vagas estiverem disponíveis.
       </p>
-      <Button asChild>
+      <Button asChild className="min-h-[44px]">
         <a href="/">Voltar para a Página Inicial</a>
       </Button>
     </div>
@@ -73,11 +73,10 @@ const queryClient = new QueryClient();
 
 // Protected Route for Client Area
 const ProtectedClientRoute = () => {
-  const { isAuthenticated, isLoading } = useAuth(); // Uses updated import
+  const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
-    // You can show a loader here
     return <div className="flex justify-center items-center h-screen">Carregando...</div>;
   }
 
@@ -113,10 +112,9 @@ function App() {
                   <Route path="lista-de-espera" element={<WaitlistForm />} />
                   <Route path="confirmacao-inscricao" element={<WaitlistConfirmationPage />} />
                   <Route path="contato" element={<Contact />} />
-                  <Route path="politica-de-privacidade" element={<PrivacyPolicyPage />} /> {/* Nova rota */}
-                  <Route path="termos-de-uso" element={<TermsOfUsePage />} /> {/* Nova rota */}
+                  <Route path="politica-de-privacidade" element={<PrivacyPolicyPage />} />
+                  <Route path="termos-de-uso" element={<TermsOfUsePage />} />
                   
-                  {/* Protected Client Route */}
                   <Route element={<ProtectedClientRoute />}>
                     <Route path="area-cliente" element={<ClientArea />} />
                   </Route>
@@ -124,14 +122,11 @@ function App() {
                   <Route path="carrinho" element={<CartPage />} />
                   <Route path="quiz" element={<Quiz />} />
                   <Route path="manuais-de-criacao" element={<Manuals />} />
-                  <Route path="ps-academy" element={<Academy />} />
                   
-                  {/* Legacy routes - keeping for backward compatibility */}
                   <Route path="getting-started" element={<Home />} />
                   <Route path="api" element={<Home />} />
                   <Route path="examples" element={<Home />} />
                   
-                  {/* 404 Route */}
                   <Route path="*" element={<NotFound />} />
                 </Route>
                 
@@ -141,7 +136,7 @@ function App() {
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-                {/* Admin Routes - Independent from client auth */}
+                {/* Admin Routes */}
                 <Route path="/admin" element={<AdminLogin />} />
                 <Route element={<AdminProtectedRoute />}>
                   <Route path="/admin/dashboard" element={<Dashboard />} />
