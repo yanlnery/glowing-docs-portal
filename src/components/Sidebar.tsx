@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronDown, ChevronRight, ExternalLink, Menu, X } from 'lucide-react';
@@ -18,12 +17,12 @@ const sidebarItems: SidebarItemProps[] = [
   {
     title: "Introduction",
     href: "/",
-    icon: <div className="w-1.5 h-1.5 rounded-full bg-serpente-600" />
+    icon: <div className="w-1.5 h-1.5 rounded-full bg-serpente-50" />
   },
   {
     title: "Getting Started",
     href: "/getting-started",
-    icon: <div className="w-1.5 h-1.5 rounded-full bg-serpente-600" />,
+    icon: <div className="w-1.5 h-1.5 rounded-full bg-serpente-50" />,
     children: [
       {
         title: "Installation",
@@ -38,7 +37,7 @@ const sidebarItems: SidebarItemProps[] = [
   {
     title: "API Reference",
     href: "/api",
-    icon: <div className="w-1.5 h-1.5 rounded-full bg-serpente-600" />,
+    icon: <div className="w-1.5 h-1.5 rounded-full bg-serpente-50" />,
     children: [
       {
         title: "Authentication",
@@ -57,7 +56,7 @@ const sidebarItems: SidebarItemProps[] = [
   {
     title: "Examples",
     href: "/examples",
-    icon: <div className="w-1.5 h-1.5 rounded-full bg-serpente-600" />
+    icon: <div className="w-1.5 h-1.5 rounded-full bg-serpente-50" />
   },
   {
     title: "GitHub",
@@ -73,8 +72,8 @@ const SidebarItem: React.FC<{
   onLinkClick?: () => void 
 }> = ({ item, isActive, onLinkClick }) => {
   const [expanded, setExpanded] = useState(isActive && item.children?.some(child => child.href === useLocation().pathname));
+  const location = useLocation();
 
-  // Handle expanding/collapsing the sidebar item
   const handleToggle = (e: React.MouseEvent) => {
     if (item.children) {
       e.preventDefault();
@@ -82,7 +81,6 @@ const SidebarItem: React.FC<{
     }
   };
 
-  // Handle clicking on a sidebar link
   const handleClick = () => {
     if (!item.children && onLinkClick) {
       onLinkClick();
@@ -97,8 +95,8 @@ const SidebarItem: React.FC<{
           "flex items-center justify-between py-2 px-3 rounded-md text-sm",
           isActive 
             ? "bg-accent text-accent-foreground font-medium" 
-            : "text-foreground/70 hover:text-foreground hover:bg-accent/50",
-          item.isExternal && "text-foreground/60 hover:text-foreground/90"
+            : "text-gray-200 md:text-foreground/70 hover:text-white md:hover:text-foreground hover:bg-accent/50",
+          item.isExternal && "text-gray-300 md:text-foreground/60 hover:text-gray-100 md:hover:text-foreground/90"
         )}
         onClick={(e) => {
           if (item.children) handleToggle(e);
@@ -113,7 +111,7 @@ const SidebarItem: React.FC<{
           {item.isExternal && <ExternalLink size={12} className="ml-1" />}
         </div>
         {item.children && (
-          <div className="text-foreground/50">
+          <div className="text-gray-400 md:text-foreground/50">
             {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
           </div>
         )}
@@ -127,9 +125,9 @@ const SidebarItem: React.FC<{
               to={child.href}
               className={cn(
                 "flex items-center py-1.5 px-2 rounded-md text-sm",
-                child.href === useLocation().pathname
-                  ? "text-foreground font-medium bg-accent/50"
-                  : "text-foreground/60 hover:text-foreground hover:bg-accent/30"
+                child.href === location.pathname
+                  ? "text-white md:text-foreground font-medium bg-accent/50"
+                  : "text-gray-300 md:text-foreground/60 hover:text-white md:hover:text-foreground hover:bg-accent/30"
               )}
               onClick={onLinkClick}
             >
@@ -174,11 +172,16 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed top-0 bottom-0 left-0 z-40 w-64 bg-sidebar border-r border-sidebar-border transition-transform duration-300",
+          "fixed top-0 bottom-0 left-0 z-40 w-64 transition-transform duration-300",
+          "bg-serpente-700 md:bg-sidebar",
+          "border-r border-serpente-600 md:border-sidebar-border",
           isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
-        <div className="flex items-center justify-between h-16 px-4 border-b border-sidebar-border">
+        <div className={cn(
+          "flex items-center justify-between h-16 px-4 border-b",
+          "border-serpente-600 md:border-sidebar-border"
+        )}>
           <Link to="/" className="flex items-center gap-2" onClick={closeSidebar}>
             <img 
               src="/lovable-uploads/7cf1001e-0989-475f-aaf5-fb56c4fb22a4.png" 
@@ -186,14 +189,14 @@ export default function Sidebar() {
               className="h-10 w-10 rounded-full"
             />
             <div className="font-medium">
-              <div className="text-sm font-bold">PET SERPENTES</div>
-              <div className="text-xs text-muted-foreground">Documentation</div>
+              <div className="text-sm font-bold text-white md:text-foreground">PET SERPENTES</div>
+              <div className="text-xs text-serpente-200 md:text-muted-foreground">Documentation</div>
             </div>
           </Link>
           <Button 
             variant="ghost" 
             size="icon" 
-            className="md:hidden" 
+            className="md:hidden text-white hover:bg-white/10"
             onClick={closeSidebar}
           >
             <X size={18} />
@@ -203,7 +206,7 @@ export default function Sidebar() {
         
         <ScrollArea className="h-[calc(100vh-4rem)] py-4 px-2">
           <div className="space-y-4 px-2">
-            <div className="text-xs font-medium text-muted-foreground px-3 py-2">
+            <div className="text-xs font-medium text-serpente-200 md:text-muted-foreground px-3 py-2">
               DOCUMENTATION
             </div>
             <div className="space-y-1">
