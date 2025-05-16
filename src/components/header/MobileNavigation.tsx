@@ -39,7 +39,7 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
   };
 
   return (
-    <div className="fixed inset-0 top-16 z-50 bg-background/95 backdrop-blur md:hidden animate-fade-in">
+    <div className="fixed inset-0 top-16 z-50 bg-black text-white md:hidden animate-fade-in mobile-nav">
       <nav className="container py-8">
         <ul className="flex flex-col space-y-4">
           {menuItems.map((item) => (
@@ -47,48 +47,48 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
               <Link
                 to={item.path}
                 className={cn(
-                  "flex w-full rounded-md p-4 text-base font-medium text-foreground min-h-[44px] items-center",
+                  "flex w-full rounded-md p-4 text-base font-medium min-h-[44px] items-center text-white", // Ensure text is white
                   isActive(item.path)
-                    ? "bg-accent text-accent-foreground"
-                    : "hover:bg-accent/50"
+                    ? "bg-accent text-accent-foreground" // Active state remains, accent-foreground is usually light
+                    : "hover:bg-gray-800" // Hover on black background
                 )}
                 onClick={handleLinkClick}
               >
-                {item.icon}
+                {item.icon && React.cloneElement(item.icon as React.ReactElement, { className: "mr-2 h-5 w-5" })}
                 {item.title}
               </Link>
             </li>
           ))}
         </ul>
-        <div className="mt-8 flex items-center justify-between border-t border-border pt-4">
-          <div className="flex items-center gap-4">
+        <div className="mt-8 flex items-center justify-between border-t border-gray-700 pt-4"> {/* Adjusted border color for black bg */}
+          <div className="flex items-center gap-4 flex-wrap">
             {isAuthenticated ? (
               <>
-                <Button variant="outline" size="sm" className="min-h-[44px]" asChild>
+                <Button variant="secondary" size="sm" className="min-h-[44px]" asChild>
                   <Link to="/area-cliente" onClick={handleLinkClick}>
                     <User size={16} className="mr-2" />
                     Área do Cliente
                   </Link>
                 </Button>
-                <Button variant="outline" size="sm" className="min-h-[44px]" onClick={handleLogout}>
+                <Button variant="secondary" size="sm" className="min-h-[44px]" onClick={handleLogout}>
                   <LogOut size={16} className="mr-2" />
                   Sair
                 </Button>
               </>
             ) : (
-              <Button variant="outline" size="sm" className="min-h-[44px]" asChild>
+              <Button variant="secondary" size="sm" className="min-h-[44px]" asChild>
                 <Link to="/login" onClick={handleLinkClick}>
                   <User size={16} className="mr-2" />
                   Login
                 </Link>
               </Button>
             )}
-            <Button variant="outline" size="sm" className="min-h-[44px]" asChild>
+            <Button variant="secondary" size="sm" className="min-h-[44px]" asChild>
               <Link to="/carrinho" onClick={handleLinkClick}>
                 <ShoppingCart size={16} className="mr-2" />
                 Carrinho
                 {cartQuantity > 0 && (
-                  <Badge className="ml-2">{cartQuantity}</Badge>
+                  <Badge className="ml-2 bg-primary text-primary-foreground">{cartQuantity}</Badge> /* Ensure badge contrasts */
                 )}
               </Link>
             </Button>
