@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -40,7 +39,8 @@ export default function HeroCarousel() {
         // Small delay to ensure click events on slides (if any) are processed
         // Then restart autoplay without rewinding
         setTimeout(() => {
-            if (api.activeElement() && api.activeElement().contains(document.activeElement)) {
+            // Check if the interaction was on a focusable element inside the carousel
+            if (api.rootNode().contains(document.activeElement)) {
                  // if interaction was on a focusable element inside carousel, let it be
             } else {
                 autoplayPlugin.current.play(false);
@@ -50,23 +50,10 @@ export default function HeroCarousel() {
     };
 
     api.on("pointerUp", onPointerUp);
-    // It's good practice to also listen to drag end events if pointerUp isn't enough
-    // Embla's `dragEnd` might be more robust for restarting autoplay after swipe
-    api.on("dragEnd", () => {
-        if (autoplayPlugin.current.options.stopOnInteraction) {
-            autoplayPlugin.current.play(false);
-        }
-    });
-
 
     return () => {
       api.off("select", () => setCurrentImageIndex(api.selectedScrollSnap()));
       api.off("pointerUp", onPointerUp);
-      api.off("dragEnd", () => {
-        if (autoplayPlugin.current.options.stopOnInteraction) {
-            autoplayPlugin.current.play(false);
-        }
-      });
     };
   }, [api]);
 

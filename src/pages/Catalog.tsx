@@ -84,19 +84,18 @@ const Catalog = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     loadProducts();
-
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === productService.getLocalStorageKey()) {
-        console.log("Product storage changed, reloading products...");
-        loadProducts();
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [loadProducts]);
+    // Removed storage event listener due to missing getLocalStorageKey method
+    // const handleStorageChange = (event: StorageEvent) => {
+    //   if (event.key === productService.getLocalStorageKey()) { // This line caused the error
+    //     console.log("Product storage changed, reloading products...");
+    //     loadProducts();
+    //   }
+    // };
+    // window.addEventListener('storage', handleStorageChange);
+    // return () => {
+    //   window.removeEventListener('storage', handleStorageChange);
+    // };
+  }, [loadProducts]); // loadProducts will be called on initial mount and if its dependencies change
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;

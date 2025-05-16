@@ -11,7 +11,16 @@ import DesktopNavigation from './header/DesktopNavigation';
 import HeaderActions from './header/HeaderActions';
 import MobileNavigation from './header/MobileNavigation';
 
-const staticBaseMenuItems: Omit<MenuItem, 'icon'> & { iconName: keyof typeof import('lucide-react') | null }[] = [
+const iconComponents = {
+  Home, Book, Syringe, FileText, Users, Phone
+};
+
+// Define a more specific type for static menu items
+interface StaticMenuItem extends Omit<MenuItem, 'icon'> {
+  iconName: keyof typeof iconComponents | null;
+}
+
+const staticBaseMenuItems: StaticMenuItem[] = [
   { title: "Início", path: "/", iconName: "Home" },
   { title: "P. S. Academy", path: "/academy", iconName: "Book", id: "academy" },
   { title: "Animais Disponíveis", path: "/catalogo", iconName: "Syringe" },
@@ -20,10 +29,6 @@ const staticBaseMenuItems: Omit<MenuItem, 'icon'> & { iconName: keyof typeof imp
   { title: "Quem Somos", path: "/sobre", iconName: "Users" },
   { title: "Contato", path: "/contato", iconName: "Phone" },
 ];
-
-const iconComponents: { [key: string]: React.ElementType } = {
-  Home, Book, Syringe, FileText, Users, Phone
-};
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -41,9 +46,10 @@ export default function Header() {
   
   const baseMenuItems = useMemo((): MenuItem[] => {
     return staticBaseMenuItems.map(item => {
-      const IconComponent = item.iconName ? iconComponents[item.iconName] : null;
+      const { iconName, ...menuItemProps } = item; // Destructure to separate iconName
+      const IconComponent = iconName ? iconComponents[iconName] : null;
       return {
-        ...item,
+        ...menuItemProps, // Spread only properties intended for MenuItem (title, path, id)
         icon: IconComponent ? <IconComponent size={16} className="mr-2" /> : undefined,
       };
     });
@@ -94,3 +100,4 @@ export default function Header() {
     </header>
   );
 }
+
