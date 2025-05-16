@@ -8,10 +8,11 @@ import { toast } from '@/components/ui/use-toast';
 import { useSettings } from '@/hooks/useSettings';
 
 const Settings = () => {
-  const { isAcademyVisible, setAcademyVisible } = useSettings();
+  const { settings, updateSettings } = useSettings();
+  const isAcademyVisible = settings.isAcademyVisible;
 
   const handleAcademyToggle = (checked: boolean) => {
-    setAcademyVisible(checked);
+    updateSettings({ isAcademyVisible: checked });
     toast({
       title: checked ? "Academy ativado" : "Academy desativado",
       description: checked 
@@ -48,6 +49,7 @@ const Settings = () => {
                 onCheckedChange={handleAcademyToggle}
               />
             </div>
+            {/* Adicionar aqui outros toggles de configuração se necessário */}
           </CardContent>
         </Card>
       </div>

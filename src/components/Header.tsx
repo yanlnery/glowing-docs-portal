@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo, useEffect } from "react"; // Added useEffect
+import React, { useState, useMemo, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Book, Syringe, Home, FileText, Users, Phone } from "lucide-react";
@@ -11,12 +11,26 @@ import DesktopNavigation from './header/DesktopNavigation';
 import HeaderActions from './header/HeaderActions';
 import MobileNavigation from './header/MobileNavigation';
 
+const staticBaseMenuItems: Omit<MenuItem, 'icon'> & { iconName: keyof typeof import('lucide-react') | null }[] = [
+  { title: "Início", path: "/", iconName: "Home" },
+  { title: "P. S. Academy", path: "/academy", iconName: "Book", id: "academy" },
+  { title: "Animais Disponíveis", path: "/catalogo", iconName: "Syringe" },
+  { title: "Espécies Criadas", path: "/especies", iconName: "FileText" },
+  { title: "Manuais de Criação", path: "/manuais", iconName: "Book" },
+  { title: "Quem Somos", path: "/sobre", iconName: "Users" },
+  { title: "Contato", path: "/contato", iconName: "Phone" },
+];
+
+const iconComponents: { [key: string]: React.ElementType } = {
+  Home, Book, Syringe, FileText, Users, Phone
+};
+
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
-  const { settings, isAcademyVisible } = useSettings(); // Changed to get settings object
+  const { settings } = useSettings(); 
+  const isAcademyVisible = settings.isAcademyVisible;
 
-  // Close mobile menu on route change
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location.pathname]);
@@ -25,19 +39,17 @@ export default function Header() {
     return location.pathname === path;
   };
   
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const baseMenuItems: MenuItem[] = [ // Added eslint-disable for baseMenuItems dependency issue with useMemo
-    { title: "Início", path: "/", icon: <Home size={16} className="mr-2" /> },
-    { title: "P. S. Academy", path: "/academy", icon: <Book size={16} className="mr-2" />, id: "academy" },
-    { title: "Animais Disponíveis", path: "/catalogo", icon: <Syringe size={16} className="mr-2" /> },
-    { title: "Espécies Criadas", path: "/especies", icon: <FileText size={16} className="mr-2" /> },
-    { title: "Manuais de Criação", path: "/manuais", icon: <Book size={16} className="mr-2" /> },
-    { title: "Quem Somos", path: "/sobre", icon: <Users size={16} className="mr-2" /> },
-    { title: "Contato", path: "/contato", icon: <Phone size={16} className="mr-2" /> },
-  ];
+  const baseMenuItems = useMemo((): MenuItem[] => {
+    return staticBaseMenuItems.map(item => {
+      const IconComponent = item.iconName ? iconComponents[item.iconName] : null;
+      return {
+        ...item,
+        icon: IconComponent ? <IconComponent size={16} className="mr-2" /> : undefined,
+      };
+    });
+  }, []); // Empty dependency array means this runs once
 
   const menuItems = useMemo(() => {
-    // console.log("Recalculating menu items, isAcademyVisible:", isAcademyVisible);
     return baseMenuItems.filter(item => {
       if (item.id === "academy") {
         return isAcademyVisible;
@@ -48,25 +60,25 @@ export default function Header() {
   
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between px-4 sm:px-6"> {/* Ensured padding for container */}
+      <div className="container flex h-16 items-center justify-between px-4 sm:px-6">
         <div className="flex items-center gap-2">
           <Logo />
         </div>
         
         <DesktopNavigation menuItems={menuItems} isActive={isActive} />
         
-        <div className="flex items-center gap-1 md:gap-2"> {/* Reduced gap for mobile */}
+        <div className="flex items-center gap-1 md:gap-2">
           <HeaderActions />
           
           <Button 
             variant="ghost" 
             size="icon"
-            className="md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md" // Ensured min size and focus styling
+            className="md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-expanded={isMenuOpen}
             aria-controls="mobile-menu"
           >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />} {/* Increased icon size */}
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             <span className="sr-only">{isMenuOpen ? "Fechar menu" : "Abrir menu"}</span>
           </Button>
         </div>
@@ -82,4 +94,3 @@ export default function Header() {
     </header>
   );
 }
-
