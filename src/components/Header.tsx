@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -46,14 +45,14 @@ export default function Header() {
   
   const baseMenuItems = useMemo((): MenuItem[] => {
     return staticBaseMenuItems.map(item => {
-      const { iconName, ...menuItemProps } = item; // Destructure to separate iconName
+      const { iconName, ...menuItemProps } = item; 
       const IconComponent = iconName ? iconComponents[iconName] : null;
       return {
-        ...menuItemProps, // Spread only properties intended for MenuItem (title, path, id)
+        ...menuItemProps, 
         icon: IconComponent ? <IconComponent size={16} className="mr-2" /> : undefined,
       };
     });
-  }, []); // Empty dependency array means this runs once
+  }, []);
 
   const menuItems = useMemo(() => {
     return baseMenuItems.filter(item => {
@@ -100,4 +99,3 @@ export default function Header() {
     </header>
   );
 }
-

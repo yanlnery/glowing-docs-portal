@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -66,7 +67,7 @@ export default function HeroCarousel() {
 
   if (carouselImagesData.length === 0) {
     return (
-      <div className="relative h-[60vh] md:h-[70vh] overflow-hidden flex items-center justify-center bg-gray-200 dark:bg-gray-800 px-4"> {/* Added px-4 for padding */}
+      <div className="relative h-[60vh] md:h-[70vh] overflow-hidden flex items-center justify-center bg-gray-200 dark:bg-gray-800 px-4">
         <p className="text-gray-500 dark:text-gray-400">Carregando carrossel...</p>
       </div>
     );
@@ -85,9 +86,8 @@ export default function HeroCarousel() {
           }}
           plugins={[autoplayPlugin.current]}
           className="h-full"
-          // style={{ touchAction: 'pan-y' }} // Apply to main carousel if needed for vertical page scroll
         >
-          <CarouselContent className="h-full" style={{ touchAction: 'pan-x' }}> {/* touch-action: pan-x for horizontal swipe */}
+          <CarouselContent className="h-full" style={{ touchAction: 'pan-x' }}>
             {carouselImagesData.map((image, index) => (
               <CarouselItem key={image.id || index} className="h-full">
                 <div className="relative h-full">
@@ -104,14 +104,15 @@ export default function HeroCarousel() {
           </CarouselContent>
         </Carousel>
 
-        <div className="absolute inset-0 z-20 flex flex-col items-start justify-end md:justify-center pb-24 md:pb-0 pointer-events-none">
-          <div className="container py-6 px-4 sm:px-6 pointer-events-auto"> {/* Standard padding */}
+        {/* Text Overlay: Adjusted padding and text sizes for mobile */}
+        <div className="absolute inset-0 z-20 flex flex-col items-start justify-end md:justify-center pb-20 md:pb-0 pointer-events-none"> {/* Increased pb slightly from pb-24 if needed, or ensure buttons are further down*/}
+          <div className="container py-6 px-4 sm:px-6 pointer-events-auto">
              {currentSlideData && (
               <>
-                <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-3 max-w-2xl animate-slide-in text-balance"> {/* Adjusted mobile text size */}
+                <h1 className="text-lg sm:text-xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-2xl animate-slide-in text-balance"> {/* Slightly reduced base text size */}
                   {currentSlideData.title || "Bem-vindo"}
                 </h1>
-                <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-xl mb-6 animate-fade-in text-balance"> {/* Adjusted mobile text size */}
+                <p className="text-xs sm:text-sm md:text-lg text-white/90 max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance"> {/* Slightly reduced base text size and mb */}
                   {currentSlideData.subtitle || "Conheça nossos animais"}
                 </p>
               </>
@@ -119,6 +120,7 @@ export default function HeroCarousel() {
           </div>
         </div>
         
+        {/* Indicators */}
         <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2 z-30 md:bottom-6">
           {carouselImagesData.map((_, index) => (
             <button
@@ -136,8 +138,8 @@ export default function HeroCarousel() {
         </div>
       </div>
 
-      {/* Buttons are block elements on mobile, so they will appear below the carousel visual container */}
-      <div className="container px-4 sm:px-6 py-6 md:absolute md:bottom-10 md:left-1/2 md:-translate-x-1/2 md:z-20 md:py-0 md:pointer-events-auto">
+      {/* Buttons Container: Ensured it's part of normal flow on mobile, with appropriate spacing */}
+      <div className="container px-4 sm:px-6 py-4 sm:py-6 md:absolute md:bottom-10 md:left-1/2 md:-translate-x-1/2 md:z-20 md:py-0 md:pointer-events-auto"> {/* py-4 for mobile */}
         <div className="flex flex-col sm:flex-row gap-3 w-full items-center justify-center md:justify-start">
           <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[48px] w-full sm:w-auto text-sm md:text-base" asChild>
             <Link to="/catalogo">
@@ -154,3 +156,4 @@ export default function HeroCarousel() {
     </div>
   );
 }
+

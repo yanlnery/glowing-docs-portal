@@ -159,7 +159,7 @@ const Catalog = () => {
     <div className="container px-4 py-8 sm:px-6 sm:py-12">
       <div className="text-center mb-8 sm:mb-10">
         <h1 className="text-3xl sm:text-4xl font-bold mb-3 sm:mb-4 text-balance">Catálogo de Animais</h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
+        <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base px-2 sm:px-0">
           Explore nossa seleção de animais disponíveis para aquisição. Todos com procedência, documentação e saúde garantida.
         </p>
       </div>
@@ -171,7 +171,7 @@ const Catalog = () => {
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Buscar por nome ou espécie..."
-              className="pl-9 h-11 sm:h-10"
+              className="pl-9 h-11 sm:h-10" // Ensure height is good for touch
               value={searchQuery}
               onChange={handleSearch}
             />
@@ -197,7 +197,7 @@ const Catalog = () => {
                       toggleDropdown(category.id);
                     }
                   }}
-                  className="min-h-[44px] flex items-center gap-1 px-3"
+                  className="min-h-[44px] flex items-center gap-1 px-3 text-xs sm:text-sm" // Adjusted text size for mobile
                 >
                   {category.label}
                   {category.subcategories.length > 0 && (
@@ -209,7 +209,7 @@ const Catalog = () => {
                 
                 {/* Subcategory Dropdown */}
                 {category.subcategories.length > 0 && openDropdown === category.id && (
-                  <div className="absolute z-10 mt-1 w-full min-w-[200px] sm:w-56 rounded-md bg-background shadow-lg ring-1 ring-black ring-opacity-5 dark:ring-white/20">
+                  <div className="absolute z-10 mt-1 w-full min-w-[180px] sm:w-56 rounded-md bg-background shadow-lg ring-1 ring-black ring-opacity-5 dark:ring-white/20"> {/* Adjusted min-width */}
                     <div className="py-1">
                       <button
                         onClick={() => handleFilterClick(category.id as ProductCategory, 'all')}
@@ -249,14 +249,14 @@ const Catalog = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-serpente-600"></div>
         </div>
       ) : products.length === 0 ? (
-        <div className="text-center py-12">
+        <div className="text-center py-12 px-4">
           <h3 className="text-xl font-semibold mb-2">Nenhum produto cadastrado</h3>
           <p className="text-muted-foreground mb-4">
             Não há animais disponíveis no momento.
           </p>
         </div>
       ) : filteredProducts.length === 0 ? (
-        <div className="text-center py-12">
+        <div className="text-center py-12 px-4">
           <h3 className="text-xl font-semibold mb-2">Nenhum resultado encontrado</h3>
           <p className="text-muted-foreground mb-4">
             Não encontramos nenhum animal com os filtros selecionados.
@@ -311,11 +311,11 @@ const Catalog = () => {
                 </div>
               </div>
               
-              <CardHeader className="p-3 sm:p-4 pb-2 sm:pb-3">
-                <CardTitle className="text-md sm:text-lg text-balance">{product.name}</CardTitle>
+              <CardHeader className="p-3 sm:p-4 pb-2 sm:pb-3"> {/* Adjusted padding */}
+                <CardTitle className="text-base sm:text-lg text-balance">{product.name}</CardTitle> {/* Adjusted mobile text size */}
               </CardHeader>
               
-              <CardContent className="p-3 sm:p-4 pt-0 pb-2 sm:pb-3">
+              <CardContent className="p-3 sm:p-4 pt-0 pb-2 sm:pb-3"> {/* Adjusted padding */}
                 <p className="text-xs sm:text-sm text-muted-foreground italic mb-2 sm:mb-3">{product.speciesName}</p>
                 
                 <div className="text-lg sm:text-xl font-bold text-serpente-600">
@@ -323,10 +323,10 @@ const Catalog = () => {
                 </div>
               </CardContent>
               
-              <CardFooter className="p-3 sm:p-4 pt-0 mt-auto">
+              <CardFooter className="p-3 sm:p-4 pt-0 mt-auto"> {/* Adjusted padding */}
                 <Button 
                   variant={product.status === 'indisponivel' ? "secondary" : "outline"} 
-                  className="w-full min-h-[44px]"
+                  className="w-full min-h-[44px] text-sm" // Ensured min-h and text size
                   asChild
                   disabled={product.status === 'indisponivel'}
                 >
