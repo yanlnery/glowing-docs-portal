@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -38,8 +39,8 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
   };
 
   return (
-    <div className="fixed inset-0 top-16 z-[100] bg-black text-white md:hidden animate-fade-in mobile-nav"> {/* mobile-nav class for CSS override */}
-      <nav className="container py-8 h-full overflow-y-auto px-4"> {/* Ensured px-4 for mobile padding */}
+    <div className="fixed inset-0 top-16 z-[100] bg-black text-white md:hidden animate-fade-in mobile-nav h-[calc(100vh-4rem)] overflow-y-auto pb-8">
+      <nav className="container py-8 h-full px-4">
         <ul className="flex flex-col space-y-4">
           {menuItems.map((item) => (
             <li key={item.title}>
@@ -53,13 +54,13 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
                 )}
                 onClick={handleLinkClick}
               >
-                {item.icon && React.cloneElement(item.icon as React.ReactElement, { className: "mr-3 h-5 w-5", color: "white" })} {/* Ensured mr-3 for spacing */}
+                {item.icon && React.cloneElement(item.icon as React.ReactElement, { className: "mr-3 h-5 w-5", color: "white" })}
                 {item.title}
               </Link>
             </li>
           ))}
         </ul>
-        <div className="mt-8 flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:items-center sm:justify-between border-t border-gray-700 pt-4 pb-8">
+        <div className="mt-8 flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:items-center sm:justify-between border-t border-gray-700 pt-4">
           <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:gap-2 flex-wrap">
             {isAuthenticated ? (
               <>
