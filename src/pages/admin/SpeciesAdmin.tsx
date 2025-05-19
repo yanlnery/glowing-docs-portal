@@ -11,6 +11,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Species } from '@/types/species'; // Import from new types file
 import { SpeciesTable } from '@/components/admin/species/SpeciesTable';
 import { SpeciesDialog } from '@/components/admin/species/SpeciesDialog';
+import { supabase } from '@/integrations/supabase/client'; // Import Supabase client
 
 // This data could be moved to a separate data file if it grows larger or is used elsewhere.
 const defaultPlantelSpecies: Species[] = [
@@ -45,6 +46,8 @@ const generateSlug = (name: string) => {
     .replace(/[^\w-]+/g, '');
 };
 
+const BUCKET_NAME = 'species_images';
+
 export default function SpeciesAdmin() {
   const [species, setSpecies] = useState<Species[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -61,13 +64,14 @@ export default function SpeciesAdmin() {
       const normalizedSpecies = parsedSpecies.map(s => ({
         ...s,
         curiosities: s.curiosities || (s as any).curiosidades || [''] 
-      })).sort((a, b) => a.order - b.order);
+      })).sort((a, b) => (a.order || 0) - (b.order || 0)); // Ensure order is a number for sorting
       setSpecies(normalizedSpecies);
     } else {
       const sortedDefaultSpecies = [...defaultPlantelSpecies].map(s => ({
         ...s,
-        slug: s.slug || generateSlug(s.name) // Ensure slug for default data
-      })).sort((a,b) => a.order - b.order);
+        slug: s.slug || generateSlug(s.name), // Ensure slug for default data
+        order: s.order || 0 // Ensure order is a number
+      })).sort((a,b) => (a.order || 0) - (b.order || 0));
       setSpecies(sortedDefaultSpecies);
       localStorage.setItem('speciesList', JSON.stringify(sortedDefaultSpecies));
     }
@@ -84,7 +88,7 @@ export default function SpeciesAdmin() {
       image: '',
       type: 'serpente',
       slug: '',
-      order: species.length > 0 ? Math.max(...species.map(s => s.order)) + 1 : 1
+      order: species.length > 0 ? Math.max(...species.map(s => s.order || 0)) + 1 : 1
     });
     setIsNewSpecies(true);
     setImagePreview(null);
@@ -95,7 +99,7 @@ export default function SpeciesAdmin() {
   const openEditSpeciesDialog = (speciesData: Species) => {
     setCurrentSpecies(speciesData);
     setIsNewSpecies(false);
-    setImagePreview(null); // Reset preview, existing image will be shown via speciesData.image
+    setImagePreview(null); 
     setImageFile(null);
     setIsDialogOpen(true);
   };
@@ -109,6 +113,8 @@ export default function SpeciesAdmin() {
         setImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+      // Clear the input value to allow re-uploading the same file if needed
+      e.target.value = '';
     }
   };
   
@@ -116,8 +122,7 @@ export default function SpeciesAdmin() {
     setImagePreview(null);
     setImageFile(null);
     if (currentSpecies) {
-      // This ensures that if an existing image was displayed and "remove" is clicked,
-      // the 'image' field in currentSpecies is cleared, so it won't be saved.
+      // Set image to empty string to indicate it should be removed or not saved
       setCurrentSpecies({ ...currentSpecies, image: '' }); 
     }
   };
@@ -156,7 +161,7 @@ export default function SpeciesAdmin() {
   const characteristicsHandler = createArrayHandler('characteristics');
   const curiositiesHandler = createArrayHandler('curiosities');
 
-  const handleSaveSpecies = () => {
+  const handleSaveSpecies = async () => {
     if (!currentSpecies) return;
 
     if (!currentSpecies.name || !currentSpecies.commonName || !currentSpecies.description) {
@@ -173,26 +178,83 @@ export default function SpeciesAdmin() {
       speciesToSave.slug = generateSlug(speciesToSave.name);
     }
 
-    // Image handling:
-    // If imageFile exists, it means a new image was uploaded.
-    // Its path will be a placeholder like `/lovable-uploads/timestamp-filename`.
-    // If no imageFile, but speciesToSave.image is already set (and wasn't cleared by handleRemoveImage), keep it.
-    // If imageFile is null AND speciesToSave.image was cleared by handleRemoveImage, it will be ''.
-    if (imageFile) {
-       // Actual upload should happen here or be triggered.
-       // For now, using a placeholder path structure.
-      speciesToSave.image = `/lovable-uploads/${Date.now()}-${imageFile.name.replace(/\s+/g, '_')}`;
+    const oldImageSupabasePath = currentSpecies.image && currentSpecies.image.includes(supabase.storage.from(BUCKET_NAME).getPublicUrl('').data.publicUrl.split('/public/')[0])
+      ? currentSpecies.image.split(`${BUCKET_NAME}/`)[1]?.split('?')[0] // Extract path after bucket name
+      : null;
+
+    // Image handling
+    if (imageFile) { // New image uploaded
+      const fileName = `${Date.now()}-${imageFile.name.replace(/\s+/g, '_')}`;
+      const filePath = `public/${fileName}`; // Store in a 'public' folder within the bucket for easier public URL access if bucket isn't fully public (though ours is)
+
+      // Delete old image from Supabase if it exists and a new one is being uploaded
+      if (oldImageSupabasePath && oldImageSupabasePath !== filePath) {
+        try {
+          const { error: deleteError } = await supabase.storage
+            .from(BUCKET_NAME)
+            .remove([oldImageSupabasePath]);
+          if (deleteError) {
+            console.error('Error deleting old image from Supabase Storage:', deleteError);
+            // Not throwing toast here, as main operation is saving new image
+          }
+        } catch (error) {
+            console.error('Exception deleting old image:', error);
+        }
+      }
+      
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from(BUCKET_NAME)
+        .upload(filePath, imageFile, {
+          cacheControl: '3600',
+          upsert: true, // if a file with the same name exists, it will be replaced.
+        });
+
+      if (uploadError) {
+        console.error('Error uploading image to Supabase Storage:', uploadError);
+        toast({
+          title: "Erro no Upload",
+          description: `Falha ao enviar imagem: ${uploadError.message}`,
+          variant: "destructive"
+        });
+        return; // Stop saving if image upload fails
+      }
+
+      if (uploadData) {
+        const { data: publicUrlData } = supabase.storage
+          .from(BUCKET_NAME)
+          .getPublicUrl(filePath);
+        speciesToSave.image = publicUrlData.publicUrl;
+      }
+    } else if (speciesToSave.image === '' && oldImageSupabasePath) {
+      // Image was removed (imageFile is null, and speciesToSave.image was set to '' by handleRemoveImage)
+      // and there was an old image in Supabase. Delete it.
+       try {
+        const { error: deleteError } = await supabase.storage
+            .from(BUCKET_NAME)
+            .remove([oldImageSupabasePath]);
+        if (deleteError) {
+            console.error('Error deleting image from Supabase Storage on removal:', deleteError);
+            toast({
+                title: "Erro ao remover imagem",
+                description: `Não foi possível remover a imagem anterior do armazenamento: ${deleteError.message}`,
+                variant: "destructive"
+            });
+        } else {
+             console.log(`Successfully removed image: ${oldImageSupabasePath}`);
+        }
+       } catch (error) {
+           console.error('Exception deleting image on removal:', error);
+       }
+       // speciesToSave.image is already ''
     }
-    // If !imageFile, speciesToSave.image already holds the correct value 
-    // (either existing image URL or '' if removed).
+    // If !imageFile and speciesToSave.image is not '', it means keep the existing Supabase URL.
 
     let updatedSpeciesList;
     if (isNewSpecies) {
-       // Ensure new species gets a unique order if not manually set or if it conflicts
       const newOrder = speciesToSave.order;
-      const orderExists = species.some(s => s.order === newOrder);
+      const orderExists = species.some(s => (s.order || 0) === newOrder);
       if (orderExists || !newOrder || newOrder < 1) {
-        speciesToSave.order = species.length > 0 ? Math.max(...species.map(s => s.order)) + 1 : 1;
+        speciesToSave.order = species.length > 0 ? Math.max(...species.map(s => s.order || 0)) + 1 : 1;
       }
       updatedSpeciesList = [...species, speciesToSave];
       toast({
@@ -208,11 +270,9 @@ export default function SpeciesAdmin() {
         description: `${speciesToSave.commonName} foi atualizada com sucesso!`
       });
     }
-
-    updatedSpeciesList.sort((a, b) => a.order - b.order);
-    // Re-assign order sequentially after sorting to ensure no gaps/duplicates from manual edits
+    
+    updatedSpeciesList.sort((a, b) => (a.order || 0) - (b.order || 0));
     const finalOrderedList = updatedSpeciesList.map((s, index) => ({ ...s, order: index + 1 }));
-
 
     setSpecies(finalOrderedList);
     localStorage.setItem('speciesList', JSON.stringify(finalOrderedList));
@@ -222,21 +282,49 @@ export default function SpeciesAdmin() {
     setImagePreview(null);
   };
 
-  const handleDeleteSpecies = (id: string) => {
-    if (confirm("Tem certeza que deseja excluir esta espécie? Esta ação não pode ser desfeita.")) {
-      const updatedSpecies = species.filter(s => s.id !== id);
-      // Re-order remaining species
-      const finalOrderedList = updatedSpecies
-        .sort((a,b) => a.order - b.order)
-        .map((s, index) => ({...s, order: index + 1}));
+  const handleDeleteSpecies = async (id: string) => {
+    const speciesToDelete = species.find(s => s.id === id);
+    if (!speciesToDelete) return;
 
-      setSpecies(finalOrderedList);
-      localStorage.setItem('speciesList', JSON.stringify(finalOrderedList));
-      toast({
-        title: "Espécie removida",
-        description: "A espécie foi removida com sucesso!"
-      });
+    // Confirmation dialog
+    const confirmed = window.confirm("Tem certeza que deseja excluir esta espécie? Esta ação não pode ser desfeita.");
+    if (!confirmed) return;
+
+
+    // Delete image from Supabase Storage if it exists
+    if (speciesToDelete.image && speciesToDelete.image.includes(supabase.storage.from(BUCKET_NAME).getPublicUrl('').data.publicUrl.split('/public/')[0])) {
+      const imagePath = speciesToDelete.image.split(`${BUCKET_NAME}/`)[1]?.split('?')[0];
+      if (imagePath) {
+        try {
+          const { error: deleteError } = await supabase.storage
+            .from(BUCKET_NAME)
+            .remove([imagePath]);
+          if (deleteError) {
+            console.error('Error deleting image from Supabase Storage during species deletion:', deleteError);
+            toast({
+              title: "Erro ao remover imagem",
+              description: `Não foi possível remover a imagem da espécie do armazenamento: ${deleteError.message}`,
+              variant: "destructive"
+            });
+            // Optionally, decide if you want to proceed with deleting the species data if image deletion fails
+          }
+        } catch(error) {
+            console.error('Exception deleting image during species deletion:', error);
+        }
+      }
     }
+
+    const updatedSpecies = species.filter(s => s.id !== id);
+    const finalOrderedList = updatedSpecies
+      .sort((a,b) => (a.order || 0) - (b.order || 0))
+      .map((s, index) => ({...s, order: index + 1}));
+
+    setSpecies(finalOrderedList);
+    localStorage.setItem('speciesList', JSON.stringify(finalOrderedList));
+    toast({
+      title: "Espécie removida",
+      description: "A espécie foi removida com sucesso!"
+    });
   };
 
   const handleMove = (currentIndex: number, direction: 'up' | 'down') => {
