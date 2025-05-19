@@ -1,10 +1,9 @@
-
 import React, { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { getCarouselImages, CarouselImage as CarouselImageDef } from "@/services/carouselService";
+import { fetchCarouselItems, type CarouselItemSchema } from "@/services/carouselService";
 import {
   Carousel,
   CarouselContent,
@@ -13,46 +12,31 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 
-const CAROUSEL_STORAGE_KEY = 'carouselImages'; // Defined in carouselService.ts
-
 export default function HeroCarousel() {
-  const [carouselImagesData, setCarouselImagesData] = useState<CarouselImageDef[]>(getCarouselImages());
+  const [carouselImagesData, setCarouselImagesData] = useState<CarouselItemSchema[]>([]);
   const [api, setApi] = useState<CarouselApi>();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   const autoplayPlugin = useRef(
     Autoplay({ delay: 5000, stopOnInteraction: true, stopOnMouseEnter: true })
   );
 
   useEffect(() => {
-    // Initial load
-    setCarouselImagesData(getCarouselImages());
-
-    // Listen for changes in localStorage
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === CAROUSEL_STORAGE_KEY) {
-        console.log("Carousel data changed in localStorage, reloading images...");
-        const updatedImages = getCarouselImages();
-        setCarouselImagesData(updatedImages);
-        // If the carousel is empty after update, we might want to stop autoplay or reset index
-        if (api && updatedImages.length > 0) {
-          api.reInit(); // Reinitialize carousel with new slides
-          // autoplayPlugin.current.play(false); // Optionally restart autoplay
-        } else if (api && updatedImages.length === 0) {
-          api.reInit();
-        }
+    const loadCarouselData = async () => {
+      setIsLoading(true);
+      const images = await fetchCarouselItems();
+      setCarouselImagesData(images);
+      setIsLoading(false);
+      if (api && images.length > 0) {
+        api.reInit(); // Reinitialize carousel with new slides
       }
     };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [api]); // Added api to dependency array to re-init if needed
+    loadCarouselData();
+  }, [api]);
 
   useEffect(() => {
-    if (!api) {
+    if (!api || carouselImagesData.length === 0) {
       return;
     }
 
@@ -63,35 +47,43 @@ export default function HeroCarousel() {
     const onPointerUp = () => {
       if (autoplayPlugin.current.options.stopOnInteraction) {
         setTimeout(() => {
-            if (api.rootNode().contains(document.activeElement)) {
-                 // if interaction was on a focusable element inside carousel, let it be
-            } else {
-                autoplayPlugin.current.play(false);
-            }
-        }, 100); // Increased delay slightly
+          if (api.rootNode().contains(document.activeElement)) {
+            // if interaction was on a focusable element inside carousel, let it be
+          } else {
+            autoplayPlugin.current.play(false);
+          }
+        }, 100);
       }
     };
 
-    setCurrentImageIndex(api.selectedScrollSnap()); // Set initial index
+    setCurrentImageIndex(api.selectedScrollSnap());
     api.on("select", onSelect);
     api.on("pointerUp", onPointerUp);
 
     return () => {
       if (api) {
-        api.off("select", onSelect); // Pass the handler function
-        api.off("pointerUp", onPointerUp); // Pass the handler function
+        api.off("select", onSelect);
+        api.off("pointerUp", onPointerUp);
       }
     };
-  }, [api]);
+  }, [api, carouselImagesData.length]);
 
   const handleIndicatorClick = (index: number) => {
     api?.scrollTo(index);
     if (autoplayPlugin.current.options.stopOnInteraction) {
-       autoplayPlugin.current.play(false); 
+      autoplayPlugin.current.play(false);
     }
   };
 
-  if (carouselImagesData.length === 0) {
+  if (isLoading) {
+    return (
+      <div className="relative h-[60vh] md:h-[70vh] overflow-hidden flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4 text-center">
+        <p className="text-gray-500 dark:text-gray-400 text-lg">Carregando carrossel...</p>
+      </div>
+    );
+  }
+
+  if (carouselImagesData.length === 0 && !isLoading) {
     return (
       <div className="relative h-[60vh] md:h-[70vh] overflow-hidden flex items-center justify-center bg-gray-200 dark:bg-gray-800 px-4 text-center">
         <div>
@@ -110,20 +102,20 @@ export default function HeroCarousel() {
         <Carousel
           setApi={setApi}
           opts={{
-            loop: carouselImagesData.length > 1, // Only loop if more than one image
+            loop: carouselImagesData.length > 1,
             align: "start",
           }}
           plugins={[autoplayPlugin.current]}
           className="h-full"
         >
-          <CarouselContent className="h-full" style={{ touchAction: 'pan-x' }}>
+          <CarouselContent className="h-full" style={{ touchAction: 'pan-y' }}>
             {carouselImagesData.map((image, index) => (
               <CarouselItem key={image.id || index} className="h-full">
                 <div className="relative h-full">
                   <div
                     className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
-                    style={{ backgroundImage: `url(${image.url})` }}
-                    aria-label={image.alt}
+                    style={{ backgroundImage: `url(${image.image_url})` }}
+                    aria-label={image.alt_text}
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10"></div>
                   </div>
@@ -133,9 +125,8 @@ export default function HeroCarousel() {
           </CarouselContent>
         </Carousel>
 
-        {/* Text Overlay: Adjusted padding and text sizes for mobile */}
         <div className="absolute inset-0 z-20 flex flex-col items-start justify-end md:justify-center pb-20 md:pb-0 pointer-events-none">
-          <div className="container py-6 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto"> {/* Consistent padding */}
+          <div className="container py-6 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto">
              {currentSlideData && (
               <>
                 <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-2xl animate-slide-in text-balance">
@@ -149,7 +140,6 @@ export default function HeroCarousel() {
           </div>
         </div>
         
-        {/* Indicators */}
         {carouselImagesData.length > 1 && (
           <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2 z-30 md:bottom-6">
             {carouselImagesData.map((_, index) => (
@@ -169,7 +159,6 @@ export default function HeroCarousel() {
         )}
       </div>
 
-      {/* Buttons Container: Ensured it's part of normal flow on mobile, with appropriate spacing */}
       <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-6 md:absolute md:bottom-10 md:left-1/2 md:-translate-x-1/2 md:z-20 md:py-0 md:pointer-events-auto">
         <div className="flex flex-col sm:flex-row gap-3 w-full items-center justify-center md:justify-start">
           <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[48px] w-full sm:w-auto text-sm md:text-base" asChild>
@@ -187,4 +176,3 @@ export default function HeroCarousel() {
     </div>
   );
 }
-

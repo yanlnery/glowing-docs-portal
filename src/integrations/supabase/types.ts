@@ -9,6 +9,75 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      carousel_items: {
+        Row: {
+          alt_text: string
+          created_at: string | null
+          id: string
+          image_url: string | null
+          item_order: number | null
+          subtitle: string | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          alt_text: string
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          item_order?: number | null
+          subtitle?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          alt_text?: string
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          item_order?: number | null
+          subtitle?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      manuals: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          image: string | null
+          pages: number | null
+          pdf_url: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image?: string | null
+          pages?: number | null
+          pdf_url?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image?: string | null
+          pages?: number | null
+          pdf_url?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           first_name: string | null
@@ -26,6 +95,51 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      species: {
+        Row: {
+          characteristics: Json | null
+          commonname: string
+          created_at: string | null
+          curiosities: Json | null
+          description: string | null
+          id: string
+          image: string | null
+          name: string
+          order: number | null
+          slug: string
+          type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          characteristics?: Json | null
+          commonname: string
+          created_at?: string | null
+          curiosities?: Json | null
+          description?: string | null
+          id?: string
+          image?: string | null
+          name: string
+          order?: number | null
+          slug: string
+          type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          characteristics?: Json | null
+          commonname?: string
+          created_at?: string | null
+          curiosities?: Json | null
+          description?: string | null
+          id?: string
+          image?: string | null
+          name?: string
+          order?: number | null
+          slug?: string
+          type?: string | null
           updated_at?: string | null
         }
         Relationships: []
