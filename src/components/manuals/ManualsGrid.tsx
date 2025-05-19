@@ -3,15 +3,15 @@ import React from "react";
 import ManualCard from "./ManualCard";
 import { Button } from "@/components/ui/button";
 import { Manual } from "@/types/manual";
-import { Skeleton } from "@/components/ui/skeleton"; // Added Skeleton
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ManualsGridProps {
-  manuals: Manual[]; // All loaded manuals
+  manuals: Manual[];
   displayedManuals: Manual[];
   searchQuery: string;
   onDownload: (pdfUrl: string | null, title: string) => void;
   onClearSearch: () => void;
-  isLoading: boolean; // Added isLoading prop
+  isLoading: boolean; // Ensure isLoading is part of the props
 }
 
 export default function ManualsGrid({ 
@@ -20,7 +20,7 @@ export default function ManualsGrid({
   searchQuery, 
   onDownload, 
   onClearSearch,
-  isLoading // Destructure isLoading
+  isLoading 
 }: ManualsGridProps) {
   if (isLoading) {
     return (
@@ -59,7 +59,6 @@ export default function ManualsGrid({
     );
   }
 
-  // This case means manuals might exist, but search query cleared them all
   return (
     <div className="text-center py-12">
       <p className="text-muted-foreground">

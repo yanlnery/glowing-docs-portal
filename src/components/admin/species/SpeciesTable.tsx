@@ -9,9 +9,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from '@/components/ui/button';
-import { Edit, Trash2, ArrowUp, ArrowDown, ImageOff } from 'lucide-react'; // Added ImageOff
+import { Edit, Trash2, ArrowUp, ArrowDown, ImageOff } from 'lucide-react';
 import { Species } from '@/types/species';
-import { Skeleton } from "@/components/ui/skeleton"; // Added Skeleton
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface SpeciesTableProps {
   speciesList: Species[];
@@ -19,7 +19,7 @@ interface SpeciesTableProps {
   onDelete: (id: string) => void;
   onMoveUp: (index: number) => void;
   onMoveDown: (index: number) => void;
-  isLoading?: boolean; // Added isLoading prop
+  isLoading?: boolean; // Ensure isLoading is part of the props (optional)
 }
 
 export function SpeciesTable({
@@ -28,7 +28,7 @@ export function SpeciesTable({
   onDelete,
   onMoveUp,
   onMoveDown,
-  isLoading // Destructure isLoading
+  isLoading 
 }: SpeciesTableProps) {
   if (isLoading) {
     return (

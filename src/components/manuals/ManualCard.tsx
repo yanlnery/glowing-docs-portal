@@ -1,12 +1,12 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Download, FileText, ImageOff } from "lucide-react"; // Added ImageOff
+import { Download, FileText, ImageOff } from "lucide-react";
 import { Manual } from "@/types/manual";
 
 interface ManualCardProps {
   manual: Manual;
-  onDownload: (pdfUrl: string | null, title: string) => void; // pdfUrl can be null
+  onDownload: (pdfUrl: string | null, title: string) => void;
 }
 
 export default function ManualCard({ manual, onDownload }: ManualCardProps) {
@@ -43,7 +43,7 @@ export default function ManualCard({ manual, onDownload }: ManualCardProps) {
         <Button 
           className="w-full" 
           variant={manual.pdf_url ? "outline" : "secondary"}
-          onClick={() => onDownload(manual.pdf_url, manual.title)} // Corrected to manual.pdf_url
+          onClick={() => onDownload(manual.pdf_url, manual.title)}
           disabled={!manual.pdf_url}
         >
           <Download className="mr-2 h-4 w-4" /> 
