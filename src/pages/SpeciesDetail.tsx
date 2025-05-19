@@ -1,87 +1,55 @@
 
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-
-interface Species {
-  id: string;
-  name: string;
-  commonName: string;
-  type: string;
-  image: string;
-  slug: string;
-  description?: string;
-  characteristics?: string[];
-  curiosities?: string[];
-  order?: number;
-}
+import { supabase } from "@/integrations/supabase/client";
+import { Species as SpeciesType } from "@/types/species"; // Use updated type
 
 export default function SpeciesDetail() {
-  const { id, slug } = useParams();
-  const [species, setSpecies] = useState<Species | null>(null);
+  const { slug } = useParams<{ slug: string }>(); // Get slug directly
+  const [species, setSpecies] = useState<SpeciesType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // First try to load from localStorage (admin data)
-    const savedSpecies = localStorage.getItem('speciesList');
-    let speciesList: Species[] = [];
-    
-    if (savedSpecies) {
-      speciesList = JSON.parse(savedSpecies);
-    } else {
-      // Fallback to default data
-      speciesList = [
-        {
-          id: "1",
-          name: "Boa constrictor constrictor",
-          commonName: "Jiboia Amazônica",
-          type: "serpente",
-          image: "/lovable-uploads/764f832e-e068-449d-80be-7d670575665f.png",
-          slug: "boa-constrictor-constrictor",
-          description: "Uma das maiores serpentes do Brasil, podendo atingir até 4 metros de comprimento. Habita florestas úmidas da Amazônia.",
-          characteristics: ["Não-venenosa", "Constritora", "Noturna", "Alimenta-se principalmente de roedores"],
-          curiosities: ["Pode viver até 30 anos em cativeiro", "É ovovivípara, dando à luz filhotes já formados"]
-        },
-        {
-          id: "2",
-          name: "Epicrates cenchria",
-          commonName: "Jiboia Arco-íris da Amazônia",
-          type: "serpente",
-          image: "/lovable-uploads/f7bc5a30-657d-418c-8b25-7b0494f36029.png",
-          slug: "epicrates-cenchria",
-          description: "Uma serpente de médio porte conhecida por suas iridescências quando exposta à luz do sol.",
-          characteristics: ["Não-venenosa", "Constritora", "Coloração avermelhada com padrões circulares"],
-          curiosities: ["Seu nome vem do reflexo iridescente que sua pele produz sob a luz", "Prefere habitats arbóreos"]
+    const fetchSpeciesDetail = async () => {
+      if (!slug) {
+        setError("Slug da espécie não fornecido.");
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      setError(null);
+
+      const { data, error: dbError } = await supabase
+        .from('species')
+        .select('*')
+        .eq('slug', slug)
+        .single(); // Expecting a single result or null
+
+      if (dbError) {
+        console.error("Error fetching species detail by slug:", dbError);
+        if (dbError.code === 'PGRST116') { // PostgREST error for "Searched for a single row, but found 0 rows" or "found multiple rows"
+             setError("Espécie não encontrada.");
+        } else {
+            setError("Falha ao carregar detalhes da espécie.");
         }
-      ];
-    }
-    
-    // Find species by ID or slug
-    let foundSpecies = null;
-    
-    if (id) {
-      foundSpecies = speciesList.find(s => s.id.toString() === id);
-    } else if (slug) {
-      foundSpecies = speciesList.find(s => s.slug === slug);
-    }
-    
-    if (foundSpecies) {
-      setSpecies(foundSpecies);
+        setSpecies(null);
+      } else {
+        setSpecies(data as SpeciesType);
+      }
       setLoading(false);
-    } else {
-      setError("Espécie não encontrada");
-      setLoading(false);
-    }
-  }, [id, slug]);
+    };
+
+    fetchSpeciesDetail();
+  }, [slug]);
 
   if (loading) {
     return (
       <div className="container px-4 py-12 sm:px-6">
         <div className="flex justify-center">
-          <div className="animate-pulse">Carregando...</div>
+          <div className="animate-pulse">Carregando detalhes da espécie...</div>
         </div>
       </div>
     );
@@ -91,7 +59,7 @@ export default function SpeciesDetail() {
     return (
       <div className="container px-4 py-12 sm:px-6">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Espécie não encontrada</h2>
+          <h2 className="text-2xl font-bold mb-4">{error || "Espécie não encontrada"}</h2>
           <p className="mb-8 text-muted-foreground">
             A espécie que você está procurando não foi encontrada ou pode ter sido removida.
           </p>
@@ -104,6 +72,13 @@ export default function SpeciesDetail() {
       </div>
     );
   }
+
+  const typeDisplayMap = {
+    serpente: 'Serpente',
+    lagarto: 'Lagarto',
+    quelonio: 'Quelônio',
+    outro: 'Outro'
+  };
 
   return (
     <div className="container px-4 py-12 sm:px-6">
@@ -121,7 +96,7 @@ export default function SpeciesDetail() {
         <div>
           <div className="aspect-square overflow-hidden rounded-lg border">
             <img 
-              src={species.image} 
+              src={species.image || '/placeholder.svg'} // Fallback image
               alt={species.commonName} 
               className="w-full h-full object-cover object-center"
             />
@@ -131,37 +106,37 @@ export default function SpeciesDetail() {
         {/* Details */}
         <div>
           <div className="mb-2 text-muted-foreground">
-            {species.type === 'serpente' && 'Serpente'}
-            {species.type === 'lagarto' && 'Lagarto'}
-            {species.type === 'quelonio' && 'Quelônio'}
+            {typeDisplayMap[species.type] || species.type}
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold mb-2">{species.commonName}</h1>
           <h2 className="text-xl text-muted-foreground mb-6"><em>{species.name}</em></h2>
           
-          <div className="prose dark:prose-invert max-w-none mb-8">
-            <p>{species.description}</p>
-          </div>
+          {species.description && (
+            <div className="prose dark:prose-invert max-w-none mb-8">
+              <p>{species.description}</p>
+            </div>
+          )}
           
           <div className="space-y-8">
             {/* Characteristics */}
-            {species.characteristics && species.characteristics.length > 0 && (
+            {species.characteristics && species.characteristics.length > 0 && species.characteristics[0] !== '' && (
               <div>
                 <h3 className="text-xl font-semibold mb-4">Características</h3>
                 <ul className="list-disc list-inside space-y-2 text-muted-foreground">
                   {species.characteristics.map((characteristic, index) => (
-                    <li key={index}>{characteristic}</li>
+                    characteristic && <li key={index}>{characteristic}</li>
                   ))}
                 </ul>
               </div>
             )}
             
             {/* Curiosities */}
-            {species.curiosities && species.curiosities.length > 0 && (
+            {species.curiosities && species.curiosities.length > 0 && species.curiosities[0] !== '' && (
               <div>
                 <h3 className="text-xl font-semibold mb-4">Curiosidades</h3>
                 <ul className="list-disc list-inside space-y-2 text-muted-foreground">
                   {species.curiosities.map((curiosity, index) => (
-                    <li key={index}>{curiosity}</li>
+                    curiosity && <li key={index}>{curiosity}</li>
                   ))}
                 </ul>
               </div>

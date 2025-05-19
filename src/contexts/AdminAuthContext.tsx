@@ -2,85 +2,86 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
-
-// Define the admin username and password here
-// Ideally, this should come from environment variables, but for simplicity:
-const ADMIN_USERNAME = "admin";
-const ADMIN_PASSWORD = "serpentes2024";
+import { supabase } from '@/integrations/supabase/client';
+import type { Session, AuthError, User } from '@supabase/supabase-js';
 
 interface AdminAuthContextType {
   isAdminLoggedIn: boolean;
+  adminUser: User | null;
+  adminSession: Session | null;
   adminLoginLoading: boolean;
-  adminLogin: (username: string, password: string) => Promise<boolean>;
-  adminLogout: () => void;
+  adminLogin: (email: string, password: string) => Promise<{ error: AuthError | null }>;
+  adminLogout: () => Promise<void>;
 }
 
 const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
 
 export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(false);
-  const [adminLoginLoading, setAdminLoginLoading] = useState<boolean>(false);
+  const [adminSession, setAdminSession] = useState<Session | null>(null);
+  const [adminUser, setAdminUser] = useState<User | null>(null);
+  const [adminLoginLoading, setAdminLoginLoading] = useState<boolean>(true); // Start as true until session is checked
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
-  
-  // Verify if there is a saved admin session
-  useEffect(() => {
-    const adminSession = localStorage.getItem('admin_session');
-    if (adminSession) {
-      try {
-        const session = JSON.parse(adminSession);
-        if (session.isAdmin && session.expiresAt > Date.now()) {
-          setIsAdminLoggedIn(true);
-          
-          // If admin is logged in and we're on the admin login page, redirect to dashboard
-          if (location.pathname === '/admin') {
-            navigate('/admin/dashboard');
-          }
-        } else {
-          // If expired, clear the session
-          localStorage.removeItem('admin_session');
-        }
-      } catch (error) {
-        localStorage.removeItem('admin_session');
-      }
-    }
-  }, [navigate, location.pathname]);
 
-  const adminLogin = async (username: string, password: string): Promise<boolean> => {
-    setAdminLoginLoading(true);
-    
-    try {
-      // Simulate a delay to appear like a real verification
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-        // Create an admin session valid for 24 hours
-        const adminSession = {
-          isAdmin: true,
-          expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
-        };
-        
-        localStorage.setItem('admin_session', JSON.stringify(adminSession));
-        setIsAdminLoggedIn(true);
-        return true;
+  useEffect(() => {
+    const getSession = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error("Error getting admin session:", error);
+        toast({ title: "Erro de Sessão", description: "Não foi possível verificar a sessão do administrador.", variant: "destructive" });
       }
-      
-      return false;
-    } finally {
+      setAdminSession(session);
+      setAdminUser(session?.user ?? null);
       setAdminLoginLoading(false);
-    }
+
+      if (session && location.pathname === '/admin') {
+        navigate('/admin/dashboard', { replace: true });
+      } else if (!session && location.pathname.startsWith('/admin/') && location.pathname !== '/admin') {
+        // If not logged in and trying to access a protected admin route, redirect to admin login
+        // navigate('/admin', { replace: true, state: { from: location } });
+      }
+    };
+    getSession();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAdminSession(session);
+      setAdminUser(session?.user ?? null);
+      setAdminLoginLoading(false);
+      if (_event === 'SIGNED_IN' && location.pathname === '/admin') {
+        navigate('/admin/dashboard', { replace: true });
+      }
+      if (_event === 'SIGNED_OUT') {
+        navigate('/admin', { replace: true });
+      }
+    });
+
+    return () => {
+      authListener?.unsubscribe();
+    };
+  }, [navigate, location, toast]);
+
+  const adminLogin = async (email: string, password: string): Promise<{ error: AuthError | null }> => {
+    setAdminLoginLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setAdminLoginLoading(false);
+    return { error };
   };
 
-  const adminLogout = () => {
-    localStorage.removeItem('admin_session');
-    setIsAdminLoggedIn(false);
-    navigate('/admin');
+  const adminLogout = async () => {
+    setAdminLoginLoading(true);
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({ title: "Erro ao Sair", description: error.message, variant: "destructive"});
+    }
+    setAdminLoginLoading(false);
   };
 
   return (
     <AdminAuthContext.Provider value={{ 
-      isAdminLoggedIn, 
+      isAdminLoggedIn: !!adminUser && !!adminSession, 
+      adminUser,
+      adminSession,
       adminLoginLoading, 
       adminLogin,
       adminLogout 
