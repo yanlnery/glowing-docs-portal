@@ -235,7 +235,7 @@ export default function AdminCarousel() {
     setIsLoading(true);
     // Update in Supabase
     const update1 = updateCarouselItem(itemToMove.id, { item_order: itemToMove.item_order });
-    const update2 = updateCarouselItem(itemToSwapWith.id, { item_order: itemSwapWith.item_order });
+    const update2 = updateCarouselItem(itemToSwapWith.id, { item_order: itemToSwapWith.item_order });
 
     Promise.all([update1, update2]).then(async (results) => {
       setIsLoading(false);
