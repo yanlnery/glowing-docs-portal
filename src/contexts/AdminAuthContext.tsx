@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
@@ -19,7 +18,7 @@ const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefin
 export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [adminSession, setAdminSession] = useState<Session | null>(null);
   const [adminUser, setAdminUser] = useState<User | null>(null);
-  const [adminLoginLoading, setAdminLoginLoading] = useState<boolean>(true); // Start as true until session is checked
+  const [adminLoginLoading, setAdminLoginLoading] = useState<boolean>(true);
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -35,36 +34,48 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setAdminUser(session?.user ?? null);
       setAdminLoginLoading(false);
 
-      if (session && location.pathname === '/admin') {
+      // Redirect logic based on session and current path
+      if (session && (location.pathname === '/admin' || location.pathname === '/admin/login')) {
         navigate('/admin/dashboard', { replace: true });
-      } else if (!session && location.pathname.startsWith('/admin/') && location.pathname !== '/admin') {
-        // If not logged in and trying to access a protected admin route, redirect to admin login
-        // navigate('/admin', { replace: true, state: { from: location } });
       }
+      // Protected route redirection is handled by AdminProtectedRoute
     };
     getSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: authListenerData } = supabase.auth.onAuthStateChange((_event, session) => {
       setAdminSession(session);
       setAdminUser(session?.user ?? null);
       setAdminLoginLoading(false);
-      if (_event === 'SIGNED_IN' && location.pathname === '/admin') {
-        navigate('/admin/dashboard', { replace: true });
-      }
-      if (_event === 'SIGNED_OUT') {
-        navigate('/admin', { replace: true });
+      
+      const currentPath = location.pathname;
+      if (_event === 'SIGNED_IN') {
+        if (currentPath === '/admin' || currentPath === '/admin/login') {
+           const from = location.state?.from?.pathname || "/admin/dashboard";
+           navigate(from, { replace: true });
+        }
+      } else if (_event === 'SIGNED_OUT') {
+        if (currentPath.startsWith('/admin/') && currentPath !== '/admin' && currentPath !== '/admin/login') {
+          navigate('/admin', { replace: true });
+        }
       }
     });
 
     return () => {
-      authListener?.unsubscribe();
+      authListenerData?.subscription?.unsubscribe();
     };
   }, [navigate, location, toast]);
 
   const adminLogin = async (email: string, password: string): Promise<{ error: AuthError | null }> => {
     setAdminLoginLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error, data } = await supabase.auth.signInWithPassword({ email, password });
+    // The onAuthStateChange listener will handle setting session and user
     setAdminLoginLoading(false);
+    if (!error && data.session) {
+        // Explicitly navigate after successful login if onAuthStateChange doesn't cover all cases quickly
+        // This helps ensure redirection even if onAuthStateChange is slightly delayed
+        const from = location.state?.from?.pathname || "/admin/dashboard";
+        navigate(from, { replace: true });
+    }
     return { error };
   };
 
@@ -74,6 +85,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     if (error) {
       toast({ title: "Erro ao Sair", description: error.message, variant: "destructive"});
     }
+    // onAuthStateChange handles navigation to /admin on SIGNED_OUT
     setAdminLoginLoading(false);
   };
 
