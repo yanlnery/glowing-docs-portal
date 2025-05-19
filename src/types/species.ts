@@ -6,7 +6,7 @@ export interface Species {
   description: string;
   characteristics: string[];
   curiosities: string[];
-  image: string; // URL da imagem
+  image: string | null; // URL da imagem, now nullable
   order: number; // "order" INTEGER
   type: 'serpente' | 'lagarto' | 'quelonio' | 'outro'; // Mapeamento do enum species_type_enum
   slug: string; // slug TEXT UNIQUE

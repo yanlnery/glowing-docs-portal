@@ -3,80 +3,70 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Manual } from "@/types/manual";
 import ManualsSearch from "@/components/manuals/ManualsSearch";
 import ManualsGrid from "@/components/manuals/ManualsGrid";
-
-const MANUALS_STORAGE_KEY = 'manuals';
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function Manuals() {
-  const [manuals, setManuals] = useState<Manual[]>([]);
+  const [allManuals, setAllManuals] = useState<Manual[]>([]);
   const [filteredManuals, setFilteredManuals] = useState<Manual[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  
-  const loadManuals = useCallback(() => {
-    try {
-      const savedManualsString = localStorage.getItem(MANUALS_STORAGE_KEY);
-      const loadedManuals = savedManualsString ? JSON.parse(savedManualsString) : [];
-      
-      if (savedManualsString === null) {
-        console.log("Nenhum manual encontrado no localStorage.");
-      }
-      setManuals(loadedManuals);
-      // Apply search query if it exists, otherwise show all loaded manuals
-      const query = searchQuery.toLowerCase().trim();
-      if (!query) {
-        setFilteredManuals(loadedManuals);
-      } else {
-        const filtered = loadedManuals.filter((manual: Manual) => 
-          manual.title.toLowerCase().includes(query) || 
-          (manual.description && manual.description.toLowerCase().includes(query)) ||
-          manual.category.toLowerCase().includes(query)
-        );
-        setFilteredManuals(filtered);
-      }
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
-    } catch (error) {
-      console.error("Failed to load manuals from localStorage:", error);
-      setManuals([]);
+  const loadManuals = useCallback(async () => {
+    setIsLoading(true);
+    const { data, error } = await supabase
+      .from('manuals')
+      .select('*')
+      .order('title', { ascending: true });
+
+    if (error) {
+      console.error("Failed to load manuals from Supabase:", error);
+      toast({ title: "Erro ao carregar manuais", description: "Não foi possível buscar os manuais.", variant: "destructive" });
+      setAllManuals([]);
       setFilteredManuals([]);
+    } else {
+      setAllManuals(data as Manual[]);
+      setFilteredManuals(data as Manual[]); // Initially show all
     }
-  }, [searchQuery]); // searchQuery is a dependency for filtering after load
+    setIsLoading(false);
+  }, [toast]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     loadManuals();
-
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === MANUALS_STORAGE_KEY) {
-        console.log("Manuals storage changed, reloading manuals...");
-        loadManuals();
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [loadManuals]); // loadManuals dependency will re-run this effect if loadManuals changes
+  }, [loadManuals]);
   
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value.toLowerCase();
-    setSearchQuery(query); 
-    
-    if (!query.trim()) {
-      setFilteredManuals(manuals); 
+  useEffect(() => {
+    // Filter logic when searchQuery or allManuals changes
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) {
+      setFilteredManuals(allManuals);
       return;
     }
-    
-    const filtered = manuals.filter(manual => 
+    const filtered = allManuals.filter(manual => 
       manual.title.toLowerCase().includes(query) || 
       (manual.description && manual.description.toLowerCase().includes(query)) ||
-      manual.category.toLowerCase().includes(query)
+      (manual.category && manual.category.toLowerCase().includes(query))
     );
     setFilteredManuals(filtered);
+  }, [searchQuery, allManuals]);
+
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
-  const handleDownload = (pdfUrl: string, title: string) => {
+  const handleDownload = (pdfUrl: string | null, title: string) => {
+    if (!pdfUrl) {
+        toast({title: "PDF não disponível", description: "O arquivo PDF para este manual não foi encontrado.", variant: "default"});
+        return;
+    }
     const link = document.createElement('a');
     link.href = pdfUrl;
-    link.download = title.replace(/\s+/g, '-').toLowerCase() + '.pdf';
+    // Sanitize title for filename
+    const filename = title.replace(/[^a-z0-9_ \-]/gi, '').replace(/\s+/g, '-').toLowerCase() + '.pdf';
+    link.download = filename;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -84,7 +74,7 @@ export default function Manuals() {
 
   const handleClearSearch = () => {
     setSearchQuery('');
-    setFilteredManuals(manuals); // Reset to all manuals
+    setFilteredManuals(allManuals);
   };
 
   return (
@@ -104,13 +94,13 @@ export default function Manuals() {
       />
       
       <ManualsGrid
-        manuals={manuals}
+        manuals={allManuals} // Pass all manuals for context if needed by grid (e.g. total count)
         displayedManuals={filteredManuals}
         searchQuery={searchQuery}
         onDownload={handleDownload}
         onClearSearch={handleClearSearch}
+        isLoading={isLoading}
       />
     </div>
   );
 }
-

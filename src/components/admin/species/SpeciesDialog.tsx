@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Dialog,
@@ -17,6 +16,7 @@ interface SpeciesDialogProps {
   isNewSpecies: boolean;
   currentSpeciesData: Species | null;
   onSave: () => void;
+  isLoading?: boolean; // Added isLoading prop
   
   // Props for SpeciesFormFields
   onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
@@ -38,7 +38,8 @@ export function SpeciesDialog({
   isNewSpecies,
   currentSpeciesData,
   onSave,
-  ...formProps // Rest of the props are for SpeciesFormFields
+  isLoading, // Destructure isLoading
+  ...formProps 
 }: SpeciesDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -57,11 +58,11 @@ export function SpeciesDialog({
         )}
 
         <DialogFooter className="pt-6">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
             Cancelar
           </Button>
-          <Button onClick={onSave}>
-            {isNewSpecies ? 'Adicionar Espécie' : 'Salvar Alterações'}
+          <Button onClick={onSave} disabled={isLoading}>
+            {isLoading ? 'Salvando...' : (isNewSpecies ? 'Adicionar Espécie' : 'Salvar Alterações')}
           </Button>
         </DialogFooter>
       </DialogContent>
