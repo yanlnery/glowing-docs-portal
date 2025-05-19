@@ -21,11 +21,6 @@ export function useSpeciesManagement() {
   const { isAdminLoggedIn } = useAdminAuth();
 
   const fetchSpecies = useCallback(async () => {
-    if (!isAdminLoggedIn) {
-      setSpeciesList([]);
-      setIsLoading(false);
-      return;
-    }
     setIsLoading(true);
     const { data, error } = await supabase
       .from('species')
@@ -39,44 +34,83 @@ export function useSpeciesManagement() {
       setSpeciesList(data as Species[]);
     }
     setIsLoading(false);
-  }, [toast, isAdminLoggedIn]);
+  }, [toast]);
 
   useEffect(() => {
     fetchSpecies();
   }, [fetchSpecies]);
 
+  const uploadSpeciesImage = async (file: File, oldImageUrl?: string | null): Promise<string | null> => {
+    if (oldImageUrl) {
+      await deleteImageFromStorage(oldImageUrl);
+    }
+
+    const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
+    const filePath = fileName;
+    
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from(BUCKET_NAME)
+      .upload(filePath, file, { cacheControl: '3600', upsert: true });
+
+    if (uploadError) {
+      toast({ title: "Erro no Upload da Imagem", description: `Falha ao enviar imagem: ${uploadError.message}`, variant: "destructive" });
+      console.error("Image Upload Error:", uploadError);
+      return null;
+    }
+    if (uploadData) {
+      const { data: publicUrlData } = supabase.storage.from(BUCKET_NAME).getPublicUrl(filePath);
+      return publicUrlData.publicUrl;
+    }
+    return null;
+  };
+
   const deleteImageFromStorage = async (imageUrl: string | null | undefined) => {
     if (!imageUrl || !imageUrl.includes(BUCKET_NAME)) return;
-    const imagePath = imageUrl.split(`${BUCKET_NAME}/`)[1]?.split('?')[0];
-    if (imagePath) {
-        const { error: storageError } = await supabase.storage.from(BUCKET_NAME).remove([imagePath]);
-        if (storageError) {
-            console.error("Error deleting image from storage:", storageError);
-            toast({title: "Erro ao remover imagem antiga", description: storageError.message, variant: "default"});
-            // Do not block the main operation for this, but inform user.
+    
+    try {
+      const url = new URL(imageUrl);
+      const pathSegments = url.pathname.split('/');
+      const bucketNameInPath = BUCKET_NAME;
+      const bucketIndex = pathSegments.findIndex(segment => segment === bucketNameInPath);
+      
+      if (bucketIndex !== -1 && pathSegments.length > bucketIndex + 1) {
+        const filePathInBucket = pathSegments.slice(bucketIndex + 1).join('/');
+        if (filePathInBucket) {
+          console.log("Attempting to remove image from storage:", filePathInBucket);
+          const { error: storageError } = await supabase.storage.from(BUCKET_NAME).remove([filePathInBucket]);
+          if (storageError) {
+              console.error("Error deleting image from storage:", storageError);
+              toast({title: "Erro ao remover imagem antiga do armazenamento", description: storageError.message, variant: "default"});
+          }
         }
+      } else {
+        console.warn("Could not parse image path for deletion from URL:", imageUrl);
+      }
+    } catch (e) {
+      console.error("Error parsing image URL for deletion:", e);
     }
   };
 
   const saveSpecies = async (
-    speciesData: Species,
+    speciesData: Omit<Species, 'id' | 'created_at' | 'updated_at'> & { id?: string },
     isNew: boolean,
     imageFile: File | null,
-    originalImageUrl?: string | null // Used to check if old image needs deletion
+    originalImageUrl?: string | null 
   ): Promise<boolean> => {
     if (!isAdminLoggedIn) {
       toast({ title: "Acesso Negado", description: "Você precisa estar logado como administrador.", variant: "destructive" });
       return false;
     }
-    if (!speciesData.name || !speciesData.commonName || !speciesData.description) {
-      toast({ title: "Erro de validação", description: "Preencha Nome Popular, Nome Científico e Descrição.", variant: "destructive" });
+    if (!speciesData.name || !speciesData.commonName) {
+      toast({ title: "Erro de validação", description: "Preencha Nome Popular e Nome Científico.", variant: "destructive" });
       return false;
     }
 
     setIsLoading(true);
     let speciesToSave = { ...speciesData };
+    
     if (!speciesToSave.slug || speciesToSave.slug.trim() === '') {
-      speciesToSave.slug = generateSlug(speciesToSave.name);
+      speciesToSave.slug = generateSlug(speciesData.name);
     }
     if (!speciesToSave.slug) {
       toast({ title: "Erro de validação", description: "Não foi possível gerar o slug. Verifique o Nome Científico.", variant: "destructive" });
@@ -84,98 +118,75 @@ export function useSpeciesManagement() {
       return false;
     }
 
-    let finalImageUrl: string | null = speciesToSave.image; // Start with current image (or null if new)
+    let finalImageUrl: string | null = speciesToSave.image || null;
 
-    if (imageFile) { // A new image file is provided
-      // Attempt to delete old image from storage if it exists and is different
-      if (originalImageUrl && originalImageUrl !== speciesToSave.image) { // originalImageUrl provided and differs from current (e.g. current was cleared)
-          await deleteImageFromStorage(originalImageUrl);
-      } else if (speciesToSave.image && speciesToSave.image !== originalImageUrl) { // current image exists and differs (less likely scenario if originalImageUrl is primary)
-          await deleteImageFromStorage(speciesToSave.image);
-      }
-
-
-      const fileName = `${Date.now()}-${imageFile.name.replace(/\s+/g, '_')}`;
-      const filePath = `public/${fileName}`; // Supabase storage paths are typically relative to bucket root, 'public/' is a common convention if used as a folder
-      
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from(BUCKET_NAME)
-        .upload(filePath, imageFile, { cacheControl: '3600', upsert: true });
-
-      if (uploadError) {
-        toast({ title: "Erro no Upload da Imagem", description: `Falha ao enviar imagem: ${uploadError.message}`, variant: "destructive" });
-        console.error("Image Upload Error:", uploadError);
+    if (imageFile) { 
+      const newUrl = await uploadSpeciesImage(imageFile, isNew ? null : originalImageUrl);
+      if (!newUrl) {
         setIsLoading(false);
-        return false; // Critical failure, stop here
+        return false; 
       }
-      if (uploadData) {
-        const { data: publicUrlData } = supabase.storage.from(BUCKET_NAME).getPublicUrl(filePath);
-        finalImageUrl = publicUrlData.publicUrl;
-      } else {
-         // Should not happen if uploadError is null, but as a safeguard
-        toast({ title: "Erro no Upload", description: "Não foi possível obter a URL da imagem após o upload.", variant: "destructive" });
-        setIsLoading(false);
-        return false;
-      }
-    } else if (speciesToSave.image === null && originalImageUrl) {
-      // Image was explicitly removed (image set to null and there was an originalImageUrl)
+      finalImageUrl = newUrl;
+    } else if (speciesToSave.image === null && originalImageUrl && !isNew) {
       await deleteImageFromStorage(originalImageUrl);
       finalImageUrl = null;
     }
-    // If no imageFile and speciesToSave.image is already set (e.g. during an update without image change), finalImageUrl retains that value.
 
-    speciesToSave.image = finalImageUrl;
+    const dbPayload: Omit<Species, 'id' | 'created_at' | 'updated_at'> = {
+      name: speciesToSave.name,
+      commonName: speciesToSave.commonName,
+      slug: speciesToSave.slug,
+      type: speciesToSave.type || 'outro',
+      image: finalImageUrl,
+      description: speciesToSave.description || '',
+      characteristics: speciesToSave.characteristics || [],
+      curiosities: speciesToSave.curiosities || [],
+      order: typeof speciesToSave.order === 'number' ? speciesToSave.order : 0,
+    };
 
-    // Remove properties not in the table or handled by DB
-    const { id, created_at, updated_at, ...dataToUpsert } = speciesToSave;
-    
-    // Ensure 'order' is a number, default to 0 if somehow not set.
-    const orderValue = typeof dataToUpsert.order === 'number' ? dataToUpsert.order : 0;
-    const dbPayload = { ...dataToUpsert, order: orderValue };
-
+    let success = false;
+    let opMessage = "";
 
     if (isNew) {
-      console.log("Attempting to insert new species:", dbPayload);
       const { data, error } = await supabase
         .from('species')
         .insert(dbPayload)
         .select()
         .single();
       if (error) {
-        toast({ title: "Erro ao adicionar espécie", description: `Detalhe: ${error.message} (Code: ${error.code})`, variant: "destructive" });
+        opMessage = `Erro ao adicionar espécie: ${error.message}`;
         console.error("Error inserting species:", error);
-        // If insert fails after image upload, delete the newly uploaded image
-        if (imageFile && finalImageUrl) {
-            await deleteImageFromStorage(finalImageUrl);
-        }
-        setIsLoading(false);
-        return false;
+        if (imageFile && finalImageUrl) await deleteImageFromStorage(finalImageUrl);
+      } else {
+        opMessage = `${data.commonName} adicionada com sucesso!`;
+        success = true;
       }
-      toast({ title: "Espécie cadastrada", description: `${data.commonName} adicionada com sucesso!` });
-    } else {
-      console.log("Attempting to update species (ID: " + id + "):", dbPayload);
+    } else if (speciesToSave.id) {
       const { data, error } = await supabase
         .from('species')
         .update(dbPayload)
-        .eq('id', id)
+        .eq('id', speciesToSave.id)
         .select()
         .single();
       if (error) {
-        toast({ title: "Erro ao atualizar espécie", description: `Detalhe: ${error.message} (Code: ${error.code})`, variant: "destructive" });
+        opMessage = `Erro ao atualizar espécie: ${error.message}`;
         console.error("Error updating species:", error);
-        // Rollback for update is more complex, might not delete image if it was pre-existing and upload failed
-        // For now, if imageFile was processed and new URL obtained, but DB fails, consider deleting the *newly uploaded* one
         if (imageFile && finalImageUrl && finalImageUrl !== originalImageUrl) {
-             await deleteImageFromStorage(finalImageUrl);
+          await deleteImageFromStorage(finalImageUrl);
         }
-        setIsLoading(false);
-        return false;
+      } else {
+        opMessage = `${data.commonName} atualizada com sucesso!`;
+        success = true;
       }
-      toast({ title: "Espécie atualizada", description: `${data.commonName} atualizada com sucesso!` });
+    } else {
+      opMessage = "ID da espécie ausente para atualização.";
+      console.error(opMessage);
     }
-    await fetchSpecies();
+
+    toast({ title: success ? "Sucesso" : "Erro", description: opMessage, variant: success ? "default" : "destructive" });
+    if (success) await fetchSpecies();
     setIsLoading(false);
-    return true;
+    return success;
   };
 
   const deleteSpecies = async (id: string): Promise<boolean> => {
@@ -184,27 +195,35 @@ export function useSpeciesManagement() {
       return false;
     }
     const speciesToDelete = speciesList.find(s => s.id === id);
-    if (!speciesToDelete) return false;
+    if (!speciesToDelete) {
+      toast({title: "Erro", description: "Espécie não encontrada.", variant: "destructive"});
+      return false;
+    }
 
-    const confirmed = window.confirm("Tem certeza que deseja excluir esta espécie? Esta ação não pode ser desfeita.");
+    const confirmed = window.confirm(`Tem certeza que deseja excluir a espécie "${speciesToDelete.commonName}"? Esta ação não pode ser desfeita.`);
     if (!confirmed) return false;
 
     setIsLoading(true);
-    if (speciesToDelete.image) { // Check if image string is not null/empty
-        await deleteImageFromStorage(speciesToDelete.image);
+    if (speciesToDelete.image) { 
+      await deleteImageFromStorage(speciesToDelete.image);
     }
 
     const { error: deleteDbError } = await supabase.from('species').delete().eq('id', id);
+    let success = false;
+    let opMessage = "";
+
     if (deleteDbError) {
-      toast({ title: "Erro ao excluir espécie", description: deleteDbError.message, variant: "destructive" });
+      opMessage = `Erro ao excluir espécie: ${deleteDbError.message}`;
       console.error("Error deleting species from DB: ", deleteDbError);
-      setIsLoading(false);
-      return false;
+    } else {
+      opMessage = `Espécie "${speciesToDelete.commonName}" removida com sucesso.`;
+      success = true;
     }
-    toast({ title: "Espécie removida" });
-    await fetchSpecies();
+    
+    toast({ title: success ? "Sucesso" : "Erro", description: opMessage, variant: success ? "default" : "destructive" });
+    if (success) await fetchSpecies();
     setIsLoading(false);
-    return true;
+    return success;
   };
   
   const reorderSpecies = async (currentIndex: number, direction: 'up' | 'down'): Promise<void> => {
@@ -216,19 +235,23 @@ export function useSpeciesManagement() {
     
     const itemAtTarget = newSpeciesList[targetIndex];
 
-    // Ensure 'order' is treated as a number
     const currentOrder = Number(itemToMove.order) || 0;
     const targetOrder = Number(itemAtTarget.order) || 0;
 
+    itemToMove.order = targetOrder;
+    itemAtTarget.order = currentOrder;
+    newSpeciesList.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+    setSpeciesList(newSpeciesList);
+
+    setIsLoading(true);
     const updates = [
         supabase.from('species').update({ order: targetOrder }).eq('id', itemToMove.id),
         supabase.from('species').update({ order: currentOrder }).eq('id', itemAtTarget.id)
     ];
-
-    setIsLoading(true);
     const results = await Promise.all(updates);
-    const errors = results.filter(res => res.error);
+    setIsLoading(false);
 
+    const errors = results.filter(res => res.error);
     if (errors.length > 0) {
         errors.forEach(err => {
           toast({ title: "Erro ao reordenar", description: err.error?.message, variant: "destructive"});
@@ -237,7 +260,7 @@ export function useSpeciesManagement() {
     } else {
         toast({ title: "Ordem atualizada" });
     }
-    await fetchSpecies(); // This will set isLoading to false
+    await fetchSpecies(); // This will set isLoading to false after fetching
   };
 
   return {

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -25,18 +26,25 @@ export default function HeroCarousel() {
   useEffect(() => {
     const loadCarouselData = async () => {
       setIsLoading(true);
-      const images = await fetchCarouselItems();
-      setCarouselImagesData(images);
-      setIsLoading(false);
-      if (api && images.length > 0) {
-        api.reInit(); // Reinitialize carousel with new slides
+      try {
+        const items = await fetchCarouselItems();
+        setCarouselImagesData(items);
+        if (api && items.length > 0) {
+          api.reInit(); 
+        }
+      } catch (error) {
+        console.error("Failed to load carousel items:", error);
+        setCarouselImagesData([]); // Ensure it's an empty array on error
+      } finally {
+        setIsLoading(false);
       }
     };
     loadCarouselData();
-  }, [api]);
+  }, [api]); // Removed api from dependency array to avoid re-fetch on api change if items already loaded. Re-added.
 
   useEffect(() => {
     if (!api || carouselImagesData.length === 0) {
+      setCurrentImageIndex(0); // Reset index if no images or api
       return;
     }
 
@@ -44,34 +52,41 @@ export default function HeroCarousel() {
       setCurrentImageIndex(api.selectedScrollSnap());
     };
 
+    // Resume autoplay on pointer up after interaction
     const onPointerUp = () => {
       if (autoplayPlugin.current.options.stopOnInteraction) {
         setTimeout(() => {
+          // Check if interaction was on a focusable element within carousel (e.g. a link on the slide itself)
+          // If so, let the interaction complete and don't immediately resume autoplay.
+          // This part is tricky and depends on exact slide content.
+          // A simpler approach is to always resume after a short delay, or require explicit play.
           if (api.rootNode().contains(document.activeElement)) {
-            // if interaction was on a focusable element inside carousel, let it be
+            // Example: if a button/link within the slide was clicked, don't immediately resume
           } else {
-            autoplayPlugin.current.play(false);
+            autoplayPlugin.current.play(false); // false to not reset, just resume
           }
-        }, 100);
+        }, 100); // Short delay to allow click events to propagate
       }
     };
-
-    setCurrentImageIndex(api.selectedScrollSnap());
+    
+    setCurrentImageIndex(api.selectedScrollSnap()); // Initialize
     api.on("select", onSelect);
-    api.on("pointerUp", onPointerUp);
+    api.on("pointerUp", onPointerUp); // Re-added pointerUp for autoplay resume
 
     return () => {
       if (api) {
         api.off("select", onSelect);
-        api.off("pointerUp", onPointerUp);
+        api.off("pointerUp", onPointerUp); // Clean up pointerUp
       }
     };
-  }, [api, carouselImagesData.length]);
+  }, [api, carouselImagesData.length]); // carouselImagesData.length will trigger re-init of listeners
 
   const handleIndicatorClick = (index: number) => {
     api?.scrollTo(index);
+    // If autoplay is stopped on interaction, explicitly restart it or manage its state.
+    // For simplicity, we can restart it after a manual navigation.
     if (autoplayPlugin.current.options.stopOnInteraction) {
-      autoplayPlugin.current.play(false);
+        autoplayPlugin.current.play(false); // Resume autoplay
     }
   };
 
@@ -87,7 +102,7 @@ export default function HeroCarousel() {
     return (
       <div className="relative h-[60vh] md:h-[70vh] overflow-hidden flex items-center justify-center bg-gray-200 dark:bg-gray-800 px-4 text-center">
         <div>
-          <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">Nenhuma imagem para exibir.</p>
+          <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">Nenhuma imagem para exibir no carrossel.</p>
           <p className="text-sm text-gray-400 dark:text-gray-300">Adicione imagens no painel administrativo para ativar o carrossel.</p>
         </div>
       </div>
@@ -109,14 +124,15 @@ export default function HeroCarousel() {
           className="h-full"
         >
           <CarouselContent className="h-full" style={{ touchAction: 'pan-y' }}>
-            {carouselImagesData.map((image, index) => (
-              <CarouselItem key={image.id || index} className="h-full">
+            {carouselImagesData.map((item, index) => (
+              <CarouselItem key={item.id || index} className="h-full">
                 <div className="relative h-full">
                   <div
                     className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
-                    style={{ backgroundImage: `url(${image.image_url})` }}
-                    aria-label={image.alt_text}
+                    style={{ backgroundImage: `url(${item.image_url})` }} // Corrected: item.image_url
+                    aria-label={item.alt_text} // Corrected: item.alt_text
                   >
+                    {/* Gradient Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10"></div>
                   </div>
                 </div>
@@ -125,21 +141,23 @@ export default function HeroCarousel() {
           </CarouselContent>
         </Carousel>
 
+        {/* Text Content Area - uses currentSlideData */}
         <div className="absolute inset-0 z-20 flex flex-col items-start justify-end md:justify-center pb-20 md:pb-0 pointer-events-none">
           <div className="container py-6 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto">
              {currentSlideData && (
               <>
                 <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-2xl animate-slide-in text-balance">
-                  {currentSlideData.title || "Bem-vindo"}
+                  {currentSlideData.title || "Bem-vindo"} {/* Corrected: currentSlideData.title */}
                 </h1>
                 <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance">
-                  {currentSlideData.subtitle || "Conheça nossos animais"}
+                  {currentSlideData.subtitle || "Conheça nossos animais"} {/* Corrected: currentSlideData.subtitle */}
                 </p>
               </>
              )}
           </div>
         </div>
         
+        {/* Indicators */}
         {carouselImagesData.length > 1 && (
           <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2 z-30 md:bottom-6">
             {carouselImagesData.map((_, index) => (
@@ -159,6 +177,7 @@ export default function HeroCarousel() {
         )}
       </div>
 
+      {/* Action Buttons Area - remains largely the same */}
       <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-6 md:absolute md:bottom-10 md:left-1/2 md:-translate-x-1/2 md:z-20 md:py-0 md:pointer-events-auto">
         <div className="flex flex-col sm:flex-row gap-3 w-full items-center justify-center md:justify-start">
           <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[48px] w-full sm:w-auto text-sm md:text-base" asChild>
