@@ -1,13 +1,14 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import React from 'react';
+// Import ToastActionElement
+import type { ToastActionElement } from "@/components/ui/toast";
 
 // Define um tipo para a função toast para clareza
 type ToastFunction = (props: {
   title: string;
   description?: string;
   variant?: 'default' | 'destructive';
-  action?: React.ReactNode;
+  action?: ToastActionElement; // Updated to use ToastActionElement
 }) => void;
 
 const getFilePathFromStorageUrl = (fileUrl: string, bucketName: string): string | null => {
@@ -83,4 +84,3 @@ export const deleteFileFromStorage = async (
     }
   }
 };
-
