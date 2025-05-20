@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -25,26 +24,29 @@ export default function HeroCarousel() {
 
   useEffect(() => {
     const loadCarouselData = async () => {
+      console.log("HeroCarousel: Attempting to load carousel data...");
       setIsLoading(true);
       try {
         const items = await fetchCarouselItems();
+        console.log("HeroCarousel: Fetched items", items);
         setCarouselImagesData(items);
         if (api && items.length > 0) {
           api.reInit(); 
         }
       } catch (error) {
-        console.error("Failed to load carousel items:", error);
-        setCarouselImagesData([]); // Ensure it's an empty array on error
+        console.error("HeroCarousel: Failed to load carousel items in component:", error);
+        setCarouselImagesData([]); 
       } finally {
         setIsLoading(false);
+        console.log("HeroCarousel: Loading finished.");
       }
     };
     loadCarouselData();
-  }, [api]); // Removed api from dependency array to avoid re-fetch on api change if items already loaded. Re-added.
+  }, [api]);
 
   useEffect(() => {
     if (!api || carouselImagesData.length === 0) {
-      setCurrentImageIndex(0); // Reset index if no images or api
+      setCurrentImageIndex(0);
       return;
     }
 
@@ -52,14 +54,9 @@ export default function HeroCarousel() {
       setCurrentImageIndex(api.selectedScrollSnap());
     };
 
-    // Resume autoplay on pointer up after interaction
     const onPointerUp = () => {
       if (autoplayPlugin.current.options.stopOnInteraction) {
         setTimeout(() => {
-          // Check if interaction was on a focusable element within carousel (e.g. a link on the slide itself)
-          // If so, let the interaction complete and don't immediately resume autoplay.
-          // This part is tricky and depends on exact slide content.
-          // A simpler approach is to always resume after a short delay, or require explicit play.
           if (api.rootNode().contains(document.activeElement)) {
             // Example: if a button/link within the slide was clicked, don't immediately resume
           } else {
@@ -69,26 +66,29 @@ export default function HeroCarousel() {
       }
     };
     
-    setCurrentImageIndex(api.selectedScrollSnap()); // Initialize
+    setCurrentImageIndex(api.selectedScrollSnap()); 
     api.on("select", onSelect);
-    api.on("pointerUp", onPointerUp); // Re-added pointerUp for autoplay resume
+    api.on("pointerUp", onPointerUp);
 
     return () => {
       if (api) {
         api.off("select", onSelect);
-        api.off("pointerUp", onPointerUp); // Clean up pointerUp
+        api.off("pointerUp", onPointerUp);
       }
     };
-  }, [api, carouselImagesData.length]); // carouselImagesData.length will trigger re-init of listeners
+  }, [api, carouselImagesData.length]);
 
   const handleIndicatorClick = (index: number) => {
     api?.scrollTo(index);
-    // If autoplay is stopped on interaction, explicitly restart it or manage its state.
-    // For simplicity, we can restart it after a manual navigation.
     if (autoplayPlugin.current.options.stopOnInteraction) {
-        autoplayPlugin.current.play(false); // Resume autoplay
+      autoplayPlugin.current.play(false); // Resume autoplay
     }
   };
+
+  const currentSlideData = carouselImagesData[currentImageIndex];
+  if (carouselImagesData.length > 0) {
+    console.log("HeroCarousel: Current slide data:", currentSlideData, "at index:", currentImageIndex);
+  }
 
   if (isLoading) {
     return (
@@ -99,6 +99,7 @@ export default function HeroCarousel() {
   }
 
   if (carouselImagesData.length === 0 && !isLoading) {
+    console.log("HeroCarousel: No images to display, rendering fallback.");
     return (
       <div className="relative h-[60vh] md:h-[70vh] overflow-hidden flex items-center justify-center bg-gray-200 dark:bg-gray-800 px-4 text-center">
         <div>
@@ -108,8 +109,6 @@ export default function HeroCarousel() {
       </div>
     );
   }
-
-  const currentSlideData = carouselImagesData[currentImageIndex];
 
   return (
     <div className="relative w-full">
@@ -129,8 +128,8 @@ export default function HeroCarousel() {
                 <div className="relative h-full">
                   <div
                     className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
-                    style={{ backgroundImage: `url(${item.image_url})` }} // Corrected: item.image_url
-                    aria-label={item.alt_text} // Corrected: item.alt_text
+                    style={{ backgroundImage: `url(${item.image_url})` }} 
+                    aria-label={item.alt_text} 
                   >
                     {/* Gradient Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10"></div>
@@ -147,10 +146,10 @@ export default function HeroCarousel() {
              {currentSlideData && (
               <>
                 <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-2xl animate-slide-in text-balance">
-                  {currentSlideData.title || "Bem-vindo"} {/* Corrected: currentSlideData.title */}
+                  {currentSlideData.title || "Bem-vindo"} 
                 </h1>
                 <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance">
-                  {currentSlideData.subtitle || "Conheça nossos animais"} {/* Corrected: currentSlideData.subtitle */}
+                  {currentSlideData.subtitle || "Conheça nossos animais"} 
                 </p>
               </>
              )}

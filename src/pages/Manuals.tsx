@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useCallback } from "react";
 import { Manual } from "@/types/manual";
 import ManualsSearch from "@/components/manuals/ManualsSearch";
@@ -14,6 +13,7 @@ export default function Manuals() {
   const { toast } = useToast();
 
   const loadManuals = useCallback(async () => {
+    console.log("ManualsPage: Attempting to load manuals...");
     setIsLoading(true);
     const { data, error } = await supabase
       .from('manuals')
@@ -21,15 +21,17 @@ export default function Manuals() {
       .order('title', { ascending: true });
 
     if (error) {
-      console.error("Failed to load manuals from Supabase:", error);
+      console.error("ManualsPage: Failed to load manuals from Supabase:", error);
       toast({ title: "Erro ao carregar manuais", description: "Não foi possível buscar os manuais.", variant: "destructive" });
       setAllManuals([]);
       setFilteredManuals([]);
     } else {
+      console.log("ManualsPage: Manuals fetched successfully:", data);
       setAllManuals(data as Manual[]);
-      setFilteredManuals(data as Manual[]); // Initially show all
+      setFilteredManuals(data as Manual[]); 
     }
     setIsLoading(false);
+    console.log("ManualsPage: Loading finished.");
   }, [toast]);
 
   useEffect(() => {
@@ -76,6 +78,10 @@ export default function Manuals() {
     setSearchQuery('');
     setFilteredManuals(allManuals);
   };
+
+  if (filteredManuals.length === 0 && !isLoading && searchQuery === '') {
+    console.log("ManualsPage: No manuals found on initial load (or after clearing search), rendering fallback in grid.");
+  }
 
   return (
     <div className="container px-4 py-8 sm:px-6 sm:py-12">

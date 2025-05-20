@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { Search as SearchIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Species as SpeciesType } from "@/types/species";
 import { SpeciesFilterControls } from "@/components/species/SpeciesFilterControls";
 import { SpeciesGridItem } from "@/components/species/SpeciesGridItem";
-import { Input } from "@/components/ui/input"; // Added Input import
+import { Input } from "@/components/ui/input";
 
 type SpeciesFilterValue = SpeciesType['type'] | 'todos';
 
@@ -18,6 +17,7 @@ export default function Species() {
 
   useEffect(() => {
     const fetchSpecies = async () => {
+      console.log("SpeciesPage: Attempting to fetch species...");
       setIsLoading(true);
       setError(null);
       const { data, error: dbError } = await supabase
@@ -26,13 +26,15 @@ export default function Species() {
         .order('order', { ascending: true });
 
       if (dbError) {
-        console.error("Error fetching species:", dbError);
+        console.error("SpeciesPage: Error fetching species:", dbError);
         setError("Falha ao carregar espécies. Tente novamente mais tarde.");
         setSpeciesList([]);
       } else {
+        console.log("SpeciesPage: Species fetched successfully:", data);
         setSpeciesList(data as SpeciesType[]);
       }
       setIsLoading(false);
+      console.log("SpeciesPage: Loading finished.");
     };
     fetchSpecies();
   }, []);
@@ -58,6 +60,10 @@ export default function Species() {
 
   if (error) {
     return <div className="container px-4 py-12 text-center text-red-500">{error}</div>;
+  }
+  
+  if (filteredSpecies.length === 0 && !isLoading && !error) {
+    console.log("SpeciesPage: No species found after filtering or initial load, rendering fallback.");
   }
 
   return (

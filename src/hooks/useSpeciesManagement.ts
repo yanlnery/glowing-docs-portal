@@ -2,8 +2,9 @@ import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Species } from '@/types/species';
 import { useToast } from '@/components/ui/use-toast';
+import type { ToastActionElement } from "@/components/ui/toast";
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
-import { uploadFileToStorage, deleteFileFromStorage } from '@/services/fileStorageService';
+import { uploadFileToStorage, deleteFileFromStorage, type ToastFunction } from '@/services/fileStorageService';
 
 const BUCKET_NAME = 'species_images';
 
@@ -22,6 +23,7 @@ export function useSpeciesManagement() {
   const { isAdminLoggedIn } = useAdminAuth();
 
   const fetchSpecies = useCallback(async () => {
+    console.log("useSpeciesManagement: Attempting to fetch species (admin hook)...");
     setIsLoading(true);
     const { data, error } = await supabase
       .from('species')
@@ -29,17 +31,25 @@ export function useSpeciesManagement() {
       .order('order', { ascending: true });
 
     if (error) {
-      toast({ title: "Erro ao carregar espécies", description: error.message, variant: "destructive" });
+      console.error("useSpeciesManagement: Error fetching species (admin hook):", error);
+      toast({ title: "Erro ao carregar espécies (admin)", description: error.message, variant: "destructive" });
       setSpeciesList([]);
     } else {
+      console.log("useSpeciesManagement: Species fetched successfully (admin hook):", data);
       setSpeciesList(data as Species[]);
     }
     setIsLoading(false);
+    console.log("useSpeciesManagement: Loading finished (admin hook).");
   }, [toast]);
 
   useEffect(() => {
-    fetchSpecies();
-  }, [fetchSpecies]);
+    if (isAdminLoggedIn) { // Only fetch if admin is logged in, or adjust if needed for public parts using this.
+      fetchSpecies();
+    } else {
+      setIsLoading(false); // Not logged in, not loading
+      setSpeciesList([]); // Clear list if not logged in
+    }
+  }, [fetchSpecies, isAdminLoggedIn]);
 
   const saveSpecies = async (
     speciesData: Omit<Species, 'id' | 'created_at' | 'updated_at'> & { id?: string },
@@ -68,30 +78,28 @@ export function useSpeciesManagement() {
       return false;
     }
 
-    let finalImageUrl: string | null = speciesData.image; // Imagem atual do formulário
+    let finalImageUrl: string | null = speciesData.image;
 
-    if (imageFile) { // Novo arquivo de imagem fornecido
-      // Se for uma atualização e existia uma imagem original, delete-a primeiro
+    // Casting toast to unknown then to ToastFunction to satisfy the service's expected type
+    // This is a workaround if the hook's toast type and service's toast type are slightly different
+    // but generally compatible in usage for title/description/variant.
+    const serviceToast = toast as unknown as ToastFunction;
+
+    if (imageFile) {
       if (!isNew && originalImageUrl) {
-        await deleteFileFromStorage(originalImageUrl, BUCKET_NAME, toast);
+        await deleteFileFromStorage(originalImageUrl, BUCKET_NAME, serviceToast);
       }
-      // Faça o upload da nova imagem
-      const newUrl = await uploadFileToStorage(imageFile, BUCKET_NAME, toast);
+      const newUrl = await uploadFileToStorage(imageFile, BUCKET_NAME, serviceToast);
       if (!newUrl) {
         setIsLoading(false);
-        // O upload falhou, a imagem antiga (se existia) já foi deletada.
-        // O toast de erro do upload já foi emitido pelo serviço.
         return false; 
       }
       finalImageUrl = newUrl;
     } else if (!isNew && originalImageUrl && speciesData.image === null) {
-      // Nenhum novo arquivo, é uma atualização, existia uma imagem original E a imagem no formulário é null (foi removida)
-      await deleteFileFromStorage(originalImageUrl, BUCKET_NAME, toast);
+      await deleteFileFromStorage(originalImageUrl, BUCKET_NAME, serviceToast);
       finalImageUrl = null;
     }
-    // Se nenhum novo arquivo foi fornecido e a imagem não foi explicitamente removida (speciesData.image não é null),
-    // finalImageUrl já contém o valor correto (seja a URL existente ou null para novas espécies sem imagem).
-
+    
     const dbPayload: Omit<Species, 'id' | 'created_at' | 'updated_at'> = {
       name: speciesToSave.name,
       commonName: speciesToSave.commonName,
@@ -116,15 +124,14 @@ export function useSpeciesManagement() {
       if (error) {
         opMessage = `Erro ao adicionar espécie: ${error.message}`;
         console.error("Error inserting species:", error);
-        // Se o upload da imagem foi bem-sucedido mas a inserção no DB falhou, reverter o upload
-        if (imageFile && finalImageUrl) await deleteFileFromStorage(finalImageUrl, BUCKET_NAME, toast);
+        if (imageFile && finalImageUrl) await deleteFileFromStorage(finalImageUrl, BUCKET_NAME, serviceToast);
       } else if (data) {
         opMessage = `${data.commonName} adicionada com sucesso!`;
         success = true;
       } else {
         opMessage = `Erro ao adicionar espécie: resposta inesperada do servidor.`;
         console.error("Error inserting species: No data returned");
-        if (imageFile && finalImageUrl) await deleteFileFromStorage(finalImageUrl, BUCKET_NAME, toast);
+        if (imageFile && finalImageUrl) await deleteFileFromStorage(finalImageUrl, BUCKET_NAME, serviceToast);
       }
     } else if (speciesToSave.id) {
       const { data, error } = await supabase
@@ -136,14 +143,8 @@ export function useSpeciesManagement() {
       if (error) {
         opMessage = `Erro ao atualizar espécie: ${error.message}`;
         console.error("Error updating species:", error);
-        // Se uma nova imagem foi carregada (finalImageUrl) e é diferente da original,
-        // e a atualização do DB falhou, teoricamente a imagem nova não deveria ter sido "confirmada".
-        // A imagem antiga já foi deletada se uma nova foi provida.
-        // Se a nova imagem (finalImageUrl) foi carregada com sucesso, mas o update falhou,
-        // e essa finalImageUrl é diferente da originalImageUrl, reverter o upload da nova imagem.
         if (imageFile && finalImageUrl && finalImageUrl !== originalImageUrl) {
-           // A imagem antiga já foi deletada. Se o upload da nova deu certo mas o db falhou, deletar a nova.
-           await deleteFileFromStorage(finalImageUrl, BUCKET_NAME, toast);
+           await deleteFileFromStorage(finalImageUrl, BUCKET_NAME, serviceToast);
         }
       } else if (data) {
         opMessage = `${data.commonName} atualizada com sucesso!`;
@@ -152,7 +153,7 @@ export function useSpeciesManagement() {
         opMessage = `Erro ao atualizar espécie: resposta inesperada do servidor.`;
         console.error("Error updating species: No data returned");
          if (imageFile && finalImageUrl && finalImageUrl !== originalImageUrl) {
-           await deleteFileFromStorage(finalImageUrl, BUCKET_NAME, toast);
+           await deleteFileFromStorage(finalImageUrl, BUCKET_NAME, serviceToast);
         }
       }
     } else {
@@ -181,9 +182,10 @@ export function useSpeciesManagement() {
     if (!confirmed) return false;
 
     setIsLoading(true);
-    // Deleta a imagem do storage se existir
+    const serviceToast = toast as unknown as ToastFunction; // Casting for service compatibility
+
     if (speciesToDelete.image) { 
-      await deleteFileFromStorage(speciesToDelete.image, BUCKET_NAME, toast);
+      await deleteFileFromStorage(speciesToDelete.image, BUCKET_NAME, serviceToast);
     }
 
     const { error: deleteDbError } = await supabase.from('species').delete().eq('id', id);
@@ -193,8 +195,6 @@ export function useSpeciesManagement() {
     if (deleteDbError) {
       opMessage = `Erro ao excluir espécie: ${deleteDbError.message}`;
       console.error("Error deleting species from DB: ", deleteDbError);
-      // Se a deleção do DB falhar, a imagem já foi deletada. Considerar o que fazer aqui.
-      // No momento, a imagem fica deletada.
     } else {
       opMessage = `Espécie "${speciesToDelete.commonName}" removida com sucesso.`;
       success = true;
@@ -222,9 +222,8 @@ export function useSpeciesManagement() {
     itemToMove.order = targetOrder;
     itemAtTarget.order = currentOrder;
     
-    // Optimistically update UI
     newSpeciesList.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
-    setSpeciesList(newSpeciesList); // This should trigger a re-render with sorted list
+    setSpeciesList(newSpeciesList); 
 
     setIsLoading(true);
     try {
@@ -240,21 +239,17 @@ export function useSpeciesManagement() {
             toast({ title: "Erro ao reordenar", description: err.error?.message, variant: "destructive"});
             console.error("Reorder error: ", err.error);
           });
-          // Revert optimistic update on error by re-fetching
           await fetchSpecies(); 
       } else {
           toast({ title: "Ordem atualizada" });
-          // No need to call fetchSpecies() if successful, optimistic update is fine
-          // However, if order values are not perfectly consecutive or unique, fetching ensures consistency.
-          // For safety, let's keep fetchSpecies() or ensure orders are managed to be unique and consecutive if possible.
-          await fetchSpecies(); // Re-fetch to ensure consistency and correct order values
+          await fetchSpecies(); 
       }
     } catch (error: any) {
         toast({ title: "Erro Crítico ao Reordenar", description: error.message, variant: "destructive"});
         console.error("Critical reorder error: ", error);
-        await fetchSpecies(); // Revert on critical error
+        await fetchSpecies(); 
     } finally {
-        setIsLoading(false); // Ensure loading is set to false
+        setIsLoading(false);
     }
   };
 

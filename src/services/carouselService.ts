@@ -8,14 +8,23 @@ export type CarouselItemInsert = TablesInsert<'carousel_items'>;
 export type CarouselItemUpdate = TablesUpdate<'carousel_items'>;
 
 export async function fetchCarouselItems(): Promise<CarouselItemSchema[]> {
+  console.log("Fetching carousel items...");
   const { data, error } = await supabase
     .from("carousel_items")
     .select("*")
     .order("item_order", { ascending: true });
 
   if (error) {
-    console.error("Erro ao buscar itens do carrossel:", error);
+    console.error("Erro ao buscar itens do carrossel no serviço:", error);
+    // Adicionando um log mais explícito para o frontend, se necessário
+    // alert("Falha ao carregar dados do carrossel. Verifique o console.");
     return [];
+  }
+
+  if (data) {
+    console.log("Carousel items fetched successfully:", data);
+  } else {
+    console.warn("Carousel items fetch returned no data, but no error.");
   }
 
   return data || [];
