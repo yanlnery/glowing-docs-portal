@@ -1,16 +1,41 @@
-
 import { supabase } from '@/integrations/supabase/client';
-import { Species } from '@/types/species';
-import { ToastFunction } from '../fileStorageService'; // ToastFunction pode não ser necessária aqui se os toasts forem centralizados
+import { Species } from '@/types/species'; // Species type uses commonName
+// import { ToastFunction } from '../fileStorageService'; // Removido
 
-// Função para buscar os dados das espécies do DB
+// Interface para o formato do banco de dados
+interface SpeciesDbRecord {
+  id: string;
+  commonname: string; // Corrigido para commonname
+  name: string;
+  description: string;
+  characteristics: string[];
+  curiosities: string[];
+  image: string | null;
+  order: number;
+  type: 'serpente' | 'lagarto' | 'quelonio' | 'outro';
+  slug: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+// Helper para mapear do formato DB para o formato da aplicação (Species type)
+const mapDbRecordToSpecies = (record: SpeciesDbRecord): Species => {
+  return {
+    ...record,
+    commonName: record.commonname, // Mapeia commonname para commonName
+  };
+};
+
+// Helper para mapear do formato da aplicação (payload) para o formato DB
+// O payload para create/update já é tratado em speciesService para ter commonname
+// por isso não é estritamente necessário aqui se o payload já estiver correto.
+
 export const fetchSpeciesDataFromDb = async (
-  // toast: ToastFunction // Removido, toast será tratado pelo serviço principal
 ): Promise<{ data: Species[] | null, error: Error | null }> => {
   console.log("speciesDb.ts: Buscando espécies do DB...");
   const { data, error } = await supabase
     .from('species')
-    .select('*')
+    .select('*') // Isso vai buscar 'commonname'
     .order('order', { ascending: true });
 
   if (error) {
@@ -19,13 +44,13 @@ export const fetchSpeciesDataFromDb = async (
   }
   
   console.log("speciesDb.ts: Espécies buscadas com sucesso.");
-  return { data: data as Species[], error: null };
+  const speciesData = data ? (data as SpeciesDbRecord[]).map(mapDbRecordToSpecies) : null;
+  return { data: speciesData, error: null };
 };
 
-// Função para criar uma nova espécie no DB
+// dbPayload aqui já vem com 'commonname' do speciesService
 export const createSpeciesInDb = async (
-  dbPayload: Omit<Species, 'id' | 'created_at' | 'updated_at'>
-  // toast: ToastFunction // Removido
+  dbPayload: Omit<SpeciesDbRecord, 'id' | 'created_at' | 'updated_at'>
 ): Promise<{ data: Species | null, error: Error | null }> => {
   const { data, error } = await supabase
     .from('species')
@@ -38,14 +63,13 @@ export const createSpeciesInDb = async (
     return { data: null, error: new Error(error.message) };
   }
   
-  return { data: data as Species, error: null };
+  return { data: data ? mapDbRecordToSpecies(data as SpeciesDbRecord) : null, error: null };
 };
 
-// Função para atualizar uma espécie existente no DB
+// dbPayload aqui já vem com 'commonname' do speciesService
 export const updateSpeciesInDb = async (
-  dbPayload: Omit<Species, 'id' | 'created_at' | 'updated_at'>,
+  dbPayload: Omit<SpeciesDbRecord, 'id' | 'created_at' | 'updated_at'>,
   id: string
-  // toast: ToastFunction // Removido
 ): Promise<{ data: Species | null, error: Error | null }> => {
   const { data, error } = await supabase
     .from('species')
@@ -59,7 +83,7 @@ export const updateSpeciesInDb = async (
     return { data: null, error: new Error(error.message) };
   }
   
-  return { data: data as Species, error: null };
+  return { data: data ? mapDbRecordToSpecies(data as SpeciesDbRecord) : null, error: null };
 };
 
 // Função para deletar um registro de espécie do DB

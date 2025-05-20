@@ -1,12 +1,10 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Manual, ManualFormData, ManualCategory } from '@/types/manual';
-import { useToast } from '@/components/ui/use-toast'; // Corrected path
-// import { useToast } from "@/hooks/use-toast"; // Or this
+import { useToast } from '@/components/ui/use-toast';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 
-const MANUALS_BUCKET = 'manuals_images'; // Bucket for both images and PDFs
+const MANUALS_BUCKET = 'manuals_images';
 
 export function useManualsManagement() {
   const [manuals, setManuals] = useState<Manual[]>([]);
@@ -15,7 +13,6 @@ export function useManualsManagement() {
   const { isAdminLoggedIn } = useAdminAuth();
 
   const fetchManuals = useCallback(async () => {
-    // Public can fetch manuals
     setIsLoading(true);
     const { data, error } = await supabase
       .from('manuals')
@@ -47,7 +44,7 @@ export function useManualsManagement() {
       if (bucketIndex !== -1 && pathSegments.length > bucketIndex + 1) {
         const filePathInBucket = pathSegments.slice(bucketIndex + 1).join('/');
         if (filePathInBucket) {
-          console.log("Attempting to remove file from manuals_images:", filePathInBucket);
+          console.log(`Attempting to remove file from ${MANUALS_BUCKET}:`, filePathInBucket);
           const { error: deleteError } = await supabase.storage.from(MANUALS_BUCKET).remove([filePathInBucket]);
           if (deleteError) {
             console.error("Error deleting old file from storage: ", deleteError);
@@ -62,10 +59,8 @@ export function useManualsManagement() {
     }
   };
   
-  const uploadManualFile = async (file: File, pathPrefix: string): Promise<string | null> => {
-    const fileName = `${pathPrefix}/${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
-    // pathPrefix could be 'covers' or 'pdfs'
-    // filePath will be like 'covers/timestamp-filename.jpg'
+  const uploadManualFile = async (file: File): Promise<string | null> => {
+    const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
     
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from(MANUALS_BUCKET)
@@ -83,7 +78,6 @@ export function useManualsManagement() {
     return null;
   };
 
-
   const saveManual = async (formData: ManualFormData, isNew: boolean): Promise<boolean> => {
     if (!isAdminLoggedIn) {
       toast({ title: "Acesso Negado", variant: "destructive" });
@@ -95,33 +89,32 @@ export function useManualsManagement() {
     }
 
     setIsLoading(true);
-    let newImageUrl = formData.image; // Existing URL or null
-    let newPdfUrl = formData.pdf_url;   // Existing URL or null
+    let newImageUrl = formData.image;
+    let newPdfUrl = formData.pdf_url;
 
     // Handle Image Upload
-    if (formData.imageFile) { // New image file provided
+    if (formData.imageFile) {
       if (!isNew && formData.originalImageUrl) await deleteFileFromStorage(formData.originalImageUrl);
-      newImageUrl = await uploadManualFile(formData.imageFile, 'covers'); // Store in 'covers/' subfolder
-      if (!newImageUrl) { // Upload failed
+      newImageUrl = await uploadManualFile(formData.imageFile);
+      if (!newImageUrl) {
         setIsLoading(false);
         return false;
       }
-    } else if (formData.image === null && formData.originalImageUrl && !isNew) { // Image explicitly removed by user
+    } else if (formData.image === null && formData.originalImageUrl && !isNew) {
         await deleteFileFromStorage(formData.originalImageUrl);
         newImageUrl = null;
     }
 
     // Handle PDF Upload
-    if (formData.pdfFile) { // New PDF file provided
+    if (formData.pdfFile) {
       if (!isNew && formData.originalPdfUrl) await deleteFileFromStorage(formData.originalPdfUrl);
-      newPdfUrl = await uploadManualFile(formData.pdfFile, 'pdfs'); // Store in 'pdfs/' subfolder
-      if (!newPdfUrl) { // PDF Upload failed
-        // Rollback image upload if it happened in this save operation
+      newPdfUrl = await uploadManualFile(formData.pdfFile);
+      if (!newPdfUrl) {
         if (formData.imageFile && newImageUrl) await deleteFileFromStorage(newImageUrl); 
         setIsLoading(false);
         return false;
       }
-    } else if (formData.pdf_url === null && formData.originalPdfUrl && !isNew) { // PDF explicitly removed
+    } else if (formData.pdf_url === null && formData.originalPdfUrl && !isNew) {
         await deleteFileFromStorage(formData.originalPdfUrl);
         newPdfUrl = null;
     }
@@ -154,7 +147,6 @@ export function useManualsManagement() {
       if (error) {
         opMessage = `Erro ao atualizar manual: ${error.message}`;
         console.error("Error updating manual: ", error);
-        // More complex rollback for update. If new files uploaded & DB failed, delete new files.
         if (formData.imageFile && newImageUrl && newImageUrl !== formData.originalImageUrl) await deleteFileFromStorage(newImageUrl);
         if (formData.pdfFile && newPdfUrl && newPdfUrl !== formData.originalPdfUrl) await deleteFileFromStorage(newPdfUrl);
       } else {
@@ -188,7 +180,6 @@ export function useManualsManagement() {
     if (!confirmed) return false;
 
     setIsLoading(true);
-    // Delete associated files from storage first
     if (manualToDelete.image) await deleteFileFromStorage(manualToDelete.image);
     if (manualToDelete.pdf_url) await deleteFileFromStorage(manualToDelete.pdf_url);
 

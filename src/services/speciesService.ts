@@ -1,4 +1,3 @@
-
 import { Species } from '@/types/species';
 import { ToastFunction } from './fileStorageService';
 // Funções internas de DB
@@ -13,11 +12,8 @@ import {
 import {
   handleSpeciesImageUploadOrRemoval,
   deleteSpeciesImage,
-  SPECIES_BUCKET_NAME, // Importar se ainda necessário, ou usar o de speciesImage.ts
+  // SPECIES_BUCKET_NAME, // Não é usado diretamente aqui
 } from './internal/speciesImage';
-// fileStorageService pode não ser mais necessário aqui diretamente
-// import { uploadFileToStorage, deleteFileFromStorage } from './fileStorageService'; // Remover se não usado diretamente
-
 
 // Helper local para gerar slug, já que não é usado em mais nenhum local
 const generateLocalSlug = (name: string): string => {
@@ -27,7 +23,6 @@ const generateLocalSlug = (name: string): string => {
     .replace(/\s+/g, '-')
     .replace(/[^\w-]+/g, '');
 };
-
 
 export const fetchSpeciesData = async (toast: ToastFunction): Promise<Species[]> => {
   console.log("SpeciesService: Chamando fetchSpeciesDataFromDb...");
@@ -39,17 +34,16 @@ export const fetchSpeciesData = async (toast: ToastFunction): Promise<Species[]>
   }
   
   console.log("SpeciesService: Espécies buscadas com sucesso.");
+  // A lógica de mapeamento de commonname para commonName no fetch já está em SpeciesPage.tsx
+  // Se precisarmos centralizar, podemos fazer aqui. Por ora, mantemos como está.
   return data || [];
 };
-
-// A função generateSlug foi movida para ser local (generateLocalSlug) ou removida se não for mais exportada.
-// export const generateSlug = generateLocalSlug; // Remover se não precisar exportar
 
 export const saveSpeciesData = async (
   speciesFormData: Omit<Species, 'id' | 'created_at' | 'updated_at'> & { id?: string },
   isNew: boolean,
-  imageFile: File | null, // Novo arquivo de imagem
-  originalImageUrlFromDb: string | null, // URL da imagem atualmente no DB (para edições)
+  imageFile: File | null,
+  originalImageUrlFromDb: string | null,
   toast: ToastFunction
 ): Promise<boolean> => {
   if (!speciesFormData.name || !speciesFormData.commonName) {
@@ -68,29 +62,27 @@ export const saveSpeciesData = async (
     return false;
   }
 
-  // Processar imagem
-  // currentImageValueInForm é o speciesToSave.image, que reflete o estado do formulário
   const imageProcessingResult = await handleSpeciesImageUploadOrRemoval(
-    speciesToSave.image, // Valor da imagem vindo do formulário
+    speciesToSave.image, 
     isNew,
     imageFile,
     originalImageUrlFromDb,
     toast
   );
 
-  if (imageProcessingResult === false) { // false indica erro no processamento da imagem
-    // Toast já foi chamado por handleSpeciesImageUploadOrRemoval ou fileStorageService
+  if (imageProcessingResult === false) {
     return false;
   }
   
-  const finalImageUrl = imageProcessingResult; // Pode ser string (URL) ou null
+  const finalImageUrl = imageProcessingResult;
 
-  const dbPayload: Omit<Species, 'id' | 'created_at' | 'updated_at'> = {
+  // Mapeamento para o banco de dados: commonName (frontend) -> commonname (db)
+  const dbPayload = {
     name: speciesToSave.name,
-    commonName: speciesToSave.commonName,
+    commonname: speciesToSave.commonName, // Campo corrigido para o DB
     slug: speciesToSave.slug,
     type: speciesToSave.type || 'outro',
-    image: finalImageUrl, // Usa a URL final da imagem processada
+    image: finalImageUrl,
     description: speciesToSave.description || '',
     characteristics: speciesToSave.characteristics || [],
     curiosities: speciesToSave.curiosities || [],
@@ -99,28 +91,25 @@ export const saveSpeciesData = async (
 
   let result;
   if (isNew) {
-    result = await createSpeciesInDb(dbPayload);
+    // Ajustar o tipo do payload para createSpeciesInDb se ele espera Omit<Species, ...>
+    // que usa commonName. Se createSpeciesInDb espera a forma do DB, está ok.
+    // Assumindo que createSpeciesInDb espera o formato do DB diretamente:
+    result = await createSpeciesInDb(dbPayload as Omit<Species, 'id' | 'created_at' | 'updated_at' | 'commonName'> & { commonname: string });
   } else {
     if (!speciesFormData.id) {
         toast({ title: "Erro", description: "ID da espécie ausente para atualização.", variant: "destructive" });
         return false;
     }
-    result = await updateSpeciesInDb(dbPayload, speciesFormData.id);
+    // Similar para updateSpeciesInDb
+    result = await updateSpeciesInDb(dbPayload as Omit<Species, 'id' | 'created_at' | 'updated_at' | 'commonName'> & { commonname: string }, speciesFormData.id);
   }
 
   if (result.error) {
     const action = isNew ? "adicionar" : "atualizar";
     toast({ title: `Erro ao ${action} espécie`, description: result.error.message, variant: "destructive" });
-    // Se houve erro ao salvar no DB e uma nova imagem foi carregada, ela precisa ser removida do storage.
-    // Isso é complexo porque a imagem antiga já pode ter sido removida.
-    // Por simplicidade, a imagem carregada pode ficar órfã ou uma lógica de rollback mais complexa seria necessária.
-    // O handleSpeciesImageUploadOrRemoval já lida com a remoção da imagem antiga ANTES do upload da nova.
-    // Se o upload da NOVA falha, ela não existe. Se o upload da NOVA SUCEDE mas o DB falha, a NOVA imagem existe.
-    // Para reverter, precisaríamos saber qual era a originalImageUrlFromDb para restaurá-la, o que não é trivial.
-    // E se a nova imagem foi carregada (finalImageUrl não é o originalImageUrlFromDb), e o DB falhou, deletamos a nova.
     if (finalImageUrl && finalImageUrl !== originalImageUrlFromDb) {
         console.warn(`DB ${isNew ? 'insert' : 'update'} failed after image upload. Attempting to clean up uploaded image: ${finalImageUrl}`);
-        await deleteSpeciesImage(finalImageUrl, toast); // Tenta limpar a nova imagem
+        await deleteSpeciesImage(finalImageUrl, toast);
     }
     return false;
   }
@@ -129,18 +118,17 @@ export const saveSpeciesData = async (
     const action = isNew ? "adicionada" : "atualizada";
     toast({ 
       title: "Sucesso", 
-      description: `${result.data.commonName} ${action} com sucesso!`, 
+      // result.data aqui pode vir com 'commonname'. Se o toast espera 'commonName', precisa mapear de volta ou usar .name
+      description: `${result.data.commonname || result.data.name} ${action} com sucesso!`, 
       variant: "default" 
     });
     return true;
   }
   
-  // Caso inesperado
   const unexpectedMsg = `Erro ao ${isNew ? "adicionar" : "atualizar"} espécie: resposta inesperada do servidor.`;
   toast({ title: "Erro", description: unexpectedMsg, variant: "destructive" });
   return false;
 };
-
 
 export const deleteSpeciesRecord = async (
   id: string,
