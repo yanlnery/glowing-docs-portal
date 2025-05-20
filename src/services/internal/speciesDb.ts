@@ -1,6 +1,7 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Species } from '@/types/species';
-import { ToastFunction } from '../fileStorageService';
+import type { ToastFunction } from '../fileStorageService'; // Added import type
 
 // Interface para o formato do banco de dados
 interface SpeciesDbRecord {
@@ -102,7 +103,7 @@ export const reorderSpeciesInDb = async (
   speciesList: Species[],
   currentIndex: number,
   direction: 'up' | 'down',
-  toast: ToastFunction // Manter toast aqui pois é uma operação complexa com múltiplos updates
+  toast: ToastFunction // ToastFunction type is now recognized
 ): Promise<Species[] | null> => {
   const newSpeciesList = [...speciesList];
   const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
@@ -117,6 +118,9 @@ export const reorderSpeciesInDb = async (
   const currentOrder = Number(itemToMove.order) || 0;
   const targetOrder = Number(itemAtTarget.order) || 0;
 
+  // Atualiza a ordem localmente primeiro para refletir a mudança visualmente (se aplicável)
+  // e para consistência antes da chamada ao DB.
+  // No entanto, a ordenação final virá do DB ou após o sucesso do DB.
   itemToMove.order = targetOrder;
   itemAtTarget.order = currentOrder;
   
@@ -131,17 +135,24 @@ export const reorderSpeciesInDb = async (
     const errors = results.filter(res => res.error);
     if (errors.length > 0) {
       errors.forEach(err => {
+        // Usando a função toast passada como parâmetro
         toast({ title: "Erro ao reordenar no DB", description: err.error?.message, variant: "destructive"});
         console.error("speciesDb.ts: Reorder error:", err.error);
       });
+      // Se houver erro, pode ser melhor reverter a mudança local ou buscar novamente do DB
+      // Por enquanto, retornaremos null indicando falha.
       return null; 
     }
     
+    // Reordena a lista local com base na nova ordem e retorna
+    // Isso garante que a lista retornada está na ordem correta após a atualização no DB.
     newSpeciesList.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
     return newSpeciesList;
   } catch (error: any) {
+    // Usando a função toast passada como parâmetro
     toast({ title: "Erro Crítico ao Reordenar no DB", description: error.message, variant: "destructive"});
     console.error("speciesDb.ts: Critical reorder error:", error);
-    return null;
+    return null; // Retornar null em caso de erro crítico
   }
 };
+
