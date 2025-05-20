@@ -1,11 +1,11 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Species } from '@/types/species'; // Species type uses commonName
-// import { ToastFunction } from '../fileStorageService'; // Removido
+import { Species } from '@/types/species';
+import { ToastFunction } from '../fileStorageService';
 
 // Interface para o formato do banco de dados
 interface SpeciesDbRecord {
   id: string;
-  commonname: string; // Corrigido para commonname
+  commonname: string; 
   name: string;
   description: string;
   characteristics: string[];
@@ -22,20 +22,17 @@ interface SpeciesDbRecord {
 const mapDbRecordToSpecies = (record: SpeciesDbRecord): Species => {
   return {
     ...record,
-    commonName: record.commonname, // Mapeia commonname para commonName
+    commonName: record.commonname,
   };
 };
 
-// Helper para mapear do formato da aplicação (payload) para o formato DB
-// O payload para create/update já é tratado em speciesService para ter commonname
-// por isso não é estritamente necessário aqui se o payload já estiver correto.
-
+// Função para buscar dados de espécies do banco de dados
 export const fetchSpeciesDataFromDb = async (
 ): Promise<{ data: Species[] | null, error: Error | null }> => {
   console.log("speciesDb.ts: Buscando espécies do DB...");
   const { data, error } = await supabase
     .from('species')
-    .select('*') // Isso vai buscar 'commonname'
+    .select('*') 
     .order('order', { ascending: true });
 
   if (error) {
@@ -48,7 +45,7 @@ export const fetchSpeciesDataFromDb = async (
   return { data: speciesData, error: null };
 };
 
-// dbPayload aqui já vem com 'commonname' do speciesService
+// Função para criar uma nova espécie no banco de dados
 export const createSpeciesInDb = async (
   dbPayload: Omit<SpeciesDbRecord, 'id' | 'created_at' | 'updated_at'>
 ): Promise<{ data: Species | null, error: Error | null }> => {
@@ -66,7 +63,7 @@ export const createSpeciesInDb = async (
   return { data: data ? mapDbRecordToSpecies(data as SpeciesDbRecord) : null, error: null };
 };
 
-// dbPayload aqui já vem com 'commonname' do speciesService
+// Função para atualizar uma espécie no banco de dados
 export const updateSpeciesInDb = async (
   dbPayload: Omit<SpeciesDbRecord, 'id' | 'created_at' | 'updated_at'>,
   id: string
@@ -86,10 +83,9 @@ export const updateSpeciesInDb = async (
   return { data: data ? mapDbRecordToSpecies(data as SpeciesDbRecord) : null, error: null };
 };
 
-// Função para deletar um registro de espécie do DB
+// Função para deletar um registro de espécie do banco de dados
 export const deleteSpeciesFromDb = async (
   id: string
-  // toast: ToastFunction // Removido
 ): Promise<{ error: Error | null }> => {
   const { error: deleteDbError } = await supabase.from('species').delete().eq('id', id);
   
@@ -101,7 +97,7 @@ export const deleteSpeciesFromDb = async (
   return { error: null };
 };
 
-// Função para reordenar itens de espécies no DB
+// Função para reordenar itens de espécies no banco de dados
 export const reorderSpeciesInDb = async (
   speciesList: Species[],
   currentIndex: number,
@@ -112,7 +108,7 @@ export const reorderSpeciesInDb = async (
   const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
 
   if (targetIndex < 0 || targetIndex >= newSpeciesList.length) {
-    return null; // Operação inválida, não fazer nada
+    return null; 
   }
   
   const itemToMove = newSpeciesList[currentIndex];
@@ -121,7 +117,6 @@ export const reorderSpeciesInDb = async (
   const currentOrder = Number(itemToMove.order) || 0;
   const targetOrder = Number(itemAtTarget.order) || 0;
 
-  // Swap orders no objeto local primeiro
   itemToMove.order = targetOrder;
   itemAtTarget.order = currentOrder;
   
@@ -139,11 +134,9 @@ export const reorderSpeciesInDb = async (
         toast({ title: "Erro ao reordenar no DB", description: err.error?.message, variant: "destructive"});
         console.error("speciesDb.ts: Reorder error:", err.error);
       });
-      return null; // Retorna null para indicar falha parcial ou total
+      return null; 
     }
     
-    // Não precisa de toast de sucesso aqui, será tratado pelo serviço principal se necessário
-    // A lista é atualizada localmente, e o serviço principal pode decidir se re-fetches ou usa esta.
     newSpeciesList.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
     return newSpeciesList;
   } catch (error: any) {
