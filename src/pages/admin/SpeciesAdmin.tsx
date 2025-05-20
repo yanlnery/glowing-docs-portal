@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+
+import React from 'react';
 import {
   Card,
   CardContent,
@@ -12,177 +13,45 @@ import { Species } from '@/types/species';
 import { SpeciesTable } from '@/components/admin/species/SpeciesTable';
 import { SpeciesDialog } from '@/components/admin/species/SpeciesDialog';
 import { useSpeciesManagement } from '@/hooks/useSpeciesManagement';
-import { useAdminAuth } from '@/contexts/AdminAuthContext'; // For checking auth state
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { useSpeciesDialogManager } from '@/hooks/useSpeciesDialogManager'; // Novo hook
 
-const generateSlug = (name: string) => {
-  if (!name) return '';
-  return name
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w-]+/g, '');
-};
-
-const BUCKET_NAME = 'species_images';
+// A função generateSlug e a constante BUCKET_NAME não são usadas aqui e foram removidas.
+// generateSlug é tratado pelo speciesService.ts
+// BUCKET_NAME é usado internamente pelo speciesService.ts
 
 export default function SpeciesAdmin() {
-  // Use the hook for species data and operations
   const { 
     speciesList, 
     isLoading: speciesLoading, 
-    fetchSpecies, 
+    // fetchSpecies, // fetchSpecies é chamado pelo useEffect do useSpeciesManagement
     saveSpecies: saveSpeciesHook, 
     deleteSpecies: deleteSpeciesHook,
     reorderSpecies,
     maxOrder
   } = useSpeciesManagement();
   
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [currentSpecies, setCurrentSpecies] = useState<Species | null>(null);
-  const [isNewSpecies, setIsNewSpecies] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const { toast } = useToast();
   const { isAdminLoggedIn } = useAdminAuth();
+  const { toast } = useToast(); // Ainda pode ser usado para toasts não relacionados ao dialog
 
-  // fetchSpecies is called by the hook's useEffect
-
-  const openNewSpeciesDialog = () => {
-    setCurrentSpecies({
-      id: '', 
-      name: '',
-      commonName: '',
-      description: 'Descrição detalhada a ser preenchida.',
-      characteristics: [''],
-      curiosities: [''],
-      image: null, // Changed from '' to null
-      type: 'serpente',
-      slug: '',
-      order: maxOrder + 1,
-    });
-    setIsNewSpecies(true);
-    setImagePreview(null);
-    setImageFile(null);
-    setIsDialogOpen(true);
-  };
-
-  const openEditSpeciesDialog = (speciesData: Species) => {
-    setCurrentSpecies(speciesData);
-    setIsNewSpecies(false);
-    setImagePreview(speciesData.image); // Show existing image if available
-    setImageFile(null);
-    setIsDialogOpen(true);
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-      // If a new image is selected, we might want to clear the existing URL from currentSpecies state
-      // This will be handled by saveSpecies logic: if imageFile exists, it takes precedence
-      if (currentSpecies) {
-         // setCurrentSpecies({ ...currentSpecies, image: null }); // Tentatively clear, will be replaced by new upload
-      }
-      e.target.value = ''; // Reset file input
-    }
-  };
-  
-  const handleRemoveImage = () => {
-    setImagePreview(null);
-    setImageFile(null);
-    if (currentSpecies) {
-      // Important: Set image to null to indicate removal
-      setCurrentSpecies({ ...currentSpecies, image: null }); 
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    if (currentSpecies) {
-      let processedValue: string | number | string[] | null = value;
-      if (name === 'order') {
-        processedValue = parseInt(value, 10);
-        if (isNaN(processedValue as number)) processedValue = currentSpecies.order; 
-      }
-      setCurrentSpecies({
-        ...currentSpecies,
-        [name]: processedValue
-      });
-    }
-  };
-
-  const createArrayHandler = (fieldName: 'characteristics' | 'curiosities') => ({
-    handleChange: (index: number, value: string) => {
-      if (currentSpecies) {
-        const updatedArray = [...currentSpecies[fieldName]];
-        updatedArray[index] = value;
-        setCurrentSpecies({ ...currentSpecies, [fieldName]: updatedArray });
-      }
-    },
-    handleAdd: () => {
-      if (currentSpecies) {
-        setCurrentSpecies({ ...currentSpecies, [fieldName]: [...currentSpecies[fieldName], ''] });
-      }
-    },
-    handleRemove: (index: number) => {
-      if (currentSpecies && currentSpecies[fieldName].length > 1) {
-        const updatedArray = currentSpecies[fieldName].filter((_, i) => i !== index);
-        setCurrentSpecies({ ...currentSpecies, [fieldName]: updatedArray });
-      } else if (currentSpecies && currentSpecies[fieldName].length === 1) {
-        // Optionally allow clearing the last item instead of preventing removal
-        setCurrentSpecies({ ...currentSpecies, [fieldName]: [''] });
-      }
-    },
+  const dialogManager = useSpeciesDialogManager({
+    saveSpeciesFn: saveSpeciesHook,
+    speciesList,
+    maxOrder,
   });
 
-  const characteristicsHandler = createArrayHandler('characteristics');
-  const curiositiesHandler = createArrayHandler('curiosities');
-
-  const handleSaveSpecies = async () => {
-    if (!currentSpecies || !isAdminLoggedIn) {
-      toast({ title: "Acesso Negado", variant: "destructive" });
-      return;
-    }
-    
-    // Validation already in hook, but can keep basic client-side check
-    if (!currentSpecies.name || !currentSpecies.commonName || !currentSpecies.description) {
-      toast({ title: "Erro de validação", description: "Preencha Nome Popular, Nome Científico e Descrição.", variant: "destructive" });
-      return;
-    }
-    
-    // The originalImageUrl is the image URL that the species had when the dialog was opened for editing
-    // or null if it's a new species or had no image.
-    const originalImageUrl = isNewSpecies ? null : (speciesList.find(s => s.id === currentSpecies.id)?.image || null);
-
-    const success = await saveSpeciesHook(currentSpecies, isNewSpecies, imageFile, originalImageUrl);
-
-    if (success) {
-      setIsDialogOpen(false);
-      setImageFile(null); // Reset image file state
-      setImagePreview(null); // Reset preview
-      // currentSpecies will be updated by the fetchSpecies in the hook
-    }
-  };
-
   const handleDeleteSpecies = async (id: string) => {
-    // ... keep existing code (handleDeleteSpecies - now calls deleteSpeciesHook)
     if (!isAdminLoggedIn) {
       toast({ title: "Acesso Negado", description: "Você precisa estar logado como administrador.", variant: "destructive" });
       return;
     }
-    // Confirmation is in the hook
     await deleteSpeciesHook(id);
-    // List will be refreshed by the hook
   };
   
   const handleMove = async (currentIndex: number, direction: 'up' | 'down') => {
     await reorderSpecies(currentIndex, direction);
   };
-  // ... keep existing code (handleMoveUp, handleMoveDown)
+
   const handleMoveUp = (index: number) => handleMove(index, 'up');
   const handleMoveDown = (index: number) => handleMove(index, 'down');
 
@@ -198,7 +67,7 @@ export default function SpeciesAdmin() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Gerenciar Espécies Criadas</h1>
-        <Button onClick={openNewSpeciesDialog}>
+        <Button onClick={dialogManager.openNewSpeciesDialog}>
           <Plus className="mr-2 h-4 w-4" /> Nova Espécie
         </Button>
       </div>
@@ -211,14 +80,14 @@ export default function SpeciesAdmin() {
           {speciesList.length === 0 && !speciesLoading ? (
             <div className="text-center py-8">
               <p className="text-muted-foreground">Nenhuma espécie cadastrada.</p>
-              <Button onClick={openNewSpeciesDialog} className="mt-4">
+              <Button onClick={dialogManager.openNewSpeciesDialog} className="mt-4">
                 Adicionar Primeira Espécie
               </Button>
             </div>
           ) : (
             <SpeciesTable
               speciesList={speciesList}
-              onEdit={openEditSpeciesDialog}
+              onEdit={dialogManager.openEditSpeciesDialog}
               onDelete={handleDeleteSpecies}
               onMoveUp={handleMoveUp}
               onMoveDown={handleMoveDown}
@@ -228,25 +97,28 @@ export default function SpeciesAdmin() {
         </CardContent>
       </Card>
 
-      {currentSpecies && (
+      {dialogManager.currentSpecies && (
         <SpeciesDialog
-          isOpen={isDialogOpen}
-          onOpenChange={setIsDialogOpen}
-          isNewSpecies={isNewSpecies}
-          currentSpeciesData={currentSpecies}
-          onSave={handleSaveSpecies}
-          onInputChange={handleInputChange}
-          onCharacteristicChange={characteristicsHandler.handleChange}
-          onAddCharacteristic={characteristicsHandler.handleAdd}
-          onRemoveCharacteristic={characteristicsHandler.handleRemove}
-          onCuriosityChange={curiositiesHandler.handleChange}
-          onAddCuriosity={curiositiesHandler.handleAdd}
-          onRemoveCuriosity={curiositiesHandler.handleRemove}
-          imagePreview={imagePreview || currentSpecies.image} // Show form preview or existing image
-          imageFile={imageFile} // Pass the file itself
-          onImageChange={handleImageChange}
-          onRemoveImage={handleRemoveImage}
-          isLoading={speciesLoading} // Pass loading state to dialog if needed for submit button
+          isOpen={dialogManager.isDialogOpen}
+          onOpenChange={(isOpen) => {
+            if (!isOpen) dialogManager.setIsDialogOpen(); // Chama a função de fechar do hook
+            // Se precisar de lógica mais complexa para onOpenChange, ajuste o hook
+          }}
+          isNewSpecies={dialogManager.isNewSpecies}
+          currentSpeciesData={dialogManager.currentSpecies}
+          onSave={dialogManager.handleSave}
+          onInputChange={dialogManager.handleInputChange}
+          onCharacteristicChange={dialogManager.characteristicsHandler.handleChange}
+          onAddCharacteristic={dialogManager.characteristicsHandler.handleAdd}
+          onRemoveCharacteristic={dialogManager.characteristicsHandler.handleRemove}
+          onCuriosityChange={dialogManager.curiositiesHandler.handleChange}
+          onAddCuriosity={dialogManager.curiositiesHandler.handleAdd}
+          onRemoveCuriosity={dialogManager.curiositiesHandler.handleRemove}
+          imagePreview={dialogManager.imagePreview || dialogManager.currentSpecies.image}
+          imageFile={dialogManager.imageFile}
+          onImageChange={dialogManager.handleImageChange}
+          onRemoveImage={dialogManager.handleRemoveImage}
+          isLoading={speciesLoading} 
         />
       )}
     </div>
