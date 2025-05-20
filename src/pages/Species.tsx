@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from "react";
 import { Search as SearchIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,8 +31,27 @@ export default function Species() {
         setError("Falha ao carregar espécies. Tente novamente mais tarde.");
         setSpeciesList([]);
       } else {
-        console.log("SpeciesPage: Species fetched successfully:", data);
-        setSpeciesList(data as SpeciesType[]);
+        console.log("SpeciesPage: Species fetched successfully:", data?.length, "records");
+        if (data && data.length > 0) {
+          // Verificar se os dados têm a estrutura esperada
+          console.log("SpeciesPage: First species object:", data[0]);
+          
+          // Verificar especificamente a propriedade 'commonName'
+          if (data[0].commonName === undefined && data[0].commonname !== undefined) {
+            console.log("SpeciesPage: Remapping 'commonname' to 'commonName'");
+            // Mapeamento para corrigir inconsistências de nomenclatura
+            const mappedData = data.map(item => ({
+              ...item,
+              commonName: item.commonname,
+            }));
+            setSpeciesList(mappedData as SpeciesType[]);
+          } else {
+            setSpeciesList(data as SpeciesType[]);
+          }
+        } else {
+          console.log("SpeciesPage: No species data returned");
+          setSpeciesList([]);
+        }
       }
       setIsLoading(false);
       console.log("SpeciesPage: Loading finished.");

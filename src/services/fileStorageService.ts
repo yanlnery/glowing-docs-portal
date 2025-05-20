@@ -1,10 +1,11 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import React from 'react';
 // Import ToastActionElement
 import type { ToastActionElement } from "@/components/ui/toast";
 
-// Define um tipo para a função toast para clareza
-type ToastFunction = (props: {
+// Define um tipo para a função toast para clareza e exporte-o
+export type ToastFunction = (props: {
   title: string;
   description?: string;
   variant?: 'default' | 'destructive';
