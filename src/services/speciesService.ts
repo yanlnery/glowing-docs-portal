@@ -1,29 +1,26 @@
 
-import { supabase } from '@/integrations/supabase/client';
 import { Species } from '@/types/species';
 import { ToastFunction } from './fileStorageService';
-import { uploadFileToStorage, deleteFileFromStorage } from './fileStorageService';
+// Funções internas de DB
+import {
+  fetchSpeciesDataFromDb,
+  createSpeciesInDb,
+  updateSpeciesInDb,
+  deleteSpeciesFromDb,
+  reorderSpeciesInDb,
+} from './internal/speciesDb';
+// Funções internas de Imagem
+import {
+  handleSpeciesImageUploadOrRemoval,
+  deleteSpeciesImage,
+  SPECIES_BUCKET_NAME, // Importar se ainda necessário, ou usar o de speciesImage.ts
+} from './internal/speciesImage';
+// fileStorageService pode não ser mais necessário aqui diretamente
+// import { uploadFileToStorage, deleteFileFromStorage } from './fileStorageService'; // Remover se não usado diretamente
 
-const BUCKET_NAME = 'species_images';
 
-export const fetchSpeciesData = async (toast: ToastFunction): Promise<Species[]> => {
-  console.log("SpeciesService: Attempting to fetch species data...");
-  const { data, error } = await supabase
-    .from('species')
-    .select('*')
-    .order('order', { ascending: true });
-
-  if (error) {
-    console.error("SpeciesService: Error fetching species:", error);
-    toast({ title: "Erro ao carregar espécies (serviço)", description: error.message, variant: "destructive" });
-    return [];
-  }
-  
-  console.log("SpeciesService: Species fetched successfully:", data);
-  return data as Species[];
-};
-
-export const generateSlug = (name: string): string => {
+// Helper local para gerar slug, já que não é usado em mais nenhum local
+const generateLocalSlug = (name: string): string => {
   if (!name) return '';
   return name
     .toLowerCase()
@@ -31,22 +28,39 @@ export const generateSlug = (name: string): string => {
     .replace(/[^\w-]+/g, '');
 };
 
+
+export const fetchSpeciesData = async (toast: ToastFunction): Promise<Species[]> => {
+  console.log("SpeciesService: Chamando fetchSpeciesDataFromDb...");
+  const { data, error } = await fetchSpeciesDataFromDb();
+
+  if (error) {
+    toast({ title: "Erro ao carregar espécies", description: error.message, variant: "destructive" });
+    return [];
+  }
+  
+  console.log("SpeciesService: Espécies buscadas com sucesso.");
+  return data || [];
+};
+
+// A função generateSlug foi movida para ser local (generateLocalSlug) ou removida se não for mais exportada.
+// export const generateSlug = generateLocalSlug; // Remover se não precisar exportar
+
 export const saveSpeciesData = async (
-  speciesData: Omit<Species, 'id' | 'created_at' | 'updated_at'> & { id?: string },
+  speciesFormData: Omit<Species, 'id' | 'created_at' | 'updated_at'> & { id?: string },
   isNew: boolean,
-  imageFile: File | null,
-  originalImageUrl: string | null,
+  imageFile: File | null, // Novo arquivo de imagem
+  originalImageUrlFromDb: string | null, // URL da imagem atualmente no DB (para edições)
   toast: ToastFunction
 ): Promise<boolean> => {
-  if (!speciesData.name || !speciesData.commonName) {
+  if (!speciesFormData.name || !speciesFormData.commonName) {
     toast({ title: "Erro de validação", description: "Preencha Nome Popular e Nome Científico.", variant: "destructive" });
     return false;
   }
 
-  let speciesToSave = { ...speciesData };
+  let speciesToSave = { ...speciesFormData };
   
   if (!speciesToSave.slug || speciesToSave.slug.trim() === '') {
-    speciesToSave.slug = generateSlug(speciesData.name);
+    speciesToSave.slug = generateLocalSlug(speciesFormData.name);
   }
   
   if (!speciesToSave.slug) {
@@ -55,185 +69,102 @@ export const saveSpeciesData = async (
   }
 
   // Processar imagem
-  let finalImageUrl = await processSpeciesImage(
-    speciesData.image,
+  // currentImageValueInForm é o speciesToSave.image, que reflete o estado do formulário
+  const imageProcessingResult = await handleSpeciesImageUploadOrRemoval(
+    speciesToSave.image, // Valor da imagem vindo do formulário
     isNew,
     imageFile,
-    originalImageUrl,
+    originalImageUrlFromDb,
     toast
   );
 
-  if (finalImageUrl === false) {
-    // Erro no processamento da imagem
+  if (imageProcessingResult === false) { // false indica erro no processamento da imagem
+    // Toast já foi chamado por handleSpeciesImageUploadOrRemoval ou fileStorageService
     return false;
   }
   
+  const finalImageUrl = imageProcessingResult; // Pode ser string (URL) ou null
+
   const dbPayload: Omit<Species, 'id' | 'created_at' | 'updated_at'> = {
     name: speciesToSave.name,
     commonName: speciesToSave.commonName,
     slug: speciesToSave.slug,
     type: speciesToSave.type || 'outro',
-    image: finalImageUrl,
+    image: finalImageUrl, // Usa a URL final da imagem processada
     description: speciesToSave.description || '',
     characteristics: speciesToSave.characteristics || [],
     curiosities: speciesToSave.curiosities || [],
     order: typeof speciesToSave.order === 'number' ? speciesToSave.order : 0,
   };
 
-  return isNew ? 
-    createNewSpecies(dbPayload, toast) : 
-    updateExistingSpecies(dbPayload, speciesData.id, toast);
-};
-
-// Função auxiliar para processar a imagem da espécie
-const processSpeciesImage = async (
-  currentImage: string | null,
-  isNew: boolean,
-  imageFile: File | null,
-  originalImageUrl: string | null,
-  toast: ToastFunction
-): Promise<string | null | false> => {
-  let finalImageUrl: string | null = currentImage;
-
-  try {
-    if (imageFile) {
-      // Se estamos atualizando e há um URL original, deletamos
-      if (!isNew && originalImageUrl) {
-        await deleteFileFromStorage(originalImageUrl, BUCKET_NAME, toast);
-      }
-      
-      // Upload da nova imagem
-      const newUrl = await uploadFileToStorage(imageFile, BUCKET_NAME, toast);
-      if (!newUrl) {
-        return false; // Erro no upload
-      }
-      finalImageUrl = newUrl;
-    } 
-    // Caso onde queremos remover a imagem existente
-    else if (!isNew && originalImageUrl && currentImage === null) {
-      await deleteFileFromStorage(originalImageUrl, BUCKET_NAME, toast);
-      finalImageUrl = null;
+  let result;
+  if (isNew) {
+    result = await createSpeciesInDb(dbPayload);
+  } else {
+    if (!speciesFormData.id) {
+        toast({ title: "Erro", description: "ID da espécie ausente para atualização.", variant: "destructive" });
+        return false;
     }
-    
-    return finalImageUrl;
-  } catch (error) {
-    console.error("Error processing species image:", error);
-    toast({ 
-      title: "Erro no processamento da imagem", 
-      description: error instanceof Error ? error.message : "Erro desconhecido", 
-      variant: "destructive" 
-    });
+    result = await updateSpeciesInDb(dbPayload, speciesFormData.id);
+  }
+
+  if (result.error) {
+    const action = isNew ? "adicionar" : "atualizar";
+    toast({ title: `Erro ao ${action} espécie`, description: result.error.message, variant: "destructive" });
+    // Se houve erro ao salvar no DB e uma nova imagem foi carregada, ela precisa ser removida do storage.
+    // Isso é complexo porque a imagem antiga já pode ter sido removida.
+    // Por simplicidade, a imagem carregada pode ficar órfã ou uma lógica de rollback mais complexa seria necessária.
+    // O handleSpeciesImageUploadOrRemoval já lida com a remoção da imagem antiga ANTES do upload da nova.
+    // Se o upload da NOVA falha, ela não existe. Se o upload da NOVA SUCEDE mas o DB falha, a NOVA imagem existe.
+    // Para reverter, precisaríamos saber qual era a originalImageUrlFromDb para restaurá-la, o que não é trivial.
+    // E se a nova imagem foi carregada (finalImageUrl não é o originalImageUrlFromDb), e o DB falhou, deletamos a nova.
+    if (finalImageUrl && finalImageUrl !== originalImageUrlFromDb) {
+        console.warn(`DB ${isNew ? 'insert' : 'update'} failed after image upload. Attempting to clean up uploaded image: ${finalImageUrl}`);
+        await deleteSpeciesImage(finalImageUrl, toast); // Tenta limpar a nova imagem
+    }
     return false;
   }
-};
 
-// Função para criar uma nova espécie
-const createNewSpecies = async (
-  dbPayload: Omit<Species, 'id' | 'created_at' | 'updated_at'>,
-  toast: ToastFunction
-): Promise<boolean> => {
-  const { data, error } = await supabase
-    .from('species')
-    .insert(dbPayload)
-    .select()
-    .single();
-
-  if (error) {
-    const errorMsg = `Erro ao adicionar espécie: ${error.message}`;
-    toast({ title: "Erro", description: errorMsg, variant: "destructive" });
-    console.error(errorMsg, error);
-    
-    // Se houve erro e temos uma imagem, devemos limpar
-    if (dbPayload.image) {
-      await deleteFileFromStorage(dbPayload.image, BUCKET_NAME, toast);
-    }
-    return false;
-  } 
-  
-  if (data) {
+  if (result.data) {
+    const action = isNew ? "adicionada" : "atualizada";
     toast({ 
       title: "Sucesso", 
-      description: `${data.commonName} adicionada com sucesso!`, 
+      description: `${result.data.commonName} ${action} com sucesso!`, 
       variant: "default" 
     });
     return true;
   }
   
-  const unexpectedMsg = "Erro ao adicionar espécie: resposta inesperada do servidor.";
+  // Caso inesperado
+  const unexpectedMsg = `Erro ao ${isNew ? "adicionar" : "atualizar"} espécie: resposta inesperada do servidor.`;
   toast({ title: "Erro", description: unexpectedMsg, variant: "destructive" });
-  console.error(unexpectedMsg);
-  
-  // Cleanup em caso de erro
-  if (dbPayload.image) {
-    await deleteFileFromStorage(dbPayload.image, BUCKET_NAME, toast);
-  }
   return false;
 };
 
-// Função para atualizar uma espécie existente
-const updateExistingSpecies = async (
-  dbPayload: Omit<Species, 'id' | 'created_at' | 'updated_at'>,
-  id: string | undefined,
-  toast: ToastFunction
-): Promise<boolean> => {
-  if (!id) {
-    const errorMsg = "ID da espécie ausente para atualização.";
-    toast({ title: "Erro", description: errorMsg, variant: "destructive" });
-    console.error(errorMsg);
-    return false;
-  }
-
-  const { data, error } = await supabase
-    .from('species')
-    .update(dbPayload)
-    .eq('id', id)
-    .select()
-    .single();
-
-  if (error) {
-    const errorMsg = `Erro ao atualizar espécie: ${error.message}`;
-    toast({ title: "Erro", description: errorMsg, variant: "destructive" });
-    console.error(errorMsg, error);
-    return false;
-  } 
-  
-  if (data) {
-    toast({ 
-      title: "Sucesso", 
-      description: `${data.commonName} atualizada com sucesso!`, 
-      variant: "default" 
-    });
-    return true;
-  }
-  
-  const unexpectedMsg = `Erro ao atualizar espécie: resposta inesperada do servidor.`;
-  toast({ title: "Erro", description: unexpectedMsg, variant: "destructive" });
-  console.error(unexpectedMsg);
-  return false;
-};
 
 export const deleteSpeciesRecord = async (
   id: string,
-  species: Species[],
+  speciesList: Species[], // Mantido para encontrar a espécie e sua imagem
   toast: ToastFunction
 ): Promise<boolean> => {
-  const speciesToDelete = species.find(s => s.id === id);
+  const speciesToDelete = speciesList.find(s => s.id === id);
   if (!speciesToDelete) {
-    toast({title: "Erro", description: "Espécie não encontrada.", variant: "destructive"});
+    toast({title: "Erro", description: "Espécie não encontrada para exclusão.", variant: "destructive"});
     return false;
   }
 
   // Deletar imagem se existir
   if (speciesToDelete.image) { 
-    await deleteFileFromStorage(speciesToDelete.image, BUCKET_NAME, toast);
+    // A função deleteSpeciesImage já lida com toasts de erro de imagem
+    await deleteSpeciesImage(speciesToDelete.image, toast);
+    // Não precisamos verificar o resultado aqui, prosseguimos para a exclusão do DB.
+    // Se a imagem não for deletada, o registro do DB ainda será removido.
   }
 
-  const { error: deleteDbError } = await supabase.from('species').delete().eq('id', id);
+  const { error: deleteDbError } = await deleteSpeciesFromDb(id);
   
   if (deleteDbError) {
-    const errorMsg = `Erro ao excluir espécie: ${deleteDbError.message}`;
-    toast({ title: "Erro", description: errorMsg, variant: "destructive" });
-    console.error("Error deleting species from DB: ", deleteDbError);
+    toast({ title: "Erro ao excluir espécie do DB", description: deleteDbError.message, variant: "destructive" });
     return false;
   } 
   
@@ -251,48 +182,17 @@ export const reorderSpeciesItems = async (
   direction: 'up' | 'down',
   toast: ToastFunction
 ): Promise<Species[] | null> => {
-  const newSpeciesList = [...speciesList];
-  const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
-
-  if (targetIndex < 0 || targetIndex >= newSpeciesList.length) {
-    return null;
-  }
+  // A lógica de reordenação e os updates no DB são tratados por reorderSpeciesInDb
+  // reorderSpeciesInDb já lida com toasts para erros de DB.
+  const updatedList = await reorderSpeciesInDb(speciesList, currentIndex, direction, toast);
   
-  const itemToMove = newSpeciesList[currentIndex];
-  const itemAtTarget = newSpeciesList[targetIndex];
-
-  const currentOrder = Number(itemToMove.order) || 0;
-  const targetOrder = Number(itemAtTarget.order) || 0;
-
-  // Swap orders
-  itemToMove.order = targetOrder;
-  itemAtTarget.order = currentOrder;
-  
-  try {
-    const updates = [
-      supabase.from('species').update({ order: targetOrder }).eq('id', itemToMove.id),
-      supabase.from('species').update({ order: currentOrder }).eq('id', itemAtTarget.id)
-    ];
-    
-    const results = await Promise.all(updates);
-    
-    const errors = results.filter(res => res.error);
-    if (errors.length > 0) {
-      errors.forEach(err => {
-        toast({ title: "Erro ao reordenar", description: err.error?.message, variant: "destructive"});
-        console.error("Reorder error: ", err.error);
-      });
-      return null;
-    }
-    
-    toast({ title: "Ordem atualizada" });
-    
-    // Retorna a lista atualizada e ordenada
-    newSpeciesList.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
-    return newSpeciesList;
-  } catch (error: any) {
-    toast({ title: "Erro Crítico ao Reordenar", description: error.message, variant: "destructive"});
-    console.error("Critical reorder error: ", error);
+  if (updatedList) {
+    toast({ title: "Ordem atualizada com sucesso!" }); // Toast de sucesso geral da operação
+    return updatedList;
+  } else {
+    // Se reorderSpeciesInDb retornou null, um erro já foi toastado por ela.
+    // Podemos adicionar um toast mais genérico se necessário, ou confiar nos toasts específicos.
+    // toast({ title: "Falha ao reordenar", description: "Não foi possível atualizar a ordem das espécies.", variant: "destructive" });
     return null;
   }
 };
