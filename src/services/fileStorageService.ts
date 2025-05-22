@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import React from 'react';
 // Import ToastActionElement
@@ -40,7 +39,13 @@ export const uploadFileToStorage = async (
   bucketName: string,
   toast: ToastFunction
 ): Promise<string | null> => {
-  const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
+  const sanitizedFileName = file.name
+    .normalize("NFD") // Normaliza para decompor caracteres acentuados
+    .replace(/[\u0300-\u036f]/g, "") // Remove os diacríticos (acentos)
+    .replace(/\s+/g, '_') // Substitui espaços por underscores
+    .replace(/[^a-zA-Z0-9._-]/g, ""); // Remove caracteres não permitidos, mantendo letras, números, ., _, -
+
+  const fileName = `${Date.now()}-${sanitizedFileName}`;
   // O Supabase considera o filePath como o caminho dentro do bucket.
   // Se não houver pastas, será apenas o nome do arquivo.
   const filePath = fileName;
