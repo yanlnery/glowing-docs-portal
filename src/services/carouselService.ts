@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 
@@ -8,7 +7,7 @@ export type CarouselItemInsert = TablesInsert<'carousel_items'>;
 export type CarouselItemUpdate = TablesUpdate<'carousel_items'>;
 
 export async function fetchCarouselItems(): Promise<CarouselItemSchema[]> {
-  console.log("Fetching carousel items...");
+  console.log("Fetching carousel items from service...");
   const { data, error } = await supabase
     .from("carousel_items")
     .select("*")
@@ -16,42 +15,66 @@ export async function fetchCarouselItems(): Promise<CarouselItemSchema[]> {
 
   if (error) {
     console.error("Erro ao buscar itens do carrossel no serviço:", error);
-    return [];
+    // Retornar array vazio em caso de erro para não quebrar a UI
+    return []; 
   }
 
-  console.log("Carousel items fetched successfully:", data);
+  console.log("Carousel items fetched successfully from service:", data);
   
-  // Verificar se as URLs das imagens estão completas e válidas
   if (data && data.length > 0) {
     data.forEach(item => {
       if (item.image_url) {
-        console.log(`Item ID ${item.id} image_url: ${item.image_url}`);
+        console.log(`Item ID ${item.id} image_url from DB: ${item.image_url}`);
       } else {
-        console.warn(`Item ID ${item.id} não possui URL de imagem`);
+        console.warn(`Item ID ${item.id} não possui URL de imagem no DB`);
       }
     });
+  } else if (data === null) {
+    console.warn("fetchCarouselItems: Supabase retornou 'data' como null. Retornando array vazio.");
+    return [];
+  } else if (data.length === 0) {
+    console.info("fetchCarouselItems: Nenhum item de carrossel encontrado no banco de dados.");
   }
   
-  return data || [];
+  return data || []; // Fallback para array vazio se data for null/undefined
 }
 
 export async function uploadCarouselImage(file: File): Promise<string | null> {
-  const filePath = `public/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+  console.log("uploadCarouselImage: Iniciando upload para o arquivo:", file.name);
+  // Sanitize file name to remove problematic characters and ensure uniqueness
+  const sanitizedFileName = file.name
+    .normalize("NFD") // Normalize to decompose accented characters
+    .replace(/[\u0300-\u036f]/g, "") // Remove diacritics (accents)
+    .replace(/\s+/g, "_") // Replace spaces with underscores
+    .replace(/[^\w.-]/g, ""); // Remove non-alphanumeric characters except ., _, -
+  
+  const filePath = `public/${Date.now()}_${sanitizedFileName}`;
+  console.log("uploadCarouselImage: Caminho do arquivo no bucket:", filePath);
 
   const { error: uploadError } = await supabase.storage
-    .from("carousel_image_files") 
-    .upload(filePath, file, { upsert: true }); // Added upsert:true for safety if file name collides
+    .from("carousel_image_files") // Certifique-se que este é o nome correto do seu bucket
+    .upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: true, // Sobrescreve se o arquivo com o mesmo nome já existir
+    });
 
   if (uploadError) {
-    console.error("Erro ao fazer upload da imagem:", uploadError);
+    console.error("Erro ao fazer upload da imagem para o Supabase Storage:", uploadError);
     return null;
   }
 
-  const { data } = supabase.storage
-    .from("carousel_image_files")
+  console.log("uploadCarouselImage: Upload bem-sucedido. Obtendo URL pública...");
+  const { data: publicUrlData } = supabase.storage
+    .from("carousel_image_files") // Novamente, o nome do bucket
     .getPublicUrl(filePath);
 
-  return data?.publicUrl ?? null;
+  if (!publicUrlData || !publicUrlData.publicUrl) {
+    console.error("uploadCarouselImage: Não foi possível obter a URL pública do arquivo:", publicUrlData);
+    return null;
+  }
+  
+  console.log("uploadCarouselImage: URL pública obtida:", publicUrlData.publicUrl);
+  return publicUrlData.publicUrl; // Retorna a URL pública completa
 }
 
 export async function insertCarouselItem(item: CarouselItemInsert): Promise<CarouselItemSchema | null> {

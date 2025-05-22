@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -35,9 +34,12 @@ export default function HeroCarouselUI({
   handleIndicatorClick,
 }: HeroCarouselUIProps) {
   
-  console.log("HeroCarouselUI: Rendering with props:", {
-    isLoading, error, itemsCount: carouselImagesData.length, currentIndex: currentImageIndex, currentSlideData
+  // Log para verificar os dados recebidos
+  console.log("HeroCarouselUI: Props recebidas", {
+    isLoading, error, itemsCount: carouselImagesData.length, currentIndex: currentImageIndex, currentSlideDataId: currentSlideData.id
   });
+  console.log("HeroCarouselUI: Slides recebidos (carouselImagesData):", carouselImagesData);
+
 
   if (error) {
     return (
@@ -55,7 +57,7 @@ export default function HeroCarouselUI({
     );
   }
 
-  if (carouselImagesData.length === 0) {
+  if (carouselImagesData.length === 0 && !isLoading) {
     console.log("HeroCarouselUI: No images to display, rendering fallback for empty data.");
     return (
       <div className="relative h-[60vh] md:h-[70vh] overflow-hidden flex items-center justify-center bg-gray-200 dark:bg-gray-800 px-4 text-center">
@@ -67,7 +69,8 @@ export default function HeroCarouselUI({
     );
   }
   
-  console.log("HeroCarouselUI: Rendering text content with currentSlideData:", currentSlideData);
+  // Log para verificar currentSlideData antes do render do texto
+  console.log("HeroCarouselUI: Renderizando texto com currentSlideData:", currentSlideData);
 
   return (
     <div className="relative w-full">
@@ -83,26 +86,30 @@ export default function HeroCarouselUI({
         >
           <CarouselContent className="h-full" style={{ touchAction: 'pan-y' }}>
             {carouselImagesData.map((item, index) => {
-              console.log(`HeroCarouselUI: Rendering CarouselItem ${index} with data:`, item);
+              // Log para cada item, especialmente a URL da imagem
+              console.log(`HeroCarouselUI: Renderizando CarouselItem ${index} com image_url:`, item.image_url);
+              
+              const backgroundImageUrl = 
+                item.image_url && item.image_url.startsWith("http")
+                ? item.image_url
+                : "/placeholder.svg"; // Usando placeholder.svg como fallback padrão
+
+              console.log(`HeroCarouselUI: Imagem para slide ${index}: ${backgroundImageUrl}`);
+
               return (
                 <CarouselItem key={item.id || index} className="h-full">
                   <div className="relative h-full">
                     <div
                       className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
                       style={{ 
-                        backgroundImage: item.image_url 
-                          ? `url(${item.image_url})` 
-                          : `url(/placeholder.svg)`,
-                        }}
+                        backgroundImage: `url(${backgroundImageUrl})`,
+                      }}
                       aria-label={item.alt_text || "Imagem do carrossel"}
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10"></div>
                     </div>
-                    {!item.image_url && (
-                      <div className="absolute inset-0 bg-gray-300 flex items-center justify-center z-0">
-                        <p className="text-gray-500">Imagem indisponível</p>
-                      </div>
-                    )}
+                    {/* Se a URL original não era válida e estamos usando o fallback, podemos mostrar uma mensagem
+                    Removido o placeholder de imagem indisponível aqui, pois o fallback já cuida disso */}
                   </div>
                 </CarouselItem>
               );
@@ -157,4 +164,3 @@ export default function HeroCarouselUI({
     </div>
   );
 }
-
