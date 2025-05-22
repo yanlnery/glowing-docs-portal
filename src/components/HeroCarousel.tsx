@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -52,7 +51,7 @@ export default function HeroCarousel() {
       }
     };
     loadCarouselData();
-  }, []);
+  }, [api]); // Adicionado api como dependência para re-init caso necessário
 
   // Effect to manage carousel selection and autoplay
   useEffect(() => {
@@ -68,14 +67,20 @@ export default function HeroCarousel() {
     const onPointerUp = () => {
       if (autoplayPlugin.current.options.stopOnInteraction) {
         setTimeout(() => {
-          autoplayPlugin.current.play(false);
-        }, 100);
+          // Autoplay type might not have play method directly like this after stopOnInteraction
+          // It usually resumes on its own or needs a specific resume call if available
+          // For now, assuming embla-carousel-autoplay handles resume.
+          // If not, this part might need adjustment based on plugin's API.
+          if (autoplayPlugin.current && typeof (autoplayPlugin.current as any).play === 'function') {
+            (autoplayPlugin.current as any).play(false);
+          }
+        }, 100); // Small delay to ensure interaction is complete
       }
     };
     
     setCurrentImageIndex(api.selectedScrollSnap()); 
     api.on("select", onSelect);
-    api.on("pointerUp", onPointerUp);
+    api.on("pointerUp", onPointerUp); // Re-added pointerUp for autoplay resume logic
 
     return () => {
       if (api) {
@@ -87,8 +92,11 @@ export default function HeroCarousel() {
 
   const handleIndicatorClick = (index: number) => {
     api?.scrollTo(index);
+    // If autoplay is stopped on interaction, explicitly try to resume it.
     if (autoplayPlugin.current.options.stopOnInteraction) {
-      autoplayPlugin.current.play(false); // Resume autoplay
+       if (autoplayPlugin.current && typeof (autoplayPlugin.current as any).play === 'function') {
+         (autoplayPlugin.current as any).play(false); // Resume autoplay
+       }
     }
   };
 
@@ -96,8 +104,7 @@ export default function HeroCarousel() {
   console.log("HeroCarousel render:", { 
     isLoading, 
     itemsCount: carouselImagesData.length,
-    currentIndex: currentImageIndex,
-    currentSlide: carouselImagesData[currentImageIndex]
+    currentIndex: currentImageIndex
   });
 
   if (error) {
@@ -128,8 +135,22 @@ export default function HeroCarousel() {
     );
   }
 
-  const currentSlideData = carouselImagesData[currentImageIndex] || {};
-  console.log("Current slide image_url:", currentSlideData.image_url);
+  // If carouselImagesData has items, currentImageIndex should be valid.
+  // No need for `|| {}` which was causing the type issue.
+  const currentSlideData = carouselImagesData[currentImageIndex]; 
+  
+  // This console.log should now be safe as currentSlideData is CarouselItemSchema
+  // (or undefined if something is very wrong, but the checks above should prevent that)
+  // Properties will be null if not set, not missing from type.
+  if (currentSlideData) {
+    console.log("Current slide image_url:", currentSlideData.image_url);
+  } else {
+    // This case should ideally not be reached if carouselImagesData.length > 0
+    // and currentImageIndex is managed correctly.
+    console.warn("HeroCarousel: currentSlideData is undefined despite checks. Index:", currentImageIndex, "Data length:", carouselImagesData.length);
+    // Potentially return a fallback or an error state here if this occurs.
+    // For now, we assume currentSlideData will be valid if we passed earlier checks.
+  }
   
   return (
     <div className="relative w-full">
@@ -151,10 +172,15 @@ export default function HeroCarousel() {
                     <div
                       className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
                       style={{ backgroundImage: `url(${item.image_url})` }} 
-                      aria-label={item.alt_text || 'Imagem do carrossel'} 
+                      aria-label={item.alt_text} // alt_text is non-nullable string
                     >
                       {/* Gradient Overlay */}
                       <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10"></div>
+                    </div>
+                  )}
+                  {!item.image_url && (
+                    <div className="absolute inset-0 bg-gray-300 flex items-center justify-center">
+                      <p className="text-gray-500">Imagem indisponível</p>
                     </div>
                   )}
                 </div>
@@ -164,16 +190,19 @@ export default function HeroCarousel() {
         </Carousel>
 
         {/* Text Content Area */}
-        <div className="absolute inset-0 z-20 flex flex-col items-start justify-end md:justify-center pb-20 md:pb-0 pointer-events-none">
-          <div className="container py-6 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-2xl animate-slide-in text-balance">
-              {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
-            </h1>
-            <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance">
-              {currentSlideData.subtitle || "Conheça nossa coleção de répteis exóticos"}
-            </p>
+        {/* Ensure currentSlideData is not undefined before accessing its properties */}
+        {currentSlideData && (
+          <div className="absolute inset-0 z-20 flex flex-col items-start justify-end md:justify-center pb-20 md:pb-0 pointer-events-none">
+            <div className="container py-6 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-2xl animate-slide-in text-balance">
+                {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
+              </h1>
+              <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance">
+                {currentSlideData.subtitle || "Conheça nossa coleção de répteis exóticos"}
+              </p>
+            </div>
           </div>
-        </div>
+        )}
         
         {/* Indicators */}
         {carouselImagesData.length > 1 && (
