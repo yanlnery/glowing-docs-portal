@@ -27,31 +27,32 @@ export default function HeroCarousel() {
     const loadCarouselData = async () => {
       console.log("HeroCarousel: Attempting to load carousel data...");
       setIsLoading(true);
+      setError(null); // Limpar erros anteriores
       try {
         const items = await fetchCarouselItems();
-        console.log("HeroCarousel: Fetched items", items);
+        console.log("HeroCarousel: Fetched items raw response", items);
         
         if (items && Array.isArray(items)) {
           setCarouselImagesData(items);
-          if (api && items.length > 0) {
-            api.reInit();
+          if (items.length === 0) {
+            console.warn("HeroCarousel: Fetched data is an empty array. No items to display.");
           }
         } else {
-          console.error("HeroCarousel: Unexpected data format:", items);
-          setError("Formato de dados inesperado");
+          console.error("HeroCarousel: Unexpected data format or null/undefined items array:", items);
+          setError("Formato de dados inesperado recebido do serviço.");
           setCarouselImagesData([]);
         }
-      } catch (error) {
-        console.error("HeroCarousel: Failed to load carousel items in component:", error);
-        setError("Falha ao carregar dados");
+      } catch (fetchError) {
+        console.error("HeroCarousel: Failed to load carousel items in component:", fetchError);
+        setError("Falha ao carregar dados do carrossel.");
         setCarouselImagesData([]);
       } finally {
         setIsLoading(false);
-        console.log("HeroCarousel: Loading finished. Items count:", carouselImagesData.length);
+        console.log("HeroCarousel: Data loading attempt finished.");
       }
     };
     loadCarouselData();
-  }, [api]); // Adicionado api como dependência para re-init caso necessário
+  }, [api]); // Dependência `api` mantida para re-init se necessário, mas reInit() removido de dentro.
 
   // Effect to manage carousel selection and autoplay
   useEffect(() => {
@@ -67,20 +68,16 @@ export default function HeroCarousel() {
     const onPointerUp = () => {
       if (autoplayPlugin.current.options.stopOnInteraction) {
         setTimeout(() => {
-          // Autoplay type might not have play method directly like this after stopOnInteraction
-          // It usually resumes on its own or needs a specific resume call if available
-          // For now, assuming embla-carousel-autoplay handles resume.
-          // If not, this part might need adjustment based on plugin's API.
           if (autoplayPlugin.current && typeof (autoplayPlugin.current as any).play === 'function') {
             (autoplayPlugin.current as any).play(false);
           }
-        }, 100); // Small delay to ensure interaction is complete
+        }, 100); 
       }
     };
     
     setCurrentImageIndex(api.selectedScrollSnap()); 
     api.on("select", onSelect);
-    api.on("pointerUp", onPointerUp); // Re-added pointerUp for autoplay resume logic
+    api.on("pointerUp", onPointerUp);
 
     return () => {
       if (api) {
@@ -92,19 +89,20 @@ export default function HeroCarousel() {
 
   const handleIndicatorClick = (index: number) => {
     api?.scrollTo(index);
-    // If autoplay is stopped on interaction, explicitly try to resume it.
     if (autoplayPlugin.current.options.stopOnInteraction) {
        if (autoplayPlugin.current && typeof (autoplayPlugin.current as any).play === 'function') {
-         (autoplayPlugin.current as any).play(false); // Resume autoplay
+         (autoplayPlugin.current as any).play(false); 
        }
     }
   };
-
-  // Debugging output
-  console.log("HeroCarousel render:", { 
+  
+  // Log de estado final antes do render principal
+  console.log("HeroCarousel: Final state before render:", { 
     isLoading, 
+    error,
     itemsCount: carouselImagesData.length,
-    currentIndex: currentImageIndex
+    currentIndex: currentImageIndex,
+    carouselImagesData // Logar os dados completos para inspeção
   });
 
   if (error) {
@@ -124,33 +122,30 @@ export default function HeroCarousel() {
   }
 
   if (carouselImagesData.length === 0) {
-    console.log("HeroCarousel: No images to display, rendering fallback.");
+    console.log("HeroCarousel: No images to display, rendering fallback for empty data.");
     return (
       <div className="relative h-[60vh] md:h-[70vh] overflow-hidden flex items-center justify-center bg-gray-200 dark:bg-gray-800 px-4 text-center">
         <div>
           <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">Nenhuma imagem para exibir no carrossel.</p>
-          <p className="text-sm text-gray-400 dark:text-gray-300">Adicione imagens no painel administrativo para ativar o carrossel.</p>
+          <p className="text-sm text-gray-400 dark:text-gray-300">Verifique o painel administrativo ou tente novamente mais tarde.</p>
         </div>
       </div>
     );
   }
 
-  // If carouselImagesData has items, currentImageIndex should be valid.
-  // No need for `|| {}` which was causing the type issue.
-  const currentSlideData = carouselImagesData[currentImageIndex]; 
+  // Definição de currentSlideData com fallback, conforme solicitado
+  const currentSlideData = carouselImagesData[currentImageIndex] ?? {
+    id: "fallback-id", // Adicionado fallback para todos os campos de CarouselItemSchema
+    image_url: "", // Será tratado pelo fallback no style da imagem
+    alt_text: "Informação do slide indisponível",
+    title: "Título Indisponível",
+    subtitle: "Subtítulo indisponível",
+    item_order: 0,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
   
-  // This console.log should now be safe as currentSlideData is CarouselItemSchema
-  // (or undefined if something is very wrong, but the checks above should prevent that)
-  // Properties will be null if not set, not missing from type.
-  if (currentSlideData) {
-    console.log("Current slide image_url:", currentSlideData.image_url);
-  } else {
-    // This case should ideally not be reached if carouselImagesData.length > 0
-    // and currentImageIndex is managed correctly.
-    console.warn("HeroCarousel: currentSlideData is undefined despite checks. Index:", currentImageIndex, "Data length:", carouselImagesData.length);
-    // Potentially return a fallback or an error state here if this occurs.
-    // For now, we assume currentSlideData will be valid if we passed earlier checks.
-  }
+  console.log("HeroCarousel: Rendering text content with currentSlideData:", currentSlideData);
   
   return (
     <div className="relative w-full">
@@ -165,44 +160,47 @@ export default function HeroCarousel() {
           className="h-full"
         >
           <CarouselContent className="h-full" style={{ touchAction: 'pan-y' }}>
-            {carouselImagesData.map((item, index) => (
-              <CarouselItem key={item.id || index} className="h-full">
-                <div className="relative h-full">
-                  {item.image_url && (
+            {carouselImagesData.map((item, index) => {
+              // Log para cada item renderizado no carrossel
+              console.log(`HeroCarousel: Rendering CarouselItem ${index} with data:`, item);
+              return (
+                <CarouselItem key={item.id || index} className="h-full">
+                  <div className="relative h-full">
                     <div
                       className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
-                      style={{ backgroundImage: `url(${item.image_url})` }} 
-                      aria-label={item.alt_text} // alt_text is non-nullable string
+                      style={{ 
+                        backgroundImage: item.image_url 
+                          ? `url(${item.image_url})` 
+                          : `url(/placeholder.svg)`, // Fallback para imagem
+                        }}
+                      aria-label={item.alt_text || "Imagem do carrossel"}
                     >
-                      {/* Gradient Overlay */}
                       <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10"></div>
                     </div>
-                  )}
-                  {!item.image_url && (
-                    <div className="absolute inset-0 bg-gray-300 flex items-center justify-center">
-                      <p className="text-gray-500">Imagem indisponível</p>
-                    </div>
-                  )}
-                </div>
-              </CarouselItem>
-            ))}
+                    {/* Fallback visual caso a imagem não carregue mas a URL exista (raro com backgroundImage) */}
+                    {!item.image_url && (
+                      <div className="absolute inset-0 bg-gray-300 flex items-center justify-center z-0">
+                        <p className="text-gray-500">Imagem indisponível</p>
+                      </div>
+                    )}
+                  </div>
+                </CarouselItem>
+              );
+            })}
           </CarouselContent>
         </Carousel>
 
-        {/* Text Content Area */}
-        {/* Ensure currentSlideData is not undefined before accessing its properties */}
-        {currentSlideData && (
-          <div className="absolute inset-0 z-20 flex flex-col items-start justify-end md:justify-center pb-20 md:pb-0 pointer-events-none">
-            <div className="container py-6 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-2xl animate-slide-in text-balance">
-                {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
-              </h1>
-              <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance">
-                {currentSlideData.subtitle || "Conheça nossa coleção de répteis exóticos"}
-              </p>
-            </div>
+        {/* Text Content Area - Usando currentSlideData com fallback */}
+        <div className="absolute inset-0 z-20 flex flex-col items-start justify-end md:justify-center pb-20 md:pb-0 pointer-events-none">
+          <div className="container py-6 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-2xl animate-slide-in text-balance">
+              {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
+            </h1>
+            <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance">
+              {currentSlideData.subtitle || "Conheça nossa coleção de répteis exóticos"}
+            </p>
           </div>
-        )}
+        </div>
         
         {/* Indicators */}
         {carouselImagesData.length > 1 && (
