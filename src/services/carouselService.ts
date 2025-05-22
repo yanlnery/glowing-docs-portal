@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 
@@ -16,17 +15,10 @@ export async function fetchCarouselItems(): Promise<CarouselItemSchema[]> {
 
   if (error) {
     console.error("Erro ao buscar itens do carrossel no serviço:", error);
-    // Adicionando um log mais explícito para o frontend, se necessário
-    // alert("Falha ao carregar dados do carrossel. Verifique o console.");
     return [];
   }
 
-  if (data) {
-    console.log("Carousel items fetched successfully:", data);
-  } else {
-    console.warn("Carousel items fetch returned no data, but no error.");
-  }
-
+  console.log("Carousel items fetched successfully:", data);
   return data || [];
 }
 

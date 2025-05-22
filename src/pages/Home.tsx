@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import HeroCarousel from "@/components/HeroCarousel";
 import FeaturedProductsSection from "@/components/home/FeaturedProductsSection";
 import AboutSection from "@/components/home/AboutSection";
@@ -7,6 +7,10 @@ import EducationalContentSection from "@/components/home/EducationalContentSecti
 import CtaSection from "@/components/home/CtaSection";
 
 export default function Home() {
+  useEffect(() => {
+    console.log("Home page rendered");
+  }, []);
+
   return (
     <div className="flex flex-col w-full">
       {/* Hero Carousel Section */}
@@ -20,7 +24,7 @@ export default function Home() {
       {/* About Section */}
       <AboutSection />
       
-      {/* Educational Content Preview - UPDATED SUBTITLE */}
+      {/* Educational Content Preview */}
       <EducationalContentSection />
       
       {/* CTA Section */}
