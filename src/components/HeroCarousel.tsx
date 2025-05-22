@@ -129,6 +129,7 @@ export default function HeroCarousel() {
   }
 
   const currentSlideData = carouselImagesData[currentImageIndex] || {};
+  console.log("Current slide image_url:", currentSlideData.image_url);
   
   return (
     <div className="relative w-full">
@@ -146,14 +147,16 @@ export default function HeroCarousel() {
             {carouselImagesData.map((item, index) => (
               <CarouselItem key={item.id || index} className="h-full">
                 <div className="relative h-full">
-                  <div
-                    className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
-                    style={{ backgroundImage: `url(${item.image_url || ''})` }} 
-                    aria-label={item.alt_text || 'Imagem do carrossel'} 
-                  >
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10"></div>
-                  </div>
+                  {item.image_url && (
+                    <div
+                      className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
+                      style={{ backgroundImage: `url(${item.image_url})` }} 
+                      aria-label={item.alt_text || 'Imagem do carrossel'} 
+                    >
+                      {/* Gradient Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10"></div>
+                    </div>
+                  )}
                 </div>
               </CarouselItem>
             ))}

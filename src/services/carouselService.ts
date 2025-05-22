@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 
@@ -19,6 +20,18 @@ export async function fetchCarouselItems(): Promise<CarouselItemSchema[]> {
   }
 
   console.log("Carousel items fetched successfully:", data);
+  
+  // Verificar se as URLs das imagens estão completas e válidas
+  if (data && data.length > 0) {
+    data.forEach(item => {
+      if (item.image_url) {
+        console.log(`Item ID ${item.id} image_url: ${item.image_url}`);
+      } else {
+        console.warn(`Item ID ${item.id} não possui URL de imagem`);
+      }
+    });
+  }
+  
   return data || [];
 }
 
