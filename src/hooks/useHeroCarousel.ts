@@ -23,7 +23,12 @@ export function useHeroCarousel() {
   const [error, setError] = useState<string | null>(null);
 
   const autoplayPlugin = useRef(
-    Autoplay({ delay: 5000, stopOnInteraction: true, stopOnMouseEnter: true })
+    Autoplay({ 
+      delay: 5000, 
+      stopOnInteraction: false, 
+      stopOnMouseEnter: true,
+      rootNode: (emblaRoot) => emblaRoot.parentElement,
+    })
   );
 
   useEffect(() => {
@@ -55,22 +60,28 @@ export function useHeroCarousel() {
     }
 
     const onSelect = () => {
-      setCurrentImageIndex(api.selectedScrollSnap());
+      const newIndex = api.selectedScrollSnap();
+      console.log("Carousel slide changed to index:", newIndex);
+      setCurrentImageIndex(newIndex);
     };
 
     const onPointerUp = () => {
-      if (autoplayPlugin.current.options.stopOnInteraction) {
+      // Resume autoplay after user interaction
+      if (autoplayPlugin.current && carouselImagesData.length > 1) {
         setTimeout(() => {
-          if (autoplayPlugin.current && typeof (autoplayPlugin.current as any).play === 'function') {
-            (autoplayPlugin.current as any).play(false);
-          }
-        }, 100);
+          autoplayPlugin.current.play();
+        }, 1000);
       }
     };
     
     setCurrentImageIndex(api.selectedScrollSnap());
     api.on("select", onSelect);
     api.on("pointerUp", onPointerUp);
+
+    // Start autoplay if there are multiple items
+    if (carouselImagesData.length > 1) {
+      autoplayPlugin.current.play();
+    }
 
     return () => {
       if (api) {
@@ -81,10 +92,14 @@ export function useHeroCarousel() {
   }, [api, carouselImagesData.length]);
 
   const handleIndicatorClick = (index: number) => {
-    api?.scrollTo(index);
-    if (autoplayPlugin.current.options.stopOnInteraction) {
-      if (autoplayPlugin.current && typeof (autoplayPlugin.current as any).play === 'function') {
-        (autoplayPlugin.current as any).play(false);
+    if (api) {
+      console.log("Manual slide change to index:", index);
+      api.scrollTo(index);
+      // Resume autoplay after manual navigation
+      if (autoplayPlugin.current && carouselImagesData.length > 1) {
+        setTimeout(() => {
+          autoplayPlugin.current.play();
+        }, 1000);
       }
     }
   };
@@ -96,7 +111,8 @@ export function useHeroCarousel() {
     error,
     itemsCount: carouselImagesData.length,
     currentIndex: currentImageIndex,
-    currentSlideData: currentSlideData.id
+    currentSlideData: currentSlideData.id,
+    autoplayRunning: carouselImagesData.length > 1
   });
 
   return {

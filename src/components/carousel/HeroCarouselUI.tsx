@@ -84,7 +84,7 @@ export default function HeroCarouselUI({
           plugins={carouselImagesData.length > 1 ? [autoplayPlugin.current] : []}
           className="h-full"
         >
-          <CarouselContent className="h-full" style={{ touchAction: 'pan-y' }}>
+          <CarouselContent className="h-full -ml-0">
             {carouselImagesData.map((item, index) => {
               const backgroundImageUrl = getCarouselImageUrl(item.image_url);
 
@@ -95,17 +95,19 @@ export default function HeroCarouselUI({
               });
 
               return (
-                <CarouselItem key={item.id || index} className="h-full">
-                  <div className="relative h-full">
-                    <div
-                      className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
-                      style={{ 
-                        backgroundImage: `url(${backgroundImageUrl})`,
+                <CarouselItem key={item.id || index} className="h-full pl-0">
+                  <div className="relative h-full w-full">
+                    <img
+                      src={backgroundImageUrl}
+                      alt={item.alt_text || "Imagem do carrossel"}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      onLoad={() => console.log(`Image loaded successfully: ${backgroundImageUrl}`)}
+                      onError={(e) => {
+                        console.error(`Failed to load image: ${backgroundImageUrl}`);
+                        console.error('Image error event:', e);
                       }}
-                      aria-label={item.alt_text || "Imagem do carrossel"}
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10"></div>
-                    </div>
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10"></div>
                   </div>
                 </CarouselItem>
               );
