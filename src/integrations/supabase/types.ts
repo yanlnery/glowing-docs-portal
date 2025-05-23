@@ -14,7 +14,7 @@ export type Database = {
           alt_text: string
           created_at: string | null
           id: string
-          image_url: string | null
+          image_url: string
           item_order: number | null
           subtitle: string | null
           title: string | null
@@ -24,7 +24,7 @@ export type Database = {
           alt_text: string
           created_at?: string | null
           id?: string
-          image_url?: string | null
+          image_url: string
           item_order?: number | null
           subtitle?: string | null
           title?: string | null
@@ -34,7 +34,7 @@ export type Database = {
           alt_text?: string
           created_at?: string | null
           id?: string
-          image_url?: string | null
+          image_url?: string
           item_order?: number | null
           subtitle?: string | null
           title?: string | null

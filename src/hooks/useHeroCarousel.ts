@@ -1,22 +1,22 @@
 
 import { useState, useEffect, useRef } from 'react';
 import type { CarouselApi } from "@/components/ui/carousel";
-import { fetchCarouselItems, type CarouselItemSchema } from "@/services/carouselService";
+import { fetchCarouselItems, type CarouselItem } from "@/services/carouselService";
 import Autoplay from "embla-carousel-autoplay";
 
-const FALLBACK_SLIDE_DATA: CarouselItemSchema = {
+const FALLBACK_SLIDE_DATA: CarouselItem = {
   id: "fallback-id",
-  image_url: "",
-  alt_text: "Informação do slide indisponível",
-  title: "Título Indisponível",
-  subtitle: "Subtítulo indisponível",
+  image_url: "/placeholder.svg",
+  alt_text: "Bem-vindo à Pet Serpentes",
+  title: "Bem-vindo à Pet Serpentes",
+  subtitle: "Conheça nossa coleção de répteis exóticos",
   item_order: 0,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
 };
 
 export function useHeroCarousel() {
-  const [carouselImagesData, setCarouselImagesData] = useState<CarouselItemSchema[]>([]);
+  const [carouselImagesData, setCarouselImagesData] = useState<CarouselItem[]>([]);
   const [api, setApi] = useState<CarouselApi>();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,38 +28,29 @@ export function useHeroCarousel() {
 
   useEffect(() => {
     const loadCarouselData = async () => {
-      console.log("useHeroCarousel: Attempting to load carousel data...");
+      console.log("Loading carousel data...");
       setIsLoading(true);
       setError(null);
+      
       try {
         const items = await fetchCarouselItems();
-        console.log("useHeroCarousel: Fetched items raw response", items);
-        
-        if (items && Array.isArray(items)) {
-          setCarouselImagesData(items);
-          if (items.length === 0) {
-            console.warn("useHeroCarousel: Fetched data is an empty array. No items to display.");
-          }
-        } else {
-          console.error("useHeroCarousel: Unexpected data format or null/undefined items array:", items);
-          setError("Formato de dados inesperado recebido do serviço.");
-          setCarouselImagesData([]);
-        }
+        console.log("Fetched carousel items:", items);
+        setCarouselImagesData(items);
       } catch (fetchError) {
-        console.error("useHeroCarousel: Failed to load carousel items in hook:", fetchError);
+        console.error("Failed to load carousel items:", fetchError);
         setError("Falha ao carregar dados do carrossel.");
         setCarouselImagesData([]);
       } finally {
         setIsLoading(false);
-        console.log("useHeroCarousel: Data loading attempt finished.");
       }
     };
+
     loadCarouselData();
-  }, []); // Removed `api` dependency here as it caused re-fetches. Data loading should be independent.
+  }, []);
 
   useEffect(() => {
     if (!api || carouselImagesData.length === 0) {
-      setCurrentImageIndex(0); // Reset index if no API or data
+      setCurrentImageIndex(0);
       return;
     }
 
@@ -70,15 +61,14 @@ export function useHeroCarousel() {
     const onPointerUp = () => {
       if (autoplayPlugin.current.options.stopOnInteraction) {
         setTimeout(() => {
-          // Check if play method exists on the plugin instance
           if (autoplayPlugin.current && typeof (autoplayPlugin.current as any).play === 'function') {
-            (autoplayPlugin.current as any).play(false); // Attempt to resume autoplay
+            (autoplayPlugin.current as any).play(false);
           }
-        }, 100); // Small delay to ensure interaction is complete
+        }, 100);
       }
     };
     
-    setCurrentImageIndex(api.selectedScrollSnap()); // Initialize current index
+    setCurrentImageIndex(api.selectedScrollSnap());
     api.on("select", onSelect);
     api.on("pointerUp", onPointerUp);
 
@@ -92,22 +82,21 @@ export function useHeroCarousel() {
 
   const handleIndicatorClick = (index: number) => {
     api?.scrollTo(index);
-    // If autoplay is active and interaction should stop it, then restart it manually after a delay
     if (autoplayPlugin.current.options.stopOnInteraction) {
-       if (autoplayPlugin.current && typeof (autoplayPlugin.current as any).play === 'function') {
-         (autoplayPlugin.current as any).play(false); // Attempt to resume autoplay after manual navigation
-       }
+      if (autoplayPlugin.current && typeof (autoplayPlugin.current as any).play === 'function') {
+        (autoplayPlugin.current as any).play(false);
+      }
     }
   };
 
   const currentSlideData = carouselImagesData[currentImageIndex] ?? FALLBACK_SLIDE_DATA;
 
-  console.log("useHeroCarousel: Hook state:", { 
+  console.log("Hook state:", { 
     isLoading, 
     error,
     itemsCount: carouselImagesData.length,
     currentIndex: currentImageIndex,
-    currentSlideData
+    currentSlideData: currentSlideData.id
   });
 
   return {
@@ -122,4 +111,3 @@ export function useHeroCarousel() {
     handleIndicatorClick,
   };
 }
-

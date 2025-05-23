@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -9,15 +10,15 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import type { CarouselItemSchema } from "@/services/carouselService";
+import type { CarouselItem } from "@/services/carouselService";
 import type { AutoplayType } from "embla-carousel-autoplay";
 
 interface HeroCarouselUIProps {
   isLoading: boolean;
   error: string | null;
-  carouselImagesData: CarouselItemSchema[];
+  carouselImagesData: CarouselItem[];
   currentImageIndex: number;
-  currentSlideData: CarouselItemSchema;
+  currentSlideData: CarouselItem;
   setApi: (api: CarouselApi | undefined) => void;
   autoplayPlugin: React.MutableRefObject<AutoplayType>;
   handleIndicatorClick: (index: number) => void;
@@ -34,12 +35,13 @@ export default function HeroCarouselUI({
   handleIndicatorClick,
 }: HeroCarouselUIProps) {
   
-  // Log para verificar os dados recebidos
-  console.log("HeroCarouselUI: Props recebidas", {
-    isLoading, error, itemsCount: carouselImagesData.length, currentIndex: currentImageIndex, currentSlideDataId: currentSlideData.id
+  console.log("HeroCarouselUI rendering with:", {
+    isLoading, 
+    error, 
+    itemsCount: carouselImagesData.length, 
+    currentIndex: currentImageIndex,
+    currentSlideTitle: currentSlideData.title
   });
-  console.log("HeroCarouselUI: Slides recebidos (carouselImagesData):", carouselImagesData);
-
 
   if (error) {
     return (
@@ -57,8 +59,7 @@ export default function HeroCarouselUI({
     );
   }
 
-  if (carouselImagesData.length === 0 && !isLoading) {
-    console.log("HeroCarouselUI: No images to display, rendering fallback for empty data.");
+  if (carouselImagesData.length === 0) {
     return (
       <div className="relative h-[60vh] md:h-[70vh] overflow-hidden flex items-center justify-center bg-gray-200 dark:bg-gray-800 px-4 text-center">
         <div>
@@ -68,9 +69,6 @@ export default function HeroCarouselUI({
       </div>
     );
   }
-  
-  // Log para verificar currentSlideData antes do render do texto
-  console.log("HeroCarouselUI: Renderizando texto com currentSlideData:", currentSlideData);
 
   return (
     <div className="relative w-full">
@@ -86,15 +84,11 @@ export default function HeroCarouselUI({
         >
           <CarouselContent className="h-full" style={{ touchAction: 'pan-y' }}>
             {carouselImagesData.map((item, index) => {
-              // Log para cada item, especialmente a URL da imagem
-              console.log(`HeroCarouselUI: Renderizando CarouselItem ${index} com image_url:`, item.image_url);
-              
-              const backgroundImageUrl = 
-                item.image_url && item.image_url.startsWith("http")
+              const backgroundImageUrl = item.image_url?.startsWith("http")
                 ? item.image_url
-                : "/placeholder.svg"; // Usando placeholder.svg como fallback padrão
+                : "/placeholder.svg";
 
-              console.log(`HeroCarouselUI: Imagem para slide ${index}: ${backgroundImageUrl}`);
+              console.log(`Rendering slide ${index} with image: ${backgroundImageUrl}`);
 
               return (
                 <CarouselItem key={item.id || index} className="h-full">
@@ -108,8 +102,6 @@ export default function HeroCarouselUI({
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10"></div>
                     </div>
-                    {/* Se a URL original não era válida e estamos usando o fallback, podemos mostrar uma mensagem
-                    Removido o placeholder de imagem indisponível aqui, pois o fallback já cuida disso */}
                   </div>
                 </CarouselItem>
               );

@@ -10,18 +10,18 @@ import {
   insertCarouselItem,
   updateCarouselItem,
   deleteCarouselItem,
-  type CarouselItemSchema,
-  type CarouselItemInsert,
-  type CarouselItemUpdate
+  type CarouselItem,
+  type CarouselInsert,
+  type CarouselUpdate
 } from '@/services/carouselService';
 import CarouselItemForm from '@/components/admin/carousel/CarouselItemForm';
 import CarouselItemsTable from '@/components/admin/carousel/CarouselItemsTable';
 
 export default function AdminCarousel() {
-  const [images, setImages] = useState<CarouselItemSchema[]>([]);
+  const [images, setImages] = useState<CarouselItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [currentImage, setCurrentImage] = useState<Partial<CarouselItemSchema> & { id?: string } | null>(null);
+  const [currentImage, setCurrentImage] = useState<Partial<CarouselItem> & { id?: string } | null>(null);
   const [isNewImage, setIsNewImage] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -33,7 +33,12 @@ export default function AdminCarousel() {
       const fetchedImages = await fetchCarouselItems();
       setImages(fetchedImages);
     } catch (error) {
-      toast({ title: "Erro ao carregar imagens", description: "Não foi possível buscar as imagens do carrossel.", variant: "destructive" });
+      console.error("Error loading images:", error);
+      toast({ 
+        title: "Erro ao carregar imagens", 
+        description: "Não foi possível buscar as imagens do carrossel.", 
+        variant: "destructive" 
+      });
       setImages([]);
     } finally {
       setIsLoading(false);
@@ -58,7 +63,7 @@ export default function AdminCarousel() {
     setIsDialogOpen(true);
   };
 
-  const openEditImageDialog = (imageData: CarouselItemSchema) => {
+  const openEditImageDialog = (imageData: CarouselItem) => {
     setCurrentImage({...imageData});
     setIsNewImage(false);
     setImagePreview(imageData.image_url || null); 
@@ -105,7 +110,11 @@ export default function AdminCarousel() {
 
   const handleSaveImage = async () => {
     if (!currentImage || !currentImage.alt_text) {
-      toast({ title: "Erro de Validação", description: "Texto alternativo (alt_text) é obrigatório.", variant: "destructive" });
+      toast({ 
+        title: "Erro de Validação", 
+        description: "Texto alternativo (alt_text) é obrigatório.", 
+        variant: "destructive" 
+      });
       return;
     }
     
@@ -116,21 +125,33 @@ export default function AdminCarousel() {
       const uploadedUrl = await uploadCarouselImage(imageFile);
       setIsLoading(false);
       if (!uploadedUrl) {
-        toast({ title: "Erro de Upload", description: "Falha ao fazer upload da nova imagem.", variant: "destructive" });
+        toast({ 
+          title: "Erro de Upload", 
+          description: "Falha ao fazer upload da nova imagem.", 
+          variant: "destructive" 
+        });
         return;
       }
       finalImageUrl = uploadedUrl;
     } else if (isNewImage && !finalImageUrl) {
-        toast({ title: "Erro de Validação", description: "Por favor, selecione uma imagem para o novo item.", variant: "destructive" });
-        return;
+      toast({ 
+        title: "Erro de Validação", 
+        description: "Por favor, selecione uma imagem para o novo item.", 
+        variant: "destructive" 
+      });
+      return;
     }
 
     if (!finalImageUrl) {
-        toast({ title: "Erro de Validação", description: "A imagem é obrigatória.", variant: "destructive" });
-        return;
+      toast({ 
+        title: "Erro de Validação", 
+        description: "A imagem é obrigatória.", 
+        variant: "destructive" 
+      });
+      return;
     }
     
-    const itemData: CarouselItemInsert | CarouselItemUpdate = {
+    const itemData: CarouselInsert | CarouselUpdate = {
       image_url: finalImageUrl,
       alt_text: currentImage.alt_text.trim(),
       title: currentImage.title?.trim() || '',
@@ -139,50 +160,47 @@ export default function AdminCarousel() {
     };
 
     setIsLoading(true);
-    let success = false;
-    let message = "";
-
-    if (isNewImage) {
-      const newItem = await insertCarouselItem(itemData as CarouselItemInsert);
-      if (newItem) {
-        success = true;
-        message = "Imagem adicionada ao carrossel.";
-      } else {
-        message = "Falha ao adicionar imagem.";
+    try {
+      if (isNewImage) {
+        await insertCarouselItem(itemData as CarouselInsert);
+        toast({ title: "Sucesso", description: "Imagem adicionada ao carrossel." });
+      } else if (currentImage.id) { 
+        await updateCarouselItem(currentImage.id, itemData as CarouselUpdate);
+        toast({ title: "Sucesso", description: "Imagem do carrossel atualizada." });
       }
-    } else if (currentImage.id) { 
-      const updatedItem = await updateCarouselItem(currentImage.id, itemData as CarouselItemUpdate);
-      if (updatedItem) {
-        success = true;
-        message = "Imagem do carrossel atualizada.";
-      } else {
-        message = "Falha ao atualizar imagem.";
-      }
-    }
-    
-    setIsLoading(false);
-    toast({ title: success ? "Sucesso" : "Erro", description: message, variant: success ? "default" : "destructive" });
-
-    if (success) {
+      
       setIsDialogOpen(false);
       setImageFile(null);
       setImagePreview(null);
-      await loadImages(); 
+      await loadImages();
+    } catch (error) {
+      console.error("Save error:", error);
+      toast({ 
+        title: "Erro", 
+        description: isNewImage ? "Falha ao adicionar imagem." : "Falha ao atualizar imagem.", 
+        variant: "destructive" 
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleDeleteImage = async (id: string, altText: string) => {
     if (window.confirm(`Tem certeza que deseja remover a imagem "${altText}" do carrossel?`)) {
       setIsLoading(true);
-      const success = await deleteCarouselItem(id);
-      setIsLoading(false);
-      toast({ 
-        title: success ? "Sucesso" : "Erro", 
-        description: success ? `Imagem "${altText}" removida.` : "Falha ao remover imagem.", 
-        variant: success ? "default" : "destructive" 
-      });
-      if (success) {
-        await loadImages(); 
+      try {
+        await deleteCarouselItem(id);
+        toast({ title: "Sucesso", description: `Imagem "${altText}" removida.` });
+        await loadImages();
+      } catch (error) {
+        console.error("Delete error:", error);
+        toast({ 
+          title: "Erro", 
+          description: "Falha ao remover imagem.", 
+          variant: "destructive" 
+        });
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -201,24 +219,21 @@ export default function AdminCarousel() {
     itemToSwapWith.item_order = tempOrder;
     
     newImagesOrder.sort((a, b) => (a.item_order || 0) - (b.item_order || 0));
-    setImages(newImagesOrder); // Optimistic UI update
+    setImages(newImagesOrder);
 
     setIsLoading(true);
-    const update1 = updateCarouselItem(itemToMove.id, { item_order: itemToMove.item_order });
-    const update2 = updateCarouselItem(itemToSwapWith.id, { item_order: itemToSwapWith.item_order });
-
     try {
-      const results = await Promise.all([update1, update2]);
-      if (results.every(res => res !== null)) {
-        toast({title: "Sucesso", description: "Ordem atualizada."});
-      } else {
-        toast({title: "Erro", description: "Falha ao atualizar ordem no banco.", variant: "destructive"});
-      }
+      await Promise.all([
+        updateCarouselItem(itemToMove.id, { item_order: itemToMove.item_order }),
+        updateCarouselItem(itemToSwapWith.id, { item_order: itemToSwapWith.item_order })
+      ]);
+      toast({title: "Sucesso", description: "Ordem atualizada."});
     } catch (error) {
-        toast({title: "Erro Crítico", description: "Falha ao comunicar com o servidor para reordenar.", variant: "destructive"});
+      console.error("Move error:", error);
+      toast({title: "Erro", description: "Falha ao atualizar ordem.", variant: "destructive"});
     } finally {
-        setIsLoading(false);
-        await loadImages(); // Always reload from DB to ensure consistency
+      setIsLoading(false);
+      await loadImages();
     }
   };
 
