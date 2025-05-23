@@ -10,15 +10,15 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import type { CarouselItem } from "@/services/carouselService";
+import type { CarouselItem as CarouselItemType } from "@/services/carouselService";
 import type { AutoplayType } from "embla-carousel-autoplay";
 
 interface HeroCarouselUIProps {
   isLoading: boolean;
   error: string | null;
-  carouselImagesData: CarouselItem[];
+  carouselImagesData: CarouselItemType[];
   currentImageIndex: number;
-  currentSlideData: CarouselItem;
+  currentSlideData: CarouselItemType;
   setApi: (api: CarouselApi | undefined) => void;
   autoplayPlugin: React.MutableRefObject<AutoplayType>;
   handleIndicatorClick: (index: number) => void;
