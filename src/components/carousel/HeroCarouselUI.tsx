@@ -11,6 +11,7 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import type { CarouselItem as CarouselItemType } from "@/services/carouselService";
+import { getCarouselImageUrl } from "@/services/carouselService";
 import type { AutoplayType } from "embla-carousel-autoplay";
 
 interface HeroCarouselUIProps {
@@ -40,7 +41,8 @@ export default function HeroCarouselUI({
     error, 
     itemsCount: carouselImagesData.length, 
     currentIndex: currentImageIndex,
-    currentSlideTitle: currentSlideData.title
+    currentSlideTitle: currentSlideData.title,
+    currentSlideImageUrl: currentSlideData.image_url
   });
 
   if (error) {
@@ -84,11 +86,13 @@ export default function HeroCarouselUI({
         >
           <CarouselContent className="h-full" style={{ touchAction: 'pan-y' }}>
             {carouselImagesData.map((item, index) => {
-              const backgroundImageUrl = item.image_url?.startsWith("http")
-                ? item.image_url
-                : "/placeholder.svg";
+              const backgroundImageUrl = getCarouselImageUrl(item.image_url);
 
-              console.log(`Rendering slide ${index} with image: ${backgroundImageUrl}`);
+              console.log(`Rendering slide ${index}:`, {
+                originalImageUrl: item.image_url,
+                processedImageUrl: backgroundImageUrl,
+                title: item.title
+              });
 
               return (
                 <CarouselItem key={item.id || index} className="h-full">

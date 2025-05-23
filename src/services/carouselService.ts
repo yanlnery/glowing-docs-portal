@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 
@@ -18,8 +17,33 @@ export async function fetchCarouselItems(): Promise<CarouselItem[]> {
     throw error;
   }
 
-  console.log("Carousel items fetched successfully:", data);
+  console.log("Raw carousel data from Supabase:", data);
+  
+  // Log each item's image_url to see what we're getting
+  data?.forEach((item, index) => {
+    console.log(`Item ${index} image_url:`, item.image_url);
+  });
+
   return data || [];
+}
+
+// Helper function to get full public URL for carousel images
+export function getCarouselImageUrl(imageUrl: string): string {
+  if (!imageUrl) return "/placeholder.svg";
+  
+  // If it's already a full URL, return as is
+  if (imageUrl.startsWith("http")) {
+    console.log("Image URL is already full:", imageUrl);
+    return imageUrl;
+  }
+  
+  // Build the full public URL from Supabase storage
+  const { data } = supabase.storage
+    .from("carousel_image_files")
+    .getPublicUrl(imageUrl);
+    
+  console.log("Generated public URL:", data.publicUrl, "from:", imageUrl);
+  return data.publicUrl;
 }
 
 export async function uploadCarouselImage(file: File): Promise<string | null> {
