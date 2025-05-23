@@ -86,27 +86,36 @@ export default function HeroCarouselUI({
         >
           <CarouselContent className="h-full -ml-0">
             {carouselImagesData.map((item, index) => {
-              const backgroundImageUrl = getCarouselImageUrl(item.image_url);
+              const processedImageUrl = getCarouselImageUrl(item.image_url);
 
               console.log(`Rendering slide ${index}:`, {
                 originalImageUrl: item.image_url,
-                processedImageUrl: backgroundImageUrl,
+                processedImageUrl: processedImageUrl,
                 title: item.title
               });
 
               return (
                 <CarouselItem key={item.id || index} className="h-full pl-0">
                   <div className="relative h-full w-full">
-                    <img
-                      src={backgroundImageUrl}
-                      alt={item.alt_text || "Imagem do carrossel"}
-                      className="absolute inset-0 w-full h-full object-cover"
-                      onLoad={() => console.log(`Image loaded successfully: ${backgroundImageUrl}`)}
-                      onError={(e) => {
-                        console.error(`Failed to load image: ${backgroundImageUrl}`);
-                        console.error('Image error event:', e);
-                      }}
-                    />
+                    {processedImageUrl ? (
+                      <img
+                        src={processedImageUrl}
+                        alt={item.alt_text || "Imagem do carrossel"}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        onLoad={() => console.log(`✅ Image loaded successfully: ${processedImageUrl}`)}
+                        onError={(e) => {
+                          console.error(`❌ Failed to load image: ${processedImageUrl}`);
+                          console.error('Image error event:', e);
+                        }}
+                      />
+                    ) : (
+                      <div className="absolute inset-0 w-full h-full bg-gray-300 flex items-center justify-center">
+                        <div className="text-center text-gray-600">
+                          <p className="text-lg">⚠️ Imagem não carregada</p>
+                          <p className="text-sm">{item.title || "Slide sem título"}</p>
+                        </div>
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10"></div>
                   </div>
                 </CarouselItem>

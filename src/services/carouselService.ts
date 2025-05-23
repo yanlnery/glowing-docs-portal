@@ -6,44 +6,57 @@ export type CarouselInsert = TablesInsert<'carousel_items'>;
 export type CarouselUpdate = TablesUpdate<'carousel_items'>;
 
 export async function fetchCarouselItems(): Promise<CarouselItem[]> {
-  console.log("Fetching carousel items from service...");
+  console.log("🔄 Fetching carousel items from service...");
   const { data, error } = await supabase
     .from("carousel_items")
     .select("*")
     .order("item_order", { ascending: true });
 
   if (error) {
-    console.error("Error fetching carousel items:", error);
+    console.error("❌ Error fetching carousel items:", error);
     throw error;
   }
 
-  console.log("Raw carousel data from Supabase:", data);
+  console.log("✅ Raw carousel data from Supabase:", data);
   
-  // Log each item's image_url to see what we're getting
+  // Log cada item para debug
   data?.forEach((item, index) => {
-    console.log(`Item ${index} image_url:`, item.image_url);
+    console.log(`📷 Item ${index + 1}:`, {
+      id: item.id,
+      title: item.title,
+      image_url: item.image_url,
+      alt_text: item.alt_text
+    });
   });
 
   return data || [];
 }
 
-// Helper function to get full public URL for carousel images
+// Helper function para obter URL completa das imagens do carrossel
 export function getCarouselImageUrl(imageUrl: string): string {
-  if (!imageUrl) return "/placeholder.svg";
+  if (!imageUrl) {
+    console.warn("⚠️ Image URL is empty, using placeholder");
+    return "/placeholder.svg";
+  }
   
-  // If it's already a full URL, return as is
+  // Se já é uma URL completa, retorna como está
   if (imageUrl.startsWith("http")) {
-    console.log("Image URL is already full:", imageUrl);
+    console.log("🌐 Image URL is already full:", imageUrl);
     return imageUrl;
   }
   
-  // Build the full public URL from Supabase storage
-  const { data } = supabase.storage
-    .from("carousel_image_files")
-    .getPublicUrl(imageUrl);
-    
-  console.log("Generated public URL:", data.publicUrl, "from:", imageUrl);
-  return data.publicUrl;
+  // Constrói a URL pública completa do Supabase storage
+  try {
+    const { data } = supabase.storage
+      .from("carousel_image_files")
+      .getPublicUrl(imageUrl);
+      
+    console.log("🔗 Generated public URL:", data.publicUrl, "from:", imageUrl);
+    return data.publicUrl;
+  } catch (error) {
+    console.error("❌ Error generating public URL:", error);
+    return "/placeholder.svg";
+  }
 }
 
 export async function uploadCarouselImage(file: File): Promise<string | null> {

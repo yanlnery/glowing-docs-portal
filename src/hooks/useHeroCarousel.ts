@@ -31,26 +31,27 @@ export function useHeroCarousel() {
     })
   );
 
-  useEffect(() => {
-    const loadCarouselData = async () => {
-      console.log("Loading carousel data...");
-      setIsLoading(true);
-      setError(null);
-      
-      try {
-        const items = await fetchCarouselItems();
-        console.log("Fetched carousel items:", items);
-        setCarouselImagesData(items);
-      } catch (fetchError) {
-        console.error("Failed to load carousel items:", fetchError);
-        setError("Falha ao carregar dados do carrossel.");
-        setCarouselImagesData([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Função para recarregar dados do carrossel
+  const reloadCarouselData = async () => {
+    console.log("🔄 Reloading carousel data...");
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const items = await fetchCarouselItems();
+      console.log("✅ Carousel data reloaded:", items.length, "items");
+      setCarouselImagesData(items);
+    } catch (fetchError) {
+      console.error("❌ Failed to reload carousel items:", fetchError);
+      setError("Falha ao carregar dados do carrossel.");
+      setCarouselImagesData([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    loadCarouselData();
+  useEffect(() => {
+    reloadCarouselData();
   }, []);
 
   useEffect(() => {
@@ -106,7 +107,7 @@ export function useHeroCarousel() {
 
   const currentSlideData = carouselImagesData[currentImageIndex] ?? FALLBACK_SLIDE_DATA;
 
-  console.log("Hook state:", { 
+  console.log("📊 Hook state:", { 
     isLoading, 
     error,
     itemsCount: carouselImagesData.length,
@@ -125,5 +126,6 @@ export function useHeroCarousel() {
     setApi,
     autoplayPlugin,
     handleIndicatorClick,
+    reloadCarouselData, // Expor função para reload manual
   };
 }
