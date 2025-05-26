@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -97,7 +98,7 @@ function App() {
               <Toaster />
               <Sonner />
               <Routes>
-                {/* Public Routes */}
+                {/* Public Routes, Auth Routes, and Protected Client Area now share WebsiteLayout */}
                 <Route element={<WebsiteLayout />}>
                   <Route path="/" element={<Home />} />
                   <Route path="catalogo" element={<Catalog />} />
@@ -115,6 +116,13 @@ function App() {
                   <Route path="politica-de-privacidade" element={<PrivacyPolicyPage />} />
                   <Route path="termos-de-uso" element={<TermsOfUsePage />} />
                   
+                  {/* Auth Routes - Now under WebsiteLayout */}
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/signup" element={<SignupPage />} />
+                  <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                  <Route path="/reset-password" element={<ResetPasswordPage />} />
+                  
+                  {/* Protected Client Route - Stays under WebsiteLayout */}
                   <Route element={<ProtectedClientRoute />}>
                     <Route path="area-cliente" element={<ClientArea />} />
                   </Route>
@@ -130,13 +138,7 @@ function App() {
                   <Route path="*" element={<NotFound />} />
                 </Route>
                 
-                {/* Auth Routes */}
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/signup" element={<SignupPage />} />
-                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/reset-password" element={<ResetPasswordPage />} />
-
-                {/* Admin Routes */}
+                {/* Admin Routes - Remain separate */}
                 <Route path="/admin" element={<AdminLogin />} />
                 <Route element={<AdminProtectedRoute />}>
                   <Route path="/admin/dashboard" element={<Dashboard />} />

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -29,7 +30,7 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-muted/30 py-12">
+    <div className="flex items-center justify-center h-full bg-muted/30">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
            <img 
