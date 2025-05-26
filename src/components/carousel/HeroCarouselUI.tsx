@@ -97,21 +97,29 @@ export default function HeroCarouselUI({
                 <CarouselItem key={item.id || index} className="h-full pl-0">
                   <div className="relative h-full w-full">
                     {processedImageUrl && processedImageUrl !== "/placeholder.svg" ? (
-                      <img
-                        src={processedImageUrl}
-                        alt={item.alt_text || "Imagem do carrossel"}
-                        className="absolute inset-0 w-full h-full object-cover z-0 border-4 border-red-500"
-                        onLoad={() => console.log(`✅ Imagem carregada com sucesso: ${processedImageUrl}`)}
-                        onError={(e) => {
-                          console.error(`❌ Falha ao carregar imagem: ${processedImageUrl}. Tentando fallback.`);
-                          console.error('Evento de erro da imagem:', e.type, e.target);
-                          const target = e.target as HTMLImageElement;
-                          if (target.src !== '/placeholder.svg') {
-                            target.src = '/placeholder.svg';
-                            target.alt = "Falha ao carregar a imagem original. Exibindo imagem substituta.";
-                          }
-                        }}
-                      />
+                     <img
+  src={processedImageUrl}
+  alt={item.alt_text || "Imagem do carrossel"}
+  style={{
+    width: "100%",
+    height: "100%",
+    maxHeight: "600px",
+    objectFit: "cover",
+    border: "4px solid red",
+    position: "relative",
+    zIndex: 10,
+  }}
+  onLoad={() => console.log(`✅ Imagem carregada com sucesso: ${processedImageUrl}`)}
+  onError={(e) => {
+    console.error(`❌ Falha ao carregar imagem: ${processedImageUrl}. Tentando fallback.`);
+    const target = e.target as HTMLImageElement;
+    if (target.src !== '/placeholder.svg') {
+      target.src = '/placeholder.svg';
+      target.alt = "Falha ao carregar a imagem original. Exibindo imagem substituta.";
+    }
+  }}
+/>
+
                     ) : (
                       <div className="absolute inset-0 w-full h-full bg-gray-300 flex items-center justify-center border-4 border-blue-500">
                         <div className="text-center text-gray-600">
