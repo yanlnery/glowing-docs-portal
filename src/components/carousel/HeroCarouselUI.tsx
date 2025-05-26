@@ -100,13 +100,12 @@ export default function HeroCarouselUI({
                       <img
                         src={processedImageUrl}
                         alt={item.alt_text || "Imagem do carrossel"}
-                        className="absolute inset-0 w-full h-full object-cover"
+                        className="absolute inset-0 w-full h-full object-cover z-0 border-4 border-red-500"
                         onLoad={() => console.log(`✅ Imagem carregada com sucesso: ${processedImageUrl}`)}
                         onError={(e) => {
                           console.error(`❌ Falha ao carregar imagem: ${processedImageUrl}. Tentando fallback.`);
                           console.error('Evento de erro da imagem:', e.type, e.target);
                           const target = e.target as HTMLImageElement;
-                          // Evitar loop infinito se o placeholder também falhar ou já for o placeholder
                           if (target.src !== '/placeholder.svg') {
                             target.src = '/placeholder.svg';
                             target.alt = "Falha ao carregar a imagem original. Exibindo imagem substituta.";
@@ -114,7 +113,7 @@ export default function HeroCarouselUI({
                         }}
                       />
                     ) : (
-                      <div className="absolute inset-0 w-full h-full bg-gray-300 flex items-center justify-center">
+                      <div className="absolute inset-0 w-full h-full bg-gray-300 flex items-center justify-center border-4 border-blue-500">
                         <div className="text-center text-gray-600">
                           <p className="text-lg">⚠️ Imagem indisponível</p>
                           <p className="text-sm">{item.title || "Slide sem título"} ({item.image_url ? "URL inválida" : "URL vazia"})</p>
