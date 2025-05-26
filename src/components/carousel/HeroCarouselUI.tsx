@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -97,22 +96,28 @@ export default function HeroCarouselUI({
               return (
                 <CarouselItem key={item.id || index} className="h-full pl-0">
                   <div className="relative h-full w-full">
-                    {processedImageUrl ? (
+                    {processedImageUrl && processedImageUrl !== "/placeholder.svg" ? (
                       <img
                         src={processedImageUrl}
                         alt={item.alt_text || "Imagem do carrossel"}
                         className="absolute inset-0 w-full h-full object-cover"
-                        onLoad={() => console.log(`✅ Image loaded successfully: ${processedImageUrl}`)}
+                        onLoad={() => console.log(`✅ Imagem carregada com sucesso: ${processedImageUrl}`)}
                         onError={(e) => {
-                          console.error(`❌ Failed to load image: ${processedImageUrl}`);
-                          console.error('Image error event:', e);
+                          console.error(`❌ Falha ao carregar imagem: ${processedImageUrl}. Tentando fallback.`);
+                          console.error('Evento de erro da imagem:', e.type, e.target);
+                          const target = e.target as HTMLImageElement;
+                          // Evitar loop infinito se o placeholder também falhar ou já for o placeholder
+                          if (target.src !== '/placeholder.svg') {
+                            target.src = '/placeholder.svg';
+                            target.alt = "Falha ao carregar a imagem original. Exibindo imagem substituta.";
+                          }
                         }}
                       />
                     ) : (
                       <div className="absolute inset-0 w-full h-full bg-gray-300 flex items-center justify-center">
                         <div className="text-center text-gray-600">
-                          <p className="text-lg">⚠️ Imagem não carregada</p>
-                          <p className="text-sm">{item.title || "Slide sem título"}</p>
+                          <p className="text-lg">⚠️ Imagem indisponível</p>
+                          <p className="text-sm">{item.title || "Slide sem título"} ({item.image_url ? "URL inválida" : "URL vazia"})</p>
                         </div>
                       </div>
                     )}
