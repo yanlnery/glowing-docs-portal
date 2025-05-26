@@ -1,6 +1,6 @@
-
 import MainLayout from "@/layouts/MainLayout";
 import Hero from "@/components/Hero";
+import HeroCarousel from "@/components/HeroCarousel";
 import CodeBlock from "@/components/CodeBlock";
 import { ArrowRight, Book, Code, FileQuestion } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,8 @@ const Index = () => {
   return (
     <MainLayout fullWidth>
       <Hero />
-
+      <HeroCarousel />
+      
       <div className="docs-container py-16">
         <div className="text-center mb-12">
           <div className="docs-section-title inline-flex">
