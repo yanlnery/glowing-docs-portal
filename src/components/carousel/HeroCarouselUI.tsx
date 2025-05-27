@@ -127,7 +127,7 @@ export default function HeroCarouselUI({
                         </div>
                       </div>
                     )}
-                    <div className="absolute inset-y-0 left-0 w-[30%] bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10" /> {/* Gradient adjusted as requested */}
+                    <div className="absolute inset-y-0 left-0 w-[40%] bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10" /> {/* Gradient adjusted as requested */}
                   </div>
                 </CarouselItem>
               );
@@ -165,7 +165,7 @@ export default function HeroCarouselUI({
         )}
       </div>
 
-      <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-6 md:absolute md:bottom-24 md:left-1/2 md:-translate-x-1/2 md:z-20 md:py-0 md:pointer-events-auto"> {/* CTA button position updated */}
+      <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-6 md:absolute md:bottom-40 md:left-1/2 md:-translate-x-1/2 md:z-20 md:py-0 md:pointer-events-auto"> {/* CTA button position updated */}
         <div className="flex flex-col sm:flex-row gap-3 w-full items-center justify-center md:justify-start">
           <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[48px] w-full sm:w-auto text-sm md:text-base" asChild>
             <Link to="/catalogo">
