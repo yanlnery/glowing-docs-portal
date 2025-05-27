@@ -103,7 +103,7 @@ export default function HeroCarouselUI({
   style={{
     width: "100%",
     height: "100%",
-    maxHeight: "1000px",
+    maxHeight: "1100px",
     objectFit: "cover",
     position: "relative",
     zIndex: 10,
