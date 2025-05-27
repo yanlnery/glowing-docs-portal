@@ -62,8 +62,8 @@ const Academy = () => {
         </div>
         <div className="flex-1">
           <img 
-            src="/lovable-uploads/481f8f82-22b1-407d-9e88-623e453faf6a.png" 
-            alt="PS Academy" 
+            src="/lovable-uploads/bf008d0e-9874-4dad-9871-fb0c80c0efd4.png" 
+            alt="PS Academy - Répteis e conhecimento" 
             className="rounded-lg shadow-lg border dark:border-gray-800" 
             loading="lazy"
           />
@@ -95,7 +95,7 @@ const Academy = () => {
             
             <div className="docs-card p-6 border rounded-lg flex flex-col">
               <div className="rounded-full bg-serpente-100 text-serpente-600 p-3 h-14 w-14 flex items-center justify-center mb-4 dark:bg-serpente-900/50">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 1 0 7.75"/></svg>
               </div>
               <h3 className="text-xl font-bold mb-2">Comunidade Ativa</h3>
               <p className="text-muted-foreground flex-grow">
