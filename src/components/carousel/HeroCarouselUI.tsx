@@ -72,46 +72,69 @@ export default function HeroCarouselUI({
   }
 
   return (
-  <div className="relative w-full h-[70vh] overflow-hidden bg-black">
-  <Carousel
-    setApi={setApi}
-    opts={{
-      loop: carouselImagesData.length > 1,
-      align: "start",
-    }}
-    plugins={carouselImagesData.length > 1 ? [autoplayPlugin.current] : []}
-    className="h-full"
-  >
-    <CarouselContent className="h-full -ml-0">
-      {carouselImagesData.map((item, index) => {
-        const processedImageUrl = getCarouselImageUrl(item.image_url);
-        return (
-          <CarouselItem key={item.id || index} className="h-full pl-0">
-            <div className="relative h-full w-full">
-              <img
-                src={processedImageUrl}
-                alt={item.alt_text || "Imagem do carrossel"}
-                className="absolute inset-0 w-full h-full object-cover z-0"
-                onLoad={() =>
-                  console.log(`✅ Imagem carregada: ${processedImageUrl}`)
-                }
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = "/placeholder.svg";
-                  target.alt =
-                    "Erro ao carregar imagem, usando placeholder.";
-                }}
-              />
-              {/* Gradiente por cima */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10" />
-            </div>
-          </CarouselItem>
-        );
-      })}
-    </CarouselContent>
-  </Carousel>
-</div>
+    <div className="relative w-full">
+      <div className="relative h-[60vh] md:h-[70vh] overflow-hidden">
+        <Carousel
+          setApi={setApi}
+          opts={{
+            loop: carouselImagesData.length > 1,
+            align: "start",
+          }}
+          plugins={carouselImagesData.length > 1 ? [autoplayPlugin.current] : []}
+          className="h-full"
+        >
+          <CarouselContent className="h-full -ml-0">
+            {carouselImagesData.map((item, index) => {
+              const processedImageUrl = getCarouselImageUrl(item.image_url);
 
+              console.log(`Rendering slide ${index}:`, {
+                originalImageUrl: item.image_url,
+                processedImageUrl: processedImageUrl,
+                title: item.title
+              });
+
+              return (
+                <CarouselItem key={item.id || index} className="h-full pl-0">
+                  <div className="relative h-full w-full">
+                    {processedImageUrl && processedImageUrl !== "/placeholder.svg" ? (
+                     <img
+  src={processedImageUrl}
+  alt={item.alt_text || "Imagem do carrossel"}
+  style={{
+    width: "100%",
+    height: "100%",
+    maxHeight: "600px",
+    objectFit: "cover",
+    border: "4px solid red",
+    position: "relative",
+    zIndex: 10,
+  }}
+  onLoad={() => console.log(`✅ Imagem carregada com sucesso: ${processedImageUrl}`)}
+  onError={(e) => {
+    console.error(`❌ Falha ao carregar imagem: ${processedImageUrl}. Tentando fallback.`);
+    const target = e.target as HTMLImageElement;
+    if (target.src !== '/placeholder.svg') {
+      target.src = '/placeholder.svg';
+      target.alt = "Falha ao carregar a imagem original. Exibindo imagem substituta.";
+    }
+  }}
+/>
+
+                    ) : (
+                      <div className="absolute inset-0 w-full h-full bg-gray-300 flex items-center justify-center border-4 border-blue-500">
+                        <div className="text-center text-gray-600">
+                          <p className="text-lg">⚠️ Imagem indisponível</p>
+                          <p className="text-sm">{item.title || "Slide sem título"} ({item.image_url ? "URL inválida" : "URL vazia"})</p>
+                        </div>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10"></div>
+                  </div>
+                </CarouselItem>
+              );
+            })}
+          </CarouselContent>
+        </Carousel>
 
         <div className="absolute inset-0 z-20 flex flex-col items-start justify-end md:justify-center pb-20 md:pb-0 pointer-events-none">
           <div className="container py-6 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto">
