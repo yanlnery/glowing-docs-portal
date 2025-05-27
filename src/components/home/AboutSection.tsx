@@ -11,9 +11,9 @@ export default function AboutSection() {
         <div className="flex flex-col lg:flex-row gap-12 items-center">
           <div className="w-full lg:w-1/2">
             <img
-              src="/lovable-uploads/3b1edcbf-8480-4165-934c-0dfcb0ec9b59.png"
-              alt="Pet Serpentes & Companhia"
-              className="rounded-lg shadow-lg w-full h-auto object-cover object-bottom aspect-[4/3]"
+              src="/lovable-uploads/c988fe8f-9ba2-4b94-a8e7-a7347e0d0a84.png"
+              alt="Pet Serpentes & Companhia - Instalações do Criadouro"
+              className="rounded-lg shadow-lg w-full h-auto object-cover object-center aspect-[4/3]"
             />
           </div>
           <div className="w-full lg:w-1/2">
@@ -74,3 +74,4 @@ export default function AboutSection() {
     </section>
   );
 }
+
