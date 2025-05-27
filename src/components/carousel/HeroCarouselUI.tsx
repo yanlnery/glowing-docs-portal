@@ -72,7 +72,7 @@ export default function HeroCarouselUI({
   }
 
   return (
-    <div className="relative w-full">
+   <div className="relative w-full h-[60vh] md:h-[70vh] overflow-hidden">
       <div className="relative h-[60vh] md:h-[70vh] overflow-hidden">
         <Carousel
           setApi={setApi}
@@ -100,7 +100,7 @@ export default function HeroCarouselUI({
                      <img
   src={processedImageUrl}
   alt={item.alt_text || "Imagem do carrossel"}
-  className="absolute inset-0 w-full h-full object-cover z-10"
+className="absolute inset-0 w-full h-full object-cover z-0"
   onLoad={() => console.log(`✅ Imagem carregada com sucesso: ${processedImageUrl}`)}
   onError={(e) => {
     console.error(`❌ Falha ao carregar imagem: ${processedImageUrl}. Tentando fallback.`);
