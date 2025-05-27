@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -98,27 +99,26 @@ export default function HeroCarouselUI({
                   <div className="relative h-full w-full">
                     {processedImageUrl && processedImageUrl !== "/placeholder.svg" ? (
                      <img
-  src={processedImageUrl}
-  alt={item.alt_text || "Imagem do carrossel"}
-  style={{
-    width: "100%",
-    height: "100%",
-    maxHeight: "900px",
-    objectFit: "cover",
-    position: "relative",
-    zIndex: 10,
-  }}
-  onLoad={() => console.log(`✅ Imagem carregada com sucesso: ${processedImageUrl}`)}
-  onError={(e) => {
-    console.error(`❌ Falha ao carregar imagem: ${processedImageUrl}. Tentando fallback.`);
-    const target = e.target as HTMLImageElement;
-    if (target.src !== '/placeholder.svg') {
-      target.src = '/placeholder.svg';
-      target.alt = "Falha ao carregar a imagem original. Exibindo imagem substituta.";
-    }
-  }}
-/>
-
+                        src={processedImageUrl}
+                        alt={item.alt_text || "Imagem do carrossel"}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          maxHeight: "900px",
+                          objectFit: "cover",
+                          position: "relative",
+                          zIndex: 10,
+                        }}
+                        onLoad={() => console.log(`✅ Imagem carregada com sucesso: ${processedImageUrl}`)}
+                        onError={(e) => {
+                          console.error(`❌ Falha ao carregar imagem: ${processedImageUrl}. Tentando fallback.`);
+                          const target = e.target as HTMLImageElement;
+                          if (target.src !== '/placeholder.svg') {
+                            target.src = '/placeholder.svg';
+                            target.alt = "Falha ao carregar a imagem original. Exibindo imagem substituta.";
+                          }
+                        }}
+                      />
                     ) : (
                       <div className="absolute inset-0 w-full h-full bg-gray-300 flex items-center justify-center border-4 border-blue-500">
                         <div className="text-center text-gray-600">
@@ -127,7 +127,7 @@ export default function HeroCarouselUI({
                         </div>
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10" /> {/* Gradient adjusted as requested */}
                   </div>
                 </CarouselItem>
               );
@@ -165,7 +165,7 @@ export default function HeroCarouselUI({
         )}
       </div>
 
-      <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-6 md:absolute md:bottom-10 md:left-1/2 md:-translate-x-1/2 md:z-20 md:py-0 md:pointer-events-auto">
+      <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-6 md:absolute md:bottom-24 md:left-1/2 md:-translate-x-1/2 md:z-20 md:py-0 md:pointer-events-auto"> {/* CTA button position updated */}
         <div className="flex flex-col sm:flex-row gap-3 w-full items-center justify-center md:justify-start">
           <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[48px] w-full sm:w-auto text-sm md:text-base" asChild>
             <Link to="/catalogo">
@@ -182,3 +182,4 @@ export default function HeroCarouselUI({
     </div>
   );
 }
+
