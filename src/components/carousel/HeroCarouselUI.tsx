@@ -127,7 +127,7 @@ export default function HeroCarouselUI({
                         </div>
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10" /> {/* Gradient adjusted as requested */}
+                    <div className="absolute inset-y-0 left-0 w-[60%] bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10" /> {/* Gradient adjusted as requested */}
                   </div>
                 </CarouselItem>
               );
