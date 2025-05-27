@@ -42,6 +42,14 @@ const Academy = () => {
       {/* Hero Section */}
       <div className="flex flex-col lg:flex-row items-center gap-8 mb-16">
         <div className="flex-1">
+          <img 
+            src="/lovable-uploads/bf008d0e-9874-4dad-9871-fb0c80c0efd4.png" 
+            alt="PS Academy - Répteis e conhecimento" 
+            className="rounded-lg shadow-lg border dark:border-gray-800" 
+            loading="lazy"
+          />
+        </div>
+        <div className="flex-1">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
             PS Academy: Aprenda com Especialistas em Répteis
           </h1>
@@ -59,14 +67,6 @@ const Academy = () => {
           <p className="text-sm text-muted-foreground mt-4">
             Seja notificado quando abrirmos novas vagas para nossos cursos.
           </p>
-        </div>
-        <div className="flex-1">
-          <img 
-            src="/lovable-uploads/bf008d0e-9874-4dad-9871-fb0c80c0efd4.png" 
-            alt="PS Academy - Répteis e conhecimento" 
-            className="rounded-lg shadow-lg border dark:border-gray-800" 
-            loading="lazy"
-          />
         </div>
       </div>
 
