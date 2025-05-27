@@ -100,15 +100,7 @@ export default function HeroCarouselUI({
                      <img
   src={processedImageUrl}
   alt={item.alt_text || "Imagem do carrossel"}
-  style={{
-    width: "100%",
-    height: "100%",
-    maxHeight: "600px",
-    objectFit: "cover",
-    border: "4px solid red",
-    position: "relative",
-    zIndex: 10,
-  }}
+  className="absolute inset-0 w-full h-full object-cover z-10"
   onLoad={() => console.log(`✅ Imagem carregada com sucesso: ${processedImageUrl}`)}
   onError={(e) => {
     console.error(`❌ Falha ao carregar imagem: ${processedImageUrl}. Tentando fallback.`);
