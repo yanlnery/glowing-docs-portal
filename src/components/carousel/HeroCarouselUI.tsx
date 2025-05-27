@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -140,7 +139,7 @@ export default function HeroCarouselUI({
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-2xl animate-slide-in text-balance">
               {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
             </h1>
-            <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance">
+            <p className="text-sm sm:text-base md:text-lg text-white/90 font-medium max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance">
               {currentSlideData.subtitle || "Conheça nossa coleção de répteis exóticos"}
             </p>
           </div>
@@ -182,4 +181,3 @@ export default function HeroCarouselUI({
     </div>
   );
 }
-
