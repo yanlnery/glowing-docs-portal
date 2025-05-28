@@ -1,8 +1,8 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Award, Calendar, CreditCard, Shield, Syringe } from "lucide-react";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 
 export default function AboutSection() {
   return (
@@ -10,10 +10,18 @@ export default function AboutSection() {
       <div className="container px-4 sm:px-6">
         <div className="flex flex-col lg:flex-row gap-12 items-center">
           <div className="w-full lg:w-1/2">
-            <img
+            <OptimizedImage
               src="/lovable-uploads/c988fe8f-9ba2-4b94-a8e7-a7347e0d0a84.png"
               alt="Pet Serpentes & Companhia - Instalações do Criadouro"
-              className="rounded-lg shadow-lg w-full h-auto object-cover object-center aspect-[4/3]"
+              priority={false}
+              quality={85}
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="rounded-lg shadow-lg w-full h-auto aspect-[4/3]"
+              style={{
+                objectFit: "cover",
+                objectPosition: "center"
+              }}
+              onLoad={() => console.log("✅ Imagem da seção About carregada")}
             />
           </div>
           <div className="w-full lg:w-1/2">
@@ -74,4 +82,3 @@ export default function AboutSection() {
     </section>
   );
 }
-

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { productService } from "@/services/productService";
 import { Product } from "@/types/product";
 
@@ -28,14 +29,23 @@ export default function FeaturedProductsSection() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mt-8">
           {featuredProducts.length > 0 ? (
-            featuredProducts.map((product) => (
+            featuredProducts.map((product, index) => (
               <div key={product.id} className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
                 <div className="relative h-48 sm:h-64 overflow-hidden">
-                  <img
+                  <OptimizedImage
                     src={product.images && product.images.length > 0 ? product.images[0].url : "/placeholder.svg"}
                     alt={product.name}
-                    className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
+                    priority={index === 0}
+                    quality={80}
+                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                    className="w-full h-full"
+                    style={{
+                      objectFit: "cover",
+                      objectPosition: "center",
+                      transform: "scale(1)",
+                      transition: "transform 0.3s ease"
+                    }}
+                    onLoad={() => console.log(`✅ Produto ${product.name} carregado`)}
                   />
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
                     {product.status === 'disponivel' ? (

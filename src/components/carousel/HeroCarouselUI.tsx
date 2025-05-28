@@ -9,6 +9,7 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import type { CarouselItem as CarouselItemData } from "@/services/carouselService";
 import { getCarouselImageUrl } from "@/services/carouselService";
 import type { AutoplayType } from "embla-carousel-autoplay";
@@ -86,20 +87,28 @@ export default function HeroCarouselUI({
           <CarouselContent className="h-full -ml-0">
             {carouselImagesData.map((item, index) => {
               const processedImageUrl = getCarouselImageUrl(item.image_url);
+              const isCurrentSlide = index === currentImageIndex;
+              const isAdjacentSlide = Math.abs(index - currentImageIndex) <= 1;
 
               console.log(`Rendering slide ${index}:`, {
                 originalImageUrl: item.image_url,
                 processedImageUrl: processedImageUrl,
-                title: item.title
+                title: item.title,
+                isCurrentSlide,
+                isAdjacentSlide
               });
 
               return (
                 <CarouselItem key={item.id || index} className="h-full pl-0">
                   <div className="relative h-full w-full">
                     {processedImageUrl && processedImageUrl !== "/placeholder.svg" ? (
-                     <img
+                      <OptimizedImage
                         src={processedImageUrl}
                         alt={item.alt_text || "Imagem do carrossel"}
+                        priority={isCurrentSlide}
+                        quality={isCurrentSlide ? 85 : 75}
+                        sizes="100vw"
+                        className="w-full h-full"
                         style={{
                           width: "100%",
                           height: "100%",
@@ -108,14 +117,9 @@ export default function HeroCarouselUI({
                           position: "relative",
                           zIndex: 10,
                         }}
-                        onLoad={() => console.log(`✅ Imagem carregada com sucesso: ${processedImageUrl}`)}
+                        onLoad={() => console.log(`✅ Imagem otimizada carregada: ${processedImageUrl}`)}
                         onError={(e) => {
-                          console.error(`❌ Falha ao carregar imagem: ${processedImageUrl}. Tentando fallback.`);
-                          const target = e.target as HTMLImageElement;
-                          if (target.src !== '/placeholder.svg') {
-                            target.src = '/placeholder.svg';
-                            target.alt = "Falha ao carregar a imagem original. Exibindo imagem substituta.";
-                          }
+                          console.error(`❌ Falha ao carregar imagem otimizada: ${processedImageUrl}`);
                         }}
                       />
                     ) : (
@@ -126,7 +130,7 @@ export default function HeroCarouselUI({
                         </div>
                       </div>
                     )}
-                    <div className="absolute inset-y-0 left-0 w-[55%] bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10" /> {/* Gradient adjusted as requested */}
+                    <div className="absolute inset-y-0 left-0 w-[55%] bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10" />
                   </div>
                 </CarouselItem>
               );
@@ -164,7 +168,7 @@ export default function HeroCarouselUI({
         )}
       </div>
 
-      <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-6 md:absolute md:bottom-40 md:left-1/2 md:-translate-x-1/2 md:z-20 md:py-0 md:pointer-events-auto"> {/* CTA button position updated */}
+      <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-6 md:absolute md:bottom-40 md:left-1/2 md:-translate-x-1/2 md:z-20 md:py-0 md:pointer-events-auto">
         <div className="flex flex-col sm:flex-row gap-3 w-full items-center justify-center md:justify-start">
           <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[48px] w-full sm:w-auto text-sm md:text-base" asChild>
             <Link to="/catalogo">
