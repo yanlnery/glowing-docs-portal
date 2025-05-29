@@ -18,6 +18,7 @@ interface CartStore {
   getTotalItems: () => number;
   getTotalPrice: () => number;
   processCheckout: () => Promise<void>;
+  isProductInCart: (productId: string) => boolean;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -30,22 +31,21 @@ export const useCartStore = create<CartStore>()(
           const existingItem = state.items.find((item) => item.product.id === product.id);
           
           if (existingItem) {
-            return {
-              items: state.items.map((item) =>
-                item.product.id === product.id
-                  ? { ...item, quantity: item.quantity + quantity }
-                  : item
-              ),
-            };
+            // Para produtos únicos, não adicionar novamente se já está no carrinho
+            console.log(`⚠️ Produto ${product.name} já está no carrinho`);
+            return state;
           }
           
+          // Como cada produto é único, sempre adiciona com quantidade 1
+          console.log(`✅ Adicionando produto ${product.name} ao carrinho`);
           return {
-            items: [...state.items, { product, quantity }],
+            items: [...state.items, { product, quantity: 1 }],
           };
         });
       },
 
       removeFromCart: (productId: string) => {
+        console.log(`🗑️ Removendo produto ${productId} do carrinho`);
         set((state) => ({
           items: state.items.filter((item) => item.product.id !== productId),
         }));
@@ -57,25 +57,36 @@ export const useCartStore = create<CartStore>()(
           return;
         }
         
+        // Para produtos únicos, a quantidade sempre será 1
+        if (quantity > 1) {
+          console.log(`⚠️ Produto único: quantidade limitada a 1`);
+          quantity = 1;
+        }
+        
         set((state) => ({
           items: state.items.map((item) =>
             item.product.id === productId
-              ? { ...item, quantity }
+              ? { ...item, quantity: 1 }
               : item
           ),
         }));
       },
 
       clearCart: () => {
+        console.log("🧹 Limpando carrinho");
         set({ items: [] });
       },
 
       getTotalItems: () => {
-        return get().items.reduce((total, item) => total + item.quantity, 0);
+        return get().items.length; // Para produtos únicos, conta o número de produtos
       },
 
       getTotalPrice: () => {
-        return get().items.reduce((total, item) => total + (item.product.price * item.quantity), 0);
+        return get().items.reduce((total, item) => total + item.product.price, 0);
+      },
+
+      isProductInCart: (productId: string) => {
+        return get().items.some((item) => item.product.id === productId);
       },
 
       processCheckout: async () => {

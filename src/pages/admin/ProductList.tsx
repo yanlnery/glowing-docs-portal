@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import AdminLayout from '@/layouts/AdminLayout';
@@ -17,7 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import {
   Edit, Trash2, EyeOff, Eye, Star, Clock, 
   Search, Plus, Filter, CheckCircle, XCircle, 
-  AlertCircle
+  AlertCircle, Loader2
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -52,6 +53,7 @@ const ProductList = () => {
   const [statusFilter, setStatusFilter] = useState<ProductStatus | 'all'>('all');
   const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState<{[key: string]: boolean}>({});
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const location = useLocation();
   const navigate = useNavigate();
@@ -68,16 +70,24 @@ const ProductList = () => {
   }, [location.search]);
 
   const loadProducts = async () => {
-    console.log("🔄 Carregando produtos para admin do Supabase...");
     try {
+      setIsLoading(true);
+      console.log("🔄 Carregando produtos para admin do Supabase...");
       const allProducts = await productService.getAll();
       console.log("📦 Produtos admin carregados:", allProducts.length);
       setProducts(allProducts);
       applyFilters(allProducts, searchQuery, statusFilter);
     } catch (error) {
       console.error("❌ Erro ao carregar produtos para admin:", error);
+      toast({
+        title: "Erro ao carregar produtos",
+        description: "Não foi possível carregar a lista de produtos",
+        variant: "destructive",
+      });
       setProducts([]);
       setFilteredProducts([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -138,15 +148,15 @@ const ProductList = () => {
     navigate(`${location.pathname}?${params.toString()}`);
   };
 
-  const handleToggleVisibility = (id: string, currentVisible: boolean) => {
+  const handleToggleVisibility = async (id: string, currentVisible: boolean) => {
     if (isProcessing[id]) return;
     
     try {
       setIsProcessing(prev => ({ ...prev, [id]: true }));
+      console.log(`🔄 Updating visibility for product ${id}: ${!currentVisible}`);
       
-      // TODO: Replace with Supabase update
-      // productService.update(id, { visible: !currentVisible });
-      loadProducts();
+      await productService.update(id, { visible: !currentVisible });
+      await loadProducts();
       
       toast({
         title: "Visibilidade atualizada",
@@ -154,6 +164,7 @@ const ProductList = () => {
         variant: "default",
       });
     } catch (error) {
+      console.error("❌ Error updating visibility:", error);
       toast({
         title: "Erro ao alterar visibilidade",
         description: "Não foi possível atualizar o produto",
@@ -164,15 +175,15 @@ const ProductList = () => {
     }
   };
 
-  const handleToggleFeatured = (id: string, currentFeatured: boolean) => {
+  const handleToggleFeatured = async (id: string, currentFeatured: boolean) => {
     if (isProcessing[id]) return;
     
     try {
       setIsProcessing(prev => ({ ...prev, [id]: true }));
+      console.log(`🔄 Updating featured for product ${id}: ${!currentFeatured}`);
       
-      // TODO: Replace with Supabase update
-      // productService.update(id, { featured: !currentFeatured });
-      loadProducts();
+      await productService.update(id, { featured: !currentFeatured });
+      await loadProducts();
       
       toast({
         title: "Status de destaque atualizado",
@@ -180,6 +191,7 @@ const ProductList = () => {
         variant: "default",
       });
     } catch (error) {
+      console.error("❌ Error updating featured:", error);
       toast({
         title: "Erro ao alterar destaque",
         description: "Não foi possível atualizar o produto",
@@ -203,24 +215,15 @@ const ProductList = () => {
     }
   };
 
-  const handleSetStatus = (id: string, newStatus: ProductStatus) => {
+  const handleSetStatus = async (id: string, newStatus: ProductStatus) => {
     if (isProcessing[id]) return;
-    
-    if (newStatus === 'vendido') {
-      toast({
-        title: "Ação não recomendada",
-        description: "Para marcar como 'Vendido', utilize o formulário de edição ou o processo de pedido.",
-        variant: "destructive",
-      });
-      return;
-    }
     
     try {
       setIsProcessing(prev => ({ ...prev, [id]: true }));
+      console.log(`🔄 Updating status for product ${id}: ${newStatus}`);
       
-      // TODO: Replace with Supabase update
-      // productService.update(id, { status: newStatus });
-      loadProducts();
+      await productService.update(id, { status: newStatus });
+      await loadProducts();
       
       toast({
         title: "Status do produto atualizado",
@@ -228,7 +231,7 @@ const ProductList = () => {
         variant: "default",
       });
     } catch (error) {
-      console.error("Erro ao atualizar status:", error);
+      console.error("❌ Error updating status:", error);
       toast({
         title: "Erro ao atualizar status",
         description: "Não foi possível atualizar o status do produto.",
@@ -249,7 +252,7 @@ const ProductList = () => {
     try {
       const success = await productService.delete(deleteProductId);
       if (success) {
-        loadProducts();
+        await loadProducts();
         toast({
           title: "Produto excluído",
           description: "O produto foi removido com sucesso",
@@ -285,6 +288,19 @@ const ProductList = () => {
         return <AlertCircle className="h-5 w-5 text-gray-400" />;
     }
   };
+
+  if (isLoading) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="flex items-center space-x-2">
+            <Loader2 className="h-6 w-6 animate-spin" />
+            <span>Carregando produtos...</span>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
@@ -395,7 +411,9 @@ const ProductList = () => {
                             onClick={() => handleToggleVisibility(product.id, product.visible ?? true)}
                             disabled={isProcessing[product.id]}
                           >
-                            {product.visible ? (
+                            {isProcessing[product.id] ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : product.visible ? (
                               <Eye className="h-5 w-5 text-green-500" />
                             ) : (
                               <EyeOff className="h-5 w-5 text-gray-400" />
@@ -408,24 +426,28 @@ const ProductList = () => {
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
+                              <Button variant="ghost" size="icon" disabled={isProcessing[product.id]}>
+                                {isProcessing[product.id] ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className="h-4 w-4"
+                                  >
+                                    <circle cx="12" cy="12" r="1" />
+                                    <circle cx="19" cy="12" r="1" />
+                                    <circle cx="5" cy="12" r="1" />
+                                  </svg>
+                                )}
                                 <span className="sr-only">Abrir menu</span>
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="h-4 w-4"
-                                >
-                                  <circle cx="12" cy="12" r="1" />
-                                  <circle cx="19" cy="12" r="1" />
-                                  <circle cx="5" cy="12" r="1" />
-                                </svg>
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">

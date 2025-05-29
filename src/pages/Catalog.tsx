@@ -6,8 +6,10 @@ import { Product, ProductCategory, ProductSubcategory } from '@/types/product';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, Filter, Star, ChevronDown, ChevronUp, AlertCircle } from 'lucide-react';
+import { Search, Filter, Star, ChevronDown, ChevronUp, AlertCircle, ShoppingCart, Check } from 'lucide-react';
 import { OptimizedImage } from '@/components/ui/optimized-image';
+import { useCartStore } from '@/stores/cartStore';
+import { useToast } from '@/hooks/use-toast';
 import {
   Card,
   CardHeader,
@@ -24,6 +26,8 @@ const Catalog = () => {
   const [subcategoryFilter, setSubcategoryFilter] = useState<ProductSubcategory | 'all'>('all');
   const [isLoading, setIsLoading] = useState(true);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const { addToCart, isProductInCart } = useCartStore();
+  const { toast } = useToast();
 
   // Debug logs para verificar hidratação
   useEffect(() => {
@@ -104,6 +108,24 @@ const Catalog = () => {
     console.log("📱 CATALOG Render mobile section - produtos filtered count:", filteredProducts?.length);
     console.log("📱 CATALOG Filtered products data:", filteredProducts);
   }, [filteredProducts]);
+
+  const handleAddToCart = (product: Product) => {
+    if (isProductInCart(product.id)) {
+      toast({
+        title: "Produto já no carrinho",
+        description: `${product.name} já foi adicionado ao carrinho`,
+        variant: "default",
+      });
+      return;
+    }
+
+    addToCart(product);
+    toast({
+      title: "Produto adicionado",
+      description: `${product.name} foi adicionado ao carrinho`,
+      variant: "default",
+    });
+  };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -296,6 +318,9 @@ const Catalog = () => {
               hasImages: product.images && product.images.length > 0 
             });
             
+            const isInCart = isProductInCart(product.id);
+            const isUnavailable = product.status === 'indisponivel' || product.status === 'vendido';
+            
             return (
               <Card 
                 key={product.id} 
@@ -354,9 +379,15 @@ const Catalog = () => {
                         Novidade
                       </Badge>
                     )}
-                    {product.status === 'indisponivel' && (
+                    {isUnavailable && (
                       <Badge variant="secondary" className="bg-red-100 hover:bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 text-xs px-1.5 py-0.5">
-                        <AlertCircle className="h-3 w-3 mr-1 inline" /> Indisponível
+                        <AlertCircle className="h-3 w-3 mr-1 inline" /> 
+                        {product.status === 'vendido' ? 'Vendido' : 'Indisponível'}
+                      </Badge>
+                    )}
+                    {isInCart && (
+                      <Badge variant="secondary" className="bg-green-100 hover:bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 text-xs px-1.5 py-0.5">
+                        <Check className="h-3 w-3 mr-1 inline" /> No carrinho
                       </Badge>
                     )}
                   </div>
@@ -375,16 +406,31 @@ const Catalog = () => {
                 </CardContent>
                 
                 <CardFooter className="p-2 sm:p-3 pt-0 mt-auto">
-                  <Button 
-                    variant={product.status === 'indisponivel' ? "secondary" : "outline"} 
-                    className="w-full min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm"
-                    asChild
-                    disabled={product.status === 'indisponivel'}
-                  >
-                    <Link to={`/produtos/${product.id}`}>
-                      {product.status === 'indisponivel' ? 'Esgotado' : 'Ver Detalhes'}
-                    </Link>
-                  </Button>
+                  <div className="flex gap-2 w-full">
+                    <Button 
+                      variant="outline" 
+                      className="flex-1 min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm"
+                      asChild
+                    >
+                      <Link to={`/produtos/${product.id}`}>
+                        Ver Detalhes
+                      </Link>
+                    </Button>
+                    {!isUnavailable && (
+                      <Button 
+                        variant={isInCart ? "secondary" : "default"}
+                        className="min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm"
+                        onClick={() => handleAddToCart(product)}
+                        disabled={isInCart}
+                      >
+                        {isInCart ? (
+                          <Check className="h-4 w-4" />
+                        ) : (
+                          <ShoppingCart className="h-4 w-4" />
+                        )}
+                      </Button>
+                    )}
+                  </div>
                 </CardFooter>
               </Card>
             );
