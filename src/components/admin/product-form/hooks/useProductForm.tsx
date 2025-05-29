@@ -1,95 +1,107 @@
 
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { toast } from '@/components/ui/use-toast';
 import { productService } from '@/services/productService';
-import { ProductImage, ProductFormData, ProductCategory, ProductSubcategory, ProductStatus } from '@/types/product';
-import { useToast } from '@/hooks/use-toast';
+import { ProductFormData, ProductImage } from '@/types/product';
 
-const formSchema = z.object({
-  name: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
-  speciesId: z.string().min(1, "Espécie é obrigatória"),
-  speciesName: z.string().min(1, "Nome da espécie é obrigatório"),
-  category: z.enum(['serpente', 'lagarto', 'quelonio']),
-  subcategory: z.enum(['boideos', 'colubrideos', 'pequenos', 'grandes', 'aquaticos', 'terrestres']),
-  status: z.enum(['disponivel', 'indisponivel', 'vendido']),
-  price: z.preprocess(
-    (val) => (val === '' ? 0 : Number(val)),
-    z.number().min(0)
-  ),
-  paymentLink: z.string().optional(),
-  description: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres"),
+const productFormSchema = z.object({
+  name: z.string().min(1, 'Nome é obrigatório'),
+  speciesName: z.string().min(1, 'Nome científico é obrigatório'),
+  speciesId: z.string().optional(),
+  description: z.string().optional(),
+  price: z.number().min(0, 'Preço deve ser positivo'),
+  category: z.enum(['serpente', 'lagarto', 'quelonio'], {
+    required_error: 'Categoria é obrigatória',
+  }),
+  subcategory: z.enum(['colubrideos', 'boideos', 'pequenos', 'grandes', 'terrestres', 'aquaticos'], {
+    required_error: 'Subcategoria é obrigatória',
+  }),
+  status: z.enum(['disponivel', 'indisponivel', 'vendido']).default('disponivel'),
   featured: z.boolean().default(false),
   isNew: z.boolean().default(false),
   visible: z.boolean().default(true),
-  order: z.preprocess(
-    (val) => (val === '' ? 0 : Number(val)),
-    z.number().min(0)
-  ),
+  order: z.number().default(0),
+  paymentLink: z.string().optional(),
+  images: z.array(z.any()).default([]),
+  details: z.array(z.any()).default([]),
+  meta: z.record(z.any()).default({}),
 });
-
-export type FormValues = z.infer<typeof formSchema>;
 
 export const useProductForm = () => {
   const { id } = useParams<{ id: string }>();
-  const isEditMode = Boolean(id);
   const navigate = useNavigate();
-  const { toast } = useToast();
-  
   const [loading, setLoading] = useState(false);
   const [imageList, setImageList] = useState<ProductImage[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  const isEditMode = Boolean(id);
+
+  const form = useForm<ProductFormData>({
+    resolver: zodResolver(productFormSchema),
     defaultValues: {
-      name: "",
-      speciesId: "",
-      speciesName: "",
-      category: "serpente" as ProductCategory,
-      subcategory: "boideos" as ProductSubcategory,
-      status: "disponivel" as ProductStatus,
+      name: '',
+      speciesName: '',
+      description: '',
       price: 0,
-      paymentLink: "",
-      description: "",
+      category: 'serpente',
+      subcategory: 'colubrideos',
+      status: 'disponivel',
       featured: false,
-      isNew: true,
+      isNew: false,
       visible: true,
       order: 0,
+      paymentLink: '',
+      images: [],
+      details: [],
+      meta: {},
     },
   });
 
+  // Load product data if editing
   useEffect(() => {
-    if (isEditMode && id) {
-      const loadProduct = async () => {
+    const loadProduct = async () => {
+      if (id) {
         try {
-          const productData = await productService.getById(id);
-          if (productData) {
-            setImageList(productData.images || []);
+          setLoading(true);
+          console.log(`🔄 Loading product ${id} for editing...`);
+          
+          const product = await productService.getById(id);
+          if (product) {
+            console.log("✅ Product loaded for editing:", product);
             
             form.reset({
-              name: productData.name,
-              speciesId: productData.speciesId || "",
-              speciesName: productData.speciesName,
-              category: productData.category,
-              subcategory: productData.subcategory,
-              status: productData.status || "disponivel",
-              price: productData.price,
-              paymentLink: productData.paymentLink,
-              description: productData.description,
-              featured: productData.featured,
-              isNew: productData.isNew,
-              visible: productData.visible ?? true,
-              order: productData.order || 0,
+              name: product.name,
+              speciesName: product.speciesName,
+              speciesId: product.speciesId,
+              description: product.description,
+              price: product.price,
+              category: product.category,
+              subcategory: product.subcategory,
+              status: product.status || 'disponivel',
+              featured: product.featured,
+              isNew: product.isNew,
+              visible: product.visible !== undefined ? product.visible : true,
+              order: product.order || 0,
+              paymentLink: product.paymentLink || '',
+              images: product.images || [],
+              details: product.details || [],
+              meta: product.meta || {},
             });
+
+            // Set existing images
+            if (product.images && product.images.length > 0) {
+              setImageList(product.images);
+            }
           } else {
             toast({
               title: "Erro",
               description: "Produto não encontrado",
-              variant: "destructive"
+              variant: "destructive",
             });
             navigate('/admin/products');
           }
@@ -98,123 +110,100 @@ export const useProductForm = () => {
           toast({
             title: "Erro",
             description: "Erro ao carregar produto",
-            variant: "destructive"
+            variant: "destructive",
           });
           navigate('/admin/products');
+        } finally {
+          setLoading(false);
         }
+      }
+    };
+
+    loadProduct();
+  }, [id, form, navigate]);
+
+  const onSubmit = async (data: ProductFormData) => {
+    try {
+      setLoading(true);
+      console.log("🔄 Submitting product form...", data);
+
+      // Combine existing images with new images
+      const allImages = [
+        ...imageList,
+        ...imageFiles.map((file, index) => ({
+          id: crypto.randomUUID(),
+          url: imagePreviewUrls[index],
+          filename: file.name,
+          alt: data.name || 'Product image',
+        })),
+      ];
+
+      const productData = {
+        ...data,
+        images: allImages,
       };
 
-      loadProduct();
-    }
-  }, [id, isEditMode, navigate, toast, form]);
-
-  const handleDelete = async () => {
-    if (isEditMode && id && window.confirm('Tem certeza que deseja excluir este produto?')) {
-      try {
-        await productService.delete(id);
-        toast({
-          title: "Produto excluído",
-          description: "O produto foi removido com sucesso.",
-        });
-        navigate('/admin/products');
-      } catch (error) {
-        console.error("Error deleting product:", error);
-        toast({
-          title: "Erro",
-          description: "Erro ao excluir produto",
-          variant: "destructive"
-        });
-      }
-    }
-  };
-
-  const fileToDataUrl = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const onSubmit = async (values: FormValues) => {
-    setLoading(true);
-    
-    let newProcessedImages: ProductImage[] = [];
-    if (imageFiles.length > 0) {
-      const newImageDataPromises = imageFiles.map(async (file) => {
-        try {
-          const dataUrl = await fileToDataUrl(file);
-          return {
-            id: crypto.randomUUID(),
-            url: dataUrl,
-            filename: file.name,
-            alt: `Imagem de ${values.name}`
-          };
-        } catch (error) {
-          console.error("Erro ao converter arquivo para data URL:", error);
-          toast({ title: "Erro de Imagem", description: `Falha ao processar ${file.name}. Tente novamente.`, variant: "destructive" });
-          return null; 
-        }
-      });
-
-      const results = await Promise.all(newImageDataPromises);
-      newProcessedImages = results.filter(img => img !== null) as ProductImage[];
-
-      if (newProcessedImages.length !== imageFiles.length) {
-        setLoading(false);
-        return;
-      }
-    }
-    
-    const allImages = [...imageList, ...newProcessedImages];
-    
-    const formData: ProductFormData = {
-      name: values.name,
-      speciesId: values.speciesId,
-      speciesName: values.speciesName,
-      category: values.category,
-      subcategory: values.subcategory,
-      status: values.status,
-      price: values.price,
-      paymentLink: values.paymentLink || "",
-      images: allImages,
-      description: values.description,
-      featured: values.featured,
-      isNew: values.isNew,
-      visible: values.visible,
-      order: values.order,
-      available: values.status === 'disponivel',
-    };
-    
-    try {
       if (isEditMode && id) {
-        await productService.update(id, formData);
+        await productService.update(id, productData);
         toast({
           title: "Sucesso",
           description: "Produto atualizado com sucesso!",
         });
       } else {
-        await productService.create(formData);
+        await productService.create(productData);
         toast({
           title: "Sucesso",
           description: "Produto criado com sucesso!",
         });
-        form.reset();
-        setImagePreviewUrls([]);
-        setImageFiles([]);
-        setImageList([]);
       }
+
       navigate('/admin/products');
     } catch (error) {
-      console.error("Erro ao salvar produto:", error);
+      console.error("Error saving product:", error);
       toast({
         title: "Erro",
-        description: (error instanceof Error && error.message) || "Ocorreu um erro ao salvar o produto",
-        variant: "destructive"
+        description: "Erro ao salvar produto. Tente novamente.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!id) return;
+
+    const confirmed = window.confirm('Tem certeza que deseja excluir este produto? Esta ação não pode ser desfeita.');
+    
+    if (confirmed) {
+      try {
+        setLoading(true);
+        console.log(`🔄 Deleting product ${id}...`);
+        
+        const success = await productService.delete(id);
+        if (success) {
+          toast({
+            title: "Sucesso",
+            description: "Produto excluído com sucesso!",
+          });
+          navigate('/admin/products');
+        } else {
+          toast({
+            title: "Erro",
+            description: "Erro ao excluir produto",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        toast({
+          title: "Erro",
+          description: "Erro ao excluir produto",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
     }
   };
 

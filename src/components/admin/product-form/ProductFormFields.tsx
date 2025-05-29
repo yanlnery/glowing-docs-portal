@@ -1,47 +1,51 @@
 
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { FormValues } from './hooks/useProductForm';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ProductFormData, ProductCategory, ProductSubcategory, ProductStatus } from '@/types/product';
 
 interface ProductFormFieldsProps {
-  form: UseFormReturn<FormValues>;
+  form: UseFormReturn<ProductFormData>;
 }
 
 export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({ form }) => {
+  const categoryOptions: { value: ProductCategory; label: string }[] = [
+    { value: 'serpente', label: 'Serpente' },
+    { value: 'lagarto', label: 'Lagarto' },
+    { value: 'quelonio', label: 'Quelônio' },
+  ];
+
+  const subcategoryOptions: { value: ProductSubcategory; label: string }[] = [
+    { value: 'colubrideos', label: 'Colubrídeos' },
+    { value: 'boideos', label: 'Boídeos' },
+    { value: 'pequenos', label: 'Pequenos' },
+    { value: 'grandes', label: 'Grandes' },
+    { value: 'terrestres', label: 'Terrestres' },
+    { value: 'aquaticos', label: 'Aquáticos' },
+  ];
+
+  const statusOptions: { value: ProductStatus; label: string }[] = [
+    { value: 'disponivel', label: 'Disponível' },
+    { value: 'indisponivel', label: 'Indisponível' },
+    { value: 'vendido', label: 'Vendido' },
+  ];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div className="space-y-4">
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nome do Animal</FormLabel>
+              <FormLabel>Nome do Animal *</FormLabel>
               <FormControl>
-                <Input placeholder="Ex: Python Regius Albino" {...field} />
+                <Input placeholder="Ex: Ball Python Banana" {...field} />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="speciesId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>ID da Espécie</FormLabel>
-              <FormControl>
-                <Input placeholder="Ex: boa-constrictor-constrictor" {...field} />
-              </FormControl>
-              <FormDescription>
-                ID da espécie conforme definido na seção Espécies
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -52,7 +56,7 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({ form }) =>
           name="speciesName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nome Científico</FormLabel>
+              <FormLabel>Nome Científico *</FormLabel>
               <FormControl>
                 <Input placeholder="Ex: Python regius" {...field} />
               </FormControl>
@@ -60,129 +64,120 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({ form }) =>
             </FormItem>
           )}
         />
-        
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="category"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Categoria</FormLabel>
-                <Select 
-                  onValueChange={field.onChange} 
-                  value={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione uma categoria" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="serpente">Serpente</SelectItem>
-                    <SelectItem value="lagarto">Lagarto</SelectItem>
-                    <SelectItem value="quelonio">Quelônio</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="subcategory"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Subcategoria</FormLabel>
-                <Select 
-                  onValueChange={field.onChange} 
-                  value={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione uma subcategoria" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="boideos">Boídeos</SelectItem>
-                    <SelectItem value="colubrideos">Colubrídeos</SelectItem>
-                    <SelectItem value="pequenos">Pequenos</SelectItem>
-                    <SelectItem value="grandes">Grandes</SelectItem>
-                    <SelectItem value="aquaticos">Aquáticos</SelectItem>
-                    <SelectItem value="terrestres">Terrestres</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Status</FormLabel>
-                <Select 
-                  onValueChange={field.onChange} 
-                  value={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione um status" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="disponivel">Disponível</SelectItem>
-                    <SelectItem value="indisponivel">Indisponível</SelectItem>
-                    <SelectItem value="vendido">Vendido</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormDescription>
-                  Define se o produto está disponível para compra
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Preço (R$)</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number" 
-                    placeholder="0.00" 
-                    {...field}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Use 0 para "Sob consulta"
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        
+      </div>
+
+      <FormField
+        control={form.control}
+        name="description"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Descrição</FormLabel>
+            <FormControl>
+              <Textarea 
+                placeholder="Descreva as características, comportamento e cuidados necessários..."
+                className="min-h-[100px]"
+                {...field}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <FormField
           control={form.control}
-          name="paymentLink"
+          name="price"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Link de Pagamento</FormLabel>
+              <FormLabel>Preço (R$)</FormLabel>
               <FormControl>
-                <Input placeholder="https://..." {...field} value={field.value || ''} />
+                <Input 
+                  type="number" 
+                  step="0.01" 
+                  min="0"
+                  placeholder="0.00"
+                  {...field}
+                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                />
               </FormControl>
-              <FormDescription>
-                Link do C6 Bank ou outro gateway para pagamento direto
-              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="category"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Categoria *</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione uma categoria" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {categoryOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="subcategory"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Subcategoria *</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione uma subcategoria" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {subcategoryOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Status de Disponibilidade</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o status" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {statusOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -197,93 +192,71 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({ form }) =>
               <FormControl>
                 <Input 
                   type="number" 
-                  placeholder="0" 
+                  min="0"
+                  placeholder="0"
                   {...field}
                   onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                 />
               </FormControl>
-              <FormDescription>
-                Números menores aparecem primeiro
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
       </div>
-      
-      <div className="space-y-4">
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <FormField
           control={form.control}
-          name="description"
+          name="featured"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Descrição</FormLabel>
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base">Produto em Destaque</FormLabel>
+                <div className="text-sm text-muted-foreground">
+                  Exibir na seção de produtos em destaque
+                </div>
+              </div>
               <FormControl>
-                <Textarea 
-                  placeholder="Descreva o animal, suas características, história, etc."
-                  className="min-h-32" 
-                  {...field} 
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
-        
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="featured"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between p-4 border rounded-md">
-                <div className="space-y-0.5">
-                  <FormLabel>Destaque</FormLabel>
-                  <FormDescription>
-                    Mostrar como destaque
-                  </FormDescription>
+
+        <FormField
+          control={form.control}
+          name="isNew"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base">Novidade</FormLabel>
+                <div className="text-sm text-muted-foreground">
+                  Marcar como produto novo
                 </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="isNew"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between p-4 border rounded-md">
-                <div className="space-y-0.5">
-                  <FormLabel>Novidade</FormLabel>
-                  <FormDescription>
-                    Marcar como novo
-                  </FormDescription>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        </div>
-        
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="visible"
           render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between p-4 border rounded-md">
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
-                <FormLabel>Visível no site</FormLabel>
-                <FormDescription>
-                  Controle se este produto aparece na loja, independente do status
-                </FormDescription>
+                <FormLabel className="text-base">Visível no Site</FormLabel>
+                <div className="text-sm text-muted-foreground">
+                  Exibir produto no catálogo público
+                </div>
               </div>
               <FormControl>
                 <Switch
@@ -295,6 +268,23 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({ form }) =>
           )}
         />
       </div>
+
+      <FormField
+        control={form.control}
+        name="paymentLink"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Link de Pagamento</FormLabel>
+            <FormControl>
+              <Input 
+                placeholder="https://..."
+                {...field}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
 };

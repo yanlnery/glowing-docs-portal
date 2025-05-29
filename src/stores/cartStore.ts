@@ -2,108 +2,104 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Product } from '@/types/product';
+import { markProductAsSold } from '@/services/productMutations';
 
-type CartItem = {
+export interface CartItem {
   product: Product;
   quantity: number;
-};
+}
 
-type CartStore = {
+interface CartStore {
   items: CartItem[];
   addToCart: (product: Product, quantity?: number) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
-  getCartQuantity: () => number;
-};
-
-// This will record the cart interactions for analytics
-const recordCartInteraction = (action: string, product: Product, quantity: number = 1) => {
-  const now = new Date().toISOString();
-  const analyticsData = JSON.parse(localStorage.getItem('cartAnalytics') || '[]');
-  
-  analyticsData.push({
-    timestamp: now,
-    action,
-    productId: product.id,
-    productName: product.name,
-    quantity,
-    price: product.price,
-    referrer: document.referrer || 'direct'
-  });
-  
-  localStorage.setItem('cartAnalytics', JSON.stringify(analyticsData));
-};
+  getTotalItems: () => number;
+  getTotalPrice: () => number;
+  processCheckout: () => Promise<void>;
+}
 
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
-      
-      addToCart: (product, quantity = 1) => {
-        const currentItems = get().items;
-        const existingItemIndex = currentItems.findIndex(item => item.product.id === product.id);
-        
-        if (existingItemIndex > -1) {
-          // Item already in cart, update quantity
-          const newItems = [...currentItems];
-          newItems[existingItemIndex].quantity += quantity;
-          set({ items: newItems });
-        } else {
-          // New item
-          set({ items: [...currentItems, { product, quantity }] });
-        }
-        
-        // Record analytics
-        recordCartInteraction('add_to_cart', product, quantity);
-      },
-      
-      removeFromCart: (productId) => {
-        const currentItems = get().items;
-        const itemToRemove = currentItems.find(item => item.product.id === productId);
-        
-        if (itemToRemove) {
-          // Record analytics before removing
-          recordCartInteraction('remove_from_cart', itemToRemove.product, itemToRemove.quantity);
+
+      addToCart: (product: Product, quantity = 1) => {
+        set((state) => {
+          const existingItem = state.items.find((item) => item.product.id === product.id);
           
-          set({
-            items: currentItems.filter(item => item.product.id !== productId)
-          });
-        }
-      },
-      
-      updateQuantity: (productId, quantity) => {
-        const currentItems = get().items;
-        const itemToUpdate = currentItems.find(item => item.product.id === productId);
-        
-        if (itemToUpdate) {
-          // Record analytics
-          recordCartInteraction('update_quantity', itemToUpdate.product, quantity - itemToUpdate.quantity);
+          if (existingItem) {
+            return {
+              items: state.items.map((item) =>
+                item.product.id === product.id
+                  ? { ...item, quantity: item.quantity + quantity }
+                  : item
+              ),
+            };
+          }
           
-          set({
-            items: currentItems.map(item => 
-              item.product.id === productId ? { ...item, quantity } : item
-            )
-          });
-        }
+          return {
+            items: [...state.items, { product, quantity }],
+          };
+        });
       },
-      
+
+      removeFromCart: (productId: string) => {
+        set((state) => ({
+          items: state.items.filter((item) => item.product.id !== productId),
+        }));
+      },
+
+      updateQuantity: (productId: string, quantity: number) => {
+        if (quantity <= 0) {
+          get().removeFromCart(productId);
+          return;
+        }
+        
+        set((state) => ({
+          items: state.items.map((item) =>
+            item.product.id === productId
+              ? { ...item, quantity }
+              : item
+          ),
+        }));
+      },
+
       clearCart: () => {
-        // Record analytics for clearing cart
-        const currentItems = get().items;
-        if (currentItems.length > 0) {
-          recordCartInteraction('clear_cart', { id: 'all', name: 'All Items' } as Product, 0);
-          set({ items: [] });
+        set({ items: [] });
+      },
+
+      getTotalItems: () => {
+        return get().items.reduce((total, item) => total + item.quantity, 0);
+      },
+
+      getTotalPrice: () => {
+        return get().items.reduce((total, item) => total + (item.product.price * item.quantity), 0);
+      },
+
+      processCheckout: async () => {
+        const items = get().items;
+        console.log("🔄 Processing checkout for items:", items);
+        
+        try {
+          // Mark all products in cart as sold
+          for (const item of items) {
+            console.log(`🔄 Marking product ${item.product.id} as sold...`);
+            await markProductAsSold(item.product.id);
+          }
+          
+          // Clear the cart after successful checkout
+          get().clearCart();
+          console.log("✅ Checkout processed successfully");
+        } catch (error) {
+          console.error("❌ Error processing checkout:", error);
+          throw error;
         }
       },
-      
-      getCartQuantity: () => {
-        return get().items.reduce((total, item) => total + item.quantity, 0);
-      }
     }),
     {
-      name: 'pet-serpentes-cart', // unique name for localStorage
-      version: 1,
+      name: 'cart-storage',
     }
   )
 );
