@@ -38,10 +38,10 @@ export default function FeaturedProductsSection() {
 
   if (isLoading) {
     return (
-      <section className="py-10 sm:py-16 bg-background">
-        <div className="container px-4 sm:px-6">
-          <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-serpente-600"></div>
+      <section className="py-8 sm:py-10 md:py-16 bg-background">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="flex justify-center py-8 sm:py-12">
+            <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-t-2 border-b-2 border-serpente-600"></div>
           </div>
         </div>
       </section>
@@ -49,19 +49,19 @@ export default function FeaturedProductsSection() {
   }
 
   return (
-    <section className="py-10 sm:py-16 bg-background">
-      <div className="container px-4 sm:px-6">
-        <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">
+    <section className="py-8 sm:py-10 md:py-16 bg-background">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="flex flex-col items-center mb-6 sm:mb-8 md:mb-12 text-center">
           <div className="docs-section-title">
-            <h2 className="text-2xl sm:text-3xl font-bold">Espécies em Destaque</h2>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">Espécies em Destaque</h2>
           </div>
-          <p className="text-muted-foreground max-w-2xl mt-4">
+          <p className="text-muted-foreground max-w-2xl mt-3 sm:mt-4 text-sm sm:text-base">
             Conheça algumas das serpentes e lagartos disponíveis no nosso criadouro, todos com certificação de origem e documentação legal.
           </p>
         </div>
 
-        {/* Grid único e responsivo para todos os dispositivos */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-8">
+        {/* Grid responsivo único - funciona em todas as resoluções */}
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-6 sm:mt-8">
           {featuredProducts.length > 0 ? (
             featuredProducts.map((product, index) => {
               console.log(`🖼️ Renderizando produto ${index}:`, { 
@@ -73,7 +73,7 @@ export default function FeaturedProductsSection() {
               
               return (
                 <div key={product.id} className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group w-full">
-                  <div className="relative h-48 sm:h-56 lg:h-64 overflow-hidden">
+                  <div className="relative h-40 sm:h-48 md:h-56 lg:h-64 overflow-hidden">
                     <OptimizedImage
                       src={product.images && product.images.length > 0 ? product.images[0].url : "/placeholder.svg"}
                       alt={product.name}
@@ -89,7 +89,7 @@ export default function FeaturedProductsSection() {
                       }}
                       onLoad={() => console.log(`✅ Produto ${product.name} carregado na home`)}
                     />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 sm:p-4">
                       {product.status === 'disponivel' ? (
                         <span className="inline-block bg-serpente-600 text-white text-xs px-2 py-1 rounded">Disponível</span>
                       ) : (
@@ -97,16 +97,16 @@ export default function FeaturedProductsSection() {
                       )}
                     </div>
                   </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-base sm:text-lg mb-1 line-clamp-1">
+                  <div className="p-3 sm:p-4">
+                    <h3 className="font-bold text-sm sm:text-base md:text-lg mb-1 line-clamp-1">
                       <em>{product.speciesName}</em>
                     </h3>
-                    <p className="text-muted-foreground text-sm mb-3 line-clamp-1">{product.name}</p>
+                    <p className="text-muted-foreground text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-1">{product.name}</p>
                     <div className="flex justify-end items-center">
                       <Button
                         variant={product.status === 'indisponivel' ? "secondary" : "outline"}
                         size="sm"
-                        className="min-h-[44px] w-full sm:w-auto touch-manipulation"
+                        className="min-h-[40px] sm:min-h-[44px] w-full sm:w-auto text-xs sm:text-sm touch-manipulation"
                         asChild
                         disabled={product.status === 'indisponivel'}
                       >
@@ -120,15 +120,15 @@ export default function FeaturedProductsSection() {
               );
             })
           ) : (
-            <div className="col-span-full text-center py-12">
-              <p className="text-muted-foreground">Nenhum animal em destaque disponível no momento.</p>
-              <p className="text-sm text-muted-foreground mt-2">Verifique o painel administrativo para adicionar produtos em destaque.</p>
+            <div className="col-span-full text-center py-8 sm:py-12">
+              <p className="text-muted-foreground text-sm sm:text-base">Nenhum animal em destaque disponível no momento.</p>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-2">Verifique o painel administrativo para adicionar produtos em destaque.</p>
             </div>
           )}
         </div>
 
-        <div className="flex justify-center mt-8 sm:mt-10">
-          <Button size="lg" className="min-h-[44px] w-full sm:w-auto touch-manipulation" asChild>
+        <div className="flex justify-center mt-6 sm:mt-8 md:mt-10">
+          <Button size="lg" className="min-h-[44px] w-full sm:w-auto text-sm sm:text-base touch-manipulation" asChild>
             <Link to="/catalogo">Ver Catálogo Completo <ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
         </div>

@@ -30,7 +30,7 @@ export function OptimizedImage({
   const [isInView, setIsInView] = useState(priority);
   const imgRef = useRef<HTMLImageElement>(null);
 
-  // Para carrossel, sempre carrega imediatamente
+  // Para carrossel e produtos em destaque, sempre carrega imediatamente
   useEffect(() => {
     if (priority) {
       setIsInView(true);
@@ -69,15 +69,15 @@ export function OptimizedImage({
     onError?.(e);
   };
 
-  // Para imagens priority (carrossel), carrega imediatamente
+  // Para imagens priority (carrossel/produtos), carrega imediatamente
   const shouldLoad = isInView || priority;
 
   return (
-    <div className={cn('relative overflow-hidden', className)} ref={imgRef}>
+    <div className={cn('relative overflow-hidden w-full h-full', className)} ref={imgRef}>
       {/* Placeholder mínimo para carregamento rápido */}
       {!isLoaded && shouldLoad && !hasError && (
         <div 
-          className="absolute inset-0 bg-gray-200 dark:bg-gray-800" 
+          className="absolute inset-0 bg-gray-200 dark:bg-gray-800 w-full h-full" 
           style={style}
         />
       )}
@@ -93,6 +93,8 @@ export function OptimizedImage({
           )}
           style={{
             objectFit: 'cover',
+            width: '100%',
+            height: '100%',
             ...style
           }}
           loading={priority ? 'eager' : 'lazy'}
@@ -107,10 +109,10 @@ export function OptimizedImage({
       {/* Fallback para erro */}
       {hasError && (
         <div 
-          className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800"
+          className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800 w-full h-full"
           style={style}
         >
-          <span className="text-sm text-gray-500">Erro ao carregar imagem</span>
+          <span className="text-xs sm:text-sm text-gray-500">Erro ao carregar imagem</span>
         </div>
       )}
     </div>

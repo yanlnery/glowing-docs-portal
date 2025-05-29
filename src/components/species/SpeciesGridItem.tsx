@@ -11,7 +11,7 @@ interface SpeciesGridItemProps {
 
 export function SpeciesGridItem({ species }: SpeciesGridItemProps) {
   return (
-    <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
+    <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group w-full">
       <Link to={`/especies-criadas/${species.slug}`} className="block">
         <div className="relative h-32 sm:h-40 md:h-48 lg:h-60 overflow-hidden">
           <OptimizedImage
@@ -39,7 +39,7 @@ export function SpeciesGridItem({ species }: SpeciesGridItemProps) {
           <p className="text-muted-foreground text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-1">{species.commonName}</p>
         </Link>
         <div className="flex justify-end mt-auto">
-          <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px] text-xs sm:text-sm" asChild>
+          <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm" asChild>
             <Link to={`/especies-criadas/${species.slug}`}>Ver Detalhes</Link>
           </Button>
         </div>
