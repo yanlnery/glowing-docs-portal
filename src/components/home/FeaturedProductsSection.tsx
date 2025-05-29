@@ -58,7 +58,7 @@ export default function FeaturedProductsSection() {
     }
     
     const firstImage = product.images[0];
-    const imageUrl = firstImage?.url || firstImage?.image_url || null;
+    const imageUrl = firstImage?.url || null;
     
     console.log(`🖼️ HOME - URL da primeira imagem do produto ${product.name}:`, imageUrl);
     return imageUrl;

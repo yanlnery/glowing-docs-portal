@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { productService } from '@/services/productService';
@@ -162,7 +161,7 @@ const Catalog = () => {
     }
     
     const firstImage = product.images[0];
-    const imageUrl = firstImage?.url || firstImage?.image_url || null;
+    const imageUrl = firstImage?.url || null;
     
     console.log(`🖼️ URL da primeira imagem do produto ${product.name}:`, imageUrl);
     return imageUrl;
