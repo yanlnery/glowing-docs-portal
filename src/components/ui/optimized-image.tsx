@@ -61,29 +61,32 @@ export function OptimizedImage({
     setIsLoaded(true);
     setHasError(false);
     onLoad?.();
+    console.log(`✅ Imagem carregada com sucesso: ${src}`);
   };
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.error('Erro ao carregar imagem:', src);
+    console.error('❌ Erro ao carregar imagem:', src);
     setHasError(true);
+    setIsLoaded(false);
     onError?.(e);
   };
 
-  // Para imagens priority (carrossel/produtos), carrega imediatamente
+  // Validar se src é uma URL válida ou caminho válido
+  const isValidSrc = src && src.trim() !== '' && src !== '/placeholder.svg';
   const shouldLoad = isInView || priority;
 
   return (
     <div className={cn('relative overflow-hidden w-full h-full', className)} ref={imgRef}>
-      {/* Placeholder mínimo para carregamento rápido */}
-      {!isLoaded && shouldLoad && !hasError && (
+      {/* Placeholder mínimo para carregamento */}
+      {!isLoaded && shouldLoad && !hasError && isValidSrc && (
         <div 
-          className="absolute inset-0 bg-gray-200 dark:bg-gray-800 w-full h-full" 
+          className="absolute inset-0 bg-gray-200 dark:bg-gray-800 w-full h-full animate-pulse" 
           style={style}
         />
       )}
       
       {/* Imagem principal - sempre visível quando carregada */}
-      {shouldLoad && (
+      {shouldLoad && isValidSrc && !hasError && (
         <img
           src={src}
           alt={alt}
@@ -106,13 +109,18 @@ export function OptimizedImage({
         />
       )}
       
-      {/* Fallback para erro */}
-      {hasError && (
+      {/* Fallback para erro ou imagem inválida */}
+      {(hasError || !isValidSrc) && (
         <div 
-          className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800 w-full h-full"
+          className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800 w-full h-full"
           style={style}
         >
-          <span className="text-xs sm:text-sm text-gray-500">Erro ao carregar imagem</span>
+          <div className="text-gray-400 dark:text-gray-500 text-center">
+            <div className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
+              <span className="text-xs sm:text-sm">📷</span>
+            </div>
+            <span className="text-xs sm:text-sm">Sem imagem</span>
+          </div>
         </div>
       )}
     </div>

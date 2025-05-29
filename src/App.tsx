@@ -64,10 +64,25 @@ const WaitlistConfirmationPage = () => (
   </div>
 );
 
-// Function for conditional Academy route based on settings
+// Function for conditional Academy route based on settings - now with proper debug
 const AcademyRoute = () => {
-  const { isAcademyVisible } = useSettings();
-  return isAcademyVisible ? <Academy /> : <Navigate to="/" replace />;
+  const { settings, isAcademyVisible } = useSettings();
+  const location = useLocation();
+  
+  console.log("🎓 ACADEMY ROUTE CHECK:", { 
+    isAcademyVisible, 
+    settings,
+    currentPath: location.pathname,
+    shouldRedirect: !isAcademyVisible 
+  });
+  
+  if (!isAcademyVisible) {
+    console.log("🎓 ACADEMY ROUTE - Redirecting to home because Academy is disabled");
+    return <Navigate to="/" replace />;
+  }
+  
+  console.log("🎓 ACADEMY ROUTE - Rendering Academy page");
+  return <Academy />;
 };
 
 const queryClient = new QueryClient();

@@ -152,6 +152,22 @@ const Catalog = () => {
     }).format(price);
   };
 
+  // Function to get the first valid image URL from product images
+  const getProductImageUrl = (product: Product): string | null => {
+    console.log(`🖼️ Verificando imagens para produto ${product.name}:`, product.images);
+    
+    if (!product.images || !Array.isArray(product.images) || product.images.length === 0) {
+      console.log(`❌ Produto ${product.name} não tem imagens`);
+      return null;
+    }
+    
+    const firstImage = product.images[0];
+    const imageUrl = firstImage?.url || firstImage?.image_url || null;
+    
+    console.log(`🖼️ URL da primeira imagem do produto ${product.name}:`, imageUrl);
+    return imageUrl;
+  };
+
   // Category filter structure
   const filterCategories = [
     { 
@@ -273,7 +289,7 @@ const Catalog = () => {
         </div>
       </div>
 
-      {/* Products Grid com debug styles e logs específicos */}
+      {/* Products Grid */}
       {isLoading ? (
         <div className="flex justify-center py-8 sm:py-12">
           <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-t-2 border-b-2 border-serpente-600"></div>
@@ -301,16 +317,7 @@ const Catalog = () => {
           </Button>
         </div>
       ) : (
-        <div 
-          className="w-full min-h-[400px] grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6"
-          style={{ 
-            minHeight: "400px", 
-            height: "auto",
-            overflow: "visible",
-            zIndex: 1 
-          }}
-          onLoad={() => console.log("📱 CATALOG Grid container loaded")}
-        >
+        <div className="w-full min-h-[400px] grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
           {filteredProducts.map((product, index) => {
             console.log(`📱 CATALOG MOBILE - Renderizando produto ${index}:`, { 
               id: product.id, 
@@ -320,6 +327,7 @@ const Catalog = () => {
             
             const isInCart = isProductInCart(product.id);
             const isUnavailable = product.status === 'indisponivel' || product.status === 'vendido';
+            const imageUrl = getProductImageUrl(product);
             
             return (
               <Card 
@@ -330,43 +338,34 @@ const Catalog = () => {
                   height: "auto",
                   overflow: "visible"
                 }}
-                onLoad={() => console.log(`📱 CATALOG Product ${index} card loaded`)}
               >
                 <div className="relative">
-                  {product.images && product.images.length > 0 ? (
-                    <div 
-                      className="aspect-[4/3] overflow-hidden rounded-t-lg"
+                  <div 
+                    className="aspect-[4/3] overflow-hidden rounded-t-lg"
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      minHeight: "120px"
+                    }}
+                  >
+                    <OptimizedImage
+                      src={imageUrl || '/placeholder.svg'}
+                      alt={product.name}
+                      priority={index < 4}
+                      quality={80}
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      className="w-full h-full"
                       style={{
+                        objectFit: "cover",
+                        objectPosition: "center",
                         width: "100%",
-                        height: "auto",
-                        minHeight: "120px"
+                        height: "100%",
+                        transform: "scale(1)",
+                        transition: "transform 0.3s ease"
                       }}
-                    >
-                      <OptimizedImage
-                        src={product.images[0].url}
-                        alt={product.name}
-                        priority={index < 4}
-                        quality={80}
-                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                        className="w-full h-full"
-                        style={{
-                          objectFit: "cover",
-                          objectPosition: "center",
-                          width: "100%",
-                          height: "100%",
-                          transform: "scale(1)",
-                          transition: "transform 0.3s ease"
-                        }}
-                        onLoad={() => console.log(`✅ CATALOG MOBILE - Produto ${product.name} imagem carregada no catálogo`)}
-                      />
-                    </div>
-                  ) : (
-                    <div className="aspect-[4/3] bg-muted flex items-center justify-center rounded-t-lg">
-                      <div className="h-8 w-8 sm:h-12 sm:w-12 rounded-full bg-muted-foreground/10 flex items-center justify-center">
-                        <span className="text-muted-foreground text-xs text-center">Sem imagem</span>
-                      </div>
-                    </div>
-                  )}
+                      onLoad={() => console.log(`✅ CATALOG MOBILE - Produto ${product.name} imagem carregada no catálogo`)}
+                    />
+                  </div>
                   
                   <div className="absolute top-2 left-2 flex flex-col gap-1.5">
                     {product.featured && (

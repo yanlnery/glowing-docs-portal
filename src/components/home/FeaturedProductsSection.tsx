@@ -48,6 +48,22 @@ export default function FeaturedProductsSection() {
     console.log("📱 Featured products data:", featuredProducts);
   }, [featuredProducts]);
 
+  // Function to get the first valid image URL from product images
+  const getProductImageUrl = (product: Product): string | null => {
+    console.log(`🖼️ HOME - Verificando imagens para produto ${product.name}:`, product.images);
+    
+    if (!product.images || !Array.isArray(product.images) || product.images.length === 0) {
+      console.log(`❌ HOME - Produto ${product.name} não tem imagens`);
+      return null;
+    }
+    
+    const firstImage = product.images[0];
+    const imageUrl = firstImage?.url || firstImage?.image_url || null;
+    
+    console.log(`🖼️ HOME - URL da primeira imagem do produto ${product.name}:`, imageUrl);
+    return imageUrl;
+  };
+
   console.log("🔍 FeaturedProductsSection render:", { 
     isLoading, 
     featuredProductsCount: featuredProducts.length,
@@ -98,6 +114,8 @@ export default function FeaturedProductsSection() {
                 imageUrl: product.images && product.images.length > 0 ? product.images[0].url : 'none'
               });
               
+              const imageUrl = getProductImageUrl(product);
+              
               return (
                 <div 
                   key={product.id} 
@@ -118,7 +136,7 @@ export default function FeaturedProductsSection() {
                     }}
                   >
                     <OptimizedImage
-                      src={product.images && product.images.length > 0 ? product.images[0].url : "/placeholder.svg"}
+                      src={imageUrl || "/placeholder.svg"}
                       alt={product.name}
                       priority={index === 0}
                       quality={80}
