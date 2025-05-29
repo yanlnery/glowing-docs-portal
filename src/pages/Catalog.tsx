@@ -26,6 +26,16 @@ const Catalog = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
+  // Debug logs para verificar hidratação
+  useEffect(() => {
+    console.log("📱 CATALOG MOUNT CHECK:", {
+      windowExists: typeof window !== "undefined",
+      windowWidth: typeof window !== "undefined" ? window.innerWidth : "undefined",
+      userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "undefined",
+      isMobile: typeof window !== "undefined" && window.innerWidth < 768
+    });
+  }, []);
+
   const applyFilters = useCallback((
     productList: Product[],
     query: string,
@@ -68,11 +78,12 @@ const Catalog = () => {
 
   const loadProducts = useCallback(() => {
     setIsLoading(true);
+    console.log("📱 Catalog Mobile rendering? Window width:", typeof window !== "undefined" ? window.innerWidth : "No window");
     console.log("🔄 Carregando produtos do catálogo...");
     try {
       const visibleProducts = productService.getAvailableProducts();
       console.log("📦 Produtos carregados:", visibleProducts.length);
-      console.log("📱 Mobile - produtos visíveis:", visibleProducts.map(p => ({ id: p.id, name: p.name, visible: p.visible })));
+      console.log("📱 CATALOG - produtos visíveis:", visibleProducts.map(p => ({ id: p.id, name: p.name, visible: p.visible })));
       setProducts(visibleProducts);
       applyFilters(visibleProducts, searchQuery, categoryFilter, subcategoryFilter);
     } catch (error) {
@@ -99,6 +110,12 @@ const Catalog = () => {
       window.removeEventListener('storage', handleStorageChange);
     };
   }, [loadProducts]);
+
+  // Log adicional para verificar render do mobile no catálogo
+  useEffect(() => {
+    console.log("📱 CATALOG Render mobile section - produtos filtered count:", filteredProducts?.length);
+    console.log("📱 CATALOG Filtered products data:", filteredProducts);
+  }, [filteredProducts]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -246,7 +263,7 @@ const Catalog = () => {
         </div>
       </div>
 
-      {/* Products Grid - Grid responsivo único para todas as resoluções */}
+      {/* Products Grid com debug styles e logs específicos */}
       {isLoading ? (
         <div className="flex justify-center py-8 sm:py-12">
           <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-t-2 border-b-2 border-serpente-600"></div>
@@ -274,19 +291,44 @@ const Catalog = () => {
           </Button>
         </div>
       ) : (
-        <div className="w-full grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+        <div 
+          className="w-full min-h-[400px] grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6"
+          style={{ 
+            minHeight: "400px", 
+            height: "auto",
+            overflow: "visible",
+            zIndex: 1 
+          }}
+          onLoad={() => console.log("📱 CATALOG Grid container loaded")}
+        >
           {filteredProducts.map((product, index) => {
-            console.log(`📱 Mobile - Renderizando produto ${index}:`, { 
+            console.log(`📱 CATALOG MOBILE - Renderizando produto ${index}:`, { 
               id: product.id, 
               name: product.name, 
               hasImages: product.images && product.images.length > 0 
             });
             
             return (
-              <Card key={product.id} className="flex flex-col h-full docs-card-gradient hover:shadow-lg transition-shadow duration-300">
+              <Card 
+                key={product.id} 
+                className="flex flex-col h-full docs-card-gradient hover:shadow-lg transition-shadow duration-300"
+                style={{
+                  minHeight: "300px",
+                  height: "auto",
+                  overflow: "visible"
+                }}
+                onLoad={() => console.log(`📱 CATALOG Product ${index} card loaded`)}
+              >
                 <div className="relative">
                   {product.images && product.images.length > 0 ? (
-                    <div className="aspect-[4/3] overflow-hidden rounded-t-lg">
+                    <div 
+                      className="aspect-[4/3] overflow-hidden rounded-t-lg"
+                      style={{
+                        width: "100%",
+                        height: "auto",
+                        minHeight: "120px"
+                      }}
+                    >
                       <OptimizedImage
                         src={product.images[0].url}
                         alt={product.name}
@@ -297,10 +339,12 @@ const Catalog = () => {
                         style={{
                           objectFit: "cover",
                           objectPosition: "center",
+                          width: "100%",
+                          height: "100%",
                           transform: "scale(1)",
                           transition: "transform 0.3s ease"
                         }}
-                        onLoad={() => console.log(`✅ Produto ${product.name} carregado no catálogo mobile`)}
+                        onLoad={() => console.log(`✅ CATALOG MOBILE - Produto ${product.name} imagem carregada no catálogo`)}
                       />
                     </div>
                   ) : (

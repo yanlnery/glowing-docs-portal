@@ -11,9 +11,20 @@ export default function FeaturedProductsSection() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Debug logs para verificar hidratação e window object
+  useEffect(() => {
+    console.log("📱 FeaturedProductsSection MOUNT CHECK:", {
+      windowExists: typeof window !== "undefined",
+      windowWidth: typeof window !== "undefined" ? window.innerWidth : "undefined",
+      userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "undefined",
+      isMobile: typeof window !== "undefined" && window.innerWidth < 768
+    });
+  }, []);
+
   useEffect(() => {
     const loadProducts = () => {
       try {
+        console.log("📱 Mobile rendering? Window width:", typeof window !== "undefined" ? window.innerWidth : "No window");
         console.log("🔄 Carregando produtos em destaque...");
         const products = productService.getFeaturedProducts().slice(0, 3);
         console.log("📦 Produtos carregados:", products.length);
@@ -29,6 +40,12 @@ export default function FeaturedProductsSection() {
 
     loadProducts();
   }, []);
+
+  // Log adicional para verificar render do mobile
+  useEffect(() => {
+    console.log("📱 Render mobile section - produtos count:", featuredProducts?.length);
+    console.log("📱 Featured products data:", featuredProducts);
+  }, [featuredProducts]);
 
   console.log("🔍 FeaturedProductsSection render:", { 
     isLoading, 
@@ -60,11 +77,20 @@ export default function FeaturedProductsSection() {
           </p>
         </div>
 
-        {/* Grid responsivo único - funciona em todas as resoluções */}
-        <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-6 sm:mt-8">
+        {/* Grid com debug styles forçados e logs específicos */}
+        <div 
+          className="w-full min-h-[300px] grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-6 sm:mt-8"
+          style={{ 
+            minHeight: "300px", 
+            height: "auto",
+            overflow: "visible",
+            zIndex: 1 
+          }}
+          onLoad={() => console.log("📱 Grid container loaded")}
+        >
           {featuredProducts.length > 0 ? (
             featuredProducts.map((product, index) => {
-              console.log(`🖼️ Renderizando produto ${index}:`, { 
+              console.log(`📱 MOBILE - Renderizando produto ${index}:`, { 
                 id: product.id, 
                 name: product.name, 
                 hasImages: product.images && product.images.length > 0,
@@ -72,22 +98,40 @@ export default function FeaturedProductsSection() {
               });
               
               return (
-                <div key={product.id} className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group w-full">
-                  <div className="relative h-40 sm:h-48 md:h-56 lg:h-64 overflow-hidden">
+                <div 
+                  key={product.id} 
+                  className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group w-full"
+                  style={{
+                    minHeight: "200px",
+                    height: "auto",
+                    overflow: "visible"
+                  }}
+                  onLoad={() => console.log(`📱 Product ${index} container loaded`)}
+                >
+                  <div 
+                    className="relative overflow-hidden"
+                    style={{
+                      height: "160px",
+                      minHeight: "160px",
+                      width: "100%"
+                    }}
+                  >
                     <OptimizedImage
                       src={product.images && product.images.length > 0 ? product.images[0].url : "/placeholder.svg"}
                       alt={product.name}
                       priority={index === 0}
                       quality={80}
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                       className="w-full h-full"
                       style={{
                         objectFit: "cover",
                         objectPosition: "center",
+                        width: "100%",
+                        height: "100%",
                         transform: "scale(1)",
                         transition: "transform 0.3s ease"
                       }}
-                      onLoad={() => console.log(`✅ Produto ${product.name} carregado na home`)}
+                      onLoad={() => console.log(`✅ MOBILE - Produto ${product.name} imagem carregada na home`)}
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 sm:p-4">
                       {product.status === 'disponivel' ? (
