@@ -9,11 +9,37 @@ import { Product } from "@/types/product";
 
 export default function FeaturedProductsSection() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const products = productService.getFeaturedProducts().slice(0, 3);
-    setFeaturedProducts(products);
+    const loadProducts = () => {
+      try {
+        console.log("🔄 Carregando produtos em destaque...");
+        const products = productService.getFeaturedProducts().slice(0, 3);
+        console.log("📦 Produtos carregados:", products.length);
+        setFeaturedProducts(products);
+      } catch (error) {
+        console.error("❌ Erro ao carregar produtos:", error);
+        setFeaturedProducts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProducts();
   }, []);
+
+  if (isLoading) {
+    return (
+      <section className="py-10 sm:py-16 bg-background">
+        <div className="container px-4 sm:px-6">
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-serpente-600"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-10 sm:py-16 bg-background">
@@ -27,11 +53,12 @@ export default function FeaturedProductsSection() {
           </p>
         </div>
 
+        {/* Responsive grid that works across all screen sizes */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mt-8">
           {featuredProducts.length > 0 ? (
             featuredProducts.map((product, index) => (
               <div key={product.id} className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
-                <div className="relative h-48 sm:h-64 overflow-hidden">
+                <div className="relative h-48 sm:h-56 md:h-64 overflow-hidden">
                   <OptimizedImage
                     src={product.images && product.images.length > 0 ? product.images[0].url : "/placeholder.svg"}
                     alt={product.name}
@@ -56,8 +83,8 @@ export default function FeaturedProductsSection() {
                   </div>
                 </div>
                 <div className="p-4">
-                  <h3 className="font-bold text-lg mb-1"><em>{product.speciesName}</em></h3>
-                  <p className="text-muted-foreground text-sm mb-3">{product.name}</p>
+                  <h3 className="font-bold text-base sm:text-lg mb-1 line-clamp-1"><em>{product.speciesName}</em></h3>
+                  <p className="text-muted-foreground text-sm mb-3 line-clamp-1">{product.name}</p>
                   <div className="flex justify-end items-center">
                     <Button
                       variant={product.status === 'indisponivel' ? "secondary" : "outline"}
@@ -75,7 +102,7 @@ export default function FeaturedProductsSection() {
               </div>
             ))
           ) : (
-            <div className="col-span-3 text-center py-12">
+            <div className="col-span-full text-center py-12">
               <p className="text-muted-foreground">Nenhum animal em destaque disponível no momento.</p>
             </div>
           )}

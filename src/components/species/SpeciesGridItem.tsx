@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 import { Species as SpeciesType } from '@/types/species';
 
 interface SpeciesGridItemProps {
@@ -10,14 +11,23 @@ interface SpeciesGridItemProps {
 
 export function SpeciesGridItem({ species }: SpeciesGridItemProps) {
   return (
-    <div key={species.id} className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
+    <div className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
       <Link to={`/especies-criadas/${species.slug}`} className="block">
         <div className="relative h-32 sm:h-40 md:h-48 lg:h-60 overflow-hidden">
-          <img
+          <OptimizedImage
             src={species.image || '/placeholder.svg'}
             alt={species.commonName}
-            className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
+            priority={false}
+            quality={80}
+            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+            className="w-full h-full"
+            style={{
+              objectFit: "cover",
+              objectPosition: "center",
+              transform: "scale(1)",
+              transition: "transform 0.3s ease"
+            }}
+            onLoad={() => console.log(`✅ Espécie ${species.commonName} carregada`)}
           />
         </div>
       </Link>

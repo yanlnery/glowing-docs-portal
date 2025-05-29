@@ -69,7 +69,9 @@ const ProductList = () => {
   }, [location.search]);
 
   const loadProducts = () => {
+    console.log("🔄 Carregando produtos para admin...");
     const allProducts = productService.getAll();
+    console.log("📦 Produtos admin carregados:", allProducts.length);
     setProducts(allProducts);
     applyFilters(allProducts, searchQuery, statusFilter);
   };

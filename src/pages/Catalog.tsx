@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { productService } from '@/services/productService';
@@ -6,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Search, Filter, Star, ChevronDown, ChevronUp, AlertCircle } from 'lucide-react';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 import {
   Card,
   CardHeader,
@@ -13,14 +15,8 @@ import {
   CardContent,
   CardFooter
 } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
-const PRODUCTS_STORAGE_KEY = "pet_serpentes_products"; // Defined in productStorage.ts
+const PRODUCTS_STORAGE_KEY = "pet_serpentes_products";
 
 const Catalog = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -37,7 +33,10 @@ const Catalog = () => {
     category: ProductCategory | 'all',
     subcategory: ProductSubcategory | 'all'
   ) => {
+    console.log("🔄 Aplicando filtros:", { totalProducts: productList.length, query, category, subcategory });
+    
     if (!productList || productList.length === 0) {
+      console.log("📭 Nenhum produto para filtrar");
       setFilteredProducts([]);
       return;
     }
@@ -64,19 +63,20 @@ const Catalog = () => {
       result = result.filter(product => product.subcategory === subcategory);
     }
     
-    console.log(`Applied filters: ${result.length} products remain after filtering`);
+    console.log(`✅ Filtros aplicados: ${result.length} produtos restantes`);
     setFilteredProducts(result);
   }, []);
 
   const loadProducts = useCallback(() => {
     setIsLoading(true);
-    console.log("Loading products from storage...");
+    console.log("🔄 Carregando produtos do catálogo...");
     try {
       const visibleProducts = productService.getAvailableProducts();
+      console.log("📦 Produtos carregados:", visibleProducts.length);
       setProducts(visibleProducts);
       applyFilters(visibleProducts, searchQuery, categoryFilter, subcategoryFilter);
     } catch (error) {
-      console.error("Error loading products:", error);
+      console.error("❌ Erro ao carregar produtos:", error);
       setProducts([]);
       setFilteredProducts([]);
     } finally {
@@ -90,7 +90,7 @@ const Catalog = () => {
     
     const handleStorageChange = (event: StorageEvent) => {
       if (event.key === PRODUCTS_STORAGE_KEY) {
-        console.log("Product storage changed, reloading products...");
+        console.log("🔄 Storage alterado, recarregando produtos...");
         loadProducts();
       }
     };
@@ -98,7 +98,7 @@ const Catalog = () => {
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, [loadProducts]); // loadProducts will be called on initial mount and if its dependencies change
+  }, [loadProducts]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -174,7 +174,7 @@ const Catalog = () => {
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Buscar por nome ou espécie..."
-              className="pl-9 h-11 sm:h-10" // Ensure height is good for touch
+              className="pl-9 h-11 sm:h-10"
               value={searchQuery}
               onChange={handleSearch}
             />
@@ -200,7 +200,7 @@ const Catalog = () => {
                       toggleDropdown(category.id);
                     }
                   }}
-                  className="min-h-[44px] flex items-center gap-1 px-3 text-xs sm:text-sm" // Adjusted text size for mobile
+                  className="min-h-[44px] flex items-center gap-1 px-3 text-xs sm:text-sm"
                 >
                   {category.label}
                   {category.subcategories.length > 0 && (
@@ -212,7 +212,7 @@ const Catalog = () => {
                 
                 {/* Subcategory Dropdown */}
                 {category.subcategories.length > 0 && openDropdown === category.id && (
-                  <div className="absolute z-10 mt-1 w-full min-w-[180px] sm:w-56 rounded-md bg-background shadow-lg ring-1 ring-black ring-opacity-5 dark:ring-white/20"> {/* Adjusted min-width */}
+                  <div className="absolute z-10 mt-1 w-full min-w-[180px] sm:w-56 rounded-md bg-background shadow-lg ring-1 ring-black ring-opacity-5 dark:ring-white/20">
                     <div className="py-1">
                       <button
                         onClick={() => handleFilterClick(category.id as ProductCategory, 'all')}
@@ -246,7 +246,7 @@ const Catalog = () => {
         </div>
       </div>
 
-      {/* Products Grid */}
+      {/* Products Grid - Single responsive grid for all screen sizes */}
       {isLoading ? (
         <div className="flex justify-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-serpente-600"></div>
@@ -274,22 +274,31 @@ const Catalog = () => {
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-          {filteredProducts.map((product) => (
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+          {filteredProducts.map((product, index) => (
             <Card key={product.id} className="flex flex-col h-full docs-card-gradient hover:shadow-lg transition-shadow duration-300">
               <div className="relative">
                 {product.images && product.images.length > 0 ? (
                   <div className="aspect-[4/3] overflow-hidden rounded-t-lg">
-                    <img
+                    <OptimizedImage
                       src={product.images[0].url}
                       alt={product.name}
-                      className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
-                      loading="lazy"
+                      priority={index < 4}
+                      quality={80}
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      className="w-full h-full"
+                      style={{
+                        objectFit: "cover",
+                        objectPosition: "center",
+                        transform: "scale(1)",
+                        transition: "transform 0.3s ease"
+                      }}
+                      onLoad={() => console.log(`✅ Produto ${product.name} carregado no grid`)}
                     />
                   </div>
                 ) : (
                   <div className="aspect-[4/3] bg-muted flex items-center justify-center rounded-t-lg">
-                    <div className="h-16 w-16 rounded-full bg-muted-foreground/10 flex items-center justify-center">
+                    <div className="h-12 w-12 rounded-full bg-muted-foreground/10 flex items-center justify-center">
                       <span className="text-muted-foreground text-xs text-center">Sem imagem</span>
                     </div>
                   </div>
@@ -314,22 +323,22 @@ const Catalog = () => {
                 </div>
               </div>
               
-              <CardHeader className="p-3 sm:p-4 pb-2 sm:pb-3"> {/* Adjusted padding */}
-                <CardTitle className="text-base sm:text-lg text-balance">{product.name}</CardTitle> {/* Adjusted mobile text size */}
+              <CardHeader className="p-2 sm:p-3 pb-1 sm:pb-2">
+                <CardTitle className="text-sm sm:text-base text-balance line-clamp-2">{product.name}</CardTitle>
               </CardHeader>
               
-              <CardContent className="p-3 sm:p-4 pt-0 pb-2 sm:pb-3"> {/* Adjusted padding */}
-                <p className="text-xs sm:text-sm text-muted-foreground italic mb-2 sm:mb-3">{product.speciesName}</p>
+              <CardContent className="p-2 sm:p-3 pt-0 pb-1 sm:pb-2">
+                <p className="text-xs sm:text-sm text-muted-foreground italic mb-2 line-clamp-1">{product.speciesName}</p>
                 
-                <div className="text-lg sm:text-xl font-bold text-serpente-600">
+                <div className="text-sm sm:text-lg font-bold text-serpente-600">
                   {formatPrice(product.price)}
                 </div>
               </CardContent>
               
-              <CardFooter className="p-3 sm:p-4 pt-0 mt-auto"> {/* Adjusted padding */}
+              <CardFooter className="p-2 sm:p-3 pt-0 mt-auto">
                 <Button 
                   variant={product.status === 'indisponivel' ? "secondary" : "outline"} 
-                  className="w-full min-h-[44px] text-sm" // Ensured min-h and text size
+                  className="w-full min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm"
                   asChild
                   disabled={product.status === 'indisponivel'}
                 >
