@@ -22,14 +22,15 @@ export default function FeaturedProductsSection() {
   }, []);
 
   useEffect(() => {
-    const loadProducts = () => {
+    const loadProducts = async () => {
       try {
         console.log("📱 Mobile rendering? Window width:", typeof window !== "undefined" ? window.innerWidth : "No window");
-        console.log("🔄 Carregando produtos em destaque...");
-        const products = productService.getFeaturedProducts().slice(0, 3);
-        console.log("📦 Produtos carregados:", products.length);
-        console.log("📦 Produtos detalhes:", products.map(p => ({ id: p.id, name: p.name, visible: p.visible, featured: p.featured })));
-        setFeaturedProducts(products);
+        console.log("🔄 Carregando produtos em destaque do Supabase...");
+        const products = await productService.getFeaturedProducts();
+        const limitedProducts = products.slice(0, 3);
+        console.log("📦 Produtos carregados:", limitedProducts.length);
+        console.log("📦 Produtos detalhes:", limitedProducts.map(p => ({ id: p.id, name: p.name, visible: p.visible, featured: p.featured })));
+        setFeaturedProducts(limitedProducts);
       } catch (error) {
         console.error("❌ Erro ao carregar produtos:", error);
         setFeaturedProducts([]);

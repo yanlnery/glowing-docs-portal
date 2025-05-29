@@ -78,6 +78,89 @@ export type Database = {
         }
         Relationships: []
       }
+      products: {
+        Row: {
+          available: boolean
+          category: string
+          created_at: string
+          description: string
+          details: Json
+          featured: boolean
+          id: string
+          images: Json
+          is_new: boolean
+          meta: Json | null
+          name: string
+          order_position: number | null
+          payment_link: string | null
+          price: number
+          slug: string | null
+          species_id: string | null
+          species_name: string
+          status: string
+          stock: number | null
+          subcategory: string
+          updated_at: string
+          visible: boolean
+        }
+        Insert: {
+          available?: boolean
+          category: string
+          created_at?: string
+          description?: string
+          details?: Json
+          featured?: boolean
+          id?: string
+          images?: Json
+          is_new?: boolean
+          meta?: Json | null
+          name: string
+          order_position?: number | null
+          payment_link?: string | null
+          price?: number
+          slug?: string | null
+          species_id?: string | null
+          species_name: string
+          status?: string
+          stock?: number | null
+          subcategory: string
+          updated_at?: string
+          visible?: boolean
+        }
+        Update: {
+          available?: boolean
+          category?: string
+          created_at?: string
+          description?: string
+          details?: Json
+          featured?: boolean
+          id?: string
+          images?: Json
+          is_new?: boolean
+          meta?: Json | null
+          name?: string
+          order_position?: number | null
+          payment_link?: string | null
+          price?: number
+          slug?: string | null
+          species_id?: string | null
+          species_name?: string
+          status?: string
+          stock?: number | null
+          subcategory?: string
+          updated_at?: string
+          visible?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_species_id_fkey"
+            columns: ["species_id"]
+            isOneToOne: false
+            referencedRelation: "species"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           first_name: string | null

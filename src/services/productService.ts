@@ -12,7 +12,7 @@ import {
 } from "./productMutations";
 
 export const productService = {
-  // Query functions
+  // Query functions - now async
   getAll: getAllProducts,
   getById: getProductById,
   getProductById: getProductById, // Alias for backward compatibility

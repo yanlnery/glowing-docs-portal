@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { productService } from '@/services/productService';
@@ -14,8 +15,6 @@ import {
   CardContent,
   CardFooter
 } from '@/components/ui/card';
-
-const PRODUCTS_STORAGE_KEY = "pet_serpentes_products";
 
 const Catalog = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -76,12 +75,12 @@ const Catalog = () => {
     setFilteredProducts(result);
   }, []);
 
-  const loadProducts = useCallback(() => {
+  const loadProducts = useCallback(async () => {
     setIsLoading(true);
     console.log("📱 Catalog Mobile rendering? Window width:", typeof window !== "undefined" ? window.innerWidth : "No window");
-    console.log("🔄 Carregando produtos do catálogo...");
+    console.log("🔄 Carregando produtos do catálogo do Supabase...");
     try {
-      const visibleProducts = productService.getAvailableProducts();
+      const visibleProducts = await productService.getAvailableProducts();
       console.log("📦 Produtos carregados:", visibleProducts.length);
       console.log("📱 CATALOG - produtos visíveis:", visibleProducts.map(p => ({ id: p.id, name: p.name, visible: p.visible })));
       setProducts(visibleProducts);
@@ -98,17 +97,6 @@ const Catalog = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     loadProducts();
-    
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === PRODUCTS_STORAGE_KEY) {
-        console.log("🔄 Storage alterado, recarregando produtos...");
-        loadProducts();
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
   }, [loadProducts]);
 
   // Log adicional para verificar render do mobile no catálogo

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import AdminLayout from '@/layouts/AdminLayout';
@@ -68,12 +67,18 @@ const ProductList = () => {
     }
   }, [location.search]);
 
-  const loadProducts = () => {
-    console.log("🔄 Carregando produtos para admin...");
-    const allProducts = productService.getAll();
-    console.log("📦 Produtos admin carregados:", allProducts.length);
-    setProducts(allProducts);
-    applyFilters(allProducts, searchQuery, statusFilter);
+  const loadProducts = async () => {
+    console.log("🔄 Carregando produtos para admin do Supabase...");
+    try {
+      const allProducts = await productService.getAll();
+      console.log("📦 Produtos admin carregados:", allProducts.length);
+      setProducts(allProducts);
+      applyFilters(allProducts, searchQuery, statusFilter);
+    } catch (error) {
+      console.error("❌ Erro ao carregar produtos para admin:", error);
+      setProducts([]);
+      setFilteredProducts([]);
+    }
   };
 
   const applyFilters = (
@@ -139,7 +144,8 @@ const ProductList = () => {
     try {
       setIsProcessing(prev => ({ ...prev, [id]: true }));
       
-      productService.update(id, { visible: !currentVisible });
+      // TODO: Replace with Supabase update
+      // productService.update(id, { visible: !currentVisible });
       loadProducts();
       
       toast({
@@ -164,7 +170,8 @@ const ProductList = () => {
     try {
       setIsProcessing(prev => ({ ...prev, [id]: true }));
       
-      productService.update(id, { featured: !currentFeatured });
+      // TODO: Replace with Supabase update
+      // productService.update(id, { featured: !currentFeatured });
       loadProducts();
       
       toast({
@@ -211,7 +218,8 @@ const ProductList = () => {
     try {
       setIsProcessing(prev => ({ ...prev, [id]: true }));
       
-      productService.update(id, { status: newStatus });
+      // TODO: Replace with Supabase update
+      // productService.update(id, { status: newStatus });
       loadProducts();
       
       toast({
@@ -235,11 +243,11 @@ const ProductList = () => {
     setDeleteProductId(id);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!deleteProductId) return;
     
     try {
-      const success = productService.delete(deleteProductId);
+      const success = await productService.delete(deleteProductId);
       if (success) {
         loadProducts();
         toast({
