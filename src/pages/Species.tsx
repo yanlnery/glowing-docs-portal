@@ -88,17 +88,17 @@ export default function Species() {
 
   return (
     <div className="container px-4 py-8 sm:py-12 sm:px-6">
-      <div className="flex flex-col items-center mb-6 sm:mb-8 md:mb-12 text-center">
+      <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">
         <div className="docs-section-title">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">Espécies Criadas</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold">Espécies Criadas</h1>
         </div>
-        <p className="text-muted-foreground max-w-2xl mt-3 sm:mt-4 text-sm sm:text-base px-2">
+        <p className="text-muted-foreground max-w-2xl mt-4">
           Conheça todas as espécies criadas em nosso plantel, com informações detalhadas e características.
         </p>
       </div>
 
       {/* Search and Filter */}
-      <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-center justify-between gap-4 px-2 sm:px-0">
+      <div className="mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="relative w-full sm:w-64">
           <SearchIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -112,16 +112,16 @@ export default function Species() {
         <SpeciesFilterControls activeFilter={activeFilter} onFilterChange={setActiveFilter} />
       </div>
 
-      {/* Species Grid - Responsivo: 2 colunas no mobile, mais colunas em telas maiores */}
+      {/* Species Grid */}
       {filteredSpecies.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 px-2 sm:px-0">
+        <div className="grid grid-cols-1 min-[480px]:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
           {filteredSpecies.map((species) => (
             <SpeciesGridItem key={species.id} species={species} />
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 px-4">
-          <p className="text-lg sm:text-xl text-muted-foreground">Nenhuma espécie encontrada com os filtros selecionados.</p>
+        <div className="text-center py-12">
+          <p className="text-xl text-muted-foreground">Nenhuma espécie encontrada com os filtros selecionados.</p>
         </div>
       )}
     </div>

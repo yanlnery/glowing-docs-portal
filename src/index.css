@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -98,7 +97,7 @@
 
 @layer components {
   .docs-container {
-    @apply container max-w-7xl mx-auto;
+    @apply container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
   
   .docs-heading {
@@ -106,11 +105,11 @@
   }
 
   .docs-section {
-    @apply py-6 sm:py-8 md:py-12;
+    @apply py-8 md:py-12;
   }
   
   .docs-card {
-    @apply bg-card border rounded-lg p-3 sm:p-4 md:p-6 shadow-sm transition-all hover:shadow-md;
+    @apply bg-card border rounded-lg p-4 sm:p-6 shadow-sm transition-all hover:shadow-md;
   }
 
   .code-block {
@@ -158,42 +157,15 @@
     padding-bottom: 2rem !important; /* Espaço extra no final do menu */
     box-sizing: border-box !important; /* Inclui padding no cálculo da altura */
   }
-
-  /* Text truncation utilities */
-  .line-clamp-1 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
-  }
-
-  .line-clamp-2 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-  }
-
-  .line-clamp-3 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-  }
-
-  /* Touch-friendly button sizes */
-  .min-h-touch {
-    min-height: 44px;
-  }
 }
 
 .docs-section-title {
-  @apply relative inline-flex items-center mb-4 sm:mb-6;
+  @apply relative inline-flex items-center mb-6;
 }
 
 .docs-section-title::before {
   content: '';
-  @apply w-1.5 h-6 sm:h-8 bg-serpente-600 rounded mr-2 sm:mr-3;
+  @apply w-1.5 h-8 bg-serpente-600 rounded mr-3;
 }
 
 .snake-pattern-bg {
