@@ -22,7 +22,11 @@ export default function MainLayout({ children, fullWidth = false }: MainLayoutPr
       <div className="flex flex-1">
         <Sidebar />
         <main className={cn("flex-1", !fullWidth && "md:pl-64")}>
-          <div className={cn(fullWidth ? "w-full" : "docs-container py-6")}>
+          <div className={cn(
+            fullWidth 
+              ? "w-full" 
+              : "docs-container py-4 sm:py-6 px-4 sm:px-6"
+          )}>
             {children}
           </div>
         </main>

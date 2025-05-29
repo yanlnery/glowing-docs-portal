@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useCallback } from "react";
 import { Manual } from "@/types/manual";
 import ManualsSearch from "@/components/manuals/ManualsSearch";
@@ -85,28 +86,30 @@ export default function Manuals() {
 
   return (
     <div className="container px-4 py-8 sm:px-6 sm:py-12">
-      <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">
+      <div className="flex flex-col items-center mb-6 sm:mb-8 md:mb-12 text-center">
         <div className="docs-section-title">
-          <h1 className="text-3xl sm:text-4xl font-bold text-balance">Manuais de Criação</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-balance">Manuais de Criação</h1>
         </div>
-        <p className="text-muted-foreground max-w-2xl mt-3 sm:mt-4 text-sm sm:text-base">
+        <p className="text-muted-foreground max-w-2xl mt-3 sm:mt-4 text-sm sm:text-base px-2">
           Conteúdo técnico e prático para criadores de répteis certificados
         </p>
       </div>
       
-      <ManualsSearch 
-        searchQuery={searchQuery}
-        onSearchChange={handleSearchChange}
-      />
-      
-      <ManualsGrid
-        manuals={allManuals} // Pass all manuals for context if needed by grid (e.g. total count)
-        displayedManuals={filteredManuals}
-        searchQuery={searchQuery}
-        onDownload={handleDownload}
-        onClearSearch={handleClearSearch}
-        isLoading={isLoading}
-      />
+      <div className="px-2 sm:px-0">
+        <ManualsSearch 
+          searchQuery={searchQuery}
+          onSearchChange={handleSearchChange}
+        />
+        
+        <ManualsGrid
+          manuals={allManuals} // Pass all manuals for context if needed by grid (e.g. total count)
+          displayedManuals={filteredManuals}
+          searchQuery={searchQuery}
+          onDownload={handleDownload}
+          onClearSearch={handleClearSearch}
+          isLoading={isLoading}
+        />
+      </div>
     </div>
   );
 }
