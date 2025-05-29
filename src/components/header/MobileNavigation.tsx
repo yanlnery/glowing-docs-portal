@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -19,7 +18,7 @@ interface MobileNavigationProps {
 
 export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }: MobileNavigationProps) {
   const { isAuthenticated, logout } = useAuth();
-  const cartQuantity = useCartStore(state => state.getCartQuantity());
+  const cartQuantity = useCartStore(state => state.getTotalItems());
   const navigate = useNavigate();
   const { toast } = useToast();
 
