@@ -30,7 +30,7 @@ export function OptimizedImage({
   const [isInView, setIsInView] = useState(priority);
   const imgRef = useRef<HTMLImageElement>(null);
 
-  // Intersection Observer para lazy loading (apenas se não for priority)
+  // Para carrossel, sempre carrega imediatamente
   useEffect(() => {
     if (priority) {
       setIsInView(true);
@@ -69,26 +69,26 @@ export function OptimizedImage({
     onError?.(e);
   };
 
-  // Para imagens priority ou no carrossel, carrega imediatamente
+  // Para imagens priority (carrossel), carrega imediatamente
   const shouldLoad = isInView || priority;
 
   return (
     <div className={cn('relative overflow-hidden', className)} ref={imgRef}>
-      {/* Placeholder enquanto carrega */}
+      {/* Placeholder mínimo para carregamento rápido */}
       {!isLoaded && shouldLoad && !hasError && (
         <div 
-          className="absolute inset-0 bg-gray-200 dark:bg-gray-800 animate-pulse" 
+          className="absolute inset-0 bg-gray-200 dark:bg-gray-800" 
           style={style}
         />
       )}
       
-      {/* Imagem principal */}
+      {/* Imagem principal - sempre visível quando carregada */}
       {shouldLoad && (
         <img
           src={src}
           alt={alt}
           className={cn(
-            'w-full h-full transition-opacity duration-300',
+            'w-full h-full transition-opacity duration-200',
             isLoaded ? 'opacity-100' : 'opacity-0'
           )}
           style={{
