@@ -87,12 +87,12 @@ export default function Species() {
   }
 
   return (
-    <div className="container px-4 py-8 sm:py-12 sm:px-6">
+    <div className="container px-4 md:px-6 py-8 sm:py-12">
       <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">
         <div className="docs-section-title">
-          <h1 className="text-3xl sm:text-4xl font-bold">Espécies Criadas</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">Espécies Criadas</h1>
         </div>
-        <p className="text-muted-foreground max-w-2xl mt-4">
+        <p className="text-muted-foreground max-w-2xl mt-4 text-sm sm:text-base">
           Conheça todas as espécies criadas em nosso plantel, com informações detalhadas e características.
         </p>
       </div>
@@ -114,14 +114,14 @@ export default function Species() {
 
       {/* Species Grid */}
       {filteredSpecies.length > 0 ? (
-        <div className="grid grid-cols-1 min-[480px]:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
           {filteredSpecies.map((species) => (
             <SpeciesGridItem key={species.id} species={species} />
           ))}
         </div>
       ) : (
         <div className="text-center py-12">
-          <p className="text-xl text-muted-foreground">Nenhuma espécie encontrada com os filtros selecionados.</p>
+          <p className="text-lg sm:text-xl text-muted-foreground">Nenhuma espécie encontrada com os filtros selecionados.</p>
         </div>
       )}
     </div>

@@ -12,7 +12,7 @@ export function SpeciesGridItem({ species }: SpeciesGridItemProps) {
   return (
     <div key={species.id} className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group">
       <Link to={`/especies-criadas/${species.slug}`} className="block">
-        <div className="relative h-40 sm:h-60 overflow-hidden">
+        <div className="relative h-32 sm:h-40 md:h-48 lg:h-60 overflow-hidden">
           <img
             src={species.image || '/placeholder.svg'}
             alt={species.commonName}
@@ -23,7 +23,7 @@ export function SpeciesGridItem({ species }: SpeciesGridItemProps) {
       </Link>
       <div className="p-3 sm:p-4">
         <Link to={`/especies-criadas/${species.slug}`}>
-          <h3 className="font-bold text-sm sm:text-lg mb-1 line-clamp-1">
+          <h3 className="font-bold text-sm sm:text-base md:text-lg mb-1 line-clamp-1">
             <em>{species.name}</em>
           </h3>
           <p className="text-muted-foreground text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-1">{species.commonName}</p>

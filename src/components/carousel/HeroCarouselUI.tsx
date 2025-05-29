@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -47,7 +48,7 @@ export default function HeroCarouselUI({
 
   if (error) {
     return (
-      <div className="relative h-[60vh] md:h-[70vh] flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4 text-center">
+      <div className="relative h-[50vh] md:h-[60vh] lg:h-[70vh] flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4 text-center">
         <p className="text-gray-500 dark:text-gray-400 text-lg">Erro: {error}</p>
       </div>
     );
@@ -55,7 +56,7 @@ export default function HeroCarouselUI({
 
   if (isLoading) {
     return (
-      <div className="relative h-[60vh] md:h-[70vh] overflow-hidden flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4 text-center">
+      <div className="relative h-[50vh] md:h-[60vh] lg:h-[70vh] overflow-hidden flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4 text-center">
         <p className="text-gray-500 dark:text-gray-400 text-lg">Carregando carrossel...</p>
       </div>
     );
@@ -63,7 +64,7 @@ export default function HeroCarouselUI({
 
   if (carouselImagesData.length === 0) {
     return (
-      <div className="relative h-[60vh] md:h-[70vh] overflow-hidden flex items-center justify-center bg-gray-200 dark:bg-gray-800 px-4 text-center">
+      <div className="relative h-[50vh] md:h-[60vh] lg:h-[70vh] overflow-hidden flex items-center justify-center bg-gray-200 dark:bg-gray-800 px-4 text-center">
         <div>
           <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">Nenhuma imagem para exibir no carrossel.</p>
           <p className="text-sm text-gray-400 dark:text-gray-300">Verifique o painel administrativo ou tente novamente mais tarde.</p>
@@ -74,7 +75,7 @@ export default function HeroCarouselUI({
 
   return (
     <div className="relative w-full">
-      <div className="relative h-[60vh] md:h-[70vh] overflow-hidden">
+      <div className="relative h-[50vh] md:h-[60vh] lg:h-[70vh] overflow-hidden">
         <Carousel
           setApi={setApi}
           opts={{
@@ -130,7 +131,7 @@ export default function HeroCarouselUI({
                         </div>
                       </div>
                     )}
-                    <div className="absolute inset-y-0 left-0 w-[55%] bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10" />
+                    <div className="absolute inset-y-0 left-0 w-full sm:w-[55%] bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10" />
                   </div>
                 </CarouselItem>
               );
@@ -138,19 +139,19 @@ export default function HeroCarouselUI({
           </CarouselContent>
         </Carousel>
 
-        <div className="absolute inset-0 z-20 flex flex-col items-start justify-end md:justify-center pb-20 md:pb-0 pointer-events-none">
+        <div className="absolute inset-0 z-20 flex flex-col items-start justify-center pb-24 sm:pb-20 md:pb-0 pointer-events-none">
           <div className="container py-6 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-2xl animate-slide-in text-balance">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-2xl animate-slide-in text-balance">
               {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
             </h1>
-            <p className="text-sm sm:text-base md:text-lg text-white/90 font-medium max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance">
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/90 font-medium max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance line-clamp-2 sm:line-clamp-none">
               {currentSlideData.subtitle || "Conheça nossa coleção de répteis exóticos"}
             </p>
           </div>
         </div>
         
         {carouselImagesData.length > 1 && (
-          <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2 z-30 md:bottom-6">
+          <div className="absolute bottom-16 sm:bottom-4 md:bottom-6 left-0 right-0 flex justify-center space-x-2 z-30">
             {carouselImagesData.map((_, index) => (
               <button
                 key={`indicator-${index}`}
@@ -169,13 +170,13 @@ export default function HeroCarouselUI({
       </div>
 
       <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-6 md:absolute md:bottom-40 md:left-1/2 md:-translate-x-1/2 md:z-20 md:py-0 md:pointer-events-auto">
-        <div className="flex flex-col sm:flex-row gap-3 w-full items-center justify-center md:justify-start">
-          <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[48px] w-full sm:w-auto text-sm md:text-base" asChild>
+        <div className="flex flex-col gap-3 w-full items-center justify-center md:justify-start md:flex-row">
+          <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base" asChild>
             <Link to="/catalogo">
               Animais Disponíveis <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
-          <Button variant="outline" size="lg" className="bg-transparent border-white text-white hover:bg-white/10 md:bg-white/20 md:border-white/20 md:hover:bg-white/20 min-h-[48px] w-full sm:w-auto text-sm md:text-base" asChild>
+          <Button variant="outline" size="lg" className="bg-transparent border-white text-white hover:bg-white/10 md:bg-white/20 md:border-white/20 md:hover:bg-white/20 min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base" asChild>
             <Link to="/sobre">
               Conheça nossa História
             </Link>

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useCallback } from "react";
 import { Manual } from "@/types/manual";
 import ManualsSearch from "@/components/manuals/ManualsSearch";
@@ -84,10 +85,10 @@ export default function Manuals() {
   }
 
   return (
-    <div className="container px-4 py-8 sm:px-6 sm:py-12">
+    <div className="container px-4 md:px-6 py-8 sm:py-12">
       <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">
         <div className="docs-section-title">
-          <h1 className="text-3xl sm:text-4xl font-bold text-balance">Manuais de Criação</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-balance">Manuais de Criação</h1>
         </div>
         <p className="text-muted-foreground max-w-2xl mt-3 sm:mt-4 text-sm sm:text-base">
           Conteúdo técnico e prático para criadores de répteis certificados

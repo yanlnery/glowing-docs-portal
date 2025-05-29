@@ -24,13 +24,13 @@ export default function ManualsGrid({
 }: ManualsGridProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {Array.from({ length: 3 }).map((_, index) => (
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+        {Array.from({ length: 6 }).map((_, index) => (
           <div key={index} className="flex flex-col space-y-3">
-            <Skeleton className="h-[200px] w-full rounded-lg" />
-            <div className="space-y-2 p-4">
-              <Skeleton className="h-4 w-[250px]" />
-              <Skeleton className="h-4 w-[200px]" />
+            <Skeleton className="h-[160px] sm:h-[200px] w-full rounded-lg" />
+            <div className="space-y-2 p-3 sm:p-4">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
               <Skeleton className="h-10 w-full mt-2" />
             </div>
           </div>
@@ -42,7 +42,7 @@ export default function ManualsGrid({
   if (manuals.length === 0 && !searchQuery) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground text-sm sm:text-base">
           Nenhum manual cadastrado no momento. Utilize o painel administrativo para adicionar novos manuais.
         </p>
       </div>
@@ -51,7 +51,7 @@ export default function ManualsGrid({
 
   if (displayedManuals.length > 0) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
         {displayedManuals.map((manual) => (
           <ManualCard key={manual.id} manual={manual} onDownload={onDownload} />
         ))}
@@ -61,13 +61,13 @@ export default function ManualsGrid({
 
   return (
     <div className="text-center py-12">
-      <p className="text-muted-foreground">
+      <p className="text-muted-foreground text-sm sm:text-base">
         Nenhum manual encontrado para sua pesquisa "{searchQuery}".
       </p>
       {searchQuery && (
         <Button 
           variant="outline" 
-          className="mt-4"
+          className="mt-4 min-h-[44px]"
           onClick={onClearSearch}
         >
           Limpar Busca

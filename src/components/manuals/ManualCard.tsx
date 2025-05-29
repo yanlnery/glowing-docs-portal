@@ -14,7 +14,7 @@ export default function ManualCard({ manual, onDownload }: ManualCardProps) {
   
   return (
     <div key={manual.id} className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md flex flex-col">
-      <div className="relative h-48 overflow-hidden bg-muted">
+      <div className="relative h-40 sm:h-48 overflow-hidden bg-muted">
         {manual.image ? (
           <img 
             src={manual.image}
@@ -35,13 +35,13 @@ export default function ManualCard({ manual, onDownload }: ManualCardProps) {
           </div>
         </div>
       </div>
-      <div className="p-4 flex-grow">
-        <h3 className="font-bold text-lg mb-2">{manual.title}</h3>
-        <p className="text-muted-foreground text-sm mb-4 line-clamp-3">{manual.description || "Sem descrição disponível."}</p>
+      <div className="p-3 sm:p-4 flex-grow">
+        <h3 className="font-bold text-sm sm:text-base md:text-lg mb-2 line-clamp-2">{manual.title}</h3>
+        <p className="text-muted-foreground text-xs sm:text-sm mb-4 line-clamp-2 sm:line-clamp-3">{manual.description || "Sem descrição disponível."}</p>
       </div>
-      <div className="p-4 pt-0 mt-auto">
+      <div className="p-3 sm:p-4 pt-0 mt-auto">
         <Button 
-          className="w-full" 
+          className="w-full min-h-[44px]" 
           variant={manual.pdf_url ? "outline" : "secondary"}
           onClick={() => onDownload(manual.pdf_url, manual.title)}
           disabled={!manual.pdf_url}
