@@ -89,14 +89,15 @@ export default function HeroCarouselUI({
             {carouselImagesData.map((item, index) => {
               const processedImageUrl = getCarouselImageUrl(item.image_url);
               const isCurrentSlide = index === currentImageIndex;
-              const isAdjacentSlide = Math.abs(index - currentImageIndex) <= 1;
+              // Carrega a imagem atual e as adjacentes para transições suaves
+              const shouldPrioritize = Math.abs(index - currentImageIndex) <= 1;
 
               console.log(`Rendering slide ${index}:`, {
                 originalImageUrl: item.image_url,
                 processedImageUrl: processedImageUrl,
                 title: item.title,
                 isCurrentSlide,
-                isAdjacentSlide
+                shouldPrioritize
               });
 
               return (
@@ -106,8 +107,8 @@ export default function HeroCarouselUI({
                       <OptimizedImage
                         src={processedImageUrl}
                         alt={item.alt_text || "Imagem do carrossel"}
-                        priority={isCurrentSlide}
-                        quality={isCurrentSlide ? 85 : 75}
+                        priority={shouldPrioritize}
+                        quality={shouldPrioritize ? 85 : 75}
                         sizes="100vw"
                         className="w-full h-full"
                         style={{
@@ -118,20 +119,20 @@ export default function HeroCarouselUI({
                           position: "relative",
                           zIndex: 10,
                         }}
-                        onLoad={() => console.log(`✅ Imagem otimizada carregada: ${processedImageUrl}`)}
+                        onLoad={() => console.log(`✅ Imagem carregada: ${processedImageUrl}`)}
                         onError={(e) => {
-                          console.error(`❌ Falha ao carregar imagem otimizada: ${processedImageUrl}`);
+                          console.error(`❌ Falha ao carregar imagem: ${processedImageUrl}`);
                         }}
                       />
                     ) : (
-                      <div className="absolute inset-0 w-full h-full bg-gray-300 flex items-center justify-center border-4 border-blue-500">
+                      <div className="absolute inset-0 w-full h-full bg-gray-300 flex items-center justify-center">
                         <div className="text-center text-gray-600">
                           <p className="text-lg">⚠️ Imagem indisponível</p>
-                          <p className="text-sm">{item.title || "Slide sem título"} ({item.image_url ? "URL inválida" : "URL vazia"})</p>
+                          <p className="text-sm">{item.title || "Slide sem título"}</p>
                         </div>
                       </div>
                     )}
-                    <div className="absolute inset-y-0 left-0 w-full sm:w-[55%] bg-gradient-to-r from-black/70 via-black/50 to-transparent z-10" />
+                    <div className="absolute inset-y-0 left-0 w-full sm:w-[55%] bg-gradient-to-r from-black/70 via-black/50 to-transparent z-20" />
                   </div>
                 </CarouselItem>
               );
@@ -139,7 +140,8 @@ export default function HeroCarouselUI({
           </CarouselContent>
         </Carousel>
 
-        <div className="absolute inset-0 z-20 flex flex-col items-start justify-center pb-24 sm:pb-20 md:pb-0 pointer-events-none">
+        {/* Overlay com conteúdo */}
+        <div className="absolute inset-0 z-30 flex flex-col items-start justify-center pb-24 sm:pb-20 md:pb-0 pointer-events-none">
           <div className="container py-6 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto">
             <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-2xl animate-slide-in text-balance">
               {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
@@ -150,8 +152,9 @@ export default function HeroCarouselUI({
           </div>
         </div>
         
+        {/* Indicadores */}
         {carouselImagesData.length > 1 && (
-          <div className="absolute bottom-16 sm:bottom-4 md:bottom-6 left-0 right-0 flex justify-center space-x-2 z-30">
+          <div className="absolute bottom-16 sm:bottom-4 md:bottom-6 left-0 right-0 flex justify-center space-x-2 z-40">
             {carouselImagesData.map((_, index) => (
               <button
                 key={`indicator-${index}`}
@@ -169,7 +172,8 @@ export default function HeroCarouselUI({
         )}
       </div>
 
-      <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-6 md:absolute md:bottom-40 md:left-1/2 md:-translate-x-1/2 md:z-20 md:py-0 md:pointer-events-auto">
+      {/* Botões de ação */}
+      <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-6 md:absolute md:bottom-40 md:left-1/2 md:-translate-x-1/2 md:z-30 md:py-0 md:pointer-events-auto">
         <div className="flex flex-col gap-3 w-full items-center justify-center md:justify-start md:flex-row">
           <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base" asChild>
             <Link to="/catalogo">

@@ -22,38 +22,20 @@ export function OptimizedImage({
   className,
   onLoad,
   onError,
+  style,
   ...props
 }: OptimizedImageProps) {
-  const [currentSrc, setCurrentSrc] = useState<string>('');
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const imgRef = useRef<HTMLImageElement>(null);
   const [isInView, setIsInView] = useState(priority);
+  const imgRef = useRef<HTMLImageElement>(null);
 
-  // Função para gerar URLs otimizadas
-  const getOptimizedSrc = (originalSrc: string, format: 'webp' | 'avif' | 'original' = 'original') => {
-    if (!originalSrc || originalSrc === '/placeholder.svg') return originalSrc;
-    
-    // Se já é uma URL completa externa, retorna como está
-    if (originalSrc.startsWith('http')) {
-      return originalSrc;
-    }
-    
-    // Para imagens locais, tenta diferentes formatos
-    if (format === 'webp' && originalSrc.includes('.')) {
-      return originalSrc.replace(/\.(jpg|jpeg|png)$/i, '.webp');
-    }
-    
-    if (format === 'avif' && originalSrc.includes('.')) {
-      return originalSrc.replace(/\.(jpg|jpeg|png)$/i, '.avif');
-    }
-    
-    return originalSrc;
-  };
-
-  // Intersection Observer para lazy loading
+  // Intersection Observer para lazy loading (apenas se não for priority)
   useEffect(() => {
-    if (priority) return;
+    if (priority) {
+      setIsInView(true);
+      return;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -75,82 +57,59 @@ export function OptimizedImage({
     return () => observer.disconnect();
   }, [priority]);
 
-  // Carrega a imagem quando está em view
-  useEffect(() => {
-    if (!isInView) return;
-
-    const loadImage = async () => {
-      const formats = ['avif', 'webp', 'original'] as const;
-      
-      for (const format of formats) {
-        try {
-          const testSrc = getOptimizedSrc(src, format);
-          
-          // Testa se a imagem carrega
-          await new Promise<void>((resolve, reject) => {
-            const testImg = new Image();
-            testImg.onload = () => resolve();
-            testImg.onerror = () => reject();
-            testImg.src = testSrc;
-          });
-          
-          setCurrentSrc(testSrc);
-          return;
-        } catch {
-          // Continua para o próximo formato
-          continue;
-        }
-      }
-      
-      // Se nenhum formato funcionar, usa o original
-      setCurrentSrc(src);
-    };
-
-    loadImage();
-  }, [isInView, src]);
-
   const handleLoad = () => {
     setIsLoaded(true);
+    setHasError(false);
     onLoad?.();
   };
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.error('Erro ao carregar imagem:', src);
     setHasError(true);
-    // Fallback para imagem original se houver erro
-    if (currentSrc !== src) {
-      setCurrentSrc(src);
-      setHasError(false);
-    } else {
-      onError?.(e);
-    }
+    onError?.(e);
   };
 
+  // Para imagens priority ou no carrossel, carrega imediatamente
+  const shouldLoad = isInView || priority;
+
   return (
-    <div className={cn('relative overflow-hidden', className)}>
-      {/* Placeholder blur enquanto carrega */}
-      {!isLoaded && isInView && (
-        <div className="absolute inset-0 bg-gray-200 dark:bg-gray-800 animate-pulse" />
+    <div className={cn('relative overflow-hidden', className)} ref={imgRef}>
+      {/* Placeholder enquanto carrega */}
+      {!isLoaded && shouldLoad && !hasError && (
+        <div 
+          className="absolute inset-0 bg-gray-200 dark:bg-gray-800 animate-pulse" 
+          style={style}
+        />
       )}
       
-      <img
-        ref={imgRef}
-        src={isInView ? currentSrc : ''}
-        alt={alt}
-        className={cn(
-          'transition-opacity duration-300',
-          isLoaded ? 'opacity-100' : 'opacity-0',
-          hasError && 'opacity-50'
-        )}
-        loading={priority ? 'eager' : 'lazy'}
-        decoding={priority ? 'sync' : 'async'}
-        onLoad={handleLoad}
-        onError={handleError}
-        sizes={sizes}
-        {...props}
-      />
+      {/* Imagem principal */}
+      {shouldLoad && (
+        <img
+          src={src}
+          alt={alt}
+          className={cn(
+            'w-full h-full transition-opacity duration-300',
+            isLoaded ? 'opacity-100' : 'opacity-0'
+          )}
+          style={{
+            objectFit: 'cover',
+            ...style
+          }}
+          loading={priority ? 'eager' : 'lazy'}
+          decoding={priority ? 'sync' : 'async'}
+          onLoad={handleLoad}
+          onError={handleError}
+          sizes={sizes}
+          {...props}
+        />
+      )}
       
+      {/* Fallback para erro */}
       {hasError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+        <div 
+          className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800"
+          style={style}
+        >
           <span className="text-sm text-gray-500">Erro ao carregar imagem</span>
         </div>
       )}
