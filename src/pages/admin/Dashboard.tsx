@@ -23,20 +23,28 @@ const Dashboard = () => {
     window.scrollTo(0, 0);
     
     // Fetch products for the dashboard
-    const allProducts = productService.getAll();
-    setProducts(allProducts);
-    
-    // Calculate stats
-    const available = allProducts.filter(p => p.status === 'disponivel').length;
-    const unavailable = allProducts.filter(p => p.status === 'indisponivel').length;
-    const sold = allProducts.filter(p => p.status === 'vendido').length;
-    
-    setStatsData({
-      total: allProducts.length,
-      available,
-      unavailable,
-      sold
-    });
+    const loadProducts = async () => {
+      try {
+        const allProducts = await productService.getAll();
+        setProducts(allProducts);
+        
+        // Calculate stats
+        const available = allProducts.filter(p => p.status === 'disponivel').length;
+        const unavailable = allProducts.filter(p => p.status === 'indisponivel').length;
+        const sold = allProducts.filter(p => p.status === 'vendido').length;
+        
+        setStatsData({
+          total: allProducts.length,
+          available,
+          unavailable,
+          sold
+        });
+      } catch (error) {
+        console.error("Error loading products for dashboard:", error);
+      }
+    };
+
+    loadProducts();
   }, []);
 
   // Generate data for charts

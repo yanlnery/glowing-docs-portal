@@ -84,33 +84,47 @@ const ProductForm = () => {
 
   useEffect(() => {
     if (isEditMode && id) {
-      const productData = productService.getById(id);
-      if (productData) {
-        setImageList(productData.images || []);
-        
-        form.reset({
-          name: productData.name,
-          speciesId: productData.speciesId || "", // Ensure speciesId is a string
-          speciesName: productData.speciesName,
-          category: productData.category,
-          subcategory: productData.subcategory,
-          status: productData.status || "disponivel", // Default status if undefined
-          price: productData.price,
-          paymentLink: productData.paymentLink,
-          description: productData.description,
-          featured: productData.featured,
-          isNew: productData.isNew,
-          visible: productData.visible ?? true, // Default to true if undefined
-          order: productData.order || 0, // Default order if undefined
-        });
-      } else {
-        toast({
-          title: "Erro",
-          description: "Produto não encontrado",
-          variant: "destructive"
-        });
-        navigate('/admin/products');
-      }
+      const loadProduct = async () => {
+        try {
+          const productData = await productService.getById(id);
+          if (productData) {
+            setImageList(productData.images || []);
+            
+            form.reset({
+              name: productData.name,
+              speciesId: productData.speciesId || "", // Ensure speciesId is a string
+              speciesName: productData.speciesName,
+              category: productData.category,
+              subcategory: productData.subcategory,
+              status: productData.status || "disponivel", // Default status if undefined
+              price: productData.price,
+              paymentLink: productData.paymentLink,
+              description: productData.description,
+              featured: productData.featured,
+              isNew: productData.isNew,
+              visible: productData.visible ?? true, // Default to true if undefined
+              order: productData.order || 0, // Default order if undefined
+            });
+          } else {
+            toast({
+              title: "Erro",
+              description: "Produto não encontrado",
+              variant: "destructive"
+            });
+            navigate('/admin/products');
+          }
+        } catch (error) {
+          console.error("Error loading product:", error);
+          toast({
+            title: "Erro",
+            description: "Erro ao carregar produto",
+            variant: "destructive"
+          });
+          navigate('/admin/products');
+        }
+      };
+
+      loadProduct();
     }
   }, [id, isEditMode, navigate, toast, form]);
 
@@ -198,13 +212,13 @@ const ProductForm = () => {
     
     try {
       if (isEditMode && id) {
-        productService.update(id, formData);
+        await productService.update(id, formData);
         toast({
           title: "Sucesso",
           description: "Produto atualizado com sucesso!",
         });
       } else {
-        productService.create(formData);
+        await productService.create(formData);
         toast({
           title: "Sucesso",
           description: "Produto criado com sucesso!",
@@ -227,6 +241,26 @@ const ProductForm = () => {
     }
   };
 
+  const handleDelete = async () => {
+    if (isEditMode && id && window.confirm('Tem certeza que deseja excluir este produto?')) {
+      try {
+        await productService.delete(id);
+        toast({
+          title: "Produto excluído",
+          description: "O produto foi removido com sucesso.",
+        });
+        navigate('/admin/products');
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        toast({
+          title: "Erro",
+          description: "Erro ao excluir produto",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -240,16 +274,7 @@ const ProductForm = () => {
           </div>
           
           {isEditMode && id && ( // Ensure id is present for delete
-            <Button variant="destructive" onClick={() => {
-              if (window.confirm('Tem certeza que deseja excluir este produto?')) {
-                productService.delete(id); // id is guaranteed by isEditMode && id
-                toast({
-                  title: "Produto excluído",
-                  description: "O produto foi removido com sucesso.",
-                });
-                navigate('/admin/products');
-              }
-            }}>
+            <Button variant="destructive" onClick={handleDelete}>
               <Trash2 className="h-4 w-4 mr-2" />
               Excluir
             </Button>

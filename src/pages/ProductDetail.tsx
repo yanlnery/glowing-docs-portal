@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useCartStore } from '@/stores/cartStore';
@@ -20,9 +21,10 @@ const ProductDetail = () => {
     window.scrollTo(0, 0);
     
     if (id) {
-      const loadProduct = () => {
+      const loadProduct = async () => {
         try {
-          const foundProduct = productService.getProductById(id);
+          setLoading(true);
+          const foundProduct = await productService.getProductById(id);
           setProduct(foundProduct);
           if (foundProduct?.images && foundProduct.images.length > 0) {
             setSelectedImage(foundProduct.images[0].url);
