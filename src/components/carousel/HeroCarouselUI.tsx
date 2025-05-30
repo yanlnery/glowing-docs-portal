@@ -75,15 +75,17 @@ export default function HeroCarouselUI({
 
   return (
     <div className="relative w-full">
-      {/* Container principal com altura otimizada - maior no mobile para ultrapassar o texto */}
-      <div className="relative h-[calc(100vh-120px)] sm:h-[calc(100vh-160px)] md:h-[60vh] lg:h-[70vh] overflow-hidden">
+      {/* Container principal com altura otimizada para mobile */}
+      <div className="relative min-h-[calc(100vh-200px)] md:h-[60vh] lg:h-[70vh] overflow-hidden">
         <Carousel
           setApi={setApi}
           opts={{
             loop: carouselImagesData.length > 1,
             align: "start",
+            // Melhor suporte para navegação por toque no mobile
             dragFree: false,
             containScroll: "trimSnaps",
+            // Ativar suporte a toque
             watchDrag: true,
             slidesToScroll: 1,
           }}
@@ -145,60 +147,53 @@ export default function HeroCarouselUI({
           </CarouselContent>
         </Carousel>
 
-        {/* Overlay com conteúdo - posicionamento compacto no mobile */}
-        <div className="absolute inset-0 z-30 flex flex-col items-start justify-center pb-20 sm:pb-24 md:pb-0 pointer-events-none">
-          <div className="container py-4 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto">
+        {/* Overlay com conteúdo - posicionamento melhorado */}
+        <div className="absolute inset-0 z-30 flex flex-col items-start justify-center pb-32 sm:pb-20 md:pb-0 pointer-events-none">
+          <div className="container py-6 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto">
             <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-2xl animate-fade-in text-balance">
               {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
             </h1>
-            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/90 font-medium max-w-xl mb-3 sm:mb-4 animate-fade-in text-balance line-clamp-2 sm:line-clamp-none">
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/90 font-medium max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance line-clamp-2 sm:line-clamp-none">
               {currentSlideData.subtitle || "Conheça nossa coleção de répteis exóticos"}
             </p>
           </div>
         </div>
-      </div>
         
-      {/* Indicadores - posicionamento colado na imagem */}
-      {carouselImagesData.length > 1 && (
-        <div className="flex justify-center space-x-2 mt-2 mb-2 z-40">
-          {carouselImagesData.map((_, index) => (
-            <button
-              key={`indicator-${index}`}
-              className={cn(
-                "w-2 h-2 md:w-3 md:h-3 rounded-full focus:outline-none transition-all touch-manipulation",
-                index === currentImageIndex
-                  ? "bg-serpente-600 scale-110"
-                  : "bg-gray-400 hover:bg-gray-500"
-              )}
-              onClick={() => handleIndicatorClick(index)}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
-      )}
+        {/* Indicadores - posicionamento otimizado para mobile */}
+        {carouselImagesData.length > 1 && (
+          <div className="absolute bottom-24 sm:bottom-4 md:bottom-6 left-0 right-0 flex justify-center space-x-2 z-40">
+            {carouselImagesData.map((_, index) => (
+              <button
+                key={`indicator-${index}`}
+                className={cn(
+                  "w-3 h-3 md:w-3 md:h-3 rounded-full focus:outline-none transition-all touch-manipulation",
+                  index === currentImageIndex
+                    ? "bg-white scale-110"
+                    : "bg-white/40 hover:bg-white/60"
+                )}
+                onClick={() => handleIndicatorClick(index)}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
-      {/* Botões de ação - posicionamento colado aos indicadores */}
-      <div className="z-30 px-4 sm:px-6">
-        <div className="flex flex-col gap-2 w-full items-center justify-center md:flex-row md:gap-3">
-          <Button 
-            size="sm" 
-            className="bg-serpente-600 hover:bg-serpente-700 text-white h-9 px-4 w-full sm:w-full md:w-auto text-sm touch-manipulation" 
-            asChild
-          >
-            <Link to="/catalogo">
-              Animais Disponíveis <ArrowRight className="ml-2 h-3 w-3" />
-            </Link>
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="border-serpente-600 text-serpente-600 hover:bg-serpente-50 h-9 px-4 w-full sm:w-full md:w-auto text-sm touch-manipulation" 
-            asChild
-          >
-            <Link to="/sobre">
-              Conheça nossa História
-            </Link>
-          </Button>
+      {/* Botões de ação - posicionamento mais próximo da imagem no mobile */}
+      <div className="absolute bottom-6 left-0 right-0 z-30 md:relative md:bottom-auto md:left-auto md:right-auto md:z-auto">
+        <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-6 md:py-0 md:absolute md:bottom-40 md:left-1/2 md:-translate-x-1/2 md:z-30 md:pointer-events-auto">
+          <div className="flex flex-col gap-3 w-full items-center justify-center md:justify-start md:flex-row">
+            <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base touch-manipulation" asChild>
+              <Link to="/catalogo">
+                Animais Disponíveis <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button variant="outline" size="lg" className="bg-white/20 border-white/20 text-white hover:bg-white/30 md:bg-white/20 md:border-white/20 md:hover:bg-white/20 min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base touch-manipulation backdrop-blur-sm" asChild>
+              <Link to="/sobre">
+                Conheça nossa História
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
     </div>
