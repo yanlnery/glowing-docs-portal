@@ -146,9 +146,6 @@ function App() {
                   <Route path="quiz" element={<Quiz />} />
                   <Route path="manuais-de-criacao" element={<Manuals />} />
                   
-                  <Route path="getting-started" element={<Home />} />
-                  <Route path="api" element={<Home />} />
-                  <Route path="examples" element={<Home />} />
                   
                   <Route path="*" element={<NotFound />} />
                 </Route>
