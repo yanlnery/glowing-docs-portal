@@ -37,12 +37,12 @@ export default function Species() {
           console.log("SpeciesPage: First species object:", data[0]);
           
           // Verificar especificamente a propriedade 'commonName'
-          if (data[0].commonName === undefined && data[0].commonname !== undefined) {
+          if (data[0].commonname !== undefined) {
             console.log("SpeciesPage: Remapping 'commonname' to 'commonName'");
             // Mapeamento para corrigir inconsistências de nomenclatura
             const mappedData = data.map(item => ({
               ...item,
-              commonName: item.commonname,
+              commonname: item.commonname,
             }));
             setSpeciesList(mappedData as SpeciesType[]);
           } else {
@@ -68,7 +68,7 @@ export default function Species() {
       const lowerQuery = searchQuery.toLowerCase();
       result = result.filter(species =>
         species.name.toLowerCase().includes(lowerQuery) ||
-        species.commonName.toLowerCase().includes(lowerQuery)
+        species.commonname.toLowerCase().includes(lowerQuery)
       );
     }
     return result;

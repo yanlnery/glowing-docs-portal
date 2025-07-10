@@ -16,7 +16,7 @@ export function SpeciesGridItem({ species }: SpeciesGridItemProps) {
         <div className="relative h-32 sm:h-40 md:h-48 lg:h-60 overflow-hidden">
           <OptimizedImage
             src={species.image || '/placeholder.svg'}
-            alt={species.commonName}
+            alt={species.commonname}
             priority={false}
             quality={80}
             sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
@@ -27,7 +27,7 @@ export function SpeciesGridItem({ species }: SpeciesGridItemProps) {
               transform: "scale(1)",
               transition: "transform 0.3s ease"
             }}
-            onLoad={() => console.log(`✅ Espécie ${species.commonName} carregada`)}
+            onLoad={() => console.log(`✅ Espécie ${species.commonname} carregada`)}
           />
         </div>
       </Link>
@@ -36,7 +36,7 @@ export function SpeciesGridItem({ species }: SpeciesGridItemProps) {
           <h3 className="font-bold text-sm sm:text-base md:text-lg mb-1 line-clamp-1">
             <em>{species.name}</em>
           </h3>
-          <p className="text-muted-foreground text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-1">{species.commonName}</p>
+          <p className="text-muted-foreground text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-1">{species.commonname}</p>
         </Link>
         <div className="flex justify-end mt-auto">
           <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm" asChild>

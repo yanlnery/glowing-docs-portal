@@ -1,7 +1,7 @@
 
 export interface Species {
   id: string; // uuid
-  commonName: string; // common_name TEXT
+  commonname: string; // commonname TEXT
   name: string; // name TEXT (Scientific Name)
   description: string;
   characteristics: string[];

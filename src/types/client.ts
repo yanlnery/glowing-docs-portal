@@ -1,5 +1,5 @@
 
-import { Tables } from '@/integrations/supabase/database.types';
+import { Tables } from '@/integrations/supabase/types';
 
 export type Profile = Tables<'profiles'>;
 export type Address = Tables<'addresses'>;

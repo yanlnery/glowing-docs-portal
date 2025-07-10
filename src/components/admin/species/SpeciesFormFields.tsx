@@ -49,7 +49,7 @@ export function SpeciesFormFields({
           <Input
             id="commonName"
             name="commonName"
-            value={speciesData.commonName}
+            value={speciesData.commonname}
             onChange={onInputChange}
           />
         </div>

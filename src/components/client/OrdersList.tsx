@@ -65,7 +65,7 @@ export const OrdersList: React.FC = () => {
               <p className="text-sm">Itens: {order.order_items?.map(item => `${item.product_name} (x${item.quantity})`).join(", ") || "N/A"}</p>
             </div>
             <div className="flex items-center gap-4">
-              <span className="font-semibold">R$ {parseFloat(order.total_amount).toFixed(2)}</span>
+              <span className="font-semibold">R$ {Number(order.total_amount).toFixed(2)}</span>
             </div>
           </div>
         </div>

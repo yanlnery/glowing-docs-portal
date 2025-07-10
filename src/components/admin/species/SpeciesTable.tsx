@@ -108,7 +108,7 @@ export function SpeciesTable({
               {item.image ? (
                 <img
                   src={item.image}
-                  alt={item.commonName}
+                  alt={item.commonname}
                   className="h-12 w-12 object-cover rounded"
                   loading="lazy"
                 />
@@ -118,7 +118,7 @@ export function SpeciesTable({
                 </div>
               )}
             </TableCell>
-            <TableCell>{item.commonName}</TableCell>
+            <TableCell>{item.commonname}</TableCell>
             <TableCell><em>{item.name}</em></TableCell>
             <TableCell>
               {item.type === 'serpente' && 'Serpente'}

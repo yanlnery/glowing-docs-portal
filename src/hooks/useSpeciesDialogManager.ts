@@ -32,7 +32,7 @@ export function useSpeciesDialogManager({
     setCurrentSpecies({
       id: '', 
       name: '',
-      commonName: '',
+      commonname: '',
       description: 'Descrição detalhada a ser preenchida.',
       characteristics: [''],
       curiosities: [''],
@@ -132,7 +132,7 @@ export function useSpeciesDialogManager({
   const handleSave = async () => {
     if (!currentSpecies) return;
     
-    if (!currentSpecies.name || !currentSpecies.commonName || !currentSpecies.description) {
+    if (!currentSpecies.name || !currentSpecies.commonname || !currentSpecies.description) {
       toast({ title: "Erro de validação", description: "Preencha Nome Popular, Nome Científico e Descrição.", variant: "destructive" });
       return;
     }

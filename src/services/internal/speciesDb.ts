@@ -23,7 +23,7 @@ interface SpeciesDbRecord {
 const mapDbRecordToSpecies = (record: SpeciesDbRecord): Species => {
   return {
     ...record,
-    commonName: record.commonname,
+    commonname: record.commonname,
   };
 };
 

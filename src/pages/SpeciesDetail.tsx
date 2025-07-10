@@ -97,7 +97,7 @@ export default function SpeciesDetail() {
           <div className="aspect-square overflow-hidden rounded-lg border">
             <img 
               src={species.image || '/placeholder.svg'} // Fallback image
-              alt={species.commonName} 
+              alt={species.commonname} 
               className="w-full h-full object-cover object-center"
             />
           </div>
@@ -108,7 +108,7 @@ export default function SpeciesDetail() {
           <div className="mb-2 text-muted-foreground">
             {typeDisplayMap[species.type] || species.type}
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2">{species.commonName}</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2">{species.commonname}</h1>
           <h2 className="text-xl text-muted-foreground mb-6"><em>{species.name}</em></h2>
           
           {species.description && (

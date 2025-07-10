@@ -46,7 +46,7 @@ export const saveSpeciesData = async (
   originalImageUrlFromDb: string | null,
   toast: ToastFunction
 ): Promise<boolean> => {
-  if (!speciesFormData.name || !speciesFormData.commonName) {
+  if (!speciesFormData.name || !speciesFormData.commonname) {
     toast({ title: "Erro de validação", description: "Preencha Nome Popular e Nome Científico.", variant: "destructive" });
     return false;
   }
@@ -79,7 +79,7 @@ export const saveSpeciesData = async (
   // Mapeamento para o banco de dados: commonName (frontend) -> commonname (db)
   const dbPayload = {
     name: speciesToSave.name,
-    commonname: speciesToSave.commonName, // Campo corrigido para o DB
+    commonname: speciesToSave.commonname, // Campo corrigido para o DB
     slug: speciesToSave.slug,
     type: speciesToSave.type || 'outro',
     image: finalImageUrl,
@@ -158,7 +158,7 @@ export const deleteSpeciesRecord = async (
   
   toast({ 
     title: "Sucesso", 
-    description: `Espécie "${speciesToDelete.commonName}" removida com sucesso.`, 
+    description: `Espécie "${speciesToDelete.commonname}" removida com sucesso.`, 
     variant: "default" 
   });
   return true;
