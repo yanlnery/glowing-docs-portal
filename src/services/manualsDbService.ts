@@ -3,10 +3,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { Manual, ManualFormData } from '@/types/manual';
 
 export const fetchManualsFromDb = async (): Promise<{ data: Manual[] | null, error: any }> => {
-  return supabase
+  const { data, error } = await supabase
     .from('manuals')
     .select('*')
     .order('title', { ascending: true });
+  
+  return { data: data as Manual[] | null, error };
 };
 
 export const addManualToDb = async (

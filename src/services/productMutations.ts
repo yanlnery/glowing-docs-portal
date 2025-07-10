@@ -32,9 +32,9 @@ const transformToSupabaseProduct = (productData: ProductFormData) => {
     visible: productData.visible !== undefined ? productData.visible : true,
     order_position: productData.order || 0,
     payment_link: productData.paymentLink || null,
-    images: processedImages,
-    details: productData.details || [],
-    meta: productData.meta || {}
+    images: processedImages as any,
+    details: (productData.details || []) as any,
+    meta: (productData.meta || {}) as any
   };
 };
 
@@ -63,21 +63,21 @@ export const createProduct = async (productData: ProductFormData): Promise<Produ
       speciesName: data.species_name,
       speciesId: data.species_id,
       description: data.description || '',
-      price: parseFloat(data.price) || 0,
-      category: data.category,
-      subcategory: data.subcategory,
+      price: Number(data.price) || 0,
+      category: data.category as any,
+      subcategory: data.subcategory as any,
       featured: data.featured || false,
       isNew: data.is_new || false,
       available: data.available || false,
-      status: data.status || 'disponivel',
+      status: (data.status as any) || 'disponivel',
       visible: data.visible || false,
       order: data.order_position || 0,
       paymentLink: data.payment_link || '',
-      images: Array.isArray(data.images) ? data.images : [],
-      details: Array.isArray(data.details) ? data.details : [],
+      images: Array.isArray(data.images) ? (data.images as any) : [],
+      details: Array.isArray(data.details) ? (data.details as any) : [],
       createdAt: data.created_at,
       updatedAt: data.updated_at,
-      meta: data.meta || {}
+      meta: (data.meta as any) || {}
     };
   } catch (error) {
     console.error("Failed to create product", error);
@@ -166,21 +166,21 @@ export const updateProduct = async (id: string, productData: Partial<ProductForm
       speciesName: data.species_name,
       speciesId: data.species_id,
       description: data.description || '',
-      price: parseFloat(data.price) || 0,
-      category: data.category,
-      subcategory: data.subcategory,
+      price: Number(data.price) || 0,
+      category: data.category as any,
+      subcategory: data.subcategory as any,
       featured: data.featured || false,
       isNew: data.is_new || false,
       available: data.available || false,
-      status: data.status || 'disponivel',
+      status: (data.status as any) || 'disponivel',
       visible: data.visible || false,
       order: data.order_position || 0,
       paymentLink: data.payment_link || '',
-      images: Array.isArray(data.images) ? data.images : [],
-      details: Array.isArray(data.details) ? data.details : [],
+      images: Array.isArray(data.images) ? (data.images as any) : [],
+      details: Array.isArray(data.details) ? (data.details as any) : [],
       createdAt: data.created_at,
       updatedAt: data.updated_at,
-      meta: data.meta || {}
+      meta: (data.meta as any) || {}
     };
   } catch (error) {
     console.error(`Failed to update product with ID ${id}`, error);
@@ -238,21 +238,21 @@ export const markProductAsSold = async (id: string): Promise<Product | null> => 
       speciesName: data.species_name,
       speciesId: data.species_id,
       description: data.description || '',
-      price: parseFloat(data.price) || 0,
-      category: data.category,
-      subcategory: data.subcategory,
+      price: Number(data.price) || 0,
+      category: data.category as any,
+      subcategory: data.subcategory as any,
       featured: data.featured || false,
       isNew: data.is_new || false,
       available: data.available || false,
-      status: data.status || 'disponivel',
+      status: (data.status as any) || 'disponivel',
       visible: data.visible || false,
       order: data.order_position || 0,
       paymentLink: data.payment_link || '',
-      images: Array.isArray(data.images) ? data.images : [],
-      details: Array.isArray(data.details) ? data.details : [],
+      images: Array.isArray(data.images) ? (data.images as any) : [],
+      details: Array.isArray(data.details) ? (data.details as any) : [],
       createdAt: data.created_at,
       updatedAt: data.updated_at,
-      meta: data.meta || {}
+      meta: (data.meta as any) || {}
     };
   } catch (error) {
     console.error(`Failed to mark product ${id} as sold`, error);
