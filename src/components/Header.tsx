@@ -1,13 +1,13 @@
 
 import React, { useState, useMemo, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Book, Syringe, Home, FileText, Users, Phone } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useSettings } from "@/hooks/useSettings";
 import type { MenuItem } from './header/menuItem.type';
 
 import Logo from './header/Logo';
-import DesktopNavigation from './header/DesktopNavigation';
 import HeaderActions from './header/HeaderActions';
 import MobileNavigation from './header/MobileNavigation';
 
@@ -84,7 +84,23 @@ export default function Header() {
           <Logo />
         </div>
         
-        <DesktopNavigation menuItems={menuItems} isActive={isActive} />
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-1">
+          {menuItems.map((item) => (
+            <Link
+              key={item.title}
+              to={item.path}
+              className={cn(
+                "inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors",
+                isActive(item.path)
+                  ? "bg-accent text-accent-foreground"
+                  : "text-foreground/60 hover:bg-accent hover:text-accent-foreground"
+              )}
+            >
+              {item.title}
+            </Link>
+          ))}
+        </nav>
         
         <div className="flex items-center gap-1 md:gap-2">
           <HeaderActions />
