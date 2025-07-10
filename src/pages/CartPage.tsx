@@ -22,6 +22,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/use-toast';
 import { productService } from '@/services/productService';
+import { orderService } from '@/services/orderService';
 
 // Define proper interfaces for our form data and errors
 interface CheckoutFormData {
@@ -103,21 +104,61 @@ const CartPage = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!validateForm()) return;
 
     try {
-      // Prepare the WhatsApp message with the product details and customer information
-      const productsList = items.map(item => {
-        return `${item.product.name} (${item.product.speciesName || "Não especificado"}) - ${formatPrice(item.product.price)}`;
-      }).join('\n');
+      // Preparar dados do pedido
+      const orderData = {
+        customer_name: formData.fullName,
+        customer_cpf: formData.cpf,
+        customer_phone: '',
+        shipping_address: {
+          street: formData.address.split(',')[0] || formData.address,
+          number: '0',
+          complement: '',
+          neighborhood: '',
+          city: formData.address.split(',')[1] || '',
+          state: '',
+          zipcode: formData.cep
+        },
+        payment_method: 'whatsapp',
+        total_amount: total,
+        status: 'pending' as const
+      };
+
+      // Criar pedido no banco
+      const { data: orderResult, error: orderError } = await orderService.createOrder(orderData);
       
+      if (orderError) {
+        throw new Error(orderError.message);
+      }
+
+      // Adicionar itens do pedido
+      if (orderResult) {
+        const orderItems = items.map(item => ({
+          order_id: orderResult.id,
+          product_id: item.product.id,
+          product_name: item.product.name,
+          species_name: item.product.speciesName,
+          product_image_url: item.product.images?.[0]?.url,
+          quantity: item.quantity,
+          price: item.product.price
+        }));
+
+        await orderService.addOrderItems(orderItems);
+      }
+
+      // Prepare the WhatsApp message with the product details and customer information
       const message = encodeURIComponent(
         `Olá! Acabei de finalizar uma compra no site Pet Serpentes.\n\n` +
+        `Pedido: #${orderResult?.id.substring(0, 8)}\n` +
         `Nome do comprador: ${formData.fullName}\n` +
-        `Animal adquirido: ${items.map(item => item.product.name).join(', ')}\n` +
-        `ID da espécie: ${items.map(item => item.product.speciesName || "Não especificado").join(', ')}\n` +
-        `Preço: ${formatPrice(total)}\n\n` +
+        `CPF: ${formData.cpf}\n` +
+        `CEP: ${formData.cep}\n` +
+        `Endereço: ${formData.address}\n\n` +
+        `Animal(is) adquirido(s):\n${items.map(item => `- ${item.product.name} (${item.product.speciesName || "Não especificado"}) - ${formatPrice(item.product.price)}`).join('\n')}\n\n` +
+        `Total: ${formatPrice(total)}\n\n` +
         `Gostaria de confirmar o pedido e combinar os detalhes do envio.`
       );
 
@@ -141,7 +182,7 @@ const CartPage = () => {
       // Show success message
       toast({
         title: "Pedido enviado",
-        description: "Você será redirecionado para o WhatsApp para finalizar seu pedido.",
+        description: "Pedido registrado com sucesso! Você será redirecionado para o WhatsApp.",
         duration: 3000,
       });
       
