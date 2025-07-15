@@ -36,8 +36,6 @@ export const useProductForm = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [imageList, setImageList] = useState<ProductImage[]>([]);
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
 
   const isEditMode = Boolean(id);
 
@@ -127,20 +125,9 @@ export const useProductForm = () => {
       setLoading(true);
       console.log("🔄 Submitting product form...", data);
 
-      // Combine existing images with new images
-      const allImages = [
-        ...imageList,
-        ...imageFiles.map((file, index) => ({
-          id: crypto.randomUUID(),
-          url: imagePreviewUrls[index],
-          filename: file.name,
-          alt: data.name || 'Product image',
-        })),
-      ];
-
       const productData = {
         ...data,
-        images: allImages,
+        images: imageList,
       };
 
       if (isEditMode && id) {
@@ -207,6 +194,10 @@ export const useProductForm = () => {
     }
   };
 
+  const handleImageUpload = (newImages: ProductImage[]) => {
+    setImageList(prev => [...prev, ...newImages]);
+  };
+
   return {
     form,
     loading,
@@ -214,10 +205,7 @@ export const useProductForm = () => {
     id,
     imageList,
     setImageList,
-    imageFiles,
-    setImageFiles,
-    imagePreviewUrls,
-    setImagePreviewUrls,
+    handleImageUpload,
     navigate,
     onSubmit,
     handleDelete,

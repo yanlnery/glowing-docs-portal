@@ -7,6 +7,7 @@ import { useProductForm } from '@/components/admin/product-form/hooks/useProduct
 import { ProductFormFields } from '@/components/admin/product-form/ProductFormFields';
 import { ProductImageManager } from '@/components/admin/product-form/ProductImageManager';
 import { ProductFormActions } from '@/components/admin/product-form/ProductFormActions';
+import { toast } from '@/components/ui/use-toast';
 
 const ProductForm = () => {
   const {
@@ -16,38 +17,11 @@ const ProductForm = () => {
     id,
     imageList,
     setImageList,
-    imageFiles,
-    setImageFiles,
-    imagePreviewUrls,
-    setImagePreviewUrls,
+    handleImageUpload,
     navigate,
     onSubmit,
     handleDelete,
   } = useProductForm();
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const filesArray = Array.from(e.target.files);
-      
-      const currentImageFiles = [...imageFiles, ...filesArray];
-      setImageFiles(currentImageFiles);
-      
-      const newImageUrls = filesArray.map(file => URL.createObjectURL(file));
-      setImagePreviewUrls(prevUrls => [...prevUrls, ...newImageUrls]);
-    }
-  };
-
-  const removeImage = (index: number) => {
-    const newPreviewUrls = [...imagePreviewUrls];
-    const removedPreviewUrl = newPreviewUrls.splice(index, 1)[0];
-    setImagePreviewUrls(newPreviewUrls);
-    
-    URL.revokeObjectURL(removedPreviewUrl);
-    
-    const newImageFiles = [...imageFiles];
-    newImageFiles.splice(index, 1);
-    setImageFiles(newImageFiles);
-  };
 
   const removeExistingImage = (index: number) => {
     const newImageList = [...imageList];
@@ -75,10 +49,9 @@ const ProductForm = () => {
                   <div className="pt-4 border-t">
                     <ProductImageManager
                       imageList={imageList}
-                      imagePreviewUrls={imagePreviewUrls}
-                      onImageChange={handleImageChange}
-                      onRemoveImage={removeImage}
                       onRemoveExistingImage={removeExistingImage}
+                      onImageUpload={handleImageUpload}
+                      toast={toast}
                     />
                   </div>
                 </div>
