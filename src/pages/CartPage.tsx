@@ -188,7 +188,7 @@ const CartPage = () => {
       
       // Redirect to WhatsApp with the pre-filled message
       setTimeout(() => {
-        window.open(`https://wa.me/message/PQ7BIYW7H5ARK1?text=${message}`, '_blank');
+        window.open(`https://wa.me/5521967802174?text=${message}`, '_blank');
         clearCart();
       }, 1500);
     } catch (error) {

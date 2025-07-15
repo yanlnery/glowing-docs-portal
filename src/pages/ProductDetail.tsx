@@ -4,7 +4,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useCartStore } from '@/stores/cartStore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, ShoppingCart, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Star, ShoppingCart, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { productService } from '@/services/productService';
 import { Product } from '@/types/product';
@@ -80,12 +80,13 @@ const ProductDetail = () => {
       toast({
         title: "Produto adicionado ao carrinho",
         description: `${product.name} foi adicionado ao seu carrinho.`,
-        action: (
-          <Button variant="outline" size="sm" onClick={() => navigate('/carrinho')}>
-            Ver Carrinho
-          </Button>
-        ),
+        duration: 2000,
       });
+
+      // Automatically redirect to cart after 2 seconds
+      setTimeout(() => {
+        navigate('/carrinho');
+      }, 2000);
     } catch (error) {
       console.error("Error adding product to cart:", error);
       toast({
@@ -230,13 +231,22 @@ const ProductDetail = () => {
                 </Button>
               </div>
               
-              <div className="bg-muted/50 p-3 rounded-md text-sm flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-serpente-600 mt-0.5 flex-shrink-0" />
-                <p className="text-muted-foreground">
-                  Todos os animais são registrados no IBAMA e possuem documentação legal completa.
-                  Para adquirir um animal, é necessário estar cadastrado no sistema oficial.
-                  <Link to="/contato" className="text-serpente-600 hover:underline ml-1">Saiba mais</Link>
-                </p>
+              <div className="space-y-3">
+                <div className="bg-muted/50 p-3 rounded-md text-sm flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-serpente-600 mt-0.5 flex-shrink-0" />
+                  <p className="text-muted-foreground">
+                    Todos os animais são registrados no IBAMA e possuem documentação legal completa.
+                    Para adquirir um animal, é necessário estar cadastrado no sistema oficial.
+                    <Link to="/contato" className="text-serpente-600 hover:underline ml-1">Saiba mais</Link>
+                  </p>
+                </div>
+                
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-md text-sm flex items-start gap-2">
+                  <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+                  <p className="text-yellow-800 dark:text-yellow-300">
+                    ⚠️ O frete é sujeito à disponibilidade logística e valores variam por região. Consulte condições antes de finalizar a compra.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
