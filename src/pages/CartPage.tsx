@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCartStore } from '@/stores/cartStore';
@@ -21,7 +22,6 @@ import {
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/use-toast';
-import { productService } from '@/services/productService';
 import { orderService } from '@/services/orderService';
 
 // Define proper interfaces for our form data and errors
@@ -39,6 +39,7 @@ interface FormErrors {
 const CartPage = () => {
   const { items, removeFromCart, clearCart } = useCartStore();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [formData, setFormData] = useState<CheckoutFormData>({
     fullName: '',
     cpf: '',
@@ -91,68 +92,103 @@ const CartPage = () => {
       ...prev,
       [name]: value
     }));
+    
+    // Clear error for this field when user starts typing
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
   };
 
   const validateForm = () => {
     const errors: FormErrors = {};
-    if (!formData.fullName) errors.fullName = "Nome completo é obrigatório";
-    if (!formData.cpf) errors.cpf = "CPF é obrigatório";
-    if (!formData.cep) errors.cep = "CEP é obrigatório";
-    if (!formData.address) errors.address = "Endereço completo é obrigatório";
+    if (!formData.fullName.trim()) errors.fullName = "Nome completo é obrigatório";
+    if (!formData.cpf.trim()) errors.cpf = "CPF é obrigatório";
+    if (!formData.cep.trim()) errors.cep = "CEP é obrigatório";
+    if (!formData.address.trim()) errors.address = "Endereço completo é obrigatório";
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleCheckout = async () => {
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      console.log("❌ Form validation failed");
+      return;
+    }
+
+    if (isProcessing) {
+      console.log("⚠️ Already processing checkout, ignoring duplicate request");
+      return;
+    }
+
+    console.log("🔄 Starting checkout process...");
+    setIsProcessing(true);
 
     try {
-      // Preparar dados do pedido
+      // Prepare order data
       const orderData = {
-        customer_name: formData.fullName,
-        customer_cpf: formData.cpf,
+        customer_name: formData.fullName.trim(),
+        customer_cpf: formData.cpf.trim(),
         customer_phone: '',
         shipping_address: {
-          street: formData.address.split(',')[0] || formData.address,
+          street: formData.address.split(',')[0]?.trim() || formData.address.trim(),
           number: '0',
           complement: '',
           neighborhood: '',
-          city: formData.address.split(',')[1] || '',
+          city: formData.address.split(',')[1]?.trim() || '',
           state: '',
-          zipcode: formData.cep
+          zipcode: formData.cep.trim()
         },
         payment_method: 'whatsapp',
         total_amount: total,
-        status: 'pending' as const
+        status: 'pending' as const // Order starts as pending until confirmed via WhatsApp
       };
 
-      // Criar pedido no banco
+      console.log("🔄 Creating order in database...", orderData);
+
+      // Create order in database
       const { data: orderResult, error: orderError } = await orderService.createOrder(orderData);
       
       if (orderError) {
-        throw new Error(orderError.message);
+        console.error("❌ Error creating order:", orderError);
+        throw new Error(`Erro ao criar pedido: ${orderError.message}`);
       }
 
-      // Adicionar itens do pedido
-      if (orderResult) {
-        const orderItems = items.map(item => ({
-          order_id: orderResult.id,
-          product_id: item.product.id,
-          product_name: item.product.name,
-          species_name: item.product.speciesName,
-          product_image_url: item.product.images?.[0]?.url,
-          quantity: item.quantity,
-          price: item.product.price
-        }));
-
-        await orderService.addOrderItems(orderItems);
+      if (!orderResult?.id) {
+        console.error("❌ Order creation returned no ID");
+        throw new Error("Erro ao criar pedido: ID não retornado");
       }
 
-      // Prepare the WhatsApp message with the product details and customer information
+      console.log("✅ Order created successfully:", orderResult.id);
+
+      // Add order items
+      const orderItems = items.map(item => ({
+        order_id: orderResult.id,
+        product_id: item.product.id,
+        product_name: item.product.name,
+        species_name: item.product.speciesName || 'Não especificado',
+        product_image_url: item.product.images?.[0]?.url || null,
+        quantity: item.quantity,
+        price: item.product.price
+      }));
+
+      console.log("🔄 Adding order items...", orderItems);
+      const { error: itemsError } = await orderService.addOrderItems(orderItems);
+      
+      if (itemsError) {
+        console.error("❌ Error adding order items:", itemsError);
+        throw new Error(`Erro ao adicionar itens do pedido: ${itemsError.message}`);
+      }
+
+      console.log("✅ Order items added successfully");
+
+      // Prepare WhatsApp message
       const message = encodeURIComponent(
         `Olá! Acabei de finalizar uma compra no site Pet Serpentes.\n\n` +
-        `Pedido: #${orderResult?.id.substring(0, 8)}\n` +
+        `Pedido: #${orderResult.id.substring(0, 8)}\n` +
         `Nome do comprador: ${formData.fullName}\n` +
         `CPF: ${formData.cpf}\n` +
         `CEP: ${formData.cep}\n` +
@@ -162,42 +198,48 @@ const CartPage = () => {
         `Gostaria de confirmar o pedido e combinar os detalhes do envio.`
       );
 
-      // Mark all purchased items as unavailable but still visible
-      items.forEach(item => {
-        try {
-          productService.update(item.product.id, {
-            ...item.product,
-            available: false,
-            status: 'indisponivel',
-            visible: true  // Mantém visível, mas indisponível
-          });
-        } catch (error) {
-          console.error(`Failed to update product status for ${item.product.id}`, error);
-        }
-      });
-
-      // Close dialog and clear cart
+      // Close dialog and show success message
       setIsDialogOpen(false);
       
-      // Show success message
       toast({
-        title: "Pedido enviado",
-        description: "Pedido registrado com sucesso! Você será redirecionado para o WhatsApp.",
+        title: "Pedido criado com sucesso!",
+        description: "Você será redirecionado para o WhatsApp para confirmar o pedido.",
         duration: 3000,
       });
+
+      console.log("✅ Checkout completed successfully, redirecting to WhatsApp...");
       
-      // Redirect to WhatsApp with the pre-filled message
+      // Redirect to WhatsApp and clear cart
       setTimeout(() => {
         window.open(`https://wa.me/5521967802174?text=${message}`, '_blank');
         clearCart();
+        
+        // Reset form for next use
+        setFormData({
+          fullName: '',
+          cpf: '',
+          cep: '',
+          address: ''
+        });
       }, 1500);
+      
     } catch (error) {
-      console.error("Error during checkout:", error);
+      console.error("❌ Checkout process failed:", error);
+      
+      let errorMessage = "Ocorreu um erro inesperado. Por favor, tente novamente.";
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Erro ao processar pedido",
-        description: "Ocorreu um erro ao processar seu pedido. Por favor, tente novamente.",
+        description: errorMessage,
         variant: "destructive",
+        duration: 5000,
       });
+    } finally {
+      setIsProcessing(false);
     }
   };
   
@@ -313,8 +355,12 @@ const CartPage = () => {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button className="w-full" onClick={() => setIsDialogOpen(true)}>
-                  Finalizar Compra
+                <Button 
+                  className="w-full" 
+                  onClick={() => setIsDialogOpen(true)}
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? "Processando..." : "Finalizar Compra"}
                 </Button>
               </CardFooter>
             </Card>
@@ -347,6 +393,7 @@ const CartPage = () => {
                 value={formData.fullName}
                 onChange={handleInputChange}
                 className={formErrors.fullName ? "border-red-500" : ""}
+                disabled={isProcessing}
               />
               {formErrors.fullName && (
                 <p className="text-red-500 text-xs">{formErrors.fullName}</p>
@@ -361,6 +408,7 @@ const CartPage = () => {
                 value={formData.cpf}
                 onChange={handleInputChange}
                 className={formErrors.cpf ? "border-red-500" : ""}
+                disabled={isProcessing}
               />
               {formErrors.cpf && (
                 <p className="text-red-500 text-xs">{formErrors.cpf}</p>
@@ -375,6 +423,7 @@ const CartPage = () => {
                 value={formData.cep}
                 onChange={handleInputChange}
                 className={formErrors.cep ? "border-red-500" : ""}
+                disabled={isProcessing}
               />
               {formErrors.cep && (
                 <p className="text-red-500 text-xs">{formErrors.cep}</p>
@@ -389,6 +438,7 @@ const CartPage = () => {
                 value={formData.address}
                 onChange={handleInputChange}
                 className={formErrors.address ? "border-red-500" : ""}
+                disabled={isProcessing}
               />
               {formErrors.address && (
                 <p className="text-red-500 text-xs">{formErrors.address}</p>
@@ -397,11 +447,18 @@ const CartPage = () => {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsDialogOpen(false)}
+              disabled={isProcessing}
+            >
               Cancelar
             </Button>
-            <Button onClick={handleCheckout}>
-              Finalizar e enviar por WhatsApp
+            <Button 
+              onClick={handleCheckout}
+              disabled={isProcessing}
+            >
+              {isProcessing ? "Processando..." : "Finalizar e enviar por WhatsApp"}
             </Button>
           </DialogFooter>
         </DialogContent>
