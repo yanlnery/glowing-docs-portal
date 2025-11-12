@@ -1,10 +1,52 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Book, Brain, HelpCircle } from "lucide-react";
+import { ArrowRight, Book, Users, Search } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { toast } from "sonner";
 
 export default function EducationalContentSection() {
+  const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    contactPreference: "email"
+  });
+
+  const handleSubmitWaitlist = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      // Prepare waitlist entry
+      const waitlistEntry = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        contactPreference: formData.contactPreference,
+        date: new Date().toISOString()
+      };
+
+      // Get current waitlist entries or initialize empty array
+      const currentEntries = JSON.parse(localStorage.getItem('waitlist') || '[]');
+      localStorage.setItem('waitlist', JSON.stringify([...currentEntries, waitlistEntry]));
+
+      toast.success("Inscrição realizada com sucesso! Entraremos em contato em breve.");
+      setIsWaitlistOpen(false);
+      setFormData({ name: "", email: "", phone: "", contactPreference: "email" });
+    } catch (error: any) {
+      toast.error("Erro ao fazer inscrição. Tente novamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <section className="py-16 bg-background">
       <div className="container px-4 sm:px-6">
@@ -41,7 +83,7 @@ export default function EducationalContentSection() {
           {/* Card 2: Pet Serpentes Academy */}
           <div className="docs-card-gradient p-6 rounded-lg border hover:shadow-md transition-all group">
             <div className="h-16 w-16 rounded-full bg-serpente-100 text-serpente-600 flex items-center justify-center mb-6 group-hover:bg-serpente-200 transition-colors dark:bg-serpente-900/50">
-              <Brain className="h-8 w-8" />
+              <Users className="h-8 w-8" />
             </div>
             <h3 className="font-bold text-xl mb-4">Pet Serpentes Academy</h3>
             <p className="text-muted-foreground mb-6 min-h-[80px]">
@@ -50,34 +92,112 @@ export default function EducationalContentSection() {
             <Button
               className="w-full group-hover:translate-y-[-2px] transition-transform"
               variant="outline"
-              asChild
+              onClick={() => setIsWaitlistOpen(true)}
             >
-              <Link to="/ps-academy" className="flex items-center justify-center">
-                Entrar na Academy <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
+              Entrar na Lista de Espera <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
 
-          {/* Card 3: Descubra seu Animal Ideal */}
+          {/* Card 3: Conheça nossas Espécies */}
           <div className="docs-card-gradient p-6 rounded-lg border hover:shadow-md transition-all group">
             <div className="h-16 w-16 rounded-full bg-serpente-100 text-serpente-600 flex items-center justify-center mb-6 group-hover:bg-serpente-200 transition-colors dark:bg-serpente-900/50">
-              <HelpCircle className="h-8 w-8" />
+              <Search className="h-8 w-8" />
             </div>
-            <h3 className="font-bold text-xl mb-4">Descubra seu Animal Ideal</h3>
+            <h3 className="font-bold text-xl mb-4">Conheça nossas Espécies</h3>
             <p className="text-muted-foreground mb-6 min-h-[80px]">
-              Teste interativo para saber qual espécie combina com seu estilo de vida.
+              Explore nosso catálogo completo de espécies e encontre o réptil ideal para você.
             </p>
             <Button
               className="w-full group-hover:translate-y-[-2px] transition-transform"
               variant="outline"
               asChild
             >
-              <Link to="/quiz" className="flex items-center justify-center">
-                Fazer o Quiz <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              <Link to="/especies-criadas" className="flex items-center justify-center">
+                Conheça nossas Espécies <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
           </div>
         </div>
+
+        {/* Waitlist Dialog */}
+        <Dialog open={isWaitlistOpen} onOpenChange={setIsWaitlistOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-center">Entre para nossa lista de espera</DialogTitle>
+              <DialogDescription className="text-center">
+                Seja o primeiro a saber quando a Pet Serpentes Academy abrir suas portas
+              </DialogDescription>
+            </DialogHeader>
+
+            <form onSubmit={handleSubmitWaitlist} className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Nome completo</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Seu nome"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">E-mail</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="seu@email.com"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone">Celular / WhatsApp</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="(00) 00000-0000"
+                  required
+                />
+              </div>
+
+              <div className="space-y-3">
+                <Label>Como prefere ser contatado?</Label>
+                <RadioGroup
+                  value={formData.contactPreference}
+                  onValueChange={(value) => setFormData({ ...formData, contactPreference: value })}
+                  className="flex flex-col space-y-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="email" id="email-only" />
+                    <label htmlFor="email-only" className="text-sm font-medium leading-none cursor-pointer">
+                      Desejo ser contatado apenas por e-mail
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="both" id="both" />
+                    <label htmlFor="both" className="text-sm font-medium leading-none cursor-pointer">
+                      Autorizo contato por e-mail e celular
+                    </label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button type="button" variant="outline" onClick={() => setIsWaitlistOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Cadastrando..." : "Cadastrar"}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </section>
   );

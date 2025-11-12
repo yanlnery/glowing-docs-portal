@@ -17,7 +17,6 @@ import Academy from "./pages/Academy";
 import Contact from "./pages/Contact";
 import ClientArea from "./pages/ClientArea";
 import NotFound from "./pages/NotFound";
-import Quiz from "./pages/Quiz";
 import WaitlistForm from "./pages/WaitlistForm";
 import CartPage from "./pages/CartPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
@@ -143,7 +142,6 @@ function App() {
                   </Route>
                   
                   <Route path="carrinho" element={<CartPage />} />
-                  <Route path="quiz" element={<Quiz />} />
                   <Route path="manuais-de-criacao" element={<Manuals />} />
                   
                   
