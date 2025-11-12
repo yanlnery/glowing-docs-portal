@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCartStore } from '@/stores/cartStore';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -38,6 +39,8 @@ interface FormErrors {
 
 const CartPage = () => {
   const { items, removeFromCart, clearCart } = useCartStore();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [formData, setFormData] = useState<CheckoutFormData>({
@@ -114,6 +117,22 @@ const CartPage = () => {
   };
 
   const handleCheckout = async () => {
+    // Check authentication first
+    if (!user) {
+      toast({
+        title: "Login necessário",
+        description: "Você precisa estar logado para finalizar a compra. Redirecionando para o login...",
+        variant: "destructive",
+        duration: 3000,
+      });
+      
+      setTimeout(() => {
+        navigate('/auth/login', { state: { from: '/carrinho' } });
+      }, 1500);
+      
+      return;
+    }
+
     if (!validateForm()) {
       console.log("❌ Form validation failed");
       return;
@@ -128,8 +147,9 @@ const CartPage = () => {
     setIsProcessing(true);
 
     try {
-      // Prepare order data
+      // Prepare order data with user_id
       const orderData = {
+        user_id: user.id,
         customer_name: formData.fullName.trim(),
         customer_cpf: formData.cpf.trim(),
         customer_phone: '',
@@ -357,7 +377,18 @@ const CartPage = () => {
               <CardFooter>
                 <Button 
                   className="w-full" 
-                  onClick={() => setIsDialogOpen(true)}
+                  onClick={() => {
+                    if (!user) {
+                      toast({
+                        title: "Login necessário",
+                        description: "Você precisa estar logado para finalizar a compra.",
+                        variant: "destructive",
+                      });
+                      navigate('/auth/login', { state: { from: '/carrinho' } });
+                      return;
+                    }
+                    setIsDialogOpen(true);
+                  }}
                   disabled={isProcessing}
                 >
                   {isProcessing ? "Processando..." : "Finalizar Compra"}
