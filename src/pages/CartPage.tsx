@@ -207,7 +207,7 @@ const CartPage = () => {
 
       // Prepare WhatsApp message
       const message = encodeURIComponent(
-        `Olá! Acabei de finalizar uma compra no site Pet Serpentes.\n\n` +
+        `Olá! Acabei de finalizar um pedido no site Pet Serpentes.\n\n` +
         `Pedido: #${orderResult.id.substring(0, 8)}\n` +
         `Nome do comprador: ${formData.fullName}\n` +
         `CPF: ${formData.cpf}\n` +
