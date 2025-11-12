@@ -112,7 +112,7 @@ export default function EducationalContentSection() {
               variant="outline"
               asChild
             >
-              <Link to="/especies-criadas" className="flex items-center justify-center">
+              <Link to="/especies" className="flex items-center justify-center">
                 Conheça nossas Espécies <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
