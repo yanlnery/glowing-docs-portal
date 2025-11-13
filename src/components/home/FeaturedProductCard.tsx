@@ -1,10 +1,12 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { Product } from "@/types/product";
 import { getProductImageUrl } from "@/utils/productImageUtils";
+import { useCartStore } from "@/stores/cartStore";
+import { ShoppingCart } from "lucide-react";
+import { toast } from "sonner";
 
 interface FeaturedProductCardProps {
   product: Product;
@@ -12,6 +14,8 @@ interface FeaturedProductCardProps {
 }
 
 export default function FeaturedProductCard({ product, index }: FeaturedProductCardProps) {
+  const addToCart = useCartStore((state) => state.addToCart);
+  
   console.log(`📱 MOBILE - Renderizando produto ${index}:`, { 
     id: product.id, 
     name: product.name, 
@@ -20,6 +24,13 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
   });
   
   const imageUrl = getProductImageUrl(product);
+  
+  const handleAddToCart = () => {
+    if (product.status === 'disponivel') {
+      addToCart(product, 1);
+      toast.success(`${product.name} adicionado ao carrinho!`);
+    }
+  };
   
   return (
     <div 
@@ -33,12 +44,7 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
       onLoad={() => console.log(`📱 Product ${index} container loaded`)}
     >
       <div 
-        className="relative overflow-hidden"
-        style={{
-          height: "160px",
-          minHeight: "160px",
-          width: "100%"
-        }}
+        className="relative overflow-hidden aspect-square"
       >
         <OptimizedImage
           src={imageUrl || "/placeholder.svg"}
@@ -69,18 +75,26 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
         <h3 className="font-bold text-sm sm:text-base md:text-lg mb-1 line-clamp-1">
           <em>{product.speciesName}</em>
         </h3>
-        <p className="text-muted-foreground text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-1">{product.name}</p>
-        <div className="flex justify-end items-center">
+        <p className="text-muted-foreground text-xs sm:text-sm mb-2 line-clamp-1">{product.name}</p>
+        <div className="flex justify-between items-center gap-2">
+          <p className="text-lg sm:text-xl font-bold text-serpente-600">
+            R$ {product.price.toFixed(2).replace('.', ',')}
+          </p>
           <Button
-            variant={product.status === 'indisponivel' ? "secondary" : "outline"}
+            variant={product.status === 'indisponivel' ? "secondary" : "default"}
             size="sm"
-            className="min-h-[40px] sm:min-h-[44px] w-full sm:w-auto text-xs sm:text-sm touch-manipulation"
-            asChild
+            className="min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm touch-manipulation"
+            onClick={handleAddToCart}
             disabled={product.status === 'indisponivel'}
           >
-            <Link to={`/produtos/${product.id}`}>
-              {product.status === 'indisponivel' ? 'Esgotado' : 'Ver Detalhes'}
-            </Link>
+            {product.status === 'indisponivel' ? (
+              'Esgotado'
+            ) : (
+              <>
+                <ShoppingCart className="w-4 h-4 mr-1" />
+                Adicionar
+              </>
+            )}
           </Button>
         </div>
       </div>
