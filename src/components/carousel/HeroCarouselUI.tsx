@@ -182,7 +182,7 @@ export default function HeroCarouselUI({
       </div>
 
       {/* Seção Nossas Espécies - FORA do carrossel, logo abaixo */}
-      <div className="bg-background py-6 sm:py-8 md:py-10 pb-12 sm:pb-16 md:pb-20">
+      <div className="bg-background reptile-scales-bg py-6 sm:py-8 md:py-10 pb-12 sm:pb-16 md:pb-20">
         <div className="container px-4 sm:px-6 md:px-8 lg:px-10">
           {/* Título centralizado com barrinha verde */}
           <div className="flex justify-center mb-4 sm:mb-6">
