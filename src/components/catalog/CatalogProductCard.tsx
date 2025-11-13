@@ -77,9 +77,9 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
           <OptimizedImage
             src={imageUrl || '/placeholder.svg'}
             alt={product.name}
-            priority={index < 4}
-            quality={95}
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            priority={index < 8}
+            quality={100}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className="w-full h-full"
             style={{
               objectFit: "cover",
@@ -87,7 +87,8 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
               width: "100%",
               height: "100%",
               transform: "scale(1)",
-              transition: "transform 0.3s ease"
+              transition: "transform 0.3s ease",
+              imageRendering: "auto"
             }}
             onLoad={() => console.log(`✅ CATALOG MOBILE - Produto ${product.name} imagem carregada no catálogo`)}
           />
