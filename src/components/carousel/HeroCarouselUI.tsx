@@ -147,14 +147,14 @@ export default function HeroCarouselUI({
           </CarouselContent>
         </Carousel>
 
-        {/* Overlay com conteúdo - título e subtítulo no canto superior esquerdo mobile, centralizado desktop */}
-        <div className="absolute inset-0 z-30 flex flex-col items-start justify-start pt-6 md:items-start md:justify-center md:pt-0 pointer-events-none">
-          <div className="container py-4 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto flex justify-start">
-            <div className="bg-black/40 backdrop-blur-[2px] p-3 md:bg-transparent md:backdrop-blur-none md:p-0">
-              <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-1 sm:mb-3 max-w-[250px] md:max-w-2xl animate-fade-in text-balance text-left">
+        {/* Overlay com conteúdo - superior esquerdo no mobile, inferior direito no desktop */}
+        <div className="absolute inset-0 z-30 flex flex-col items-start justify-start pt-6 md:items-end md:justify-end md:pt-0 md:pb-20 pointer-events-none">
+          <div className="container py-4 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto flex justify-start md:justify-end">
+            <div className="bg-black/40 backdrop-blur-[2px] p-3 md:bg-black/40 md:backdrop-blur-[2px] md:p-4">
+              <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-1 sm:mb-3 max-w-[250px] md:max-w-2xl animate-fade-in text-balance text-left md:text-right">
                 {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
               </h1>
-              <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/95 font-medium max-w-[200px] md:max-w-xl mb-0 sm:mb-6 animate-fade-in text-balance line-clamp-3 sm:line-clamp-none text-left">
+              <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/95 font-medium max-w-[200px] md:max-w-xl mb-0 animate-fade-in text-balance line-clamp-3 sm:line-clamp-none text-left md:text-right">
                 {currentSlideData.subtitle || "Conheça nossa coleção de répteis exóticos"}
               </p>
             </div>
