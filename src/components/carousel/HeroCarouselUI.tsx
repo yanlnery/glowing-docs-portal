@@ -76,7 +76,7 @@ export default function HeroCarouselUI({
   return (
     <div className="relative w-full">
       {/* Container principal com altura otimizada para mobile */}
-      <div className="relative h-[500px] md:h-[60vh] lg:h-[70vh] overflow-hidden">
+      <div className="relative h-[500px] md:h-[65vh] lg:h-[75vh] overflow-hidden">
         <Carousel
           setApi={setApi}
           opts={{
@@ -147,14 +147,14 @@ export default function HeroCarouselUI({
           </CarouselContent>
         </Carousel>
 
-        {/* Overlay com conteúdo - título e subtítulo no canto superior direito para mobile */}
-        <div className="absolute inset-0 z-30 flex flex-col items-end justify-start pt-6 md:items-start md:justify-center md:pt-0 pointer-events-none">
-          <div className="container py-4 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto flex justify-end md:justify-start">
-            <div className="bg-black/60 backdrop-blur-sm rounded-lg p-3 md:bg-transparent md:backdrop-blur-none md:p-0">
-              <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-1 sm:mb-3 max-w-[250px] md:max-w-2xl animate-fade-in text-balance text-right md:text-left">
+        {/* Overlay com conteúdo - título e subtítulo no canto superior esquerdo mobile, centralizado desktop */}
+        <div className="absolute inset-0 z-30 flex flex-col items-start justify-start pt-6 md:items-start md:justify-center md:pt-0 pointer-events-none">
+          <div className="container py-4 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto flex justify-start">
+            <div className="bg-black/40 backdrop-blur-[2px] rounded-lg p-3 md:bg-transparent md:backdrop-blur-none md:p-0">
+              <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-1 sm:mb-3 max-w-[250px] md:max-w-2xl animate-fade-in text-balance text-left">
                 {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
               </h1>
-              <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/95 font-medium max-w-[200px] md:max-w-xl mb-0 sm:mb-6 animate-fade-in text-balance line-clamp-3 sm:line-clamp-none text-right md:text-left">
+              <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/95 font-medium max-w-[200px] md:max-w-xl mb-0 sm:mb-6 animate-fade-in text-balance line-clamp-3 sm:line-clamp-none text-left">
                 {currentSlideData.subtitle || "Conheça nossa coleção de répteis exóticos"}
               </p>
             </div>
@@ -183,14 +183,14 @@ export default function HeroCarouselUI({
 
       {/* Botões de ação - sempre abaixo do carrossel */}
       <div className="relative">
-        <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-4">
-          <div className="flex flex-col gap-2 w-full items-center justify-center md:justify-start md:flex-row md:gap-3">
+        <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-3 md:py-2">
+          <div className="flex flex-col gap-2 w-full items-center justify-center md:flex-row md:gap-3">
             <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base touch-manipulation" asChild>
               <Link to="/catalogo">
                 Animais Disponíveis <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button variant="outline" size="lg" className="border-serpente-600 text-serpente-600 hover:bg-serpente-600 hover:text-white min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base touch-manipulation" asChild>
+            <Button variant="outline" size="lg" className="bg-white border-2 border-serpente-600 text-serpente-600 hover:bg-serpente-600 hover:text-white shadow-lg min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base touch-manipulation" asChild>
               <Link to="/sobre">
                 Conheça nossa História
               </Link>
