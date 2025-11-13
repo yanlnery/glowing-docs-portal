@@ -54,11 +54,11 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
       <div 
         className="relative overflow-hidden aspect-square"
       >
-        <OptimizedImage
+          <OptimizedImage
           src={imageUrl || "/placeholder.svg"}
           alt={product.name}
           priority={index === 0}
-          quality={80}
+          quality={95}
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           className="w-full h-full"
           style={{
@@ -94,16 +94,16 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
           )}
           
           <div className="space-y-0.5">
-            <p className="text-lg sm:text-xl font-bold text-serpente-600">
+            <p className="text-lg sm:text-xl font-bold text-serpente-600 dark:text-serpente-400">
               R$ {product.price.toFixed(2).replace('.', ',')}
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground dark:text-gray-300">
               em até 10x sem juros
             </p>
           </div>
           
           {product.pixPrice && (
-            <p className="text-sm font-semibold text-green-600">
+            <p className="text-sm font-semibold text-green-600 dark:text-green-400">
               R$ {product.pixPrice.toFixed(2).replace('.', ',')} no PIX (10% OFF)
             </p>
           )}

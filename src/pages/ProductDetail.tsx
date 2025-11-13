@@ -175,13 +175,23 @@ const ProductDetail = () => {
               </p>
             </div>
             
-            <div>
-              <div className="text-3xl font-bold text-serpente-600">
+            <div className="space-y-2">
+              {product.originalPrice && (
+                <div className="text-sm text-muted-foreground line-through">
+                  De {formatPrice(product.originalPrice)}
+                </div>
+              )}
+              
+              <div className="text-3xl font-bold text-serpente-600 dark:text-serpente-400">
                 {formatPrice(product.price)}
               </div>
-              {product.meta?.oldPrice && product.meta.oldPrice > 0 && (
-                <div className="text-sm text-muted-foreground line-through">
-                  {formatPrice(product.meta.oldPrice)}
+              <p className="text-sm text-muted-foreground dark:text-gray-300">
+                em até 10x sem juros
+              </p>
+              
+              {product.pixPrice && (
+                <div className="text-xl font-semibold text-green-600 dark:text-green-400">
+                  {formatPrice(product.pixPrice)} no PIX (10% OFF)
                 </div>
               )}
             </div>

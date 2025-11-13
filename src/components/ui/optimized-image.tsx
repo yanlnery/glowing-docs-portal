@@ -17,7 +17,7 @@ export function OptimizedImage({
   src,
   alt,
   priority = false,
-  quality = 75,
+  quality = 95,
   sizes = '100vw',
   className,
   onLoad,
