@@ -1,11 +1,11 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { Product } from "@/types/product";
 import { getProductImageUrl } from "@/utils/productImageUtils";
 import { useCartStore } from "@/stores/cartStore";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Check } from "lucide-react";
 import { toast } from "sonner";
 
 interface FeaturedProductCardProps {
@@ -15,6 +15,7 @@ interface FeaturedProductCardProps {
 
 export default function FeaturedProductCard({ product, index }: FeaturedProductCardProps) {
   const addToCart = useCartStore((state) => state.addToCart);
+  const [isAdding, setIsAdding] = useState(false);
   
   console.log(`📱 MOBILE - Renderizando produto ${index}:`, { 
     id: product.id, 
@@ -27,8 +28,15 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
   
   const handleAddToCart = () => {
     if (product.status === 'disponivel') {
+      setIsAdding(true);
       addToCart(product, 1);
-      toast.success(`${product.name} adicionado ao carrinho!`);
+      toast.success(`${product.name} adicionado ao carrinho!`, {
+        duration: 2000,
+      });
+      
+      setTimeout(() => {
+        setIsAdding(false);
+      }, 1500);
     }
   };
   
@@ -83,12 +91,19 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
           <Button
             variant={product.status === 'indisponivel' ? "secondary" : "default"}
             size="sm"
-            className="min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm touch-manipulation"
+            className={`min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm touch-manipulation transition-all ${
+              isAdding ? 'animate-pulse bg-green-600 hover:bg-green-600' : ''
+            }`}
             onClick={handleAddToCart}
             disabled={product.status === 'indisponivel'}
           >
             {product.status === 'indisponivel' ? (
               'Esgotado'
+            ) : isAdding ? (
+              <>
+                <Check className="w-4 h-4 mr-1 animate-bounce" />
+                Adicionado!
+              </>
             ) : (
               <>
                 <ShoppingCart className="w-4 h-4 mr-1" />
