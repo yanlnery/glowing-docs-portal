@@ -139,7 +139,7 @@ export default function HeroCarouselUI({
                         </div>
                       </div>
                     )}
-                    <div className="absolute inset-y-0 left-0 w-full sm:w-[55%] bg-gradient-to-r from-black/70 via-black/50 to-transparent z-20" />
+                    <div className="hidden md:block absolute inset-y-0 left-0 w-full sm:w-[55%] bg-gradient-to-r from-black/70 via-black/50 to-transparent z-20" />
                   </div>
                 </CarouselItem>
               );
@@ -147,15 +147,17 @@ export default function HeroCarouselUI({
           </CarouselContent>
         </Carousel>
 
-        {/* Overlay com conteúdo - título e subtítulo no canto inferior esquerdo para mobile */}
-        <div className="absolute inset-0 z-30 flex flex-col items-start justify-end pb-20 md:justify-center md:pb-0 pointer-events-none">
-          <div className="container py-6 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto">
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-xs md:max-w-2xl animate-fade-in text-balance drop-shadow-lg">
-              {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
-            </h1>
-            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/95 font-medium max-w-[200px] md:max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance line-clamp-3 sm:line-clamp-none drop-shadow-md">
-              {currentSlideData.subtitle || "Conheça nossa coleção de répteis exóticos"}
-            </p>
+        {/* Overlay com conteúdo - título e subtítulo no canto superior direito para mobile */}
+        <div className="absolute inset-0 z-30 flex flex-col items-end justify-start pt-6 md:items-start md:justify-center md:pt-0 pointer-events-none">
+          <div className="container py-4 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto flex justify-end md:justify-start">
+            <div className="bg-black/60 backdrop-blur-sm rounded-lg p-3 md:bg-transparent md:backdrop-blur-none md:p-0">
+              <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-1 sm:mb-3 max-w-[250px] md:max-w-2xl animate-fade-in text-balance text-right md:text-left">
+                {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
+              </h1>
+              <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/95 font-medium max-w-[200px] md:max-w-xl mb-0 sm:mb-6 animate-fade-in text-balance line-clamp-3 sm:line-clamp-none text-right md:text-left">
+                {currentSlideData.subtitle || "Conheça nossa coleção de répteis exóticos"}
+              </p>
+            </div>
           </div>
         </div>
         
