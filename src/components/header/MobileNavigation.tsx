@@ -91,7 +91,9 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
 
         {/* Navigation menu */}
         <ul className="flex flex-col space-y-2">
-          {menuItems.map((item) => (
+          {menuItems
+            .filter(item => item.path !== '/academy') // Hide Academy on mobile
+            .map((item) => (
             <li key={item.title}>
               <Link
                 to={item.path}

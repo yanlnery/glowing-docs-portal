@@ -76,7 +76,7 @@ export default function HeroCarouselUI({
   return (
     <div className="relative w-full">
       {/* Container principal com altura otimizada para mobile */}
-      <div className="relative min-h-[calc(100vh-200px)] md:h-[60vh] lg:h-[70vh] overflow-hidden">
+      <div className="relative h-[500px] md:h-[60vh] lg:h-[70vh] overflow-hidden">
         <Carousel
           setApi={setApi}
           opts={{
@@ -119,7 +119,7 @@ export default function HeroCarouselUI({
                         className="w-full h-full opacity-100"
                         style={{
                           width: "100%",
-                          height: "100%",
+                          height: "500px",
                           objectFit: "cover",
                           objectPosition: "center",
                           position: "relative",
@@ -148,12 +148,12 @@ export default function HeroCarouselUI({
         </Carousel>
 
         {/* Overlay com conteúdo - posicionamento melhorado */}
-        <div className="absolute inset-0 z-30 flex flex-col items-start justify-center pb-32 sm:pb-20 md:pb-0 pointer-events-none">
+        <div className="absolute inset-0 z-30 flex flex-col items-start justify-center pb-24 md:pb-0 pointer-events-none">
           <div className="container py-6 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto">
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-2xl animate-fade-in text-balance">
+            <h1 className="text-2xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-2xl animate-fade-in text-balance drop-shadow-lg">
               {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
             </h1>
-            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/90 font-medium max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance line-clamp-2 sm:line-clamp-none">
+            <p className="text-sm sm:text-sm md:text-base lg:text-lg text-white/95 font-medium max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance line-clamp-2 sm:line-clamp-none drop-shadow-md">
               {currentSlideData.subtitle || "Conheça nossa coleção de répteis exóticos"}
             </p>
           </div>
@@ -161,7 +161,7 @@ export default function HeroCarouselUI({
         
         {/* Indicadores - posicionamento otimizado para mobile */}
         {carouselImagesData.length > 1 && (
-          <div className="absolute bottom-24 sm:bottom-4 md:bottom-6 left-0 right-0 flex justify-center space-x-2 z-40">
+          <div className="absolute bottom-16 sm:bottom-4 md:bottom-6 left-0 right-0 flex justify-center space-x-2 z-40">
             {carouselImagesData.map((_, index) => (
               <button
                 key={`indicator-${index}`}
@@ -180,9 +180,9 @@ export default function HeroCarouselUI({
       </div>
 
       {/* Botões de ação - posicionamento mais próximo da imagem no mobile */}
-      <div className="absolute bottom-6 left-0 right-0 z-30 md:relative md:bottom-auto md:left-auto md:right-auto md:z-auto">
-        <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-6 md:py-0 md:absolute md:bottom-40 md:left-1/2 md:-translate-x-1/2 md:z-30 md:pointer-events-auto">
-          <div className="flex flex-col gap-3 w-full items-center justify-center md:justify-start md:flex-row">
+      <div className="absolute bottom-2 left-0 right-0 z-30 md:relative md:bottom-auto md:left-auto md:right-auto md:z-auto">
+        <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-2 sm:py-6 md:py-0 md:absolute md:bottom-40 md:left-1/2 md:-translate-x-1/2 md:z-30 md:pointer-events-auto">
+          <div className="flex flex-col gap-2 w-full items-center justify-center md:justify-start md:flex-row md:gap-3">
             <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base touch-manipulation" asChild>
               <Link to="/catalogo">
                 Animais Disponíveis <ArrowRight className="ml-2 h-4 w-4" />
