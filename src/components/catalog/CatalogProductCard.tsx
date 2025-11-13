@@ -122,11 +122,11 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
         <CardTitle className="text-sm sm:text-base text-balance line-clamp-2">{product.name}</CardTitle>
       </CardHeader>
       
-      <CardContent className="p-2 sm:p-3 pt-0 pb-1 sm:pb-2">
+      <CardContent className="p-2 sm:p-3 pt-0 pb-1 sm:pb-2 flex-1">
         <p className="text-xs sm:text-sm text-muted-foreground italic mb-2 line-clamp-1">{product.speciesName}</p>
         
         {/* Preços - Layout compacto no mobile */}
-        <div className="space-y-1 bg-muted/30 p-2 rounded-md">
+        <div className="space-y-1">
           {product.originalPrice && (
             <p className="text-[10px] sm:text-xs text-muted-foreground line-through">
               De {formatPrice(product.originalPrice)}
@@ -150,7 +150,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
         </div>
       </CardContent>
       
-      <CardFooter className="p-2 sm:p-3 pt-0 mt-auto">
+      <CardFooter className="p-2 sm:p-3 pt-1 sm:pt-2">
         <div className="flex gap-2 w-full">
           <Button 
             variant="outline" 
