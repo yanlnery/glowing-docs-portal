@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Waves, Footprints, Shell } from "lucide-react";
+
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
@@ -185,59 +185,76 @@ export default function HeroCarouselUI({
       <div className="bg-background py-6 sm:py-8 md:py-10">
         <div className="container px-4 sm:px-6 md:px-8 lg:px-10">
           {/* Título centralizado */}
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 sm:mb-8 text-foreground">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 text-foreground">
             Nossas Espécies
           </h2>
           
-          {/* Grid com 3 ícones */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto">
+          {/* Grid com 3 imagens */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-12 max-w-5xl mx-auto">
+            
             {/* Card Serpentes */}
             <Link 
               to="/catalogo?category=serpente" 
-              className="group flex flex-col items-center justify-center bg-gradient-to-br from-serpente-50 to-serpente-100 dark:from-serpente-900/20 dark:to-serpente-800/20 rounded-xl p-6 sm:p-8 border-2 border-serpente-200 dark:border-serpente-700 hover:border-serpente-500 dark:hover:border-serpente-500 hover:shadow-xl transition-all duration-300 hover:scale-105 touch-manipulation min-h-[180px] sm:min-h-[200px]"
+              className="group flex flex-col items-center justify-center touch-manipulation"
             >
-              <div className="w-16 h-16 sm:w-20 sm:h-20 mb-3 sm:mb-4 rounded-full bg-serpente-500/10 flex items-center justify-center group-hover:bg-serpente-500/20 transition-colors">
-                <Waves className="w-8 h-8 sm:w-10 sm:h-10 text-serpente-600 dark:text-serpente-400" strokeWidth={2.5} />
+              {/* Container da imagem com efeito hover */}
+              <div className="relative w-full max-w-[280px] aspect-square mb-4 sm:mb-6 transition-transform duration-300 group-hover:scale-110">
+                <img
+                  src="/lovable-uploads/species-snake.png"
+                  alt="Serpente"
+                  className="w-full h-full object-contain drop-shadow-xl"
+                  loading="lazy"
+                />
               </div>
-              <span className="text-lg sm:text-xl font-bold text-serpente-700 dark:text-serpente-300 group-hover:text-serpente-800 dark:group-hover:text-serpente-200 transition-colors">
+              
+              {/* Título */}
+              <span className="text-xl sm:text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
                 Serpentes
-              </span>
-              <span className="text-xs sm:text-sm text-serpente-600/70 dark:text-serpente-400/70 mt-2 text-center">
-                Ver todas as serpentes
               </span>
             </Link>
 
             {/* Card Lagartos */}
             <Link 
               to="/catalogo?category=lagarto" 
-              className="group flex flex-col items-center justify-center bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl p-6 sm:p-8 border-2 border-green-200 dark:border-green-700 hover:border-green-500 dark:hover:border-green-500 hover:shadow-xl transition-all duration-300 hover:scale-105 touch-manipulation min-h-[180px] sm:min-h-[200px]"
+              className="group flex flex-col items-center justify-center touch-manipulation"
             >
-              <div className="w-16 h-16 sm:w-20 sm:h-20 mb-3 sm:mb-4 rounded-full bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
-                <Footprints className="w-8 h-8 sm:w-10 sm:h-10 text-green-600 dark:text-green-400" strokeWidth={2.5} />
+              {/* Container da imagem com efeito hover */}
+              <div className="relative w-full max-w-[280px] aspect-square mb-4 sm:mb-6 transition-transform duration-300 group-hover:scale-110">
+                <img
+                  src="/lovable-uploads/species-lizard.png"
+                  alt="Lagarto"
+                  className="w-full h-full object-contain drop-shadow-xl"
+                  loading="lazy"
+                />
               </div>
-              <span className="text-lg sm:text-xl font-bold text-green-700 dark:text-green-300 group-hover:text-green-800 dark:group-hover:text-green-200 transition-colors">
+              
+              {/* Título */}
+              <span className="text-xl sm:text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
                 Lagartos
-              </span>
-              <span className="text-xs sm:text-sm text-green-600/70 dark:text-green-400/70 mt-2 text-center">
-                Ver todos os lagartos
               </span>
             </Link>
 
             {/* Card Quelônios */}
             <Link 
               to="/catalogo?category=quelonio" 
-              className="group flex flex-col items-center justify-center bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 rounded-xl p-6 sm:p-8 border-2 border-amber-200 dark:border-amber-700 hover:border-amber-500 dark:hover:border-amber-500 hover:shadow-xl transition-all duration-300 hover:scale-105 touch-manipulation min-h-[180px] sm:min-h-[200px]"
+              className="group flex flex-col items-center justify-center touch-manipulation"
             >
-              <div className="w-16 h-16 sm:w-20 sm:h-20 mb-3 sm:mb-4 rounded-full bg-amber-500/10 flex items-center justify-center group-hover:bg-amber-500/20 transition-colors">
-                <Shell className="w-8 h-8 sm:w-10 sm:h-10 text-amber-600 dark:text-amber-400" strokeWidth={2.5} />
+              {/* Container da imagem com efeito hover */}
+              <div className="relative w-full max-w-[280px] aspect-square mb-4 sm:mb-6 transition-transform duration-300 group-hover:scale-110">
+                <img
+                  src="/lovable-uploads/species-turtle.png"
+                  alt="Quelônio"
+                  className="w-full h-full object-contain drop-shadow-xl"
+                  loading="lazy"
+                />
               </div>
-              <span className="text-lg sm:text-xl font-bold text-amber-700 dark:text-amber-300 group-hover:text-amber-800 dark:group-hover:text-amber-200 transition-colors">
+              
+              {/* Título */}
+              <span className="text-xl sm:text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
                 Quelônios
               </span>
-              <span className="text-xs sm:text-sm text-amber-600/70 dark:text-amber-400/70 mt-2 text-center">
-                Ver todos os quelônios
-              </span>
             </Link>
+            
           </div>
         </div>
       </div>
