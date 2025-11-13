@@ -150,7 +150,7 @@ export default function HeroCarouselUI({
         {/* Overlay com conteúdo - título e subtítulo no canto superior esquerdo mobile, centralizado desktop */}
         <div className="absolute inset-0 z-30 flex flex-col items-start justify-start pt-6 md:items-start md:justify-center md:pt-0 pointer-events-none">
           <div className="container py-4 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto flex justify-start">
-            <div className="bg-black/40 backdrop-blur-[2px] rounded-lg p-3 md:bg-transparent md:backdrop-blur-none md:p-0">
+            <div className="bg-black/40 backdrop-blur-[2px] p-3 md:bg-transparent md:backdrop-blur-none md:p-0">
               <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-1 sm:mb-3 max-w-[250px] md:max-w-2xl animate-fade-in text-balance text-left">
                 {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
               </h1>
