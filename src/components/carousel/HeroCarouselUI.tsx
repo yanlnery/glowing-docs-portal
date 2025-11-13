@@ -161,9 +161,9 @@ export default function HeroCarouselUI({
           </div>
         </div>
         
-        {/* Indicadores - posicionados dentro do carrossel */}
+        {/* Indicadores - sobrepostos à imagem do carrossel */}
         {carouselImagesData.length > 1 && (
-          <div className="absolute bottom-6 sm:bottom-6 md:bottom-40 left-0 right-0 flex justify-center space-x-2 z-40">
+          <div className="absolute bottom-4 md:bottom-8 left-0 right-0 flex justify-center space-x-2 z-50">
             {carouselImagesData.map((_, index) => (
               <button
                 key={`indicator-${index}`}
@@ -182,8 +182,8 @@ export default function HeroCarouselUI({
       </div>
 
       {/* Botões de ação - sempre abaixo do carrossel */}
-      <div className="relative">
-        <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-3 md:py-2">
+      <div className="relative bg-background">
+        <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-2 md:py-2">
           <div className="flex flex-col gap-2 w-full items-center justify-center md:flex-row md:gap-3">
             <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base touch-manipulation" asChild>
               <Link to="/catalogo">

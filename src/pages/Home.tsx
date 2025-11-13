@@ -14,7 +14,7 @@ export default function Home() {
   return (
     <div className="flex flex-col w-full">
       {/* Hero Carousel Section */}
-      <section className="relative">
+      <section className="relative mb-0">
         <HeroCarousel />
       </section>
 
