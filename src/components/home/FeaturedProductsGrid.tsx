@@ -9,9 +9,12 @@ interface FeaturedProductsGridProps {
 }
 
 export default function FeaturedProductsGrid({ products }: FeaturedProductsGridProps) {
+  // Limita para 8 produtos (2 fileiras x 4 colunas)
+  const displayedProducts = products.slice(0, 8);
+  
   return (
     <div 
-      className="w-full min-h-[300px] grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-6 sm:mt-8"
+      className="w-full min-h-[300px] grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-6 sm:mt-8"
       style={{ 
         minHeight: "300px", 
         height: "auto",
@@ -20,8 +23,8 @@ export default function FeaturedProductsGrid({ products }: FeaturedProductsGridP
       }}
       onLoad={() => console.log("📱 Grid container loaded")}
     >
-      {products.length > 0 ? (
-        products.map((product, index) => (
+      {displayedProducts.length > 0 ? (
+        displayedProducts.map((product, index) => (
           <FeaturedProductCard 
             key={product.id} 
             product={product} 
