@@ -1,15 +1,26 @@
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { productService } from '@/services/productService';
 import { Product, ProductCategory, ProductSubcategory } from '@/types/product';
 
 export const useCatalogData = () => {
+  const [searchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<ProductCategory | 'all'>('all');
   const [subcategoryFilter, setSubcategoryFilter] = useState<ProductSubcategory | 'all'>('all');
   const [isLoading, setIsLoading] = useState(true);
+
+  // Ler filtro da URL na montagem do componente
+  useEffect(() => {
+    const categoryParam = searchParams.get('category') as ProductCategory | null;
+    if (categoryParam && ['serpente', 'lagarto', 'quelonio'].includes(categoryParam)) {
+      console.log('🔗 Aplicando filtro da URL:', categoryParam);
+      setCategoryFilter(categoryParam);
+    }
+  }, [searchParams]);
 
   const applyFilters = useCallback((
     productList: Product[],
