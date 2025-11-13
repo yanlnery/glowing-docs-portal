@@ -74,9 +74,9 @@ export default function HeroCarouselUI({
   }
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full mb-0">
       {/* Container principal com altura otimizada para mobile */}
-      <div className="relative h-[500px] md:h-[65vh] lg:h-[75vh] overflow-hidden">
+      <div className="relative h-[500px] md:h-[65vh] lg:h-[75vh] overflow-hidden mb-0">
         <Carousel
           setApi={setApi}
           opts={{
@@ -161,17 +161,17 @@ export default function HeroCarouselUI({
           </div>
         </div>
         
-        {/* Indicadores - sobrepostos à imagem do carrossel */}
+        {/* Indicadores - DENTRO da imagem, encostados na borda inferior */}
         {carouselImagesData.length > 1 && (
-          <div className="absolute bottom-4 md:bottom-8 left-0 right-0 flex justify-center space-x-2 z-50">
+          <div className="absolute bottom-6 left-0 right-0 flex justify-center space-x-2 z-50">
             {carouselImagesData.map((_, index) => (
               <button
                 key={`indicator-${index}`}
                 className={cn(
-                  "w-3 h-3 md:w-3 md:h-3 rounded-full focus:outline-none transition-all touch-manipulation",
+                  "w-3 h-3 md:w-4 md:h-4 rounded-full focus:outline-none transition-all touch-manipulation shadow-lg",
                   index === currentImageIndex
                     ? "bg-white scale-110"
-                    : "bg-white/40 hover:bg-white/60"
+                    : "bg-white/50 hover:bg-white/70"
                 )}
                 onClick={() => handleIndicatorClick(index)}
                 aria-label={`Go to slide ${index + 1}`}
@@ -181,9 +181,9 @@ export default function HeroCarouselUI({
         )}
       </div>
 
-      {/* Botões de ação - sempre abaixo do carrossel */}
-      <div className="relative bg-background">
-        <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-2 md:py-2">
+      {/* Botões de ação - imediatamente abaixo do carrossel, SEM espaço verde */}
+      <div className="relative bg-background -mt-1">
+        <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-4 md:py-6">
           <div className="flex flex-col gap-2 w-full items-center justify-center md:flex-row md:gap-3">
             <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base touch-manipulation" asChild>
               <Link to="/catalogo">
