@@ -11,6 +11,8 @@ const transformSupabaseProduct = (row: any): Product => {
     speciesId: row.species_id,
     description: row.description || '',
     price: parseFloat(row.price) || 0,
+    originalPrice: row.original_price ? parseFloat(row.original_price) : undefined,
+    pixPrice: row.pix_price ? parseFloat(row.pix_price) : undefined,
     category: row.category,
     subcategory: row.subcategory,
     featured: row.featured || false,

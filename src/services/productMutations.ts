@@ -23,6 +23,8 @@ const transformToSupabaseProduct = (productData: ProductFormData) => {
     species_id: productData.speciesId || null,
     description: productData.description || '',
     price: productData.price || 0,
+    original_price: productData.originalPrice || null,
+    pix_price: productData.pixPrice || null,
     category: productData.category,
     subcategory: productData.subcategory,
     featured: productData.featured || false,
@@ -64,6 +66,8 @@ export const createProduct = async (productData: ProductFormData): Promise<Produ
       speciesId: data.species_id,
       description: data.description || '',
       price: Number(data.price) || 0,
+      originalPrice: (data as any).original_price ? Number((data as any).original_price) : undefined,
+      pixPrice: (data as any).pix_price ? Number((data as any).pix_price) : undefined,
       category: data.category as any,
       subcategory: data.subcategory as any,
       featured: data.featured || false,
@@ -130,6 +134,8 @@ export const updateProduct = async (id: string, productData: Partial<ProductForm
     if (processedProductData.speciesId !== undefined) supabaseUpdate.species_id = processedProductData.speciesId;
     if (processedProductData.description !== undefined) supabaseUpdate.description = processedProductData.description;
     if (processedProductData.price !== undefined) supabaseUpdate.price = processedProductData.price;
+    if (processedProductData.originalPrice !== undefined) (supabaseUpdate as any).original_price = processedProductData.originalPrice;
+    if (processedProductData.pixPrice !== undefined) (supabaseUpdate as any).pix_price = processedProductData.pixPrice;
     if (processedProductData.category !== undefined) supabaseUpdate.category = processedProductData.category;
     if (processedProductData.subcategory !== undefined) supabaseUpdate.subcategory = processedProductData.subcategory;
     if (processedProductData.featured !== undefined) supabaseUpdate.featured = processedProductData.featured;
@@ -167,6 +173,8 @@ export const updateProduct = async (id: string, productData: Partial<ProductForm
       speciesId: data.species_id,
       description: data.description || '',
       price: Number(data.price) || 0,
+      originalPrice: (data as any).original_price ? Number((data as any).original_price) : undefined,
+      pixPrice: (data as any).pix_price ? Number((data as any).pix_price) : undefined,
       category: data.category as any,
       subcategory: data.subcategory as any,
       featured: data.featured || false,
