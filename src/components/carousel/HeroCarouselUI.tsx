@@ -119,7 +119,7 @@ export default function HeroCarouselUI({
                         className="w-full h-full opacity-100"
                         style={{
                           width: "100%",
-                          height: "500px",
+                          height: "100%",
                           objectFit: "cover",
                           objectPosition: "65% center",
                           position: "relative",
