@@ -84,34 +84,54 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
           <em>{product.speciesName}</em>
         </h3>
         <p className="text-muted-foreground text-xs sm:text-sm mb-2 line-clamp-1">{product.name}</p>
-        <div className="flex justify-between items-center gap-2">
-          <p className="text-lg sm:text-xl font-bold text-serpente-600">
-            R$ {product.price.toFixed(2).replace('.', ',')}
-          </p>
-          <Button
-            variant={product.status === 'indisponivel' ? "secondary" : "default"}
-            size="sm"
-            className={`min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm touch-manipulation transition-all ${
-              isAdding ? 'animate-pulse bg-green-600 hover:bg-green-600' : ''
-            }`}
-            onClick={handleAddToCart}
-            disabled={product.status === 'indisponivel'}
-          >
-            {product.status === 'indisponivel' ? (
-              'Esgotado'
-            ) : isAdding ? (
-              <>
-                <Check className="w-4 h-4 mr-1 animate-bounce" />
-                Adicionado!
-              </>
-            ) : (
-              <>
-                <ShoppingCart className="w-4 h-4 mr-1" />
-                Adicionar
-              </>
-            )}
-          </Button>
+        
+        {/* Preços */}
+        <div className="space-y-1 mb-3">
+          {product.originalPrice && (
+            <p className="text-xs text-muted-foreground line-through">
+              De R$ {product.originalPrice.toFixed(2).replace('.', ',')}
+            </p>
+          )}
+          
+          <div className="space-y-0.5">
+            <p className="text-lg sm:text-xl font-bold text-serpente-600">
+              R$ {product.price.toFixed(2).replace('.', ',')}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              em até 10x sem juros
+            </p>
+          </div>
+          
+          {product.pixPrice && (
+            <p className="text-sm font-semibold text-green-600">
+              R$ {product.pixPrice.toFixed(2).replace('.', ',')} no PIX (10% OFF)
+            </p>
+          )}
         </div>
+        
+        <Button
+          variant={product.status === 'indisponivel' ? "secondary" : "default"}
+          size="sm"
+          className={`w-full min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm touch-manipulation transition-all ${
+            isAdding ? 'animate-pulse bg-green-600 hover:bg-green-600' : ''
+          }`}
+          onClick={handleAddToCart}
+          disabled={product.status === 'indisponivel'}
+        >
+          {product.status === 'indisponivel' ? (
+            'Esgotado'
+          ) : isAdding ? (
+            <>
+              <Check className="w-4 h-4 mr-1 animate-bounce" />
+              Adicionado!
+            </>
+          ) : (
+            <>
+              <ShoppingCart className="w-4 h-4 mr-1" />
+              Adicionar
+            </>
+          )}
+        </Button>
       </div>
     </div>
   );

@@ -87,10 +87,33 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({ form }) =>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <FormField
           control={form.control}
+          name="originalPrice"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Preço Original (R$)</FormLabel>
+              <FormControl>
+                <Input 
+                  type="number" 
+                  step="0.01" 
+                  min="0"
+                  placeholder="0.00"
+                  {...field}
+                  value={field.value || ''}
+                  onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                />
+              </FormControl>
+              <FormMessage />
+              <p className="text-xs text-muted-foreground">Preço que aparecerá riscado</p>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="price"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Preço (R$)</FormLabel>
+              <FormLabel>Preço Parcelado (R$) *</FormLabel>
               <FormControl>
                 <Input 
                   type="number" 
@@ -102,10 +125,36 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({ form }) =>
                 />
               </FormControl>
               <FormMessage />
+              <p className="text-xs text-muted-foreground">Em até 10x sem juros</p>
             </FormItem>
           )}
         />
 
+        <FormField
+          control={form.control}
+          name="pixPrice"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Preço no PIX (R$)</FormLabel>
+              <FormControl>
+                <Input 
+                  type="number" 
+                  step="0.01" 
+                  min="0"
+                  placeholder="0.00"
+                  {...field}
+                  value={field.value || ''}
+                  onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                />
+              </FormControl>
+              <FormMessage />
+              <p className="text-xs text-muted-foreground">10% de desconto para PIX</p>
+            </FormItem>
+          )}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
           control={form.control}
           name="category"

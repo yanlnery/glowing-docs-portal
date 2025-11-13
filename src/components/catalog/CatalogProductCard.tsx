@@ -125,8 +125,28 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
       <CardContent className="p-2 sm:p-3 pt-0 pb-1 sm:pb-2">
         <p className="text-xs sm:text-sm text-muted-foreground italic mb-2 line-clamp-1">{product.speciesName}</p>
         
-        <div className="text-sm sm:text-lg font-bold text-serpente-600">
-          {formatPrice(product.price)}
+        {/* Preços */}
+        <div className="space-y-1">
+          {product.originalPrice && (
+            <p className="text-xs text-muted-foreground line-through">
+              De {formatPrice(product.originalPrice)}
+            </p>
+          )}
+          
+          <div className="space-y-0.5">
+            <div className="text-sm sm:text-lg font-bold text-serpente-600">
+              {formatPrice(product.price)}
+            </div>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">
+              em até 10x sem juros
+            </p>
+          </div>
+          
+          {product.pixPrice && (
+            <p className="text-xs sm:text-sm font-semibold text-green-600">
+              {formatPrice(product.pixPrice)} no PIX (10% OFF)
+            </p>
+          )}
         </div>
       </CardContent>
       
