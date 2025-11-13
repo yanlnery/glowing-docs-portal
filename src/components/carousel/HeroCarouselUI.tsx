@@ -161,9 +161,9 @@ export default function HeroCarouselUI({
           </div>
         </div>
         
-        {/* Indicadores - posicionamento otimizado para mobile */}
+        {/* Indicadores - posicionados dentro do carrossel */}
         {carouselImagesData.length > 1 && (
-          <div className="absolute bottom-16 sm:bottom-4 md:bottom-6 left-0 right-0 flex justify-center space-x-2 z-40">
+          <div className="absolute bottom-6 sm:bottom-6 md:bottom-40 left-0 right-0 flex justify-center space-x-2 z-40">
             {carouselImagesData.map((_, index) => (
               <button
                 key={`indicator-${index}`}
@@ -181,16 +181,16 @@ export default function HeroCarouselUI({
         )}
       </div>
 
-      {/* Botões de ação - abaixo do carrossel no mobile, dentro no desktop */}
-      <div className="relative md:absolute md:bottom-40 md:left-1/2 md:-translate-x-1/2 md:z-30">
-        <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-4 md:py-0">
+      {/* Botões de ação - sempre abaixo do carrossel */}
+      <div className="relative">
+        <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-4">
           <div className="flex flex-col gap-2 w-full items-center justify-center md:justify-start md:flex-row md:gap-3">
             <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base touch-manipulation" asChild>
               <Link to="/catalogo">
                 Animais Disponíveis <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button variant="outline" size="lg" className="bg-white/90 border-white text-serpente-900 hover:bg-white md:bg-white/20 md:border-white/20 md:text-white md:hover:bg-white/20 min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base touch-manipulation backdrop-blur-sm" asChild>
+            <Button variant="outline" size="lg" className="border-serpente-600 text-serpente-600 hover:bg-serpente-600 hover:text-white min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base touch-manipulation" asChild>
               <Link to="/sobre">
                 Conheça nossa História
               </Link>
