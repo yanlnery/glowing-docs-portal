@@ -7,7 +7,7 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
 export default function AboutSection() {
   return (
     <section className="py-16 foliage-pattern-bg">
-      <div className="container px-4 sm:px-6">
+      <div className="foliage-pattern-content container px-4 sm:px-6">
         <div className="flex flex-col lg:flex-row gap-12 items-center">
           <div className="w-full lg:w-1/2">
             <OptimizedImage
