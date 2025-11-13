@@ -74,9 +74,9 @@ export default function HeroCarouselUI({
   }
 
   return (
-    <div className="relative w-full mb-0">
+    <div className="relative w-full">
       {/* Container principal com altura otimizada para mobile */}
-      <div className="relative h-[500px] md:h-[65vh] lg:h-[75vh] overflow-hidden mb-0">
+      <div className="relative h-[500px] md:h-[65vh] lg:h-[75vh] overflow-hidden">
         <Carousel
           setApi={setApi}
           opts={{
@@ -182,8 +182,8 @@ export default function HeroCarouselUI({
       </div>
 
       {/* Botões de ação - imediatamente abaixo do carrossel, SEM espaço verde */}
-      <div className="relative bg-background -mt-1">
-        <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-4 md:py-6">
+      <div className="relative bg-transparent">
+        <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-3 md:py-4">
           <div className="flex flex-col gap-2 w-full items-center justify-center md:flex-row md:gap-3">
             <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base touch-manipulation" asChild>
               <Link to="/catalogo">
