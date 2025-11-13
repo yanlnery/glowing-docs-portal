@@ -182,12 +182,16 @@ export default function HeroCarouselUI({
       </div>
 
       {/* Seção Nossas Espécies - FORA do carrossel, logo abaixo */}
-      <div className="bg-background py-6 sm:py-8 md:py-10">
+      <div className="bg-background py-6 sm:py-8 md:py-10 pb-12 sm:pb-16 md:pb-20">
         <div className="container px-4 sm:px-6 md:px-8 lg:px-10">
-          {/* Título centralizado */}
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 text-foreground">
-            Nossas Espécies
-          </h2>
+          {/* Título centralizado com barrinha verde */}
+          <div className="flex justify-center mb-8 sm:mb-12">
+            <div className="docs-section-title">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
+                Nossas Espécies
+              </h2>
+            </div>
+          </div>
           
           {/* Grid com 3 imagens */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-12 max-w-5xl mx-auto">
@@ -198,7 +202,7 @@ export default function HeroCarouselUI({
               className="group flex flex-col items-center justify-center touch-manipulation"
             >
               {/* Container da imagem com efeito hover */}
-              <div className="relative w-full max-w-[280px] aspect-square mb-4 sm:mb-6 transition-transform duration-300 group-hover:scale-110">
+              <div className="relative w-full max-w-[280px] aspect-square mb-2 sm:mb-3 transition-transform duration-300 group-hover:scale-110">
                 <img
                   src="/lovable-uploads/species-snake.png"
                   alt="Serpente"
@@ -219,7 +223,7 @@ export default function HeroCarouselUI({
               className="group flex flex-col items-center justify-center touch-manipulation"
             >
               {/* Container da imagem com efeito hover */}
-              <div className="relative w-full max-w-[280px] aspect-square mb-4 sm:mb-6 transition-transform duration-300 group-hover:scale-110">
+              <div className="relative w-full max-w-[280px] aspect-square mb-2 sm:mb-3 transition-transform duration-300 group-hover:scale-110">
                 <img
                   src="/lovable-uploads/species-lizard.png"
                   alt="Lagarto"
@@ -240,7 +244,7 @@ export default function HeroCarouselUI({
               className="group flex flex-col items-center justify-center touch-manipulation"
             >
               {/* Container da imagem com efeito hover */}
-              <div className="relative w-full max-w-[280px] aspect-square mb-4 sm:mb-6 transition-transform duration-300 group-hover:scale-110">
+              <div className="relative w-full max-w-[280px] aspect-square mb-2 sm:mb-3 transition-transform duration-300 group-hover:scale-110">
                 <img
                   src="/lovable-uploads/species-turtle.png"
                   alt="Quelônio"
