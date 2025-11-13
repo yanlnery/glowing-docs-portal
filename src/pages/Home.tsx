@@ -13,8 +13,8 @@ export default function Home() {
 
   return (
     <div className="flex flex-col w-full">
-      {/* Hero Carousel Section */}
-      <section className="relative mb-0">
+      {/* Hero Carousel Section - SEM espaço inferior */}
+      <section className="relative mb-0 pb-0">
         <HeroCarousel />
       </section>
 
