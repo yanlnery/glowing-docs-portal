@@ -147,13 +147,13 @@ export default function HeroCarouselUI({
           </CarouselContent>
         </Carousel>
 
-        {/* Overlay com conteúdo - posicionamento melhorado */}
-        <div className="absolute inset-0 z-30 flex flex-col items-start justify-center pb-24 md:pb-0 pointer-events-none">
-          <div className="container py-6 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto">
-            <h1 className="text-2xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-2xl animate-fade-in text-balance drop-shadow-lg">
+        {/* Overlay com conteúdo - título e subtítulo no lado direito para mobile */}
+        <div className="absolute inset-0 z-30 flex flex-col items-end justify-center pr-4 md:items-start md:pr-0 pointer-events-none">
+          <div className="container py-6 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto text-right md:text-left">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-xs md:max-w-2xl animate-fade-in text-balance drop-shadow-lg ml-auto md:ml-0">
               {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
             </h1>
-            <p className="text-sm sm:text-sm md:text-base lg:text-lg text-white/95 font-medium max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance line-clamp-2 sm:line-clamp-none drop-shadow-md">
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/95 font-medium max-w-[200px] md:max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance line-clamp-3 sm:line-clamp-none drop-shadow-md ml-auto md:ml-0">
               {currentSlideData.subtitle || "Conheça nossa coleção de répteis exóticos"}
             </p>
           </div>
@@ -179,16 +179,16 @@ export default function HeroCarouselUI({
         )}
       </div>
 
-      {/* Botões de ação - posicionamento mais próximo da imagem no mobile */}
-      <div className="absolute bottom-2 left-0 right-0 z-30 md:relative md:bottom-auto md:left-auto md:right-auto md:z-auto">
-        <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-2 sm:py-6 md:py-0 md:absolute md:bottom-40 md:left-1/2 md:-translate-x-1/2 md:z-30 md:pointer-events-auto">
+      {/* Botões de ação - abaixo do carrossel no mobile, dentro no desktop */}
+      <div className="relative md:absolute md:bottom-40 md:left-1/2 md:-translate-x-1/2 md:z-30">
+        <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-4 md:py-0">
           <div className="flex flex-col gap-2 w-full items-center justify-center md:justify-start md:flex-row md:gap-3">
             <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base touch-manipulation" asChild>
               <Link to="/catalogo">
                 Animais Disponíveis <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button variant="outline" size="lg" className="bg-white/20 border-white/20 text-white hover:bg-white/30 md:bg-white/20 md:border-white/20 md:hover:bg-white/20 min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base touch-manipulation backdrop-blur-sm" asChild>
+            <Button variant="outline" size="lg" className="bg-white/90 border-white text-serpente-900 hover:bg-white md:bg-white/20 md:border-white/20 md:text-white md:hover:bg-white/20 min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base touch-manipulation backdrop-blur-sm" asChild>
               <Link to="/sobre">
                 Conheça nossa História
               </Link>

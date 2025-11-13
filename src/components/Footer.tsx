@@ -43,11 +43,6 @@ export default function Footer() {
               <li>
                 <Link to="/" className="hover:text-white transition-colors">Início</Link>
               </li>
-              {isAcademyVisible && (
-                <li>
-                  <Link to="/academy" className="hover:text-white transition-colors">P.S. Academy</Link>
-                </li>
-              )}
               <li>
                 <Link to="/catalogo" className="hover:text-white transition-colors">Animais Disponíveis</Link>
               </li>
