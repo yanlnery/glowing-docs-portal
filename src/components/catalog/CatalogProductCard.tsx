@@ -78,7 +78,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
             src={imageUrl || '/placeholder.svg'}
             alt={product.name}
             priority={index < 4}
-            quality={80}
+            quality={95}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="w-full h-full"
             style={{
@@ -134,16 +134,16 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
           )}
           
           <div className="space-y-0.5">
-            <div className="text-sm sm:text-lg font-bold text-serpente-600">
+            <div className="text-sm sm:text-lg font-bold text-serpente-600 dark:text-serpente-400">
               {formatPrice(product.price)}
             </div>
-            <p className="text-[10px] sm:text-xs text-muted-foreground">
+            <p className="text-[10px] sm:text-xs text-muted-foreground dark:text-gray-300">
               em até 10x sem juros
             </p>
           </div>
           
           {product.pixPrice && (
-            <p className="text-xs sm:text-sm font-semibold text-green-600">
+            <p className="text-xs sm:text-sm font-semibold text-green-600 dark:text-green-400">
               {formatPrice(product.pixPrice)} no PIX (10% OFF)
             </p>
           )}
