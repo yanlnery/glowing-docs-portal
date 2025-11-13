@@ -110,7 +110,7 @@ export default function HeroCarouselUI({
                 <CarouselItem key={item.id || index} className="h-full pl-0">
                   <div className="relative h-full w-full">
                     {processedImageUrl && processedImageUrl !== "/placeholder.svg" ? (
-                      <OptimizedImage
+                       <OptimizedImage
                         src={processedImageUrl}
                         alt={item.alt_text || "Imagem do carrossel"}
                         priority={true}
@@ -121,7 +121,7 @@ export default function HeroCarouselUI({
                           width: "100%",
                           height: "500px",
                           objectFit: "cover",
-                          objectPosition: "center",
+                          objectPosition: "65% center",
                           position: "relative",
                           zIndex: 10,
                           opacity: 1,
@@ -147,13 +147,13 @@ export default function HeroCarouselUI({
           </CarouselContent>
         </Carousel>
 
-        {/* Overlay com conteúdo - título e subtítulo no lado direito para mobile */}
-        <div className="absolute inset-0 z-30 flex flex-col items-end justify-center pr-4 md:items-start md:pr-0 pointer-events-none">
-          <div className="container py-6 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto text-right md:text-left">
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-xs md:max-w-2xl animate-fade-in text-balance drop-shadow-lg ml-auto md:ml-0">
+        {/* Overlay com conteúdo - título e subtítulo no canto inferior esquerdo para mobile */}
+        <div className="absolute inset-0 z-30 flex flex-col items-start justify-end pb-20 md:justify-center md:pb-0 pointer-events-none">
+          <div className="container py-6 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-2 sm:mb-3 max-w-xs md:max-w-2xl animate-fade-in text-balance drop-shadow-lg">
               {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
             </h1>
-            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/95 font-medium max-w-[200px] md:max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance line-clamp-3 sm:line-clamp-none drop-shadow-md ml-auto md:ml-0">
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/95 font-medium max-w-[200px] md:max-w-xl mb-4 sm:mb-6 animate-fade-in text-balance line-clamp-3 sm:line-clamp-none drop-shadow-md">
               {currentSlideData.subtitle || "Conheça nossa coleção de répteis exóticos"}
             </p>
           </div>
