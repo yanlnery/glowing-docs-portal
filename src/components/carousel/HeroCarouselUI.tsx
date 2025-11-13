@@ -161,9 +161,9 @@ export default function HeroCarouselUI({
           </div>
         </div>
         
-        {/* Indicadores - DENTRO da imagem, encostados na borda inferior */}
+        {/* Indicadores - DENTRO da imagem, acima dos botões */}
         {carouselImagesData.length > 1 && (
-          <div className="absolute bottom-6 left-0 right-0 flex justify-center space-x-2 z-50">
+          <div className="absolute bottom-20 sm:bottom-24 md:bottom-28 left-0 right-0 flex justify-center space-x-2 z-50">
             {carouselImagesData.map((_, index) => (
               <button
                 key={`indicator-${index}`}
@@ -179,22 +179,22 @@ export default function HeroCarouselUI({
             ))}
           </div>
         )}
-      </div>
 
-      {/* Botões de ação - imediatamente abaixo do carrossel, SEM espaço verde */}
-      <div className="relative bg-transparent -mt-6">
-        <div className="container px-4 sm:px-6 md:px-8 lg:px-10 py-2 md:py-3">
-          <div className="flex flex-col gap-2 w-full items-center justify-center md:flex-row md:gap-3">
-            <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base touch-manipulation" asChild>
-              <Link to="/catalogo">
-                Animais Disponíveis <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button variant="outline" size="lg" className="bg-white border-2 border-serpente-600 text-serpente-600 hover:bg-serpente-600 hover:text-white shadow-lg min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base touch-manipulation" asChild>
-              <Link to="/sobre">
-                Conheça nossa História
-              </Link>
-            </Button>
+        {/* Botões de ação - DENTRO do carrossel, sobre a imagem */}
+        <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 left-0 right-0 z-40">
+          <div className="container px-4 sm:px-6 md:px-8 lg:px-10">
+            <div className="flex flex-col gap-2 w-full items-center justify-center md:flex-row md:gap-3">
+              <Button size="lg" className="bg-serpente-600 hover:bg-serpente-700 text-white min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base touch-manipulation" asChild>
+                <Link to="/catalogo">
+                  Animais Disponíveis <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button variant="outline" size="lg" className="bg-white border-2 border-serpente-600 text-serpente-600 hover:bg-serpente-600 hover:text-white shadow-lg min-h-[44px] w-full sm:w-full md:w-auto text-sm md:text-base touch-manipulation" asChild>
+                <Link to="/sobre">
+                  Conheça nossa História
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
