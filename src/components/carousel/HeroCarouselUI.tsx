@@ -148,9 +148,9 @@ export default function HeroCarouselUI({
         </Carousel>
 
         {/* Overlay com conteúdo - inferior esquerdo */}
-        <div className="absolute inset-0 z-30 flex flex-col items-start justify-end pb-20 md:pb-24 pointer-events-none">
+        <div className="absolute inset-0 z-30 flex flex-col items-start justify-end pb-20 md:pb-24 pointer-events-none bg-gradient-to-r from-black/60 via-black/20 to-transparent">
           <div className="container py-4 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto flex justify-start">
-            <div className="bg-black/40 backdrop-blur-[2px] p-3 md:p-4">
+            <div className="p-3 md:p-4">
               <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-1 sm:mb-3 max-w-[250px] md:max-w-2xl animate-fade-in text-balance text-left">
                 {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
               </h1>
