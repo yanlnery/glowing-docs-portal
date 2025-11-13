@@ -31,6 +31,8 @@ export interface Product {
   speciesId?: string;
   description: string;
   price: number;
+  originalPrice?: number;
+  pixPrice?: number;
   category: ProductCategory;
   subcategory: ProductSubcategory;
   featured: boolean;
