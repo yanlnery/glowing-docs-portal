@@ -92,6 +92,49 @@ export function useHeroCarousel() {
     };
   }, [api, carouselImagesData.length]);
 
+  // Navegação por teclado
+  useEffect(() => {
+    if (!api || carouselImagesData.length === 0) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Setas esquerda e direita para navegação
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        api.scrollPrev();
+        // Resume autoplay após navegação manual
+        if (autoplayPlugin.current && carouselImagesData.length > 1) {
+          setTimeout(() => autoplayPlugin.current.play(), 1000);
+        }
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        api.scrollNext();
+        // Resume autoplay após navegação manual
+        if (autoplayPlugin.current && carouselImagesData.length > 1) {
+          setTimeout(() => autoplayPlugin.current.play(), 1000);
+        }
+      } else if (event.key === ' ' || event.code === 'Space') {
+        // Barra de espaço pausa/retoma o autoplay
+        event.preventDefault();
+        if (autoplayPlugin.current) {
+          const isPlaying = autoplayPlugin.current.isPlaying();
+          if (isPlaying) {
+            autoplayPlugin.current.stop();
+            console.log("Autoplay pausado");
+          } else {
+            autoplayPlugin.current.play();
+            console.log("Autoplay retomado");
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [api, carouselImagesData.length]);
+
   const handleIndicatorClick = (index: number) => {
     if (api) {
       console.log("Manual slide change to index:", index);
