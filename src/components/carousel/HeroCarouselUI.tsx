@@ -194,7 +194,7 @@ export default function HeroCarouselUI({
           </div>
           
           {/* Grid com 3 imagens */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-12 max-w-5xl mx-auto">
+          <div className="grid grid-cols-3 gap-4 sm:gap-8 md:gap-12 max-w-5xl mx-auto">
             
             {/* Card Serpentes */}
             <Link 

@@ -125,26 +125,26 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
       <CardContent className="p-2 sm:p-3 pt-0 pb-1 sm:pb-2">
         <p className="text-xs sm:text-sm text-muted-foreground italic mb-2 line-clamp-1">{product.speciesName}</p>
         
-        {/* Preços */}
-        <div className="space-y-1">
+        {/* Preços - Layout compacto no mobile */}
+        <div className="space-y-1 bg-muted/30 p-2 rounded-md">
           {product.originalPrice && (
-            <p className="text-xs text-muted-foreground line-through">
+            <p className="text-[10px] sm:text-xs text-muted-foreground line-through">
               De {formatPrice(product.originalPrice)}
             </p>
           )}
           
-          <div className="space-y-0.5">
-            <div className="text-sm sm:text-lg font-bold text-serpente-600 dark:text-serpente-400">
+          <div className="space-y-0">
+            <div className="text-base sm:text-lg font-bold text-serpente-600 dark:text-serpente-400">
               {formatPrice(product.price)}
             </div>
-            <p className="text-[10px] sm:text-xs text-muted-foreground dark:text-gray-300">
-              em até 10x sem juros
+            <p className="text-[9px] sm:text-xs text-muted-foreground dark:text-gray-300">
+              até 10x s/ juros
             </p>
           </div>
           
           {product.pixPrice && (
-            <p className="text-xs sm:text-sm font-semibold text-green-600 dark:text-green-400">
-              {formatPrice(product.pixPrice)} no PIX (10% OFF)
+            <p className="text-[10px] sm:text-sm font-semibold text-green-600 dark:text-green-400">
+              {formatPrice(product.pixPrice)} no PIX
             </p>
           )}
         </div>
