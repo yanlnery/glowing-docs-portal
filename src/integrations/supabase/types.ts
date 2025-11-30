@@ -273,7 +273,9 @@ export type Database = {
           meta: Json | null
           name: string
           order_position: number | null
+          original_price: number | null
           payment_link: string | null
+          pix_price: number | null
           price: number
           slug: string | null
           species_id: string | null
@@ -297,7 +299,9 @@ export type Database = {
           meta?: Json | null
           name: string
           order_position?: number | null
+          original_price?: number | null
           payment_link?: string | null
+          pix_price?: number | null
           price?: number
           slug?: string | null
           species_id?: string | null
@@ -321,7 +325,9 @@ export type Database = {
           meta?: Json | null
           name?: string
           order_position?: number | null
+          original_price?: number | null
           payment_link?: string | null
+          pix_price?: number | null
           price?: number
           slug?: string | null
           species_id?: string | null

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Award, Calendar, CreditCard, Shield, Syringe } from "lucide-react";
+import { Award, Calendar, CreditCard, Shield, ShieldCheck, Syringe } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 
 export default function AboutSection() {
@@ -69,6 +69,13 @@ export default function AboutSection() {
                 <div>
                   <h3 className="font-bold">Acompanhamento Veterinário</h3>
                   <p className="text-sm text-muted-foreground">Suporte em saúde animal</p>
+                </div>
+              </div>
+              <div className="flex gap-3 items-start">
+                <ShieldCheck className="text-serpente-600 h-6 w-6 mt-1" />
+                <div>
+                  <h3 className="font-bold">Combate ao Tráfico de Fauna</h3>
+                  <p className="text-sm text-muted-foreground">Atuação ativa na conservação e na redução do tráfico ilegal por meio da criação legalizada e da educação ambiental.</p>
                 </div>
               </div>
             </div>
