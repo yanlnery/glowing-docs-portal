@@ -15,12 +15,11 @@ const filterOptions: { label: string; value: SpeciesTypeFilter }[] = [
   { label: "Serpentes", value: "serpente" },
   { label: "Lagartos", value: "lagarto" },
   { label: "Quelônios", value: "quelonio" },
-  { label: "Outros", value: "outro" },
 ];
 
 export function SpeciesFilterControls({ activeFilter, onFilterChange }: SpeciesFilterControlsProps) {
   return (
-    <div className="flex items-center gap-2 w-full overflow-x-auto py-2">
+    <div className="flex flex-wrap items-center gap-2 py-2">
       {filterOptions.map(option => (
         <Button
           key={option.value}
