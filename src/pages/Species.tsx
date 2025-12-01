@@ -23,6 +23,7 @@ export default function SpeciesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch inicial - só roda uma vez no mount
   useEffect(() => {
     const fetchSpecies = async () => {
       setLoading(true);
@@ -42,12 +43,6 @@ export default function SpeciesPage() {
         }));
 
         setSpeciesList(mappedData);
-
-        const selectedSlug = searchParams.get('selected');
-        if (selectedSlug && mappedData.length > 0) {
-          const species = mappedData.find(s => s.slug === selectedSlug);
-          if (species) setSelectedSpecies(species);
-        }
       } catch (err: any) {
         console.error('Erro ao buscar espécies:', err);
         setError(err.message);
@@ -57,7 +52,18 @@ export default function SpeciesPage() {
     };
 
     fetchSpecies();
-  }, [searchParams]);
+  }, []); // Só roda uma vez
+
+  // Pré-seleção baseada na URL
+  useEffect(() => {
+    const selectedSlug = searchParams.get('selected');
+    if (selectedSlug && speciesList.length > 0) {
+      const species = speciesList.find(s => s.slug === selectedSlug);
+      if (species) {
+        setSelectedSpecies(species);
+      }
+    }
+  }, [searchParams, speciesList]);
 
   const filteredSpecies = useMemo(() => {
     return speciesList.filter((species) => {
@@ -72,7 +78,7 @@ export default function SpeciesPage() {
 
   const handleSelectSpecies = (species: Species) => {
     setSelectedSpecies(species);
-    setSearchParams({ selected: species.slug });
+    setSearchParams({ selected: species.slug }, { replace: true });
   };
 
   if (loading) {
