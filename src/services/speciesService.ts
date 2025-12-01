@@ -44,6 +44,8 @@ export const saveSpeciesData = async (
   isNew: boolean,
   imageFile: File | null,
   originalImageUrlFromDb: string | null,
+  galleryFiles: File[] = [],
+  originalGallery: string[] = [],
   toast: ToastFunction
 ): Promise<boolean> => {
   if (!speciesFormData.name || !speciesFormData.commonname) {
@@ -62,6 +64,7 @@ export const saveSpeciesData = async (
     return false;
   }
 
+  // Processar imagem principal
   const imageProcessingResult = await handleSpeciesImageUploadOrRemoval(
     speciesToSave.image, 
     isNew,
@@ -76,13 +79,30 @@ export const saveSpeciesData = async (
   
   const finalImageUrl = imageProcessingResult;
 
+  // Processar galeria de imagens
+  let finalGallery = [...(speciesToSave.gallery || [])];
+  
+  // Upload de novas imagens da galeria
+  if (galleryFiles.length > 0) {
+    for (const file of galleryFiles) {
+      const { uploadFileToStorage } = await import('./fileStorageService');
+      const { SPECIES_BUCKET_NAME } = await import('./internal/speciesImage');
+      
+      const uploadedUrl = await uploadFileToStorage(file, SPECIES_BUCKET_NAME, toast);
+      if (uploadedUrl) {
+        finalGallery.push(uploadedUrl);
+      }
+    }
+  }
+
   // Mapeamento para o banco de dados: commonName (frontend) -> commonname (db)
   const dbPayload = {
     name: speciesToSave.name,
-    commonname: speciesToSave.commonname, // Campo corrigido para o DB
+    commonname: speciesToSave.commonname,
     slug: speciesToSave.slug,
     type: speciesToSave.type || 'outro',
     image: finalImageUrl,
+    gallery: finalGallery,
     description: speciesToSave.description || '',
     characteristics: speciesToSave.characteristics || [],
     curiosities: speciesToSave.curiosities || [],
@@ -132,7 +152,7 @@ export const saveSpeciesData = async (
 
 export const deleteSpeciesRecord = async (
   id: string,
-  speciesList: Species[], // Mantido para encontrar a espécie e sua imagem
+  speciesList: Species[],
   toast: ToastFunction
 ): Promise<boolean> => {
   const speciesToDelete = speciesList.find(s => s.id === id);
@@ -141,12 +161,16 @@ export const deleteSpeciesRecord = async (
     return false;
   }
 
-  // Deletar imagem se existir
-  if (speciesToDelete.image) { 
-    // A função deleteSpeciesImage já lida com toasts de erro de imagem
+  // Deletar imagem principal se existir
+  if (speciesToDelete.image) {
     await deleteSpeciesImage(speciesToDelete.image, toast);
-    // Não precisamos verificar o resultado aqui, prosseguimos para a exclusão do DB.
-    // Se a imagem não for deletada, o registro do DB ainda será removido.
+  }
+
+  // Deletar imagens da galeria se existirem
+  if (speciesToDelete.gallery && speciesToDelete.gallery.length > 0) {
+    for (const imageUrl of speciesToDelete.gallery) {
+      await deleteSpeciesImage(imageUrl, toast);
+    }
   }
 
   const { error: deleteDbError } = await deleteSpeciesFromDb(id);

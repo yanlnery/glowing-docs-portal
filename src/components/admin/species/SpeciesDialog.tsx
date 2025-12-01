@@ -16,7 +16,7 @@ interface SpeciesDialogProps {
   isNewSpecies: boolean;
   currentSpeciesData: Species | null;
   onSave: () => void;
-  isLoading?: boolean; // Added isLoading prop
+  isLoading?: boolean;
   
   // Props for SpeciesFormFields
   onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
@@ -30,6 +30,10 @@ interface SpeciesDialogProps {
   imageFile: File | null;
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRemoveImage: () => void;
+  galleryPreviews: string[];
+  galleryFiles: File[];
+  onGalleryAdd: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onGalleryRemove: (index: number) => void;
 }
 
 export function SpeciesDialog({

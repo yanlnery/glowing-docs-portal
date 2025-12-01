@@ -10,6 +10,7 @@ import Catalog from "./pages/Catalog";
 import About from "./pages/About";
 import Species from "./pages/Species";
 import SpeciesDetail from "./pages/SpeciesDetail";
+import SpeciesDetailRedirect from "./pages/SpeciesDetailRedirect";
 import ProductDetail from "./pages/ProductDetail";
 import Manuals from "./pages/Manuals";
 import Education from "./pages/Education";
@@ -118,8 +119,7 @@ function App() {
                   <Route path="catalogo" element={<Catalog />} />
                   <Route path="produtos/:id" element={<ProductDetail />} />
                   <Route path="especies" element={<Species />} />
-                  <Route path="especies/:id" element={<SpeciesDetail />} />
-                  <Route path="especies-criadas/:slug" element={<SpeciesDetail />} />
+                  <Route path="especies-criadas/:slug" element={<SpeciesDetailRedirect />} />
                   <Route path="manuais" element={<Manuals />} />
                   <Route path="sobre" element={<About />} />
                   <Route path="educacao" element={<Education />} />

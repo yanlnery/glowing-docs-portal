@@ -1,127 +1,138 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { Species } from '@/types/species';
+import { Input } from '@/components/ui/input';
+import { SpeciesFilterControls } from '@/components/species/SpeciesFilterControls';
+import { SpeciesSidebar } from '@/components/species/SpeciesSidebar';
+import { SpeciesDetailPanel } from '@/components/species/SpeciesDetailPanel';
+import { SpeciesMobileView } from '@/components/species/SpeciesMobileView';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Search } from 'lucide-react';
 
-import React, { useState, useEffect, useMemo } from "react";
-import { Search as SearchIcon } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { Species as SpeciesType } from "@/types/species";
-import { SpeciesFilterControls } from "@/components/species/SpeciesFilterControls";
-import { SpeciesGridItem } from "@/components/species/SpeciesGridItem";
-import { Input } from "@/components/ui/input";
+type SpeciesTypeFilter = Species['type'] | 'todos';
 
-type SpeciesFilterValue = SpeciesType['type'] | 'todos';
-
-export default function Species() {
-  const [activeFilter, setActiveFilter] = useState<SpeciesFilterValue>("todos");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [speciesList, setSpeciesList] = useState<SpeciesType[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export default function SpeciesPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const isMobile = useIsMobile();
+  
+  const [activeFilter, setActiveFilter] = useState<SpeciesTypeFilter>('todos');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [speciesList, setSpeciesList] = useState<Species[]>([]);
+  const [selectedSpecies, setSelectedSpecies] = useState<Species | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSpecies = async () => {
-      console.log("SpeciesPage: Attempting to fetch species...");
-      setIsLoading(true);
-      setError(null);
-      const { data, error: dbError } = await supabase
-        .from('species')
-        .select('*')
-        .order('order', { ascending: true });
+      setLoading(true);
+      try {
+        const { data, error: fetchError } = await supabase
+          .from('species')
+          .select('*')
+          .order('order', { ascending: true });
 
-      if (dbError) {
-        console.error("SpeciesPage: Error fetching species:", dbError);
-        setError("Falha ao carregar espécies. Tente novamente mais tarde.");
-        setSpeciesList([]);
-      } else {
-        console.log("SpeciesPage: Species fetched successfully:", data?.length, "records");
-        if (data && data.length > 0) {
-          // Verificar se os dados têm a estrutura esperada
-          console.log("SpeciesPage: First species object:", data[0]);
-          
-          // Verificar especificamente a propriedade 'commonName'
-          if (data[0].commonname !== undefined) {
-            console.log("SpeciesPage: Remapping 'commonname' to 'commonName'");
-            // Mapeamento para corrigir inconsistências de nomenclatura
-            const mappedData = data.map(item => ({
-              ...item,
-              commonname: item.commonname,
-            }));
-            setSpeciesList(mappedData as SpeciesType[]);
-          } else {
-            setSpeciesList(data as SpeciesType[]);
-          }
-        } else {
-          console.log("SpeciesPage: No species data returned");
-          setSpeciesList([]);
+        if (fetchError) throw fetchError;
+
+        const mappedData: Species[] = (data || []).map((item: any) => ({
+          ...item,
+          characteristics: item.characteristics || [],
+          curiosities: item.curiosities || [],
+          gallery: item.gallery || [],
+        }));
+
+        setSpeciesList(mappedData);
+
+        const selectedSlug = searchParams.get('selected');
+        if (selectedSlug && mappedData.length > 0) {
+          const species = mappedData.find(s => s.slug === selectedSlug);
+          if (species) setSelectedSpecies(species);
         }
+      } catch (err: any) {
+        console.error('Erro ao buscar espécies:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
-      setIsLoading(false);
-      console.log("SpeciesPage: Loading finished.");
     };
+
     fetchSpecies();
-  }, []);
+  }, [searchParams]);
 
   const filteredSpecies = useMemo(() => {
-    let result = speciesList;
-    if (activeFilter !== "todos") {
-      result = result.filter(species => species.type === activeFilter);
-    }
-    if (searchQuery) {
-      const lowerQuery = searchQuery.toLowerCase();
-      result = result.filter(species =>
-        species.name.toLowerCase().includes(lowerQuery) ||
-        species.commonname.toLowerCase().includes(lowerQuery)
-      );
-    }
-    return result;
+    return speciesList.filter((species) => {
+      const matchesType = activeFilter === 'todos' || species.type === activeFilter;
+      const matchesSearch =
+        searchQuery === '' ||
+        species.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        species.commonname.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesType && matchesSearch;
+    });
   }, [speciesList, activeFilter, searchQuery]);
 
-  if (isLoading) {
-    return <div className="container px-4 py-12 text-center">Carregando espécies...</div>;
+  const handleSelectSpecies = (species: Species) => {
+    setSelectedSpecies(species);
+    setSearchParams({ selected: species.slug });
+  };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center">
+          <p className="text-lg text-muted-foreground">Carregando espécies...</p>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="container px-4 py-12 text-center text-red-500">{error}</div>;
-  }
-  
-  if (filteredSpecies.length === 0 && !isLoading && !error) {
-    console.log("SpeciesPage: No species found after filtering or initial load, rendering fallback.");
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center">
+          <p className="text-lg text-destructive">Erro ao carregar espécies: {error}</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="container px-4 md:px-6 py-8 sm:py-12">
-      <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">
-        <div className="docs-section-title">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">Espécies Criadas</h1>
-        </div>
-        <p className="text-muted-foreground max-w-2xl mt-4 text-sm sm:text-base">
-          Conheça todas as espécies criadas em nosso plantel, com informações detalhadas e características.
+    <div className="container mx-auto px-4 py-8 lg:py-12">
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold mb-3 text-serpente-400">Espécies Criadas</h1>
+        <p className="text-muted-foreground text-lg">
+          Conheça as espécies que criamos em nosso criadouro legalizado
         </p>
       </div>
 
-      {/* Search and Filter */}
-      <div className="mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="relative w-full sm:w-64">
-          <SearchIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder="Buscar espécie..."
-            className="h-10 w-full rounded-md border border-input bg-background pl-8 pr-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+      <div className="mb-8 space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <div className="relative w-full sm:w-80">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              type="text"
+              placeholder="Buscar espécie..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <SpeciesFilterControls
+            activeFilter={activeFilter}
+            onFilterChange={setActiveFilter}
           />
         </div>
-        <SpeciesFilterControls activeFilter={activeFilter} onFilterChange={setActiveFilter} />
       </div>
 
-      {/* Species Grid */}
-      {filteredSpecies.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-          {filteredSpecies.map((species) => (
-            <SpeciesGridItem key={species.id} species={species} />
-          ))}
-        </div>
+      {isMobile ? (
+        <SpeciesMobileView species={filteredSpecies} />
       ) : (
-        <div className="text-center py-12">
-          <p className="text-lg sm:text-xl text-muted-foreground">Nenhuma espécie encontrada com os filtros selecionados.</p>
+        <div className="flex gap-6">
+          <SpeciesSidebar
+            species={filteredSpecies}
+            selectedId={selectedSpecies?.id || null}
+            onSelect={handleSelectSpecies}
+          />
+          <SpeciesDetailPanel species={selectedSpecies} />
         </div>
       )}
     </div>
