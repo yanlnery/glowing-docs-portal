@@ -20,7 +20,7 @@ const filterOptions: { label: string; value: SpeciesTypeFilter }[] = [
 
 export function SpeciesFilterControls({ activeFilter, onFilterChange }: SpeciesFilterControlsProps) {
   return (
-    <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-end overflow-x-auto py-2 sm:py-0">
+    <div className="flex items-center gap-2 w-full overflow-x-auto py-2">
       {filterOptions.map(option => (
         <Button
           key={option.value}
