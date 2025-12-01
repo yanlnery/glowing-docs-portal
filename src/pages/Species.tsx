@@ -102,15 +102,20 @@ export default function SpeciesPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 lg:py-12">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-3 text-serpente-400">Espécies Criadas</h1>
-        <p className="text-muted-foreground text-lg">
+    <div className="container px-4 md:px-6 py-8 sm:py-12">
+      {/* Header centralizado com barra verde */}
+      <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">
+        <div className="docs-section-title">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-balance">Espécies Criadas</h1>
+        </div>
+        <p className="text-muted-foreground max-w-2xl mt-3 sm:mt-4 text-sm sm:text-base">
           Conheça as espécies que criamos em nosso criadouro legalizado
         </p>
       </div>
 
-      <div className="mb-6">
+      {/* Busca + Filtros na mesma linha (desktop) */}
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        {/* Busca à esquerda */}
         <div className="relative w-full sm:w-80">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
@@ -121,10 +126,19 @@ export default function SpeciesPage() {
             className="pl-10"
           />
         </div>
+        
+        {/* Filtros à direita (apenas desktop) */}
+        {!isMobile && (
+          <SpeciesFilterControls
+            activeFilter={activeFilter}
+            onFilterChange={setActiveFilter}
+          />
+        )}
       </div>
 
       {isMobile ? (
         <>
+          {/* Filtros abaixo da busca no mobile */}
           <div className="mb-4">
             <SpeciesFilterControls
               activeFilter={activeFilter}
@@ -136,12 +150,6 @@ export default function SpeciesPage() {
       ) : (
         <div className="flex gap-6 min-h-[calc(100vh-24rem)]">
           <div className="w-full lg:w-[320px] flex-shrink-0">
-            <div className="mb-4">
-              <SpeciesFilterControls
-                activeFilter={activeFilter}
-                onFilterChange={setActiveFilter}
-              />
-            </div>
             <SpeciesSidebar
               species={filteredSpecies}
               selectedId={selectedSpecies?.id || null}
