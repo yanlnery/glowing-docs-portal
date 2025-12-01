@@ -40,7 +40,9 @@ export function useSpeciesManagement() {
     speciesData: Omit<Species, 'id' | 'created_at' | 'updated_at'> & { id?: string },
     isNew: boolean,
     imageFile: File | null,
-    originalImageUrl?: string | null
+    originalImageUrl: string | null | undefined,
+    galleryFiles: File[] = [],
+    originalGallery: string[] = []
   ): Promise<boolean> => {
     if (!isAdminLoggedIn) {
       toast({ title: "Acesso Negado", description: "Você precisa estar logado como administrador.", variant: "destructive" });
@@ -54,6 +56,8 @@ export function useSpeciesManagement() {
       isNew,
       imageFile,
       originalImageUrl || null,
+      galleryFiles,
+      originalGallery,
       toast
     );
     

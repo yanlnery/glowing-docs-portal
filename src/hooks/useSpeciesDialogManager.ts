@@ -7,7 +7,9 @@ type SaveSpeciesFunction = (
   speciesData: Omit<Species, 'id' | 'created_at' | 'updated_at'> & { id?: string },
   isNew: boolean,
   imageFile: File | null,
-  originalImageUrl?: string | null
+  originalImageUrl: string | null | undefined,
+  galleryFiles?: File[],
+  originalGallery?: string[]
 ) => Promise<boolean>;
 
 interface UseSpeciesDialogManagerProps {
@@ -26,6 +28,8 @@ export function useSpeciesDialogManager({
   const [isNewSpecies, setIsNewSpecies] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
   const { toast } = useToast();
 
   const openNewSpeciesDialog = useCallback(() => {
@@ -37,6 +41,7 @@ export function useSpeciesDialogManager({
       characteristics: [''],
       curiosities: [''],
       image: null,
+      gallery: [],
       type: 'serpente',
       slug: '',
       order: maxOrder + 1,
@@ -44,6 +49,8 @@ export function useSpeciesDialogManager({
     setIsNewSpecies(true);
     setImagePreview(null);
     setImageFile(null);
+    setGalleryPreviews([]);
+    setGalleryFiles([]);
     setIsDialogOpen(true);
   }, [maxOrder]);
 
@@ -52,6 +59,8 @@ export function useSpeciesDialogManager({
     setIsNewSpecies(false);
     setImagePreview(speciesData.image);
     setImageFile(null);
+    setGalleryPreviews([]);
+    setGalleryFiles([]);
     setIsDialogOpen(true);
   }, []);
 
@@ -85,6 +94,38 @@ export function useSpeciesDialogManager({
     setImageFile(null);
     if (currentSpecies) {
       setCurrentSpecies({ ...currentSpecies, image: null }); 
+    }
+  };
+
+  const handleGalleryAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setGalleryFiles(prev => [...prev, file]);
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setGalleryPreviews(prev => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+      e.target.value = '';
+    }
+  };
+
+  const handleGalleryRemove = (index: number) => {
+    if (!currentSpecies) return;
+    
+    const existingCount = currentSpecies.gallery?.length || 0;
+    
+    if (index < existingCount) {
+      // Remover de gallery existente
+      const newGallery = [...(currentSpecies.gallery || [])];
+      newGallery.splice(index, 1);
+      setCurrentSpecies({ ...currentSpecies, gallery: newGallery });
+    } else {
+      // Remover de novos arquivos
+      const newFileIndex = index - existingCount;
+      setGalleryFiles(prev => prev.filter((_, i) => i !== newFileIndex));
+      setGalleryPreviews(prev => prev.filter((_, i) => i !== newFileIndex));
     }
   };
 
@@ -138,26 +179,30 @@ export function useSpeciesDialogManager({
     }
     
     const originalImageUrl = isNewSpecies ? null : (speciesList.find(s => s.id === currentSpecies.id)?.image || null);
+    const originalGallery = isNewSpecies ? [] : (speciesList.find(s => s.id === currentSpecies.id)?.gallery || []);
 
-    const success = await saveSpeciesFn(currentSpecies, isNewSpecies, imageFile, originalImageUrl);
+    const success = await saveSpeciesFn(currentSpecies, isNewSpecies, imageFile, originalImageUrl, galleryFiles, originalGallery);
 
     if (success) {
       handleDialogClose();
-      // States like imageFile and imagePreview are reset when dialog opens next or via openNew/Edit
     }
   };
 
   return {
     isDialogOpen,
-    setIsDialogOpen: handleDialogClose, // Or pass setIsDialogOpen directly if preferred
+    setIsDialogOpen: handleDialogClose,
     currentSpecies,
     isNewSpecies,
     imagePreview,
     imageFile,
+    galleryPreviews,
+    galleryFiles,
     openNewSpeciesDialog,
     openEditSpeciesDialog,
     handleImageChange,
     handleRemoveImage,
+    handleGalleryAdd,
+    handleGalleryRemove,
     handleInputChange,
     characteristicsHandler,
     curiositiesHandler,

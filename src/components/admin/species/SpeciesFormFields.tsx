@@ -6,9 +6,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Species } from '@/types/species';
 import { ArrayFieldManager } from './ArrayFieldManager';
 import { ImageUpload } from './ImageUpload';
+import { MultiImageUpload } from './MultiImageUpload';
 
 interface SpeciesFormFieldsProps {
-  speciesData: Species; // currentSpecies is always non-null when dialog is open
+  speciesData: Species;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   
   onCharacteristicChange: (index: number, value: string) => void;
@@ -23,6 +24,11 @@ interface SpeciesFormFieldsProps {
   imageFile: File | null;
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRemoveImage: () => void;
+
+  galleryPreviews: string[];
+  galleryFiles: File[];
+  onGalleryAdd: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onGalleryRemove: (index: number) => void;
 }
 
 export function SpeciesFormFields({
@@ -38,8 +44,12 @@ export function SpeciesFormFields({
   imageFile,
   onImageChange,
   onRemoveImage,
+  galleryPreviews,
+  galleryFiles,
+  onGalleryAdd,
+  onGalleryRemove,
 }: SpeciesFormFieldsProps) {
-  if (!speciesData) return null; // Should not happen if dialog is open
+  if (!speciesData) return null;
 
   return (
     <div className="grid gap-6 pt-4">
@@ -48,7 +58,7 @@ export function SpeciesFormFields({
           <Label htmlFor="commonName">Nome Popular*</Label>
           <Input
             id="commonName"
-            name="commonName"
+            name="commonname"
             value={speciesData.commonname}
             onChange={onInputChange}
           />
@@ -97,6 +107,14 @@ export function SpeciesFormFields({
         existingImageUrl={speciesData.image}
         onImageChange={onImageChange}
         onRemoveImage={onRemoveImage}
+      />
+
+      <MultiImageUpload
+        galleryPreviews={galleryPreviews}
+        galleryFiles={galleryFiles}
+        existingGalleryUrls={speciesData.gallery || []}
+        onGalleryAdd={onGalleryAdd}
+        onGalleryRemove={onGalleryRemove}
       />
 
       <div className="space-y-1.5">

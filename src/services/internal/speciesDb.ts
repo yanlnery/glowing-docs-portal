@@ -12,6 +12,7 @@ interface SpeciesDbRecord {
   characteristics: string[];
   curiosities: string[];
   image: string | null;
+  gallery: string[];
   order: number;
   type: 'serpente' | 'lagarto' | 'quelonio' | 'outro';
   slug: string;

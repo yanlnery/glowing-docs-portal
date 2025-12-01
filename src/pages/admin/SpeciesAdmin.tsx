@@ -118,7 +118,11 @@ export default function SpeciesAdmin() {
           imageFile={dialogManager.imageFile}
           onImageChange={dialogManager.handleImageChange}
           onRemoveImage={dialogManager.handleRemoveImage}
-          isLoading={speciesLoading} 
+          galleryPreviews={dialogManager.galleryPreviews}
+          galleryFiles={dialogManager.galleryFiles}
+          onGalleryAdd={dialogManager.handleGalleryAdd}
+          onGalleryRemove={dialogManager.handleGalleryRemove}
+          isLoading={speciesLoading}
         />
       )}
     </div>
