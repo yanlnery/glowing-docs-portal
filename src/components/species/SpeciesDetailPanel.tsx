@@ -23,7 +23,7 @@ export function SpeciesDetailPanel({ species }: SpeciesDetailPanelProps) {
   return (
     <div 
       key={species.id} 
-      className="flex-1 animate-fade-in"
+      className="flex-1 animate-fade-in min-h-[calc(100vh-24rem)]"
     >
       <div className="bg-card border border-border rounded-lg p-6 lg:p-8">
         {/* Título */}

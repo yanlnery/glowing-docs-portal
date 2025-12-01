@@ -104,34 +104,44 @@ export default function SpeciesPage() {
         </p>
       </div>
 
-      <div className="mb-8 space-y-4">
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <div className="relative w-full sm:w-80">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              type="text"
-              placeholder="Buscar espécie..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <SpeciesFilterControls
-            activeFilter={activeFilter}
-            onFilterChange={setActiveFilter}
+      <div className="mb-6">
+        <div className="relative w-full sm:w-80">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            type="text"
+            placeholder="Buscar espécie..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
           />
         </div>
       </div>
 
       {isMobile ? (
-        <SpeciesMobileView species={filteredSpecies} />
+        <>
+          <div className="mb-4">
+            <SpeciesFilterControls
+              activeFilter={activeFilter}
+              onFilterChange={setActiveFilter}
+            />
+          </div>
+          <SpeciesMobileView species={filteredSpecies} />
+        </>
       ) : (
-        <div className="flex gap-6">
-          <SpeciesSidebar
-            species={filteredSpecies}
-            selectedId={selectedSpecies?.id || null}
-            onSelect={handleSelectSpecies}
-          />
+        <div className="flex gap-6 min-h-[calc(100vh-24rem)]">
+          <div className="w-full lg:w-[320px] flex-shrink-0">
+            <div className="mb-4">
+              <SpeciesFilterControls
+                activeFilter={activeFilter}
+                onFilterChange={setActiveFilter}
+              />
+            </div>
+            <SpeciesSidebar
+              species={filteredSpecies}
+              selectedId={selectedSpecies?.id || null}
+              onSelect={handleSelectSpecies}
+            />
+          </div>
           <SpeciesDetailPanel species={selectedSpecies} />
         </div>
       )}
