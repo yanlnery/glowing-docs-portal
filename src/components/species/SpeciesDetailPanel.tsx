@@ -7,24 +7,19 @@ interface SpeciesDetailPanelProps {
 }
 
 export function SpeciesDetailPanel({ species }: SpeciesDetailPanelProps) {
-  if (!species) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-center p-12">
-          <div className="text-5xl mb-4">🦎</div>
-          <p className="text-muted-foreground text-lg">
-            Selecione uma espécie na lista ao lado para ver detalhes
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div 
-      key={species.id} 
-      className="flex-1 animate-fade-in min-h-[calc(100vh-24rem)]"
-    >
+    <div className="flex-1 min-h-[calc(100vh-24rem)]">
+      {!species ? (
+        <div className="h-full flex items-center justify-center">
+          <div className="text-center p-12">
+            <div className="text-5xl mb-4">🦎</div>
+            <p className="text-muted-foreground text-lg">
+              Selecione uma espécie na lista ao lado para ver detalhes
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div key={species.id} className="animate-fade-in">
       <div className="bg-card border border-border rounded-lg p-6 lg:p-8">
         {/* Título */}
         <div className="mb-6">
@@ -89,6 +84,8 @@ export function SpeciesDetailPanel({ species }: SpeciesDetailPanelProps) {
           </div>
         )}
       </div>
+        </div>
+      )}
     </div>
   );
 }
