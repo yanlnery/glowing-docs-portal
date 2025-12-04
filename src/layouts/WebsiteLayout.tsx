@@ -7,16 +7,18 @@ import Footer from '@/components/Footer';
 export default function WebsiteLayout() {
   const location = useLocation();
   
-  // Scroll to top when location changes
+  // Smooth scroll to top when location changes
   useEffect(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [location]);
   
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1">
-        <Outlet />
+        <div key={location.pathname} className="animate-fade-in">
+          <Outlet />
+        </div>
       </main>
       <Footer />
     </div>
