@@ -54,7 +54,10 @@ export function SpeciesSidebar({ species, selectedId, onSelect }: SpeciesSidebar
                       <img 
                         src={speciesItem.image} 
                         alt={speciesItem.commonname}
+                        loading="eager"
+                        decoding="async"
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                        style={{ imageRendering: 'auto', WebkitBackfaceVisibility: 'hidden' }}
                       />
                     ) : (
                       <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground text-lg">
