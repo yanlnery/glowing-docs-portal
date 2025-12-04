@@ -32,17 +32,26 @@ export function SpeciesSidebar({ species, selectedId, onSelect }: SpeciesSidebar
                   key={speciesItem.id}
                   onClick={() => onSelect(speciesItem)}
                   className={cn(
-                    "w-full text-left p-3 rounded-md transition-all duration-200 mb-1",
-                    "hover:bg-serpente-600/10 hover:border-l-4 hover:border-serpente-400",
+                    "group w-full text-left p-3 rounded-lg transition-all duration-300 mb-1.5 relative overflow-hidden",
+                    "border-l-4",
                     selectedId === speciesItem.id
-                      ? "bg-serpente-600/20 border-l-4 border-serpente-500"
-                      : "border-l-4 border-transparent"
+                      ? "bg-serpente-600/20 border-serpente-500 shadow-md"
+                      : "border-transparent hover:bg-serpente-600/10 hover:border-serpente-400 hover:shadow-sm hover:translate-x-1"
                   )}
                 >
-                  <div className="font-medium text-sm">
+                  {/* Efeito de brilho no hover */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-serpente-400/0 via-serpente-400/5 to-serpente-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                  
+                  <div className={cn(
+                    "font-medium text-sm transition-colors duration-200",
+                    selectedId === speciesItem.id ? "text-serpente-400" : "group-hover:text-serpente-500"
+                  )}>
                     {speciesItem.commonname}
                   </div>
-                  <div className="text-xs italic text-muted-foreground mt-0.5">
+                  <div className={cn(
+                    "text-xs italic mt-0.5 transition-colors duration-200",
+                    selectedId === speciesItem.id ? "text-serpente-400/70" : "text-muted-foreground group-hover:text-muted-foreground/80"
+                  )}>
                     {speciesItem.name}
                   </div>
                 </button>
