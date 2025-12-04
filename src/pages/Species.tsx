@@ -54,13 +54,20 @@ export default function SpeciesPage() {
     fetchSpecies();
   }, []); // Só roda uma vez
 
-  // Pré-seleção baseada na URL
+  // Pré-seleção baseada na URL ou auto-seleção da primeira espécie
   useEffect(() => {
     const selectedSlug = searchParams.get('selected');
-    if (selectedSlug && speciesList.length > 0) {
-      const species = speciesList.find(s => s.slug === selectedSlug);
-      if (species) {
-        setSelectedSpecies(species);
+    
+    if (speciesList.length > 0) {
+      if (selectedSlug) {
+        // Se há um slug na URL, seleciona essa espécie
+        const species = speciesList.find(s => s.slug === selectedSlug);
+        if (species) {
+          setSelectedSpecies(species);
+        }
+      } else if (!selectedSpecies) {
+        // Se não há slug na URL e nenhuma espécie selecionada, seleciona a primeira
+        setSelectedSpecies(speciesList[0]);
       }
     }
   }, [searchParams, speciesList]);
