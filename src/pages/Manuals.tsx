@@ -36,7 +36,6 @@ export default function Manuals() {
   }, [toast]);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
     loadManuals();
   }, [loadManuals]);
   
