@@ -110,7 +110,7 @@ export default function SpeciesPage() {
   }
 
   return (
-    <div className="container px-4 md:px-6 py-8 sm:py-12">
+    <div className="container px-4 md:px-6 py-8 sm:py-12 min-h-[60vh]">
       {/* Header centralizado com barra verde */}
       <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">
         <div className="docs-section-title">
