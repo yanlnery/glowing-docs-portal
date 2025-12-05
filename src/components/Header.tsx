@@ -36,15 +36,6 @@ export default function Header() {
   const { settings } = useSettings(); 
   const isAcademyVisible = settings.isAcademyVisible;
 
-  // Debug log para verificar configurações da Academy
-  useEffect(() => {
-    console.log("🎓 HEADER - Academy visibility check:", { 
-      isAcademyVisible, 
-      settings,
-      currentPath: location.pathname 
-    });
-  }, [isAcademyVisible, settings, location.pathname]);
-
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location.pathname]);
@@ -65,16 +56,12 @@ export default function Header() {
   }, []);
 
   const menuItems = useMemo(() => {
-    const filtered = baseMenuItems.filter(item => {
+    return baseMenuItems.filter(item => {
       if (item.id === "academy") {
-        console.log("🎓 HEADER - Filtering Academy item:", { isAcademyVisible, itemId: item.id });
         return isAcademyVisible;
       }
       return true;
     });
-    
-    console.log("🎓 HEADER - Final menu items:", filtered.map(item => ({ title: item.title, visible: true })));
-    return filtered;
   }, [isAcademyVisible, baseMenuItems]);
   
   return (

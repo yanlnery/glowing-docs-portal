@@ -15,15 +15,6 @@ export default function HeroCarousel() {
     handleIndicatorClick,
   } = useHeroCarousel();
 
-  // Log para verificar os dados recebidos do hook
-  console.log("HeroCarousel (Main Component): Data from useHeroCarousel", {
-    isLoading,
-    error,
-    carouselImagesDataCount: carouselImagesData.length,
-    currentImageIndex,
-    currentSlideDataId: currentSlideData.id
-  });
-
   return (
     <HeroCarouselUI
       isLoading={isLoading}
@@ -37,4 +28,3 @@ export default function HeroCarousel() {
     />
   );
 }
-

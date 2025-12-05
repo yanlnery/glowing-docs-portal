@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter as Router, Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet, useLocation, Link } from "react-router-dom";
 import WebsiteLayout from "./layouts/WebsiteLayout";
 import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
@@ -58,30 +58,20 @@ const WaitlistConfirmationPage = () => (
         Entraremos em contato assim que novas vagas estiverem disponíveis.
       </p>
       <Button asChild className="min-h-[44px]">
-        <a href="/">Voltar para a Página Inicial</a>
+        <Link to="/">Voltar para a Página Inicial</Link>
       </Button>
     </div>
   </div>
 );
 
-// Function for conditional Academy route based on settings - now with proper debug
+// Function for conditional Academy route based on settings
 const AcademyRoute = () => {
-  const { settings, isAcademyVisible } = useSettings();
-  const location = useLocation();
-  
-  console.log("🎓 ACADEMY ROUTE CHECK:", { 
-    isAcademyVisible, 
-    settings,
-    currentPath: location.pathname,
-    shouldRedirect: !isAcademyVisible 
-  });
+  const { isAcademyVisible } = useSettings();
   
   if (!isAcademyVisible) {
-    console.log("🎓 ACADEMY ROUTE - Redirecting to home because Academy is disabled");
     return <Navigate to="/" replace />;
   }
   
-  console.log("🎓 ACADEMY ROUTE - Rendering Academy page");
   return <Academy />;
 };
 
