@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import {
   Card,
   CardContent,
@@ -60,7 +61,7 @@ export default function SpeciesAdmin() {
   }
   
   if (!isAdminLoggedIn && !speciesLoading) {
-     return <div className="p-6 text-center">Por favor, <a href="/admin" className="underline text-primary">faça login</a> para gerenciar as espécies.</div>;
+     return <div className="p-6 text-center">Por favor, <Link to="/admin" className="underline text-primary">faça login</Link> para gerenciar as espécies.</div>;
   }
 
   return (

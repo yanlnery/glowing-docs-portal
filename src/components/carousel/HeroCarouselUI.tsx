@@ -35,15 +35,6 @@ export default function HeroCarouselUI({
   autoplayPlugin,
   handleIndicatorClick,
 }: HeroCarouselUIProps) {
-  
-  console.log("HeroCarouselUI rendering with:", {
-    isLoading, 
-    error, 
-    itemsCount: carouselImagesData.length, 
-    currentIndex: currentImageIndex,
-    currentSlideTitle: currentSlideData.title,
-    currentSlideImageUrl: currentSlideData.image_url
-  });
 
   if (error) {
     return (
@@ -97,14 +88,6 @@ export default function HeroCarouselUI({
               const isCurrentSlide = index === currentImageIndex;
               const shouldPrioritize = Math.abs(index - currentImageIndex) <= 1;
 
-              console.log(`Rendering slide ${index}:`, {
-                originalImageUrl: item.image_url,
-                processedImageUrl: processedImageUrl,
-                title: item.title,
-                isCurrentSlide,
-                shouldPrioritize
-              });
-
               return (
                 <CarouselItem key={item.id || index} className="h-full pl-0">
                   <div className="relative h-full w-full">
@@ -124,10 +107,6 @@ export default function HeroCarouselUI({
                           position: "relative",
                           zIndex: 10,
                           opacity: 1,
-                        }}
-                        onLoad={() => console.log(`✅ Imagem carregada: ${processedImageUrl}`)}
-                        onError={(e) => {
-                          console.error(`❌ Falha ao carregar imagem: ${processedImageUrl}`);
                         }}
                       />
                     ) : (

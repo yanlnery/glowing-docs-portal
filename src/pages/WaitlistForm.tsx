@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -201,7 +201,7 @@ const WaitlistForm = () => {
         <CardFooter className="flex flex-col items-center justify-center text-center text-xs text-muted-foreground">
           <p>
             Ao se inscrever, você concorda com nossa{' '}
-            <a href="/privacidade" className="hover:underline text-serpente-600">Política de Privacidade</a>
+            <Link to="/politica-de-privacidade" className="hover:underline text-serpente-600">Política de Privacidade</Link>
           </p>
         </CardFooter>
       </Card>

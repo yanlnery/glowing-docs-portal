@@ -33,16 +33,14 @@ export function useHeroCarousel() {
 
   // Função para recarregar dados do carrossel
   const reloadCarouselData = async () => {
-    console.log("🔄 Reloading carousel data...");
     setIsLoading(true);
     setError(null);
     
     try {
       const items = await fetchCarouselItems();
-      console.log("✅ Carousel data reloaded:", items.length, "items");
       setCarouselImagesData(items);
     } catch (fetchError) {
-      console.error("❌ Failed to reload carousel items:", fetchError);
+      console.error("Failed to reload carousel items:", fetchError);
       setError("Falha ao carregar dados do carrossel.");
       setCarouselImagesData([]);
     } finally {
@@ -62,7 +60,6 @@ export function useHeroCarousel() {
 
     const onSelect = () => {
       const newIndex = api.selectedScrollSnap();
-      console.log("Carousel slide changed to index:", newIndex);
       setCurrentImageIndex(newIndex);
     };
 
@@ -119,10 +116,8 @@ export function useHeroCarousel() {
           const isPlaying = autoplayPlugin.current.isPlaying();
           if (isPlaying) {
             autoplayPlugin.current.stop();
-            console.log("Autoplay pausado");
           } else {
             autoplayPlugin.current.play();
-            console.log("Autoplay retomado");
           }
         }
       }
@@ -137,7 +132,6 @@ export function useHeroCarousel() {
 
   const handleIndicatorClick = (index: number) => {
     if (api) {
-      console.log("Manual slide change to index:", index);
       api.scrollTo(index);
       // Resume autoplay after manual navigation
       if (autoplayPlugin.current && carouselImagesData.length > 1) {
@@ -150,15 +144,6 @@ export function useHeroCarousel() {
 
   const currentSlideData = carouselImagesData[currentImageIndex] ?? FALLBACK_SLIDE_DATA;
 
-  console.log("📊 Hook state:", { 
-    isLoading, 
-    error,
-    itemsCount: carouselImagesData.length,
-    currentIndex: currentImageIndex,
-    currentSlideData: currentSlideData.id,
-    autoplayRunning: carouselImagesData.length > 1
-  });
-
   return {
     isLoading,
     error,
@@ -169,6 +154,6 @@ export function useHeroCarousel() {
     setApi,
     autoplayPlugin,
     handleIndicatorClick,
-    reloadCarouselData, // Expor função para reload manual
+    reloadCarouselData,
   };
 }

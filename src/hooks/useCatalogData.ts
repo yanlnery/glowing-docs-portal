@@ -17,7 +17,6 @@ export const useCatalogData = () => {
   useEffect(() => {
     const categoryParam = searchParams.get('category') as ProductCategory | null;
     if (categoryParam && ['serpente', 'lagarto', 'quelonio'].includes(categoryParam)) {
-      console.log('🔗 Aplicando filtro da URL:', categoryParam);
       setCategoryFilter(categoryParam);
     }
   }, [searchParams]);
@@ -28,10 +27,7 @@ export const useCatalogData = () => {
     category: ProductCategory | 'all',
     subcategory: ProductSubcategory | 'all'
   ) => {
-    console.log("🔄 Aplicando filtros:", { totalProducts: productList.length, query, category, subcategory });
-    
     if (!productList || productList.length === 0) {
-      console.log("📭 Nenhum produto para filtrar");
       setFilteredProducts([]);
       return;
     }
@@ -58,22 +54,17 @@ export const useCatalogData = () => {
       result = result.filter(product => product.subcategory === subcategory);
     }
     
-    console.log(`✅ Filtros aplicados: ${result.length} produtos restantes`);
     setFilteredProducts(result);
   }, []);
 
   const loadProducts = useCallback(async () => {
     setIsLoading(true);
-    console.log("📱 Catalog Mobile rendering? Window width:", typeof window !== "undefined" ? window.innerWidth : "No window");
-    console.log("🔄 Carregando produtos do catálogo do Supabase...");
     try {
       const visibleProducts = await productService.getAvailableProducts();
-      console.log("📦 Produtos carregados:", visibleProducts.length);
-      console.log("📱 CATALOG - produtos visíveis:", visibleProducts.map(p => ({ id: p.id, name: p.name, visible: p.visible })));
       setProducts(visibleProducts);
       applyFilters(visibleProducts, searchQuery, categoryFilter, subcategoryFilter);
     } catch (error) {
-      console.error("❌ Erro ao carregar produtos:", error);
+      console.error("Erro ao carregar produtos:", error);
       setProducts([]);
       setFilteredProducts([]);
     } finally {

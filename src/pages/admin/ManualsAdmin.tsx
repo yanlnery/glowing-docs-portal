@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -170,7 +171,7 @@ export default function ManualsAdmin() {
   }
   
   if (!isAdminLoggedIn && !manualsLoading) {
-     return <AdminLayout><div className="p-6 text-center">Por favor, <a href="/admin" className="underline text-primary">faça login</a> para gerenciar os manuais.</div></AdminLayout>;
+     return <AdminLayout><div className="p-6 text-center">Por favor, <Link to="/admin" className="underline text-primary">faça login</Link> para gerenciar os manuais.</div></AdminLayout>;
   }
 
 
