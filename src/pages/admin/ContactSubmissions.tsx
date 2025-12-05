@@ -9,7 +9,10 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Eye, Trash2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Eye, Trash2, Search, Filter, Mail, CheckCircle, Reply } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
 import AdminLayout from '@/layouts/AdminLayout';
@@ -28,9 +31,12 @@ interface ContactSubmission {
 
 export default function ContactSubmissions() {
   const [submissions, setSubmissions] = useState<ContactSubmission[]>([]);
+  const [filteredSubmissions, setFilteredSubmissions] = useState<ContactSubmission[]>([]);
   const [viewSubmission, setViewSubmission] = useState<ContactSubmission | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const { toast } = useToast();
 
   const loadSubmissions = async () => {
@@ -53,6 +59,55 @@ export default function ContactSubmissions() {
   useEffect(() => {
     loadSubmissions();
   }, []);
+
+  useEffect(() => {
+    filterSubmissions();
+  }, [submissions, searchTerm, statusFilter]);
+
+  const filterSubmissions = () => {
+    let filtered = submissions;
+
+    if (searchTerm) {
+      filtered = filtered.filter(submission => 
+        submission.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        submission.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        submission.subject?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        submission.message.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(submission => submission.status === statusFilter);
+    }
+
+    setFilteredSubmissions(filtered);
+  };
+
+  const getStatusBadge = (status: string | null) => {
+    const variants: Record<string, { variant: "default" | "secondary" | "outline"; icon: typeof Mail; label: string }> = {
+      new: { variant: "default", icon: Mail, label: "Nova" },
+      read: { variant: "secondary", icon: Eye, label: "Lida" },
+      replied: { variant: "default", icon: Reply, label: "Respondida" },
+      closed: { variant: "outline", icon: CheckCircle, label: "Fechada" }
+    };
+    
+    const config = variants[status || 'new'] || variants.new;
+    const Icon = config.icon;
+    
+    return (
+      <Badge variant={config.variant} className="flex items-center gap-1">
+        <Icon className="h-3 w-3" />
+        {config.label}
+      </Badge>
+    );
+  };
+
+  const messageStats = {
+    total: submissions.length,
+    new: submissions.filter(m => m.status === 'new' || !m.status).length,
+    read: submissions.filter(m => m.status === 'read').length,
+    replied: submissions.filter(m => m.status === 'replied').length,
+  };
 
   const handleDeleteSubmission = async (id: string) => {
     if (!confirm('Tem certeza que deseja excluir esta mensagem?')) return;
@@ -101,15 +156,87 @@ export default function ContactSubmissions() {
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Mensagens de Contato</h1>
         </div>
+
+        {/* Estatísticas */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold">{messageStats.total}</div>
+                <div className="text-sm text-muted-foreground">Total</div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">{messageStats.new}</div>
+                <div className="text-sm text-muted-foreground">Novas</div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-yellow-600">{messageStats.read}</div>
+                <div className="text-sm text-muted-foreground">Lidas</div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">{messageStats.replied}</div>
+                <div className="text-sm text-muted-foreground">Respondidas</div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Filtros */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Buscar por nome, email, assunto ou mensagem..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[180px]">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os status</SelectItem>
+                  <SelectItem value="new">Nova</SelectItem>
+                  <SelectItem value="read">Lida</SelectItem>
+                  <SelectItem value="replied">Respondida</SelectItem>
+                  <SelectItem value="closed">Fechada</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
         
         <Card>
           <CardHeader>
-            <CardTitle>Mensagens recebidas</CardTitle>
+            <CardTitle>Mensagens recebidas ({filteredSubmissions.length})</CardTitle>
           </CardHeader>
           <CardContent>
-            {submissions.length === 0 ? (
+            {filteredSubmissions.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">Nenhuma mensagem de contato recebida ainda.</p>
+                <p className="text-muted-foreground">
+                  {searchTerm || statusFilter !== 'all' 
+                    ? "Nenhuma mensagem corresponde aos filtros aplicados."
+                    : "Nenhuma mensagem de contato recebida ainda."}
+                </p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -121,17 +248,19 @@ export default function ContactSubmissions() {
                       <TableHead>Email</TableHead>
                       <TableHead>Telefone</TableHead>
                       <TableHead>Assunto</TableHead>
+                      <TableHead>Status</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {submissions.map((submission) => (
-                              <TableRow key={submission.id}>
+                    {filteredSubmissions.map((submission) => (
+                      <TableRow key={submission.id} className={submission.status === 'new' || !submission.status ? 'bg-blue-50/30' : ''}>
                         <TableCell>{formatDate(submission.created_at)}</TableCell>
                         <TableCell>{submission.name}</TableCell>
                         <TableCell>{submission.email}</TableCell>
                         <TableCell>{submission.phone || "-"}</TableCell>
-                        <TableCell>{submission.subject}</TableCell>
+                        <TableCell>{submission.subject || "-"}</TableCell>
+                        <TableCell>{getStatusBadge(submission.status)}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             <Button size="sm" variant="outline" onClick={() => handleViewSubmission(submission)}>
