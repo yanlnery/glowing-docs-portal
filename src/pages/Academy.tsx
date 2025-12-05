@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -8,6 +7,8 @@ import AcademyFeatures from '@/components/academy/AcademyFeatures';
 import AcademyCoursePreview from '@/components/academy/AcademyCoursePreview';
 import AcademyPricing from '@/components/academy/AcademyPricing';
 import AcademyCTA from '@/components/academy/AcademyCTA';
+import { waitlistService } from '@/services/waitlistService';
+import { toast } from 'sonner';
 
 const Academy = () => {
   const navigate = useNavigate();
@@ -18,19 +19,22 @@ const Academy = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  const handleWaitlistSubmit = (data: any) => {
-    // Store in localStorage for demonstration purposes
-    const waitlistEntry = {
-      ...data,
-      date: new Date().toISOString()
-    };
+  const handleWaitlistSubmit = async (data: any) => {
+    try {
+      const { error } = await waitlistService.addToWaitlist({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        contact_preference: data.contactPreference
+      });
 
-    // Get current waitlist entries or initialize empty array
-    const currentEntries = JSON.parse(localStorage.getItem('waitlist') || '[]');
-    localStorage.setItem('waitlist', JSON.stringify([...currentEntries, waitlistEntry]));
+      if (error) throw error;
 
-    setIsWaitlistDialogOpen(false);
-    navigate('/confirmacao-inscricao');
+      setIsWaitlistDialogOpen(false);
+      navigate('/confirmacao-inscricao');
+    } catch (error) {
+      toast.error("Erro ao fazer inscrição. Tente novamente.");
+    }
   };
 
   const openWaitlistDialog = () => setIsWaitlistDialogOpen(true);

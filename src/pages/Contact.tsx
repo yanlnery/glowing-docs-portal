@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -6,13 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Phone, Mail, MessageSquare, Instagram, Youtube } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import emailjs from 'emailjs-com';
-
-// Note: You'll need to create an EmailJS account and add these IDs for this to work:
-// Sign up at https://www.emailjs.com/
-const EMAILJS_SERVICE_ID = "pet_serpentes"; // Replace with your service ID
-const EMAILJS_TEMPLATE_ID = "contact_form"; // Replace with your template ID
-const EMAILJS_USER_ID = "YOUR_USER_ID"; // Replace with your user ID
+import { contactService } from "@/services/contactService";
 
 export default function Contact() {
   const { toast } = useToast();
@@ -35,33 +28,16 @@ export default function Contact() {
     setIsSubmitting(true);
     
     try {
-      // Store the submission in localStorage for the admin panel
-      const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
-      const newSubmission = {
-        ...formData,
-        id: Date.now().toString(),
-        date: new Date().toISOString()
-      };
-      
-      submissions.push(newSubmission);
-      localStorage.setItem('contactSubmissions', JSON.stringify(submissions));
-      
-      // Send email using EmailJS
-      const templateParams = {
-        to_email: "contato@petserpentes.com.br",
-        from_name: formData.name,
-        from_email: formData.email,
-        phone: formData.phone || "Não informado",
+      // Save to Supabase
+      const { error } = await contactService.sendMessage({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || null,
         subject: formData.subject,
         message: formData.message
-      };
+      });
       
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        templateParams,
-        EMAILJS_USER_ID
-      );
+      if (error) throw error;
       
       toast({
         title: "Mensagem enviada!",
@@ -77,7 +53,6 @@ export default function Contact() {
         message: ""
       });
     } catch (error) {
-      console.error("Error sending email:", error);
       toast({
         title: "Erro ao enviar mensagem",
         description: "Houve um problema ao enviar sua mensagem. Por favor, tente novamente.",

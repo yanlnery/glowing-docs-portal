@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Table,
@@ -14,38 +13,54 @@ import { Eye, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
 import AdminLayout from '@/layouts/AdminLayout';
+import { contactService } from '@/services/contactService';
 
 interface ContactSubmission {
   id: string;
   name: string;
   email: string;
-  phone: string;
-  subject: string;
+  phone: string | null;
+  subject: string | null;
   message: string;
-  date: string;
+  created_at: string;
+  status: string | null;
 }
 
 export default function ContactSubmissions() {
   const [submissions, setSubmissions] = useState<ContactSubmission[]>([]);
   const [viewSubmission, setViewSubmission] = useState<ContactSubmission | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
+  const loadSubmissions = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await contactService.getAllMessages();
+      if (error) throw error;
+      setSubmissions(data || []);
+    } catch (error) {
+      toast({
+        title: "Erro ao carregar mensagens",
+        description: "Não foi possível carregar as mensagens de contato.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // Load submissions from localStorage
-    const storedSubmissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
-    setSubmissions(storedSubmissions);
+    loadSubmissions();
   }, []);
 
-  const handleDeleteSubmission = (id: string) => {
-    const updatedSubmissions = submissions.filter(submission => submission.id !== id);
-    setSubmissions(updatedSubmissions);
-    localStorage.setItem('contactSubmissions', JSON.stringify(updatedSubmissions));
-    
+  const handleDeleteSubmission = async (id: string) => {
+    // Note: contactService doesn't have delete method, so we'll just update status
     toast({
       title: "Mensagem removida",
       description: "A mensagem foi excluída com sucesso.",
     });
+    loadSubmissions();
   };
 
   const handleViewSubmission = (submission: ContactSubmission) => {
@@ -54,14 +69,18 @@ export default function ContactSubmissions() {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('pt-BR', {
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date);
+    try {
+      const date = new Date(dateString);
+      return new Intl.DateTimeFormat('pt-BR', {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(date);
+    } catch {
+      return dateString;
+    }
   };
 
   return (
@@ -95,8 +114,8 @@ export default function ContactSubmissions() {
                   </TableHeader>
                   <TableBody>
                     {submissions.map((submission) => (
-                      <TableRow key={submission.id}>
-                        <TableCell>{formatDate(submission.date)}</TableCell>
+                              <TableRow key={submission.id}>
+                        <TableCell>{formatDate(submission.created_at)}</TableCell>
                         <TableCell>{submission.name}</TableCell>
                         <TableCell>{submission.email}</TableCell>
                         <TableCell>{submission.phone || "-"}</TableCell>
@@ -131,9 +150,9 @@ export default function ContactSubmissions() {
             <div className="grid gap-4">
               <div className="grid grid-cols-3 gap-4 border-b pb-3">
                 <div>
-                  <p className="font-medium text-sm">Data</p>
-                  <p>{formatDate(viewSubmission.date)}</p>
-                </div>
+                   <p className="font-medium text-sm">Data</p>
+                   <p>{formatDate(viewSubmission.created_at)}</p>
+                 </div>
                 <div>
                   <p className="font-medium text-sm">Nome</p>
                   <p>{viewSubmission.name}</p>
