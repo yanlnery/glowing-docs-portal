@@ -55,7 +55,19 @@ export default function ContactSubmissions() {
   }, []);
 
   const handleDeleteSubmission = async (id: string) => {
-    // Note: contactService doesn't have delete method, so we'll just update status
+    if (!confirm('Tem certeza que deseja excluir esta mensagem?')) return;
+    
+    const { error } = await contactService.deleteMessage(id);
+    
+    if (error) {
+      toast({
+        title: "Erro ao excluir",
+        description: "Não foi possível excluir a mensagem.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     toast({
       title: "Mensagem removida",
       description: "A mensagem foi excluída com sucesso.",
