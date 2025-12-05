@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Button } from '@/components/ui/button';
@@ -11,19 +10,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-import { Search, Download, Calendar } from 'lucide-react';
+import { Search, Download, Calendar, Trash2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
-
-interface WaitlistEntry {
-  name: string;
-  email: string;
-  phone: string;
-  emailNotifications?: boolean;
-  phoneNotifications?: boolean;
-  marketingConsent?: boolean;
-  contactPreference?: 'email' | 'both';
-  date: string;
-}
+import { waitlistService, WaitlistEntry } from '@/services/waitlistService';
+import { toast } from 'sonner';
 
 const formatDate = (dateString: string) => {
   try {
@@ -37,25 +27,40 @@ const WaitlistAdmin = () => {
   const [waitlist, setWaitlist] = useState<WaitlistEntry[]>([]);
   const [filteredList, setFilteredList] = useState<WaitlistEntry[]>([]);
   const [search, setSearch] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
     loadWaitlist();
   }, []);
   
-  const loadWaitlist = () => {
+  const loadWaitlist = async () => {
+    setIsLoading(true);
     try {
-      const savedWaitlist = JSON.parse(localStorage.getItem('waitlist') || '[]') as WaitlistEntry[];
-      // Sort by date, newest first
-      const sortedWaitlist = savedWaitlist.sort((a, b) => 
-        new Date(b.date).getTime() - new Date(a.date).getTime()
-      );
-      setWaitlist(sortedWaitlist);
-      setFilteredList(sortedWaitlist);
+      const { data, error } = await waitlistService.getAllEntries();
+      if (error) throw error;
+      
+      setWaitlist(data || []);
+      setFilteredList(data || []);
     } catch (error) {
-      console.error("Failed to load waitlist data:", error);
+      toast.error("Erro ao carregar lista de espera");
       setWaitlist([]);
       setFilteredList([]);
+    } finally {
+      setIsLoading(false);
     }
+  };
+  
+  const handleDelete = async (id: string) => {
+    if (!confirm('Tem certeza que deseja remover este registro?')) return;
+    
+    const { error } = await waitlistService.deleteEntry(id);
+    if (error) {
+      toast.error("Erro ao remover registro");
+      return;
+    }
+    
+    toast.success("Registro removido com sucesso");
+    loadWaitlist();
   };
   
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,19 +82,7 @@ const WaitlistAdmin = () => {
   };
   
   const getNotificationPreference = (entry: WaitlistEntry) => {
-    if (entry.contactPreference) {
-      return entry.contactPreference === 'both' ? 'E-mail e Celular' : 'Apenas E-mail';
-    }
-    
-    if (entry.emailNotifications && entry.phoneNotifications) {
-      return 'E-mail e Celular';
-    } else if (entry.emailNotifications) {
-      return 'Apenas E-mail';
-    } else if (entry.phoneNotifications) {
-      return 'Apenas Celular';
-    } else {
-      return 'Nenhum';
-    }
+    return entry.contact_preference === 'both' ? 'E-mail e Celular' : 'Apenas E-mail';
   };
   
   const exportToCsv = () => {
@@ -102,7 +95,7 @@ const WaitlistAdmin = () => {
       entry.email,
       entry.phone,
       getNotificationPreference(entry),
-      formatDate(entry.date)
+      formatDate(entry.created_at)
     ]);
     
     // Combine headers and rows
@@ -168,11 +161,12 @@ const WaitlistAdmin = () => {
                     <TableHead>Celular</TableHead>
                     <TableHead>Preferência de Notificação</TableHead>
                     <TableHead>Data de Cadastro</TableHead>
+                    <TableHead className="w-[80px]">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredList.map((entry, index) => (
-                    <TableRow key={index}>
+                  {filteredList.map((entry) => (
+                    <TableRow key={entry.id}>
                       <TableCell className="font-medium">{entry.name}</TableCell>
                       <TableCell>{entry.email}</TableCell>
                       <TableCell>{entry.phone}</TableCell>
@@ -180,8 +174,18 @@ const WaitlistAdmin = () => {
                       <TableCell>
                         <div className="flex items-center">
                           <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
-                          {formatDate(entry.date)}
+                          {formatDate(entry.created_at)}
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(entry.id)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
+import { waitlistService } from "@/services/waitlistService";
 
 export default function EducationalContentSection() {
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
@@ -24,18 +24,14 @@ export default function EducationalContentSection() {
     setIsSubmitting(true);
 
     try {
-      // Prepare waitlist entry
-      const waitlistEntry = {
+      const { error } = await waitlistService.addToWaitlist({
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        contactPreference: formData.contactPreference,
-        date: new Date().toISOString()
-      };
+        contact_preference: formData.contactPreference
+      });
 
-      // Get current waitlist entries or initialize empty array
-      const currentEntries = JSON.parse(localStorage.getItem('waitlist') || '[]');
-      localStorage.setItem('waitlist', JSON.stringify([...currentEntries, waitlistEntry]));
+      if (error) throw error;
 
       toast.success("Inscrição realizada com sucesso! Entraremos em contato em breve.");
       setIsWaitlistOpen(false);
