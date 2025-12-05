@@ -21,6 +21,9 @@ const ProductForm = () => {
     navigate,
     onSubmit,
     handleDelete,
+    speciesList,
+    loadingSpecies,
+    handleSpeciesSelect,
   } = useProductForm();
 
   const removeExistingImage = (index: number) => {
@@ -44,7 +47,12 @@ const ProductForm = () => {
             <Card>
               <CardContent className="p-6">
                 <div className="space-y-6">
-                  <ProductFormFields form={form} />
+                  <ProductFormFields 
+                    form={form} 
+                    speciesList={speciesList}
+                    loadingSpecies={loadingSpecies}
+                    onSpeciesSelect={handleSpeciesSelect}
+                  />
                   
                   <div className="pt-4 border-t">
                     <ProductImageManager

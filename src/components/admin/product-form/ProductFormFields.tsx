@@ -1,18 +1,30 @@
 
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ProductFormData, ProductCategory, ProductSubcategory, ProductStatus } from '@/types/product';
+import { Species } from '@/types/species';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Loader2 } from 'lucide-react';
 
 interface ProductFormFieldsProps {
   form: UseFormReturn<ProductFormData>;
+  speciesList?: Species[];
+  loadingSpecies?: boolean;
+  onSpeciesSelect?: (speciesId: string) => void;
 }
 
-export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({ form }) => {
+export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({ 
+  form, 
+  speciesList = [], 
+  loadingSpecies = false,
+  onSpeciesSelect 
+}) => {
   const categoryOptions: { value: ProductCategory; label: string }[] = [
     { value: 'serpente', label: 'Serpente' },
     { value: 'lagarto', label: 'Lagarto' },
@@ -34,8 +46,65 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({ form }) =>
     { value: 'vendido', label: 'Vendido' },
   ];
 
+  const selectedSpeciesId = form.watch('speciesId');
+  const selectedSpecies = speciesList.find(s => s.id === selectedSpeciesId);
+
   return (
     <div className="space-y-6">
+      {/* Species Selection */}
+      <Card className="border-primary/20 bg-primary/5">
+        <CardContent className="pt-6">
+          <FormItem>
+            <FormLabel className="text-base font-semibold">Selecionar Espécie</FormLabel>
+            <FormDescription className="mb-3">
+              Selecione uma espécie cadastrada para preencher automaticamente as informações do produto.
+            </FormDescription>
+            <Select 
+              onValueChange={(value) => onSpeciesSelect?.(value)}
+              value={selectedSpeciesId || ''}
+            >
+              <FormControl>
+                <SelectTrigger className="bg-background">
+                  {loadingSpecies ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Carregando espécies...</span>
+                    </div>
+                  ) : (
+                    <SelectValue placeholder="Selecione uma espécie cadastrada" />
+                  )}
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {speciesList.map((species) => (
+                  <SelectItem key={species.id} value={species.id}>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{species.commonname}</span>
+                      <span className="text-muted-foreground text-sm">({species.name})</span>
+                      <Badge variant="outline" className="ml-2 text-xs">
+                        {species.type === 'serpente' ? 'Serpente' : 
+                         species.type === 'lagarto' ? 'Lagarto' : 'Quelônio'}
+                      </Badge>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormItem>
+
+          {selectedSpecies && (
+            <div className="mt-4 p-3 rounded-lg bg-background border">
+              <div className="flex items-center gap-2 mb-2">
+                <Badge variant="secondary">{selectedSpecies.type}</Badge>
+                <span className="text-sm text-muted-foreground">Espécie selecionada</span>
+              </div>
+              <p className="text-sm font-medium">{selectedSpecies.commonname}</p>
+              <p className="text-xs text-muted-foreground italic">{selectedSpecies.name}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
           control={form.control}
@@ -74,12 +143,17 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({ form }) =>
             <FormLabel>Descrição</FormLabel>
             <FormControl>
               <Textarea 
-                placeholder="Descreva as características, comportamento e cuidados necessários..."
-                className="min-h-[100px]"
+                placeholder="Selecione uma espécie acima para preencher automaticamente ou descreva manualmente..."
+                className="min-h-[150px]"
                 {...field}
               />
             </FormControl>
             <FormMessage />
+            {selectedSpecies && (
+              <FormDescription>
+                ✓ Preenchido automaticamente com informações da espécie selecionada
+              </FormDescription>
+            )}
           </FormItem>
         )}
       />
