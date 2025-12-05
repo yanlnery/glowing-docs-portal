@@ -46,6 +46,16 @@ export const contactService = {
     return { data, error };
   },
 
+  // Deletar mensagem
+  async deleteMessage(id: string): Promise<{ error: any }> {
+    const { error } = await supabase
+      .from('contact_messages')
+      .delete()
+      .eq('id', id);
+    
+    return { error };
+  },
+
   // Estatísticas de mensagens
   async getMessageStats(): Promise<{ data: any; error: any }> {
     const { data, error } = await supabase
