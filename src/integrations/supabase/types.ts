@@ -92,6 +92,36 @@ export type Database = {
         }
         Relationships: []
       }
+      cart_analytics: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          item_count: number
+          items: Json
+          session_id: string | null
+          total_value: number
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          item_count?: number
+          items?: Json
+          session_id?: string | null
+          total_value?: number
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          item_count?: number
+          items?: Json
+          session_id?: string | null
+          total_value?: number
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           created_at: string | null

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -13,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
+import { waitlistService } from '@/services/waitlistService';
 
 const WaitlistForm = () => {
   const [name, setName] = useState('');
@@ -30,27 +30,22 @@ const WaitlistForm = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      // Store in localStorage for demonstration purposes
-      const waitlistEntry = {
+    try {
+      // Determine contact preference based on checkboxes
+      const contactPreference = emailNotifications && phoneNotifications ? 'both' : 'email';
+      
+      const { error } = await waitlistService.addToWaitlist({
         name,
         email,
         phone,
-        emailNotifications,
-        phoneNotifications,
-        marketingConsent,
-        planType: selectedPlan,
-        date: new Date().toISOString()
-      };
+        contact_preference: contactPreference
+      });
 
-      // Get current waitlist entries or initialize empty array
-      const currentEntries = JSON.parse(localStorage.getItem('waitlist') || '[]');
-      localStorage.setItem('waitlist', JSON.stringify([...currentEntries, waitlistEntry]));
+      if (error) throw error;
 
       toast({
         title: "Inscrição realizada!",
@@ -59,7 +54,15 @@ const WaitlistForm = () => {
 
       // Navigate to confirmation page
       navigate('/confirmacao-inscricao');
-    }, 1500);
+    } catch (error) {
+      toast({
+        title: "Erro ao fazer inscrição",
+        description: "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

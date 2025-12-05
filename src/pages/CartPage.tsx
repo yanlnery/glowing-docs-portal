@@ -24,6 +24,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/use-toast';
 import { orderService } from '@/services/orderService';
+import { cartAnalyticsService } from '@/services/cartAnalyticsService';
 
 // Define proper interfaces for our form data and errors
 interface CheckoutFormData {
@@ -53,28 +54,16 @@ const CartPage = () => {
   
   useEffect(() => {
     // Record cart view for analytics
-    const recordCartView = () => {
-      try {
-        const now = new Date().toISOString();
-        const analyticsData = JSON.parse(localStorage.getItem('cartAnalytics') || '[]');
-        
-        analyticsData.push({
-          timestamp: now,
-          action: 'view_cart',
-          productId: '',
-          productName: '',
-          quantity: 0,
-          price: 0,
-          referrer: document.referrer || 'direct'
-        });
-        
-        localStorage.setItem('cartAnalytics', JSON.stringify(analyticsData));
-      } catch (error) {
-        console.error("Error recording cart view:", error);
-      }
-    };
-    
-    recordCartView();
+    cartAnalyticsService.recordEvent({
+      action: 'view_cart',
+      item_count: items.length,
+      total_value: items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0),
+      items: items.map(item => ({
+        id: item.product.id,
+        name: item.product.name,
+        price: item.product.price
+      }))
+    });
   }, []);
   
   // Calculate total

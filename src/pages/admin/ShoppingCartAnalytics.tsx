@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/layouts/AdminLayout';
 import {
@@ -27,28 +26,17 @@ import { format, parseISO, subDays, isAfter } from 'date-fns';
 import { 
   ShoppingCart, 
   BarChart, 
-  PieChart, 
-  LineChart, 
-  Calendar, 
   Clock, 
   ExternalLink
 } from 'lucide-react';
 import { PieChart as RechartsPie, Pie, BarChart as RechartsBar, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
-
-// Define types for analytics data
-interface CartAnalyticsEntry {
-  timestamp: string;
-  action: string;
-  productId: string;
-  productName: string;
-  quantity: number;
-  price: number;
-  referrer: string;
-}
+import { cartAnalyticsService, CartAnalyticsEntry } from '@/services/cartAnalyticsService';
+import { toast } from 'sonner';
 
 const ShoppingCartAnalytics = () => {
   const [analyticsData, setAnalyticsData] = useState<CartAnalyticsEntry[]>([]);
   const [timeFilter, setTimeFilter] = useState('all');
+  const [isLoading, setIsLoading] = useState(true);
   
   // Colors for charts
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
@@ -57,13 +45,17 @@ const ShoppingCartAnalytics = () => {
     loadAnalytics();
   }, []);
   
-  const loadAnalytics = () => {
+  const loadAnalytics = async () => {
+    setIsLoading(true);
     try {
-      const data = JSON.parse(localStorage.getItem('cartAnalytics') || '[]') as CartAnalyticsEntry[];
-      setAnalyticsData(data);
+      const { data, error } = await cartAnalyticsService.getAllEntries();
+      if (error) throw error;
+      setAnalyticsData(data || []);
     } catch (error) {
-      console.error("Failed to load cart analytics:", error);
+      toast.error("Erro ao carregar dados de analytics");
       setAnalyticsData([]);
+    } finally {
+      setIsLoading(false);
     }
   };
   
@@ -75,7 +67,7 @@ const ShoppingCartAnalytics = () => {
     const cutoffDate = subDays(new Date(), parseInt(timeFilter));
     return analyticsData.filter(entry => {
       try {
-        return isAfter(parseISO(entry.timestamp), cutoffDate);
+        return entry.created_at && isAfter(parseISO(entry.created_at), cutoffDate);
       } catch {
         return false;
       }
@@ -87,33 +79,43 @@ const ShoppingCartAnalytics = () => {
   // Calculate metrics
   const totalCartVisits = filteredData.filter(entry => entry.action === 'view_cart').length;
   const totalAddToCart = filteredData.filter(entry => entry.action === 'add_to_cart').length;
-  const totalProducts = filteredData.filter(entry => entry.action === 'add_to_cart')
-    .reduce((sum, entry) => sum + entry.quantity, 0);
+  const totalProducts = filteredData.reduce((sum, entry) => sum + (entry.item_count || 0), 0);
   
-  // Most added products
-  const productCounts = filteredData
-    .filter(entry => entry.action === 'add_to_cart')
+  // Get product names from items array
+  const getProductName = (entry: CartAnalyticsEntry) => {
+    if (entry.items && Array.isArray(entry.items) && entry.items.length > 0) {
+      return entry.items.map((item: any) => item.name || 'Produto').join(', ');
+    }
+    return '-';
+  };
+  
+  // Most viewed/accessed sessions
+  const sessionCounts = filteredData
     .reduce((acc: {[key: string]: number}, entry) => {
-      const productName = entry.productName || 'Unknown Product';
-      acc[productName] = (acc[productName] || 0) + entry.quantity;
+      const sessionId = entry.session_id || 'unknown';
+      acc[sessionId] = (acc[sessionId] || 0) + 1;
       return acc;
     }, {});
   
-  const topProducts = Object.entries(productCounts)
-    .map(([name, count]) => ({ name, count }))
+  const topSessions = Object.entries(sessionCounts)
+    .map(([name, count]) => ({ name: name.substring(0, 12) + '...', count }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
   
-  // Referrers
-  const referrerCounts = filteredData
+  // Action distribution
+  const actionCounts = filteredData
     .reduce((acc: {[key: string]: number}, entry) => {
-      const referrer = entry.referrer || 'direct';
-      acc[referrer] = (acc[referrer] || 0) + 1;
+      const action = entry.action || 'unknown';
+      acc[action] = (acc[action] || 0) + 1;
       return acc;
     }, {});
   
-  const topReferrers = Object.entries(referrerCounts)
-    .map(([name, count]) => ({ name, count }))
+  const actionDistribution = Object.entries(actionCounts)
+    .map(([name, count]) => ({ 
+      name: name === 'view_cart' ? 'Visualização' : 
+            name === 'add_to_cart' ? 'Adição' : name, 
+      count 
+    }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
   
@@ -196,18 +198,18 @@ const ShoppingCartAnalytics = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Top Products Chart */}
+            {/* Sessions Chart */}
             <Card>
               <CardHeader>
-                <CardTitle>Produtos Mais Adicionados</CardTitle>
-                <CardDescription>Top 5 produtos adicionados ao carrinho</CardDescription>
+                <CardTitle>Sessões Mais Ativas</CardTitle>
+                <CardDescription>Top 5 sessões com mais interações</CardDescription>
               </CardHeader>
               <CardContent>
-                {topProducts.length > 0 ? (
+                {topSessions.length > 0 ? (
                   <div className="w-full h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <RechartsBar
-                        data={topProducts}
+                        data={topSessions}
                         margin={{ top: 5, right: 20, left: 20, bottom: 60 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" />
@@ -215,7 +217,7 @@ const ShoppingCartAnalytics = () => {
                         <YAxis />
                         <Tooltip />
                         <Legend />
-                        <Bar dataKey="count" fill="#8884d8" name="Quantidade" />
+                        <Bar dataKey="count" fill="#8884d8" name="Interações" />
                       </RechartsBar>
                     </ResponsiveContainer>
                   </div>
@@ -227,19 +229,19 @@ const ShoppingCartAnalytics = () => {
               </CardContent>
             </Card>
             
-            {/* Referrers Chart */}
+            {/* Actions Chart */}
             <Card>
               <CardHeader>
-                <CardTitle>Fontes de Tráfego</CardTitle>
-                <CardDescription>De onde os usuários chegam ao carrinho</CardDescription>
+                <CardTitle>Distribuição de Ações</CardTitle>
+                <CardDescription>Tipos de interações no carrinho</CardDescription>
               </CardHeader>
               <CardContent>
-                {topReferrers.length > 0 ? (
+                {actionDistribution.length > 0 ? (
                   <div className="w-full h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <RechartsPie>
                         <Pie
-                          data={topReferrers}
+                          data={actionDistribution}
                           cx="50%"
                           cy="50%"
                           labelLine={false}
@@ -248,7 +250,7 @@ const ShoppingCartAnalytics = () => {
                           fill="#8884d8"
                           dataKey="count"
                         >
-                          {topReferrers.map((entry, index) => (
+                          {actionDistribution.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Pie>
@@ -283,19 +285,19 @@ const ShoppingCartAnalytics = () => {
                       <TableRow>
                         <TableHead>Data/Hora</TableHead>
                         <TableHead>Ação</TableHead>
-                        <TableHead>Produto</TableHead>
-                        <TableHead>Quantidade</TableHead>
-                        <TableHead>Preço</TableHead>
-                        <TableHead>Origem</TableHead>
+                        <TableHead>Itens</TableHead>
+                        <TableHead>Qtd</TableHead>
+                        <TableHead>Valor Total</TableHead>
+                        <TableHead>Sessão</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {filteredData.slice(0, 10).map((entry, index) => (
-                        <TableRow key={index}>
+                        <TableRow key={entry.id || index}>
                           <TableCell>
                             <div className="flex items-center">
                               <Clock className="h-4 w-4 mr-1 text-muted-foreground" />
-                              {formatDateTime(entry.timestamp)}
+                              {entry.created_at ? formatDateTime(entry.created_at) : '-'}
                             </div>
                           </TableCell>
                           <TableCell>{
@@ -305,13 +307,12 @@ const ShoppingCartAnalytics = () => {
                             entry.action === 'view_cart' ? 'Visualização do Carrinho' :
                             entry.action
                           }</TableCell>
-                          <TableCell>{entry.productName || '-'}</TableCell>
-                          <TableCell>{entry.quantity || '-'}</TableCell>
-                          <TableCell>{entry.price ? formatPrice(entry.price) : '-'}</TableCell>
+                          <TableCell>{getProductName(entry)}</TableCell>
+                          <TableCell>{entry.item_count || '-'}</TableCell>
+                          <TableCell>{entry.total_value ? formatPrice(entry.total_value) : '-'}</TableCell>
                           <TableCell>
-                            <div className="flex items-center">
-                              <ExternalLink className="h-4 w-4 mr-1 text-muted-foreground" />
-                              {entry.referrer || 'Acesso direto'}
+                            <div className="flex items-center text-xs text-muted-foreground">
+                              {entry.session_id ? entry.session_id.substring(0, 12) + '...' : '-'}
                             </div>
                           </TableCell>
                         </TableRow>
