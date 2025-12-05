@@ -6,7 +6,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from '@/components/ui/use-toast';
 import { productService } from '@/services/productService';
-import { ProductFormData, ProductImage } from '@/types/product';
+import { ProductFormData, ProductImage, ProductCategory } from '@/types/product';
+import { Species } from '@/types/species';
+import { supabase } from '@/integrations/supabase/client';
 
 const productFormSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -38,6 +40,8 @@ export const useProductForm = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [imageList, setImageList] = useState<ProductImage[]>([]);
+  const [speciesList, setSpeciesList] = useState<Species[]>([]);
+  const [loadingSpecies, setLoadingSpecies] = useState(false);
 
   const isEditMode = Boolean(id);
 
@@ -63,6 +67,85 @@ export const useProductForm = () => {
       meta: {},
     },
   });
+
+  // Load species list
+  useEffect(() => {
+    const fetchSpecies = async () => {
+      setLoadingSpecies(true);
+      try {
+        const { data, error } = await supabase
+          .from('species')
+          .select('*')
+          .order('order', { ascending: true });
+
+        if (error) throw error;
+
+        const mappedSpecies: Species[] = (data || []).map((item) => ({
+          id: item.id,
+          name: item.name,
+          commonname: item.commonname,
+          slug: item.slug,
+          type: (item.type as 'serpente' | 'lagarto' | 'quelonio' | 'outro') || 'serpente',
+          image: item.image || '',
+          description: item.description || '',
+          characteristics: Array.isArray(item.characteristics) ? item.characteristics as string[] : [],
+          curiosities: Array.isArray(item.curiosities) ? item.curiosities as string[] : [],
+          gallery: Array.isArray(item.gallery) ? item.gallery as string[] : [],
+          order: item.order || 0,
+        }));
+
+        setSpeciesList(mappedSpecies);
+      } catch (error) {
+        console.error('Error fetching species:', error);
+      } finally {
+        setLoadingSpecies(false);
+      }
+    };
+
+    fetchSpecies();
+  }, []);
+
+  // Handle species selection - auto-fill form fields
+  const handleSpeciesSelect = (speciesId: string) => {
+    const selectedSpecies = speciesList.find(s => s.id === speciesId);
+    if (!selectedSpecies) return;
+
+    // Map species type to product category
+    const categoryMap: Record<string, ProductCategory> = {
+      'serpente': 'serpente',
+      'lagarto': 'lagarto',
+      'quelonio': 'quelonio',
+    };
+
+    const category = categoryMap[selectedSpecies.type] || 'serpente';
+
+    // Build description from species info
+    let description = selectedSpecies.description || '';
+    
+    if (selectedSpecies.characteristics && selectedSpecies.characteristics.length > 0) {
+      description += '\n\nCaracterísticas:\n• ' + selectedSpecies.characteristics.join('\n• ');
+    }
+    
+    if (selectedSpecies.curiosities && selectedSpecies.curiosities.length > 0) {
+      description += '\n\nCuriosidades:\n• ' + selectedSpecies.curiosities.join('\n• ');
+    }
+
+    // Update form fields
+    form.setValue('speciesId', selectedSpecies.id);
+    form.setValue('name', selectedSpecies.commonname);
+    form.setValue('speciesName', selectedSpecies.name);
+    form.setValue('description', description.trim());
+    form.setValue('category', category);
+    form.setValue('meta', {
+      characteristics: selectedSpecies.characteristics,
+      curiosities: selectedSpecies.curiosities,
+    });
+
+    toast({
+      title: "Espécie selecionada",
+      description: `Informações de "${selectedSpecies.commonname}" aplicadas ao produto.`,
+    });
+  };
 
   // Load product data if editing
   useEffect(() => {
@@ -215,5 +298,8 @@ export const useProductForm = () => {
     navigate,
     onSubmit,
     handleDelete,
+    speciesList,
+    loadingSpecies,
+    handleSpeciesSelect,
   };
 };
