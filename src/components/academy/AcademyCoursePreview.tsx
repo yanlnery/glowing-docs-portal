@@ -35,12 +35,12 @@ const AcademyCoursePreview: React.FC = () => {
                 <span className="text-lg font-bold text-serpente-600">C2</span>
               </div>
               <div>
-                <h4 className="font-bold">Reprodução e Genética</h4>
-                <p className="text-sm text-muted-foreground">Técnicas avançadas de breeding</p>
+                <h4 className="font-bold">Alimentação e Nutrição</h4>
+                <p className="text-sm text-muted-foreground">Saúde e bem-estar animal</p>
               </div>
             </div>
             <p className="italic text-muted-foreground">
-              "Domine as técnicas de reprodução e entenda os padrões genéticos para criar morphs incríveis."
+              "Aprenda sobre dietas adequadas, suplementação e práticas alimentares para manter seus animais saudáveis."
             </p>
           </div>
 
@@ -50,12 +50,12 @@ const AcademyCoursePreview: React.FC = () => {
                 <span className="text-lg font-bold text-serpente-600">C3</span>
               </div>
               <div>
-                <h4 className="font-bold">Manejo e Nutrição</h4>
-                <p className="text-sm text-muted-foreground">Saúde e bem-estar animal</p>
+                <h4 className="font-bold">Manejo</h4>
+                <p className="text-sm text-muted-foreground">Técnicas práticas</p>
               </div>
             </div>
             <p className="italic text-muted-foreground">
-              "Aprenda as melhores práticas de manejo, alimentação e cuidados para garantir a saúde dos seus animais."
+              "Domine as melhores técnicas de manejo para garantir segurança e conforto na criação dos seus répteis."
             </p>
           </div>
         </div>

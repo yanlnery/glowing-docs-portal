@@ -30,8 +30,8 @@ const AcademyCommunityMotto: React.FC<AcademyCommunityMottoProps> = ({ onOpenWai
         <div className="flex flex-wrap justify-center gap-8 mb-10">
           <div className="flex items-center gap-2">
             <Users className="h-5 w-5 text-serpente-600" />
-            <span className="font-bold text-xl">500+</span>
-            <span className="text-muted-foreground">Membros</span>
+            <span className="font-bold text-xl">Comunidade</span>
+            <span className="text-muted-foreground">Ativa</span>
           </div>
           <div className="flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-serpente-600" />

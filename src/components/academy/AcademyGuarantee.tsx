@@ -7,23 +7,23 @@ const AcademyGuarantee: React.FC = () => {
         <div className="max-w-3xl mx-auto text-center">
           {/* Badge circular */}
           <div className="relative inline-flex items-center justify-center mb-8">
-            <div className="w-32 h-32 rounded-full border-4 border-serpente-500 flex items-center justify-center relative">
-              <span className="text-5xl font-bold text-serpente-500">7</span>
-              {/* Texto circular ao redor */}
-              <svg className="absolute w-40 h-40" viewBox="0 0 160 160">
-                <defs>
-                  <path
-                    id="circlePath"
-                    d="M 80, 80 m -60, 0 a 60,60 0 1,1 120,0 a 60,60 0 1,1 -120,0"
-                  />
-                </defs>
-                <text className="fill-serpente-400 text-xs uppercase tracking-widest">
-                  <textPath href="#circlePath" startOffset="0%">
-                    DIAS DE GARANTIA • DIAS DE GARANTIA •
-                  </textPath>
-                </text>
-              </svg>
+            <div className="w-36 h-36 rounded-full border-4 border-serpente-500 flex items-center justify-center relative">
+              <span className="text-7xl font-bold text-serpente-500">7</span>
             </div>
+            {/* Texto circular ao redor - fora do círculo */}
+            <svg className="absolute w-48 h-48" viewBox="0 0 192 192">
+              <defs>
+                <path
+                  id="circlePath"
+                  d="M 96, 96 m -80, 0 a 80,80 0 1,1 160,0 a 80,80 0 1,1 -160,0"
+                />
+              </defs>
+              <text className="fill-serpente-400 text-[10px] uppercase tracking-[0.3em]">
+                <textPath href="#circlePath" startOffset="0%">
+                  DIAS DE GARANTIA • DIAS DE GARANTIA •
+                </textPath>
+              </text>
+            </svg>
           </div>
 
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
