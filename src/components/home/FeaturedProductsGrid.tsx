@@ -29,8 +29,8 @@ export default function FeaturedProductsGrid({ products }: FeaturedProductsGridP
     [autoplayPlugin]
   );
 
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
 
   const scrollPrev = useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev();
@@ -40,14 +40,18 @@ export default function FeaturedProductsGrid({ products }: FeaturedProductsGridP
     if (emblaApi) emblaApi.scrollNext();
   }, [emblaApi]);
 
+  const scrollTo = useCallback((index: number) => {
+    if (emblaApi) emblaApi.scrollTo(index);
+  }, [emblaApi]);
+
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
-    setCanScrollPrev(emblaApi.canScrollPrev());
-    setCanScrollNext(emblaApi.canScrollNext());
+    setSelectedIndex(emblaApi.selectedScrollSnap());
   }, [emblaApi]);
 
   useEffect(() => {
     if (!emblaApi) return;
+    setScrollSnaps(emblaApi.scrollSnapList());
     onSelect();
     emblaApi.on("select", onSelect);
     emblaApi.on("reInit", onSelect);
@@ -97,6 +101,22 @@ export default function FeaturedProductsGrid({ products }: FeaturedProductsGridP
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Dots Indicators */}
+      <div className="flex justify-center gap-2 mt-4">
+        {scrollSnaps.map((_, index) => (
+          <button
+            key={index}
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+              index === selectedIndex 
+                ? "bg-primary w-6" 
+                : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
+            }`}
+            onClick={() => scrollTo(index)}
+            aria-label={`Ir para slide ${index + 1}`}
+          />
+        ))}
       </div>
     </div>
   );
