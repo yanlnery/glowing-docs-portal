@@ -84,13 +84,13 @@ export default function FeaturedProductsGrid({ products }: FeaturedProductsGridP
         <ChevronRight className="h-4 w-4" />
       </Button>
 
-      {/* Carousel */}
-      <div className="overflow-hidden mx-0 sm:mx-10" ref={emblaRef}>
-        <div className="flex gap-4">
+      {/* Carousel - Cards maiores e mais espaçados */}
+      <div className="overflow-hidden mx-0 sm:mx-12" ref={emblaRef}>
+        <div className="flex gap-6 lg:gap-8">
           {displayedProducts.map((product, index) => (
             <div 
               key={product.id} 
-              className="flex-none w-[calc(50%-8px)] sm:w-[calc(33.333%-11px)] lg:w-[calc(25%-12px)] xl:w-[calc(20%-13px)]"
+              className="flex-none w-[85%] sm:w-[45%] lg:w-[30%] xl:w-[30%]"
             >
               <FeaturedProductCard 
                 product={product} 
@@ -101,15 +101,15 @@ export default function FeaturedProductsGrid({ products }: FeaturedProductsGridP
         </div>
       </div>
 
-      {/* Dots Indicators - One per product */}
-      <div className="flex justify-center gap-2 mt-4">
+      {/* Dots Indicators */}
+      <div className="flex justify-center gap-2 mt-6">
         {displayedProducts.map((_, index) => (
           <button
             key={index}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+            className={`h-2 rounded-full transition-all duration-300 ${
               index === selectedIndex 
-                ? "bg-primary w-6" 
-                : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                ? "bg-primary w-8" 
+                : "bg-muted-foreground/30 hover:bg-muted-foreground/50 w-2"
             }`}
             onClick={() => scrollTo(index)}
             aria-label={`Ir para produto ${index + 1}`}
