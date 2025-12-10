@@ -1,0 +1,1 @@
+UPDATE system_settings SET value = 'true'::jsonb WHERE key = 'isAcademyVisible'
