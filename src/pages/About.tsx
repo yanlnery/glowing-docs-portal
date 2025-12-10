@@ -2,17 +2,28 @@ import React from 'react';
 import { Leaf, BookOpen, Award, Heart } from 'lucide-react';
 
 const About = () => {
-  const historiaText = {
-    title: "Nossa História",
-    subtitle: "Conheça a trajetória e a missão do Pet Serpentes & Companhia",
+  const origemText = {
+    title: "A Origem do Criadouro",
     paragraphs: [
-      "O Pet Serpentes & Companhia é conduzido por Yan Nery, professor e biólogo apaixonado por herpetologia desde criança. Yan cresceu como aquarista entusiasta, sempre entre aquários e terrários, montando desde pequenos aquários até sistemas marinhos complexos, como também terrários bioativos, o que moldou sua curiosidade e respeito pela vida selvagem.",
-      "Em 2023, Yan assumiu a frente do criadouro, dando continuidade ao trabalho iniciado por Daniel Leirião em 2015, quando o empreendimento nasceu como um criadouro de aves exóticas. A partir de 2019, os répteis passaram a fazer parte do manejo legalizado, e hoje representam o foco principal da operação.",
-      "Localizado no Rio de Janeiro e com certificação do IBAMA e INEA-RJ, o criadouro se dedica à criação responsável, à promoção do bem-estar animal e à disseminação de conhecimento sobre espécies nativas. Atuamos com ética, transparência e compromisso com a educação ambiental e científica, incluindo parcerias com escolas públicas e apoio a pesquisas acadêmicas.",
-      "Nosso propósito vai além da comercialização: queremos ser referência nacional em bem-estar animal, desenvolvendo recintos naturais e espaçosos que simulem o habitat das espécies — elevando o padrão do setor."
-    ],
-    ceo: "Yan Nery",
-    ceoTitle: "CEO e Biólogo"
+      "O Pet Serpentes & Companhia nasceu da paixão por répteis e do desejo de trabalhar com criação legalizada no Brasil. O que começou como um interesse pessoal em terrários e aquários se transformou em um criadouro comercial focado em espécies nativas.",
+      "O projeto começou oficialmente em 2015 com aves exóticas, mas foi em 2019 que os répteis se tornaram o foco principal da operação. Desde então, o criadouro vem crescendo e se consolidando no mercado de herpetocultura."
+    ]
+  };
+
+  const oQueFazemosText = {
+    title: "O Que Fazemos",
+    paragraphs: [
+      "Localizado no Rio de Janeiro e certificado pelo IBAMA e INEA-RJ, o criadouro trabalha com criação responsável de répteis nativos. Oferecemos animais saudáveis, nascidos em cativeiro, com toda documentação necessária.",
+      "Além da comercialização, fazemos um trabalho educativo. Orientamos compradores sobre as reais necessidades de cada espécie, ajudamos pesquisadores com informações sobre reprodução e manejo, e recebemos estudantes interessados em aprender sobre herpetocultura."
+    ]
+  };
+
+  const propositoText = {
+    title: "Nosso Propósito",
+    paragraphs: [
+      "Queremos ser referência em criação responsável de répteis no Brasil. Isso significa investir constantemente em recintos melhores, compartilhar conhecimento de forma honesta e contribuir para que mais pessoas entendam e respeitem nossa fauna nativa.",
+      "Trabalhamos para elevar o padrão da herpetocultura brasileira, mostrando que é possível criar répteis com qualidade, dentro da lei e com respeito aos animais."
+    ]
   };
 
   const missaoItens = [
@@ -70,14 +81,16 @@ const About = () => {
     <div className="bg-background text-foreground py-12 md:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Nossa História Section - Com título e subtítulo centralizados */}
+        {/* Nossa História Section - Header */}
         <section className="mb-16 md:mb-24">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">{historiaText.title}</h2>
-            <p className="text-muted-foreground mb-8 text-lg mx-auto max-w-2xl">{historiaText.subtitle}</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Quem Somos</h2>
+            <p className="text-muted-foreground mb-8 text-lg mx-auto max-w-2xl">
+              Conheça a trajetória e a missão do Pet Serpentes & Companhia
+            </p>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center mb-16">
             <div className="order-1 md:order-1">
               <img 
                 src="/lovable-uploads/13113c77-f713-4585-9041-1766e67545b8.png" 
@@ -86,16 +99,42 @@ const About = () => {
               />
             </div>
             <div className="order-2 md:order-2 prose prose-invert max-w-none text-foreground">
-              <h3 className="text-xl font-semibold text-foreground">{historiaText.ceo}</h3>
-              <p className="text-sm text-primary mb-4">{historiaText.ceoTitle}</p>
-              {historiaText.paragraphs.map((p, index) => (
-                <p key={index} className="mb-4 leading-relaxed">{p}</p>
+              <h3 className="text-2xl font-semibold text-foreground mb-4">{origemText.title}</h3>
+              {origemText.paragraphs.map((p, index) => (
+                <p key={index} className="mb-4 leading-relaxed text-foreground/90">{p}</p>
+              ))}
+            </div>
+          </div>
+
+          {/* O Que Fazemos */}
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center mb-16">
+            <div className="order-2 md:order-1 prose prose-invert max-w-none text-foreground">
+              <h3 className="text-2xl font-semibold text-foreground mb-4">{oQueFazemosText.title}</h3>
+              {oQueFazemosText.paragraphs.map((p, index) => (
+                <p key={index} className="mb-4 leading-relaxed text-foreground/90">{p}</p>
+              ))}
+            </div>
+            <div className="order-1 md:order-2">
+              <img 
+                src="/lovable-uploads/c988fe8f-9ba2-4b94-a8e7-a7347e0d0a84.png" 
+                alt="Instalações do Pet Serpentes & Companhia" 
+                className="w-full h-auto rounded-lg shadow-lg object-cover aspect-[4/3]" 
+              />
+            </div>
+          </div>
+
+          {/* Nosso Propósito */}
+          <div className="bg-card p-8 rounded-lg shadow-md">
+            <h3 className="text-2xl font-semibold text-foreground mb-4 text-center">{propositoText.title}</h3>
+            <div className="max-w-3xl mx-auto">
+              {propositoText.paragraphs.map((p, index) => (
+                <p key={index} className="mb-4 leading-relaxed text-foreground/90 text-center">{p}</p>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Nossa Missão Section - Com título centralizado */}
+        {/* Nossa Missão Section */}
         <section className="mb-16 md:mb-24">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Nossa Missão</h2>
@@ -112,7 +151,7 @@ const About = () => {
           </div>
         </section>
 
-        {/* Nossa Trajetória Section - Com título centralizado */}
+        {/* Nossa Trajetória Section */}
         <section>
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Nossa Trajetória</h2>
@@ -125,13 +164,11 @@ const About = () => {
             
             {trajetoriaItens.map((item, index) => (
               <div key={index} className={`mb-12 md:flex ${index % 2 === 0 ? 'md:flex-row-reverse' : ''} items-center w-full`}>
-                <div className="md:w-1/2"></div> {/* Spacer for timeline alignment */}
+                <div className="md:w-1/2"></div>
                 <div className={`md:w-1/2 ${index % 2 === 0 ? 'md:pl-8 lg:pl-12' : 'md:pr-8 lg:pr-12 md:text-right'} relative`}>
-                  {/* Dot on the line */}
                   <div className="hidden md:block absolute top-1/2 -mt-2.5 transform -translate-y-1/2 z-10">
                     <div className={`w-5 h-5 rounded-full bg-primary border-4 border-background ${index % 2 === 0 ? 'md:-ml-[calc(50%+0.625rem)]' : 'md:-mr-[calc(50%+0.625rem)] md:left-auto md:right-0' } `}></div>
                   </div>
-                   {/* Mobile line */}
                   <div className="md:hidden absolute top-0 left-0 w-0.5 h-full bg-border -ml-2.5"></div>
                   <div className="md:hidden absolute top-4 left-0 w-5 h-5 rounded-full bg-primary border-4 border-background transform -translate-x-1/2 -ml-0.5"></div>
 

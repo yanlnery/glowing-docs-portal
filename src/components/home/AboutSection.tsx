@@ -29,25 +29,25 @@ export default function AboutSection() {
               <h2 className="text-3xl font-bold">Sobre o Criadouro</h2>
             </div>
             <p className="mt-6 text-lg leading-relaxed text-foreground/90">
-              O <strong>Pet Serpentes & Companhia</strong> é conduzido por Yan Nery, professor e biólogo apaixonado por herpetologia. Localizado no Rio de Janeiro, nosso criadouro é 100% legalizado pelo IBAMA e INEA-RJ, com foco total no bem-estar animal, criação responsável e na disseminação de conhecimento sobre répteis nativos.
+              O <strong>Pet Serpentes & Companhia</strong> é um criadouro comercial legalizado localizado no Rio de Janeiro, certificado pelo IBAMA e INEA-RJ. Trabalhamos exclusivamente com répteis nativos, focando no bem-estar dos animais e na criação responsável.
             </p>
             <p className="mt-4 text-lg leading-relaxed text-foreground/90">
-              Atuamos com ética e compromisso, promovendo educação ambiental, pesquisa científica e o manejo consciente das espécies.
+              Nosso trabalho vai além da venda de animais. Fazemos questão de compartilhar conhecimento sobre as espécies que criamos, ajudando novos tutores a entenderem as necessidades reais de cada animal. Também colaboramos com pesquisadores e instituições que estudam répteis brasileiros.
             </p>
 
             <div className="grid grid-cols-2 gap-4 mt-8">
               <div className="flex gap-3 items-start">
                 <Shield className="text-serpente-600 h-6 w-6 mt-1" />
                 <div>
-                  <h3 className="font-bold">100% Legal</h3>
-                  <p className="text-sm text-muted-foreground">Criadouro certificado pelo IBAMA e INEA</p>
+                  <h3 className="font-bold">Criadouro Certificado</h3>
+                  <p className="text-sm text-muted-foreground">Registro oficial IBAMA e INEA</p>
                 </div>
               </div>
               <div className="flex gap-3 items-start">
                 <Award className="text-serpente-600 h-6 w-6 mt-1" />
                 <div>
                   <h3 className="font-bold">Expertise</h3>
-                  <p className="text-sm text-muted-foreground">Equipe qualificada em herpetologia</p>
+                  <p className="text-sm text-muted-foreground">Equipe qualificada em herpetocultura</p>
                 </div>
               </div>
               <div className="flex gap-3 items-start">
@@ -60,8 +60,8 @@ export default function AboutSection() {
               <div className="flex gap-3 items-start">
                 <CreditCard className="text-serpente-600 h-6 w-6 mt-1" />
                 <div>
-                  <h3 className="font-bold">Facilidades</h3>
-                  <p className="text-sm text-muted-foreground">Parcelamento e formas de pagamento</p>
+                  <h3 className="font-bold">10% OFF no PIX</h3>
+                  <p className="text-sm text-muted-foreground">Ou 10x sem juros no cartão</p>
                 </div>
               </div>
               <div className="flex gap-3 items-start">

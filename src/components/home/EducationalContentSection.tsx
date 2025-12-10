@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Book, Users, Search } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { waitlistService } from "@/services/waitlistService";
+import manualCriacaoImg from "@/assets/manual-criacao.png";
+import academyPreviewImg from "@/assets/academy-preview.png";
+import especiesPreviewImg from "@/assets/especies-preview.png";
 
 export default function EducationalContentSection() {
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
@@ -43,6 +46,32 @@ export default function EducationalContentSection() {
     }
   };
 
+  const cards = [
+    {
+      image: manualCriacaoImg,
+      title: "Manuais de Criação",
+      description: "Guias técnicos com tudo o que você precisa saber sobre cuidados, alimentação e estrutura ideal.",
+      linkTo: "/manuais-de-criacao",
+      buttonText: "Acessar Manuais",
+      isLink: true
+    },
+    {
+      image: academyPreviewImg,
+      title: "Pet Serpentes Academy",
+      description: "Plataforma com aulas, vídeos exclusivos e uma comunidade ativa para entusiastas do hobby.",
+      buttonText: "Entrar na Lista de Espera",
+      isLink: false
+    },
+    {
+      image: especiesPreviewImg,
+      title: "Conheça nossas Espécies",
+      description: "Explore nosso catálogo completo de espécies e encontre o réptil ideal para você.",
+      linkTo: "/especies",
+      buttonText: "Conheça nossas Espécies",
+      isLink: true
+    }
+  ];
+
   return (
     <section className="py-16 bg-background">
       <div className="container px-4 sm:px-6">
@@ -56,63 +85,42 @@ export default function EducationalContentSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Card 1: Manuais de Criação */}
-          <div className="docs-card-gradient p-6 rounded-lg border hover:shadow-md transition-all group">
-            <div className="h-16 w-16 rounded-full bg-serpente-100 text-serpente-600 flex items-center justify-center mb-6 group-hover:bg-serpente-200 transition-colors dark:bg-serpente-900/50">
-              <Book className="h-8 w-8" />
+          {cards.map((card, index) => (
+            <div key={index} className="docs-card-gradient rounded-lg border hover:shadow-md transition-all group overflow-hidden flex flex-col">
+              <div className="aspect-[16/10] overflow-hidden">
+                <img 
+                  src={card.image} 
+                  alt={card.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <div className="p-6 flex flex-col flex-1">
+                <h3 className="font-bold text-xl mb-4">{card.title}</h3>
+                <p className="text-muted-foreground mb-6 flex-1">
+                  {card.description}
+                </p>
+                {card.isLink ? (
+                  <Button
+                    className="w-full group-hover:translate-y-[-2px] transition-transform"
+                    variant="outline"
+                    asChild
+                  >
+                    <Link to={card.linkTo!} className="flex items-center justify-center">
+                      {card.buttonText} <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button
+                    className="w-full group-hover:translate-y-[-2px] transition-transform"
+                    variant="outline"
+                    onClick={() => setIsWaitlistOpen(true)}
+                  >
+                    {card.buttonText} <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                )}
+              </div>
             </div>
-            <h3 className="font-bold text-xl mb-4">Manuais de Criação</h3>
-            <p className="text-muted-foreground mb-6 min-h-[80px]">
-              Guias técnicos com tudo o que você precisa saber sobre cuidados, alimentação e estrutura ideal.
-            </p>
-            <Button
-              className="w-full group-hover:translate-y-[-2px] transition-transform"
-              variant="outline"
-              asChild
-            >
-              <Link to="/manuais-de-criacao" className="flex items-center justify-center">
-                Acessar Manuais <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </Button>
-          </div>
-
-          {/* Card 2: Pet Serpentes Academy */}
-          <div className="docs-card-gradient p-6 rounded-lg border hover:shadow-md transition-all group">
-            <div className="h-16 w-16 rounded-full bg-serpente-100 text-serpente-600 flex items-center justify-center mb-6 group-hover:bg-serpente-200 transition-colors dark:bg-serpente-900/50">
-              <Users className="h-8 w-8" />
-            </div>
-            <h3 className="font-bold text-xl mb-4">Pet Serpentes Academy</h3>
-            <p className="text-muted-foreground mb-6 min-h-[80px]">
-              Plataforma com aulas, vídeos exclusivos e uma comunidade ativa para entusiastas do hobby.
-            </p>
-            <Button
-              className="w-full group-hover:translate-y-[-2px] transition-transform"
-              variant="outline"
-              onClick={() => setIsWaitlistOpen(true)}
-            >
-              Entrar na Lista de Espera <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </div>
-
-          {/* Card 3: Conheça nossas Espécies */}
-          <div className="docs-card-gradient p-6 rounded-lg border hover:shadow-md transition-all group">
-            <div className="h-16 w-16 rounded-full bg-serpente-100 text-serpente-600 flex items-center justify-center mb-6 group-hover:bg-serpente-200 transition-colors dark:bg-serpente-900/50">
-              <Search className="h-8 w-8" />
-            </div>
-            <h3 className="font-bold text-xl mb-4">Conheça nossas Espécies</h3>
-            <p className="text-muted-foreground mb-6 min-h-[80px]">
-              Explore nosso catálogo completo de espécies e encontre o réptil ideal para você.
-            </p>
-            <Button
-              className="w-full group-hover:translate-y-[-2px] transition-transform"
-              variant="outline"
-              asChild
-            >
-              <Link to="/especies" className="flex items-center justify-center">
-                Conheça nossas Espécies <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </Button>
-          </div>
+          ))}
         </div>
 
         {/* Waitlist Dialog */}
