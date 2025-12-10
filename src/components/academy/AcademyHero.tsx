@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Crown, Sparkles } from 'lucide-react';
 
 interface AcademyHeroProps {
   onOpenWaitlistDialog: () => void;
@@ -19,6 +18,19 @@ const AcademyHero: React.FC<AcademyHeroProps> = ({ onOpenWaitlistDialog }) => {
         />
       </div>
       <div className="flex-1">
+        {/* Exclusive community badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-2 mb-6 bg-gradient-to-r from-amber-500/10 via-amber-400/5 to-amber-500/10 border border-amber-500/30 rounded-full animate-fade-in">
+          <Crown className="w-4 h-4 text-amber-500" />
+          <span className="text-sm font-semibold bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 bg-clip-text text-transparent uppercase tracking-wider">
+            PSA One
+          </span>
+          <span className="text-xs text-amber-600/80 dark:text-amber-400/80">•</span>
+          <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+            Comunidade Exclusiva
+          </span>
+          <Sparkles className="w-3 h-3 text-amber-500" />
+        </div>
+
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
           Faça parte da maior comunidade de herpecultura do Brasil
         </h1>

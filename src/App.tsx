@@ -15,6 +15,7 @@ import ProductDetail from "./pages/ProductDetail";
 import Manuals from "./pages/Manuals";
 import Education from "./pages/Education";
 import Academy from "./pages/Academy";
+import AcademyConfirmation from "./pages/AcademyConfirmation";
 import Contact from "./pages/Contact";
 import ClientArea from "./pages/ClientArea";
 import NotFound from "./pages/NotFound";
@@ -47,22 +48,6 @@ import ContactSubmissions from "./pages/admin/ContactSubmissions";
 import SpeciesAdmin from "./pages/admin/SpeciesAdmin";
 import AdminCarousel from "./pages/admin/AdminCarousel";
 import AdminProtectedRoute from "./components/admin/AdminProtectedRoute";
-
-// Create a confirmation page for waitlist registration
-const WaitlistConfirmationPage = () => (
-  <div className="container px-4 py-12 sm:px-6 max-w-md mx-auto text-center">
-    <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg border border-green-200 dark:border-green-800">
-      <h1 className="text-3xl font-bold text-green-700 dark:text-green-300 mb-4">Inscrição Confirmada!</h1>
-      <p className="mb-6">
-        Sua inscrição na lista de espera da Pet Serpentes Academy foi realizada com sucesso. 
-        Entraremos em contato assim que novas vagas estiverem disponíveis.
-      </p>
-      <Button asChild className="min-h-[44px]">
-        <Link to="/">Voltar para a Página Inicial</Link>
-      </Button>
-    </div>
-  </div>
-);
 
 // Function for conditional Academy route based on settings
 const AcademyRoute = () => {
@@ -115,7 +100,7 @@ function App() {
                   <Route path="educacao" element={<Education />} />
                   <Route path="academy" element={<AcademyRoute />} />
                   <Route path="lista-de-espera" element={<WaitlistForm />} />
-                  <Route path="confirmacao-inscricao" element={<WaitlistConfirmationPage />} />
+                  <Route path="confirmacao-inscricao" element={<AcademyConfirmation />} />
                   <Route path="contato" element={<Contact />} />
                   <Route path="politica-de-privacidade" element={<PrivacyPolicyPage />} />
                   <Route path="termos-de-uso" element={<TermsOfUsePage />} />
