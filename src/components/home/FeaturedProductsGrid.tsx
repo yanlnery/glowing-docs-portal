@@ -24,13 +24,12 @@ export default function FeaturedProductsGrid({ products }: FeaturedProductsGridP
       loop: true, 
       align: "start",
       slidesToScroll: 1,
-      dragFree: true,
+      containScroll: false,
     },
     [autoplayPlugin]
   );
 
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
 
   const scrollPrev = useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev();
@@ -51,7 +50,6 @@ export default function FeaturedProductsGrid({ products }: FeaturedProductsGridP
 
   useEffect(() => {
     if (!emblaApi) return;
-    setScrollSnaps(emblaApi.scrollSnapList());
     onSelect();
     emblaApi.on("select", onSelect);
     emblaApi.on("reInit", onSelect);
@@ -103,9 +101,9 @@ export default function FeaturedProductsGrid({ products }: FeaturedProductsGridP
         </div>
       </div>
 
-      {/* Dots Indicators */}
+      {/* Dots Indicators - One per product */}
       <div className="flex justify-center gap-2 mt-4">
-        {scrollSnaps.map((_, index) => (
+        {displayedProducts.map((_, index) => (
           <button
             key={index}
             className={`w-2 h-2 rounded-full transition-all duration-300 ${
@@ -114,7 +112,7 @@ export default function FeaturedProductsGrid({ products }: FeaturedProductsGridP
                 : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
             }`}
             onClick={() => scrollTo(index)}
-            aria-label={`Ir para slide ${index + 1}`}
+            aria-label={`Ir para produto ${index + 1}`}
           />
         ))}
       </div>
