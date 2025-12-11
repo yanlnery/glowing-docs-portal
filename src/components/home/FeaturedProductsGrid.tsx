@@ -59,6 +59,20 @@ export default function FeaturedProductsGrid({ products }: FeaturedProductsGridP
     };
   }, [emblaApi, onSelect]);
 
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        scrollPrev();
+      } else if (e.key === "ArrowRight") {
+        scrollNext();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [scrollPrev, scrollNext]);
+
   if (displayedProducts.length === 0) {
     return <FeaturedProductsEmpty />;
   }
