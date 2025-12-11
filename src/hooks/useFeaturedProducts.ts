@@ -11,7 +11,7 @@ export function useFeaturedProducts() {
     const loadProducts = async () => {
       try {
         const products = await productService.getFeaturedProducts();
-        const limitedProducts = products.slice(0, 3);
+        const limitedProducts = products.slice(0, 10);
         setFeaturedProducts(limitedProducts);
       } catch (error) {
         console.error("Erro ao carregar produtos:", error);
