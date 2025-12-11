@@ -87,7 +87,7 @@ export default function EducationalContentSection() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {cards.map((card, index) => (
             <div key={index} className="docs-card-gradient rounded-lg border hover:shadow-md transition-all group overflow-hidden flex flex-col">
-              <div className="aspect-[16/10] overflow-hidden">
+              <div className="aspect-[4/3] overflow-hidden">
                 <img 
                   src={card.image} 
                   alt={card.title}

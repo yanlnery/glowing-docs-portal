@@ -86,11 +86,11 @@ export default function FeaturedProductsGrid({ products }: FeaturedProductsGridP
 
       {/* Carousel - Cards maiores e mais espaçados */}
       <div className="overflow-hidden mx-0 sm:mx-12" ref={emblaRef}>
-        <div className="flex gap-6 lg:gap-8">
+        <div className="flex">
           {displayedProducts.map((product, index) => (
             <div 
               key={product.id} 
-              className="flex-none w-[85%] sm:w-[45%] lg:w-[30%] xl:w-[30%]"
+              className="flex-none w-[85%] sm:w-[45%] lg:w-[30%] xl:w-[30%] pr-6 lg:pr-8"
             >
               <FeaturedProductCard 
                 product={product} 
