@@ -1,10 +1,11 @@
-
 import React, { useEffect } from "react";
+import { motion } from "framer-motion";
 import HeroCarousel from "@/components/HeroCarousel";
 import FeaturedProductsSection from "@/components/home/FeaturedProductsSection";
 import AboutSection from "@/components/home/AboutSection";
 import EducationalContentSection from "@/components/home/EducationalContentSection";
 import CtaSection from "@/components/home/CtaSection";
+import { AnimatedSection } from "@/components/ui/animated-section";
 
 export default function Home() {
   useEffect(() => {
@@ -13,22 +14,35 @@ export default function Home() {
 
   return (
     <div className="flex flex-col w-full">
-      {/* Hero Carousel Section - SEM espaço inferior */}
-      <section className="relative mb-0 pb-0">
+      {/* Hero Carousel Section - com fade in inicial */}
+      <motion.section 
+        className="relative mb-0 pb-0"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
         <HeroCarousel />
-      </section>
+      </motion.section>
 
       {/* Featured Species Section */}
-      <FeaturedProductsSection />
+      <AnimatedSection delay={0.1}>
+        <FeaturedProductsSection />
+      </AnimatedSection>
       
       {/* About Section */}
-      <AboutSection />
+      <AnimatedSection delay={0.15}>
+        <AboutSection />
+      </AnimatedSection>
       
       {/* Educational Content Preview */}
-      <EducationalContentSection />
+      <AnimatedSection delay={0.1}>
+        <EducationalContentSection />
+      </AnimatedSection>
       
       {/* CTA Section */}
-      <CtaSection />
+      <AnimatedSection delay={0.1}>
+        <CtaSection />
+      </AnimatedSection>
     </div>
   );
 }
