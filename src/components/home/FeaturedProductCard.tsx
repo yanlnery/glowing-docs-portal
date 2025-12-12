@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { Product } from "@/types/product";
@@ -51,23 +52,19 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
       }}
       onLoad={() => console.log(`📱 Product ${index} container loaded`)}
     >
-      <div 
-        className="relative overflow-hidden aspect-square"
-      >
-          <OptimizedImage
+      <Link to={`/produtos/${product.id}`} className="block relative overflow-hidden aspect-square group/image cursor-pointer">
+        <OptimizedImage
           src={imageUrl || "/placeholder.svg"}
           alt={product.name}
           priority={index === 0}
           quality={95}
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className="w-full h-full"
+          className="w-full h-full group-hover/image:scale-105 transition-transform duration-300"
           style={{
             objectFit: "cover",
             objectPosition: "center",
             width: "100%",
-            height: "100%",
-            transform: "scale(1)",
-            transition: "transform 0.3s ease"
+            height: "100%"
           }}
           onLoad={() => console.log(`✅ MOBILE - Produto ${product.name} imagem carregada na home`)}
         />
@@ -78,14 +75,14 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
             <span className="inline-block bg-red-600 text-white text-xs px-2 py-1 rounded">Indisponível</span>
           )}
         </div>
-      </div>
+      </Link>
       <div className="p-3 sm:p-4">
         <h3 className="font-bold text-sm sm:text-base md:text-lg mb-1 line-clamp-1">
           <em>{product.speciesName}</em>
         </h3>
         <p className="text-muted-foreground text-xs sm:text-sm mb-2 line-clamp-1">{product.name}</p>
         
-        {/* Preços */}
+        {/* Preços - PIX em destaque primeiro */}
         <div className="space-y-1 mb-3">
           {product.originalPrice && (
             <p className="text-xs text-muted-foreground line-through">
@@ -93,20 +90,17 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
             </p>
           )}
           
-          <div className="space-y-0.5">
-            <p className="text-lg sm:text-xl font-bold text-serpente-600 dark:text-serpente-400">
-              R$ {product.price.toFixed(2).replace('.', ',')}
-            </p>
-            <p className="text-xs text-muted-foreground dark:text-gray-300">
-              em até 10x sem juros
-            </p>
-          </div>
-          
+          {/* Preço PIX em destaque */}
           {product.pixPrice && (
-            <p className="text-sm font-semibold text-green-600 dark:text-green-400">
-              R$ {product.pixPrice.toFixed(2).replace('.', ',')} no PIX (10% OFF)
+            <p className="text-lg sm:text-xl font-bold text-green-600 dark:text-green-400">
+              R$ {product.pixPrice.toFixed(2).replace('.', ',')} <span className="text-sm font-semibold">no PIX</span>
             </p>
           )}
+          
+          {/* Preço parcelado */}
+          <p className="text-xs text-muted-foreground dark:text-gray-300">
+            ou R$ {product.price.toFixed(2).replace('.', ',')} em até 10x sem juros
+          </p>
         </div>
         
         <Button
