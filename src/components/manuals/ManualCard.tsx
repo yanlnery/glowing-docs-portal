@@ -42,7 +42,7 @@ export default function ManualCard({ manual, onDownload }: ManualCardProps) {
       <div className="p-3 sm:p-4 pt-0 mt-auto">
         <Button 
           className="w-full min-h-[44px]" 
-          variant={manual.pdf_url ? "outline" : "secondary"}
+          variant={manual.pdf_url ? "default" : "secondary"}
           onClick={() => onDownload(manual.pdf_url, manual.title)}
           disabled={!manual.pdf_url}
         >

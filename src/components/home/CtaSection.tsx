@@ -12,7 +12,7 @@ export default function CtaSection() {
             <h2 className="text-2xl md:text-3xl font-bold mb-2">Pronto para ter seu próprio réptil?</h2>
             <p className="text-white/80">Entre em contato conosco e descubra as espécies disponíveis</p>
           </div>
-          <Button size="lg" variant="outline" className="bg-white text-serpente-600 hover:bg-white/90 border-none" asChild>
+          <Button size="lg" className="bg-white text-serpente-700 hover:bg-white/90 border-none shadow-lg font-semibold" asChild>
             <Link to="/contato">Falar com um Especialista</Link>
           </Button>
         </div>

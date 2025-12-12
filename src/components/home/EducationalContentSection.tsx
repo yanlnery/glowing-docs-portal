@@ -102,7 +102,6 @@ export default function EducationalContentSection() {
                 {card.isLink ? (
                   <Button
                     className="w-full group-hover:translate-y-[-2px] transition-transform"
-                    variant="outline"
                     asChild
                   >
                     <Link to={card.linkTo!} className="flex items-center justify-center">
@@ -112,7 +111,6 @@ export default function EducationalContentSection() {
                 ) : (
                   <Button
                     className="w-full group-hover:translate-y-[-2px] transition-transform"
-                    variant="outline"
                     onClick={() => setIsWaitlistOpen(true)}
                   >
                     {card.buttonText} <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
