@@ -10,6 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-gradient-to-br from-[hsl(142,45%,38%)] via-[hsl(142,55%,28%)] to-[hsl(142,45%,38%)] text-white border border-[hsl(142,40%,50%,0.3)] shadow-[0_4px_15px_hsl(142,50%,30%,0.3),0_0_20px_hsl(142,50%,40%,0.15),inset_0_1px_0_hsl(142,50%,60%,0.3)] hover:shadow-[0_6px_20px_hsl(142,50%,30%,0.4),0_0_30px_hsl(142,50%,40%,0.25),inset_0_1px_0_hsl(142,50%,60%,0.4)] hover:-translate-y-0.5 active:translate-y-0",
+        "premium-light": "bg-white text-[hsl(142,55%,28%)] border border-white/30 shadow-[0_4px_15px_rgba(255,255,255,0.3),0_0_20px_rgba(255,255,255,0.15),inset_0_1px_0_rgba(255,255,255,0.5)] hover:shadow-[0_6px_20px_rgba(255,255,255,0.4),0_0_30px_rgba(255,255,255,0.25),inset_0_1px_0_rgba(255,255,255,0.6)] hover:-translate-y-0.5 active:translate-y-0 font-semibold",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
