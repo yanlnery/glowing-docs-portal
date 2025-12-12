@@ -65,7 +65,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
         overflow: "visible"
       }}
     >
-      <div className="relative">
+      <Link to={`/produtos/${product.id}`} className="block relative group cursor-pointer">
         <div 
           className="aspect-[4/3] overflow-hidden rounded-t-lg"
           style={{
@@ -80,14 +80,12 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
             priority={index < 8}
             quality={100}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="w-full h-full"
+            className="w-full h-full group-hover:scale-105 transition-transform duration-300"
             style={{
               objectFit: "cover",
               objectPosition: "center",
               width: "100%",
               height: "100%",
-              transform: "scale(1)",
-              transition: "transform 0.3s ease",
               imageRendering: "auto"
             }}
             onLoad={() => console.log(`✅ CATALOG MOBILE - Produto ${product.name} imagem carregada no catálogo`)}
@@ -117,7 +115,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
             </Badge>
           )}
         </div>
-      </div>
+      </Link>
       
       <CardHeader className="p-2 sm:p-3 pb-1 sm:pb-2">
         <CardTitle className="text-sm sm:text-base text-balance line-clamp-2">{product.name}</CardTitle>
@@ -126,7 +124,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
       <CardContent className="p-2 sm:p-3 pt-0 pb-1 sm:pb-2 flex-1">
         <p className="text-xs sm:text-sm text-muted-foreground italic mb-2 line-clamp-1">{product.speciesName}</p>
         
-        {/* Preços - Layout compacto no mobile */}
+        {/* Preços - PIX em destaque primeiro */}
         <div className="space-y-1">
           {product.originalPrice && (
             <p className="text-[10px] sm:text-xs text-muted-foreground line-through">
@@ -134,32 +132,31 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
             </p>
           )}
           
-          <div className="space-y-0">
-            <div className="text-base sm:text-lg font-bold text-serpente-600 dark:text-serpente-400">
-              {formatPrice(product.price)}
+          {/* Preço PIX em destaque */}
+          {product.pixPrice && (
+            <div className="text-base sm:text-lg font-bold text-green-600 dark:text-green-400">
+              {formatPrice(product.pixPrice)} <span className="text-xs font-semibold">no PIX</span>
             </div>
-            <p className="text-[9px] sm:text-xs text-muted-foreground dark:text-gray-300">
-              até 10x s/ juros
+          )}
+          
+          {/* Preço parcelado */}
+          <div className="space-y-0">
+            <p className="text-[10px] sm:text-xs text-muted-foreground dark:text-gray-300">
+              ou {formatPrice(product.price)} em até 10x s/ juros
             </p>
           </div>
-          
-          {product.pixPrice && (
-            <p className="text-[10px] sm:text-sm font-semibold text-green-600 dark:text-green-400">
-              {formatPrice(product.pixPrice)} no PIX
-            </p>
-          )}
         </div>
       </CardContent>
       
       <CardFooter className="p-2 sm:p-3 pt-1 sm:pt-2">
         <div className="flex gap-2 w-full">
           <Button 
-            variant="outline" 
-            className="flex-1 min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm"
+            variant="default" 
+            className="flex-1 min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm font-semibold"
             asChild
           >
             <Link to={`/produtos/${product.id}`}>
-              Ver Detalhes
+              Adquirir
             </Link>
           </Button>
           {!isUnavailable && (
