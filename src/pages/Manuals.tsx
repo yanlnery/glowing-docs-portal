@@ -1,10 +1,11 @@
-
 import React, { useEffect, useState, useCallback } from "react";
 import { Manual } from "@/types/manual";
 import ManualsSearch from "@/components/manuals/ManualsSearch";
 import ManualsGrid from "@/components/manuals/ManualsGrid";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useMaterialDownload } from "@/hooks/useMaterialDownload";
+import MaterialDownloadGate from "@/components/materials/MaterialDownloadGate";
 
 export default function Manuals() {
   const [allManuals, setAllManuals] = useState<Manual[]>([]);
@@ -12,6 +13,8 @@ export default function Manuals() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  
+  const { isGateOpen, pendingDownload, handleDownload, closeGate, onDownloadComplete } = useMaterialDownload();
 
   const loadManuals = useCallback(async () => {
     console.log("ManualsPage: Attempting to load manuals...");
@@ -59,21 +62,6 @@ export default function Manuals() {
     setSearchQuery(e.target.value);
   };
 
-  const handleDownload = (pdfUrl: string | null, title: string) => {
-    if (!pdfUrl) {
-        toast({title: "PDF não disponível", description: "O arquivo PDF para este manual não foi encontrado.", variant: "default"});
-        return;
-    }
-    const link = document.createElement('a');
-    link.href = pdfUrl;
-    // Sanitize title for filename
-    const filename = title.replace(/[^a-z0-9_ \-]/gi, '').replace(/\s+/g, '-').toLowerCase() + '.pdf';
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   const handleClearSearch = () => {
     setSearchQuery('');
     setFilteredManuals(allManuals);
@@ -100,13 +88,24 @@ export default function Manuals() {
       />
       
       <ManualsGrid
-        manuals={allManuals} // Pass all manuals for context if needed by grid (e.g. total count)
+        manuals={allManuals}
         displayedManuals={filteredManuals}
         searchQuery={searchQuery}
         onDownload={handleDownload}
         onClearSearch={handleClearSearch}
         isLoading={isLoading}
       />
+
+      {/* Material Download Gate Modal */}
+      {pendingDownload && (
+        <MaterialDownloadGate
+          isOpen={isGateOpen}
+          onClose={closeGate}
+          materialTitle={pendingDownload.title}
+          pdfUrl={pendingDownload.pdfUrl}
+          onDownloadComplete={onDownloadComplete}
+        />
+      )}
     </div>
   );
 }

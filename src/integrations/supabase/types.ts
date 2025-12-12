@@ -194,6 +194,39 @@ export type Database = {
         }
         Relationships: []
       }
+      material_leads: {
+        Row: {
+          consent: boolean
+          created_at: string
+          downloaded_material: string | null
+          email: string
+          id: string
+          name: string
+          source: string | null
+          updated_at: string
+        }
+        Insert: {
+          consent?: boolean
+          created_at?: string
+          downloaded_material?: string | null
+          email: string
+          id?: string
+          name: string
+          source?: string | null
+          updated_at?: string
+        }
+        Update: {
+          consent?: boolean
+          created_at?: string
+          downloaded_material?: string | null
+          email?: string
+          id?: string
+          name?: string
+          source?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
