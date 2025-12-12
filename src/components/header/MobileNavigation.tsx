@@ -39,76 +39,121 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
   };
 
   return (
-    <div className="fixed inset-0 top-16 z-[100] bg-black text-white md:hidden animate-fade-in mobile-nav h-[calc(100vh-4rem)] overflow-y-auto pb-8">
-      <nav className="container py-4 h-full px-4">
+    <div className="fixed inset-0 top-16 z-[100] bg-gradient-to-b from-background to-background/95 backdrop-blur-sm text-foreground md:hidden animate-fade-in mobile-nav h-[calc(100vh-4rem)] overflow-y-auto">
+      <nav className="container py-6 h-full px-5">
         
-        {/* Header actions moved to top with improved layout */}
-        <div className="border-b border-gray-700 pb-4 mb-4">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 flex-1">
-              {isAuthenticated ? (
-                <>
-                  <Button variant="outline" className="border-gray-600 hover:bg-gray-800 text-white min-h-[44px] flex-1 justify-start" asChild>
-                    <Link to="/area-cliente" onClick={handleLinkClick} className="flex items-center">
-                      <User size={20} className="mr-2" />
-                      Área do Cliente
-                    </Link>
-                  </Button>
-                  <Button variant="outline" className="border-gray-600 hover:bg-gray-800 text-white min-h-[44px] min-w-[44px] px-3" onClick={handleLogout}>
-                    <LogOut size={20} />
-                    <span className="sr-only">Sair</span>
-                  </Button>
-                </>
-              ) : (
-                <Button variant="outline" className="border-gray-600 hover:bg-gray-800 text-white min-h-[44px] flex-1 justify-start" asChild>
-                  <Link to="/login" onClick={handleLinkClick} className="flex items-center">
-                    <User size={20} className="mr-2" />
-                    Login
+        {/* Header actions - design mais elegante */}
+        <div className="flex items-center justify-between gap-3 mb-8">
+          <div className="flex-1">
+            {isAuthenticated ? (
+              <div className="flex items-center gap-2">
+                <Button 
+                  className="flex-1 justify-start gap-3 h-12 text-base font-medium"
+                  asChild
+                >
+                  <Link to="/area-cliente" onClick={handleLinkClick}>
+                    <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center">
+                      <User size={18} className="text-primary" />
+                    </div>
+                    Minha Conta
                   </Link>
                 </Button>
-              )}
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <Button variant="outline" className="border-gray-600 hover:bg-gray-800 text-white min-h-[44px] min-w-[44px] px-3 relative" asChild>
-                <Link to="/carrinho" onClick={handleLinkClick}>
-                  <ShoppingCart size={20} />
-                  {cartQuantity > 0 && (
-                    <Badge className="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center text-xs bg-serpente-600 text-white">
-                      {cartQuantity}
-                    </Badge>
-                  )}
-                  <span className="sr-only">Carrinho</span>
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  className="h-12 w-12 border-border/50 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50"
+                  onClick={handleLogout}
+                >
+                  <LogOut size={20} />
+                </Button>
+              </div>
+            ) : (
+              <Button 
+                className="w-full justify-start gap-3 h-12 text-base font-medium"
+                asChild
+              >
+                <Link to="/login" onClick={handleLinkClick}>
+                  <div className="w-9 h-9 rounded-full bg-primary-foreground/20 flex items-center justify-center">
+                    <User size={18} />
+                  </div>
+                  Entrar / Criar conta
                 </Link>
               </Button>
-              
-              <div className="min-h-[44px] min-w-[44px] flex items-center justify-center">
-                <ThemeToggle />
-              </div>
+            )}
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="icon"
+              className="h-12 w-12 border-border/50 relative"
+              asChild
+            >
+              <Link to="/carrinho" onClick={handleLinkClick}>
+                <ShoppingCart size={20} />
+                {cartQuantity > 0 && (
+                  <Badge className="absolute -top-1.5 -right-1.5 w-5 h-5 p-0 flex items-center justify-center text-xs bg-primary text-primary-foreground font-bold">
+                    {cartQuantity}
+                  </Badge>
+                )}
+              </Link>
+            </Button>
+            
+            <div className="h-12 w-12 flex items-center justify-center border border-border/50 rounded-md">
+              <ThemeToggle />
             </div>
           </div>
         </div>
 
-        {/* Navigation menu */}
-        <ul className="flex flex-col space-y-2">
+        {/* Separador elegante */}
+        <div className="relative mb-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-border/30"></div>
+          </div>
+          <div className="relative flex justify-center">
+            <span className="bg-background px-4 text-xs text-muted-foreground uppercase tracking-wider">Menu</span>
+          </div>
+        </div>
+
+        {/* Navigation menu - mais elegante */}
+        <ul className="flex flex-col space-y-1">
           {menuItems.map((item) => (
             <li key={item.title}>
               <Link
                 to={item.path}
                 className={cn(
-                  "flex w-full rounded-md p-4 text-base font-medium min-h-[44px] items-center text-white", 
+                  "flex w-full rounded-xl px-4 py-4 text-base font-medium items-center transition-all duration-200", 
                   isActive(item.path)
-                    ? "bg-serpente-700 text-white"
-                    : "hover:bg-gray-800" 
+                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                    : "text-foreground hover:bg-muted/80" 
                 )}
                 onClick={handleLinkClick}
               >
-                {item.icon && React.cloneElement(item.icon as React.ReactElement, { className: "mr-3 h-5 w-5", color: "white" })}
+                {item.icon && (
+                  <div className={cn(
+                    "w-10 h-10 rounded-lg flex items-center justify-center mr-4 transition-colors",
+                    isActive(item.path) 
+                      ? "bg-primary-foreground/20" 
+                      : "bg-muted"
+                  )}>
+                    {React.cloneElement(item.icon as React.ReactElement, { 
+                      className: "h-5 w-5",
+                      strokeWidth: 1.5
+                    })}
+                  </div>
+                )}
                 {item.title}
               </Link>
             </li>
           ))}
         </ul>
+
+        {/* Footer com branding */}
+        <div className="mt-auto pt-8 pb-4 text-center">
+          <p className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()} Pet Serpentes
+          </p>
+        </div>
       </nav>
     </div>
   );
