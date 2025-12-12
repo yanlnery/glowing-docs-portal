@@ -11,13 +11,19 @@ export const useCatalogData = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<ProductCategory | 'all'>('all');
   const [subcategoryFilter, setSubcategoryFilter] = useState<ProductSubcategory | 'all'>('all');
+  const [speciesFilter, setSpeciesFilter] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Ler filtro da URL na montagem do componente
+  // Ler filtros da URL na montagem do componente
   useEffect(() => {
     const categoryParam = searchParams.get('category') as ProductCategory | null;
     if (categoryParam && ['serpente', 'lagarto', 'quelonio'].includes(categoryParam)) {
       setCategoryFilter(categoryParam);
+    }
+    
+    const speciesParam = searchParams.get('especie');
+    if (speciesParam) {
+      setSpeciesFilter(speciesParam);
     }
   }, [searchParams]);
 
@@ -25,7 +31,8 @@ export const useCatalogData = () => {
     productList: Product[],
     query: string,
     category: ProductCategory | 'all',
-    subcategory: ProductSubcategory | 'all'
+    subcategory: ProductSubcategory | 'all',
+    speciesId: string | null
   ) => {
     if (!productList || productList.length === 0) {
       setFilteredProducts([]);
@@ -33,6 +40,11 @@ export const useCatalogData = () => {
     }
     
     let result = [...productList];
+    
+    // Apply species filter (from URL param)
+    if (speciesId) {
+      result = result.filter(product => product.speciesId === speciesId);
+    }
     
     // Apply search filter
     if (query) {
@@ -62,7 +74,7 @@ export const useCatalogData = () => {
     try {
       const visibleProducts = await productService.getAvailableProducts();
       setProducts(visibleProducts);
-      applyFilters(visibleProducts, searchQuery, categoryFilter, subcategoryFilter);
+      applyFilters(visibleProducts, searchQuery, categoryFilter, subcategoryFilter, speciesFilter);
     } catch (error) {
       console.error("Erro ao carregar produtos:", error);
       setProducts([]);
@@ -70,24 +82,25 @@ export const useCatalogData = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [applyFilters, searchQuery, categoryFilter, subcategoryFilter]);
+  }, [applyFilters, searchQuery, categoryFilter, subcategoryFilter, speciesFilter]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    applyFilters(products, query, categoryFilter, subcategoryFilter);
+    applyFilters(products, query, categoryFilter, subcategoryFilter, speciesFilter);
   };
 
   const handleFilterClick = (category: ProductCategory | 'all', subcategory: ProductSubcategory | 'all') => {
     setCategoryFilter(category);
     setSubcategoryFilter(subcategory);
-    applyFilters(products, searchQuery, category, subcategory);
+    applyFilters(products, searchQuery, category, subcategory, speciesFilter);
   };
 
   const clearFilters = () => {
     setSearchQuery('');
     setCategoryFilter('all');
     setSubcategoryFilter('all');
-    applyFilters(products, '', 'all', 'all');
+    setSpeciesFilter(null);
+    applyFilters(products, '', 'all', 'all', null);
   };
 
   return {
@@ -96,6 +109,7 @@ export const useCatalogData = () => {
     searchQuery,
     categoryFilter,
     subcategoryFilter,
+    speciesFilter,
     isLoading,
     loadProducts,
     handleSearch,
