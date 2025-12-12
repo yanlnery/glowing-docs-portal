@@ -224,3 +224,30 @@
   background-color: rgba(30, 86, 49, 0.03);
   background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231e5631' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
+
+/* Premium CTA Button */
+.btn-premium {
+  background: linear-gradient(135deg, hsl(142 45% 38%) 0%, hsl(142 55% 28%) 50%, hsl(142 45% 38%) 100%);
+  background-size: 200% 200%;
+  color: white;
+  border: 1px solid hsl(142 40% 50% / 0.3);
+  box-shadow: 
+    0 4px 15px hsl(142 50% 30% / 0.3),
+    0 0 20px hsl(142 50% 40% / 0.15),
+    inset 0 1px 0 hsl(142 50% 60% / 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.btn-premium:hover {
+  background-position: 100% 100%;
+  box-shadow: 
+    0 6px 20px hsl(142 50% 30% / 0.4),
+    0 0 30px hsl(142 50% 40% / 0.25),
+    inset 0 1px 0 hsl(142 50% 60% / 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-premium:active {
+  transform: translateY(0);
+}

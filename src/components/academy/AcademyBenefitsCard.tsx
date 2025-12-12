@@ -99,7 +99,7 @@ const AcademyBenefitsCard: React.FC<AcademyBenefitsCardProps> = ({ onOpenWaitlis
           </div>
           <Button 
             size="lg" 
-            className="bg-serpente-600 hover:bg-serpente-700 text-white px-12 py-6 text-lg"
+            className="btn-premium px-12 py-6 text-lg font-semibold"
             onClick={onOpenWaitlistDialog}
           >
             Quero fazer parte

@@ -61,7 +61,7 @@ const AcademyPricing: React.FC<AcademyPricingProps> = ({ onOpenWaitlistDialog })
           </CardContent>
           <CardFooter className="pt-4">
             <Button 
-              className="w-full bg-serpente-600 hover:bg-serpente-700 py-6 text-lg" 
+              className="w-full btn-premium py-6 text-lg font-semibold" 
               onClick={onOpenWaitlistDialog}
             >
               Entrar para Lista de Espera
