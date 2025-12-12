@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import WaitlistForm from '@/components/WaitlistForm';
 import AcademyHero from '@/components/academy/AcademyHero';
@@ -10,57 +10,107 @@ import AcademyBenefitsCard from '@/components/academy/AcademyBenefitsCard';
 import AcademyPricing from '@/components/academy/AcademyPricing';
 import AcademyGuarantee from '@/components/academy/AcademyGuarantee';
 import AcademyCTA from '@/components/academy/AcademyCTA';
-import { waitlistService } from '@/services/waitlistService';
+import AcademySubscriberBanner from '@/components/academy/AcademySubscriberBanner';
+import { useSubscription, STRIPE_PRODUCTS } from '@/hooks/useSubscription';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
 const Academy = () => {
   const navigate = useNavigate();
-  const [isWaitlistDialogOpen, setIsWaitlistDialogOpen] = useState(false);
+  const [searchParams] = useSearchParams();
+  const { user } = useAuth();
+  const { 
+    isLoading, 
+    hasAcademyAccess, 
+    subscriptionEnd, 
+    subscribe, 
+    openCustomerPortal,
+    checkSubscription 
+  } = useSubscription();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const handleWaitlistSubmit = async (data: any) => {
+  // Handle success/cancel from Stripe
+  useEffect(() => {
+    const success = searchParams.get('success');
+    const canceled = searchParams.get('canceled');
+
+    if (success === 'true') {
+      toast.success('Assinatura realizada com sucesso! Aguarde alguns segundos...');
+      setTimeout(() => {
+        checkSubscription();
+      }, 3000);
+    } else if (canceled === 'true') {
+      toast.info('Assinatura cancelada');
+    }
+  }, [searchParams, checkSubscription]);
+
+  const handleSubscribe = async () => {
+    if (!user) {
+      toast.error('Você precisa estar logado para assinar');
+      navigate('/login?redirect=/academy');
+      return;
+    }
+
     try {
-      const { error } = await waitlistService.addToWaitlist({
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        contact_preference: data.contactPreference
-      });
-
-      if (error) throw error;
-
-      setIsWaitlistDialogOpen(false);
-      navigate('/confirmacao-inscricao');
+      await subscribe(STRIPE_PRODUCTS.academy.price_id);
     } catch (error) {
-      toast.error("Erro ao fazer inscrição. Tente novamente.");
+      console.error('Error subscribing:', error);
+      toast.error('Erro ao iniciar assinatura. Tente novamente.');
     }
   };
 
-  const openWaitlistDialog = () => setIsWaitlistDialogOpen(true);
+  const handleManageSubscription = async () => {
+    try {
+      await openCustomerPortal();
+    } catch (error) {
+      console.error('Error opening portal:', error);
+      toast.error('Erro ao abrir portal de gerenciamento');
+    }
+  };
 
   return (
     <div className="container py-12 px-4 sm:px-6">
-      <AcademyHero onOpenWaitlistDialog={openWaitlistDialog} />
-      <AcademyFeatures />
-      <AcademyCommunityMotto onOpenWaitlistDialog={openWaitlistDialog} />
-      <AcademyCoursePreview />
-      <AcademyBenefitsCard onOpenWaitlistDialog={openWaitlistDialog} />
-      <AcademyPricing onOpenWaitlistDialog={openWaitlistDialog} />
-      <AcademyGuarantee />
-      <AcademyCTA onOpenWaitlistDialog={openWaitlistDialog} />
+      {/* Subscriber Banner */}
+      {hasAcademyAccess && (
+        <AcademySubscriberBanner 
+          subscriptionEnd={subscriptionEnd}
+          onManageSubscription={handleManageSubscription}
+        />
+      )}
 
-      {/* Waitlist Dialog */}
-      <Dialog open={isWaitlistDialogOpen} onOpenChange={setIsWaitlistDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <WaitlistForm
-            onSubmit={handleWaitlistSubmit}
-            onCancel={() => setIsWaitlistDialogOpen(false)}
-          />
-        </DialogContent>
-      </Dialog>
+      <AcademyHero 
+        onSubscribe={handleSubscribe} 
+        isLoading={isLoading}
+        hasAccess={hasAcademyAccess}
+      />
+      <AcademyFeatures />
+      <AcademyCommunityMotto 
+        onSubscribe={handleSubscribe}
+        isLoading={isLoading}
+        hasAccess={hasAcademyAccess}
+      />
+      <AcademyCoursePreview />
+      <AcademyBenefitsCard 
+        onSubscribe={handleSubscribe}
+        isLoading={isLoading}
+        hasAccess={hasAcademyAccess}
+      />
+      <AcademyPricing 
+        onSubscribe={handleSubscribe}
+        isLoading={isLoading}
+        hasAccess={hasAcademyAccess}
+        onManageSubscription={handleManageSubscription}
+      />
+      <AcademyGuarantee />
+      {!hasAcademyAccess && (
+        <AcademyCTA 
+          onSubscribe={handleSubscribe}
+          isLoading={isLoading}
+        />
+      )}
     </div>
   );
 };

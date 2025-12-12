@@ -1,12 +1,14 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Check, GraduationCap, Users, Star } from 'lucide-react';
+import { Check, GraduationCap, Users, Star, Loader2 } from 'lucide-react';
 
 interface AcademyBenefitsCardProps {
-  onOpenWaitlistDialog: () => void;
+  onSubscribe: () => void;
+  isLoading?: boolean;
+  hasAccess?: boolean;
 }
 
-const AcademyBenefitsCard: React.FC<AcademyBenefitsCardProps> = ({ onOpenWaitlistDialog }) => {
+const AcademyBenefitsCard: React.FC<AcademyBenefitsCardProps> = ({ onSubscribe, isLoading, hasAccess }) => {
   const educationBenefits = [
     'Conteúdos educativos sobre herpetocultura responsável',
     'Orientações gerais sobre manejo e cuidados básicos',
@@ -97,13 +99,23 @@ const AcademyBenefitsCard: React.FC<AcademyBenefitsCardProps> = ({ onOpenWaitlis
             <span className="text-4xl md:text-5xl font-bold">R$ 17,90</span>
             <span className="text-gray-400 text-lg">/mês</span>
           </div>
-          <Button 
-            size="lg" 
-            className="btn-premium px-12 py-6 text-lg font-semibold"
-            onClick={onOpenWaitlistDialog}
-          >
-            Quero fazer parte
-          </Button>
+          {!hasAccess && (
+            <Button 
+              size="lg" 
+              className="btn-premium px-12 py-6 text-lg font-semibold"
+              onClick={onSubscribe}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Carregando...
+                </>
+              ) : (
+                'Quero fazer parte'
+              )}
+            </Button>
+          )}
         </div>
       </div>
     </section>

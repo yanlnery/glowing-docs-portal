@@ -1,12 +1,14 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Users, BookOpen, MapPin } from 'lucide-react';
+import { Users, BookOpen, MapPin, Loader2 } from 'lucide-react';
 
 interface AcademyCommunityMottoProps {
-  onOpenWaitlistDialog: () => void;
+  onSubscribe: () => void;
+  isLoading?: boolean;
+  hasAccess?: boolean;
 }
 
-const AcademyCommunityMotto: React.FC<AcademyCommunityMottoProps> = ({ onOpenWaitlistDialog }) => {
+const AcademyCommunityMotto: React.FC<AcademyCommunityMottoProps> = ({ onSubscribe, isLoading, hasAccess }) => {
   return (
     <section className="py-16 px-4 bg-gradient-to-br from-serpente-50 to-serpente-100 dark:from-serpente-950 dark:to-gray-900 rounded-2xl mb-16">
       <div className="max-w-4xl mx-auto text-center">
@@ -45,13 +47,23 @@ const AcademyCommunityMotto: React.FC<AcademyCommunityMottoProps> = ({ onOpenWai
           </div>
         </div>
         
-        <Button 
-          size="lg" 
-          className="btn-premium px-10 py-6 text-base font-semibold"
-          onClick={onOpenWaitlistDialog}
-        >
-          Quero fazer parte
-        </Button>
+        {!hasAccess && (
+          <Button 
+            size="lg" 
+            className="btn-premium px-10 py-6 text-base font-semibold"
+            onClick={onSubscribe}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Carregando...
+              </>
+            ) : (
+              'Quero fazer parte'
+            )}
+          </Button>
+        )}
       </div>
     </section>
   );
