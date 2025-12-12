@@ -83,6 +83,21 @@ export default function SpeciesPage() {
     });
   }, [speciesList, activeFilter, searchQuery]);
 
+  // Quando o filtro ou busca mudar, seleciona a primeira espécie da lista filtrada
+  useEffect(() => {
+    if (filteredSpecies.length > 0) {
+      // Verifica se a espécie atualmente selecionada está na lista filtrada
+      const currentIsInFiltered = selectedSpecies && filteredSpecies.some(s => s.id === selectedSpecies.id);
+      
+      // Se não estiver, seleciona a primeira da lista
+      if (!currentIsInFiltered) {
+        setSelectedSpecies(filteredSpecies[0]);
+      }
+    } else {
+      setSelectedSpecies(null);
+    }
+  }, [filteredSpecies]);
+
   const handleSelectSpecies = (species: Species) => {
     setSelectedSpecies(species);
     setSearchParams({ selected: species.slug }, { replace: true });
