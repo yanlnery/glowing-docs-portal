@@ -46,7 +46,9 @@ import {
   Trash2, 
   FileDown,
   Search,
-  Users
+  Users,
+  Send,
+  Bell
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -69,6 +71,11 @@ export default function SpeciesWaitlistAdmin() {
   // Notes dialog
   const [notesEntry, setNotesEntry] = useState<SpeciesWaitlistEntry | null>(null);
   const [notesText, setNotesText] = useState('');
+  
+  // Notification dialog
+  const [notifySpecies, setNotifySpecies] = useState<{ id: string; name: string } | null>(null);
+  const [notifyMessage, setNotifyMessage] = useState('');
+  const [isSendingNotification, setIsSendingNotification] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -172,6 +179,41 @@ export default function SpeciesWaitlistAdmin() {
     link.click();
   };
 
+  const handleNotifyWaitlist = async () => {
+    if (!notifySpecies) return;
+    
+    setIsSendingNotification(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('notify-waitlist', {
+        body: {
+          species_id: notifySpecies.id,
+          species_name: notifySpecies.name,
+          message: notifyMessage || undefined
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Notificações enviadas!',
+        description: `${data.notified} email(s) enviado(s) com sucesso.`,
+      });
+
+      setNotifySpecies(null);
+      setNotifyMessage('');
+      fetchData();
+    } catch (error: any) {
+      console.error('Error sending notifications:', error);
+      toast({
+        title: 'Erro ao enviar notificações',
+        description: error.message || 'Tente novamente mais tarde.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsSendingNotification(false);
+    }
+  };
+
   const filteredEntries = entries.filter(entry => {
     const matchesSearch = 
       entry.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -201,15 +243,27 @@ export default function SpeciesWaitlistAdmin() {
         {/* Summary cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {speciesCounts.slice(0, 4).map(item => (
-            <Card key={item.species_id} className="cursor-pointer hover:bg-muted/50" onClick={() => setSpeciesFilter(item.species_id)}>
+            <Card key={item.species_id} className="cursor-pointer hover:bg-muted/50 group">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">{item.commonname}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center gap-2">
-                  <Users className="w-5 h-5 text-serpente-500" />
-                  <span className="text-2xl font-bold">{item.count}</span>
-                  <span className="text-sm text-muted-foreground">aguardando</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2" onClick={() => setSpeciesFilter(item.species_id)}>
+                    <Users className="w-5 h-5 text-serpente-500" />
+                    <span className="text-2xl font-bold">{item.count}</span>
+                    <span className="text-sm text-muted-foreground">aguardando</span>
+                  </div>
+                  {item.count > 0 && (
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={(e) => { e.stopPropagation(); setNotifySpecies({ id: item.species_id, name: item.commonname }); }}
+                    >
+                      <Bell className="w-4 h-4" />
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -395,6 +449,53 @@ export default function SpeciesWaitlistAdmin() {
             <div className="flex gap-3 justify-end">
               <Button variant="outline" onClick={() => setNotesEntry(null)}>Cancelar</Button>
               <Button onClick={handleSaveNotes}>Salvar Notas</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Notify Dialog */}
+        <Dialog open={!!notifySpecies} onOpenChange={() => { setNotifySpecies(null); setNotifyMessage(''); }}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Send className="w-5 h-5" />
+                Notificar Lista de Espera
+              </DialogTitle>
+              <DialogDescription>
+                Enviar email para todos os interessados em <strong>{notifySpecies?.name}</strong> com status "Aguardando".
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">Mensagem personalizada (opcional)</label>
+                <Textarea
+                  value={notifyMessage}
+                  onChange={(e) => setNotifyMessage(e.target.value)}
+                  placeholder="Deixe em branco para usar a mensagem padrão ou escreva uma mensagem personalizada..."
+                  rows={4}
+                />
+              </div>
+              <div className="bg-muted/50 p-3 rounded-lg text-sm text-muted-foreground">
+                <strong>Mensagem padrão:</strong> "Temos uma ótima notícia! O animal {notifySpecies?.name} que você demonstrou interesse está disponível para aquisição."
+              </div>
+            </div>
+            <div className="flex gap-3 justify-end">
+              <Button variant="outline" onClick={() => { setNotifySpecies(null); setNotifyMessage(''); }}>
+                Cancelar
+              </Button>
+              <Button onClick={handleNotifyWaitlist} disabled={isSendingNotification}>
+                {isSendingNotification ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Enviando...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4 mr-2" />
+                    Enviar Notificações
+                  </>
+                )}
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
