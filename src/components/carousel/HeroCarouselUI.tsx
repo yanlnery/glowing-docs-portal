@@ -65,8 +65,8 @@ export default function HeroCarouselUI({
 
   return (
     <div className="relative w-full">
-      {/* Container principal com altura otimizada para mobile */}
-      <div className="relative h-[500px] md:h-[65vh] lg:h-[75vh] overflow-hidden">
+      {/* Container principal com altura fixa para uniformidade */}
+      <div className="relative h-[400px] sm:h-[450px] md:h-[65vh] lg:h-[75vh] overflow-hidden">
         <Carousel
           setApi={setApi}
           opts={{
@@ -125,19 +125,22 @@ export default function HeroCarouselUI({
           </CarouselContent>
         </Carousel>
 
-        {/* Overlay com conteúdo - inferior esquerdo */}
-        <div className="absolute inset-0 z-30 flex flex-col items-start justify-end pb-16 sm:pb-20 md:pb-24 pointer-events-none">
-          {/* Gradiente de fundo para legibilidade */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent md:bg-gradient-to-r md:from-black/60 md:via-black/30 md:to-transparent" />
+        {/* Overlay com conteúdo - sobre a imagem, parte inferior */}
+        <div className="absolute inset-0 z-30 flex flex-col justify-end pointer-events-none">
+          {/* Gradiente de fundo para legibilidade - mais forte no mobile */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
           
-          <div className="relative container py-4 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto flex justify-start">
-            <div className="max-w-[280px] sm:max-w-md md:max-w-2xl">
-              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-2 sm:mb-3 animate-fade-in text-balance text-left drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
-                {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
-              </h1>
-              <p className="text-sm sm:text-base md:text-lg text-white/95 font-medium mb-0 animate-fade-in text-balance line-clamp-3 sm:line-clamp-none text-left drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
-                {currentSlideData.subtitle || "Conheça nossa coleção de répteis exóticos"}
-              </p>
+          {/* Container do texto - garantir que fique sobre a imagem */}
+          <div className="relative z-10 pb-14 sm:pb-16 md:pb-20 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto">
+            <div className="container mx-auto">
+              <div className="max-w-[90%] sm:max-w-md md:max-w-2xl">
+                <h1 className="text-lg sm:text-xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-1 sm:mb-2 md:mb-3 animate-fade-in text-left drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                  {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
+                </h1>
+                <p className="text-xs sm:text-sm md:text-lg text-white/95 font-medium animate-fade-in line-clamp-2 sm:line-clamp-3 md:line-clamp-none text-left drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+                  {currentSlideData.subtitle || "Conheça nossa coleção de répteis exóticos"}
+                </p>
+              </div>
             </div>
           </div>
         </div>
