@@ -79,7 +79,7 @@ export default function FeaturedProductsGrid({ products }: FeaturedProductsGridP
   
   return (
     <div className="relative mt-6 sm:mt-8">
-      {/* Navigation Buttons */}
+      {/* Navigation Buttons - apenas desktop */}
       <Button
         variant="outline"
         size="icon"
@@ -98,25 +98,13 @@ export default function FeaturedProductsGrid({ products }: FeaturedProductsGridP
         <ChevronRight className="h-4 w-4" />
       </Button>
 
-      {/* Grid no mobile (2 colunas), Carousel no desktop */}
-      {/* Mobile: Grid 2 colunas */}
-      <div className="grid grid-cols-2 gap-3 sm:hidden">
-        {displayedProducts.slice(0, 6).map((product, index) => (
-          <FeaturedProductCard 
-            key={product.id}
-            product={product} 
-            index={index} 
-          />
-        ))}
-      </div>
-
-      {/* Desktop: Carousel */}
-      <div className="hidden sm:block overflow-hidden mx-0 sm:mx-12" ref={emblaRef}>
+      {/* Carousel para todas as telas - 2 produtos no mobile, 3 no desktop */}
+      <div className="overflow-hidden mx-0 sm:mx-12" ref={emblaRef}>
         <div className="flex">
           {displayedProducts.map((product, index) => (
             <div 
               key={product.id} 
-              className="flex-none sm:w-[45%] lg:w-[30%] xl:w-[30%] pr-6 lg:pr-8"
+              className="flex-none w-[48%] sm:w-[45%] lg:w-[30%] xl:w-[30%] pr-3 sm:pr-6 lg:pr-8"
             >
               <FeaturedProductCard 
                 product={product} 
@@ -127,14 +115,14 @@ export default function FeaturedProductsGrid({ products }: FeaturedProductsGridP
         </div>
       </div>
 
-      {/* Dots Indicators - apenas desktop */}
-      <div className="hidden sm:flex justify-center gap-2 mt-6">
+      {/* Dots Indicators */}
+      <div className="flex justify-center gap-2 mt-6">
         {displayedProducts.map((_, index) => (
           <button
             key={index}
             className={`h-2 rounded-full transition-all duration-300 ${
               index === selectedIndex 
-                ? "bg-primary w-8" 
+                ? "bg-primary w-6 sm:w-8" 
                 : "bg-muted-foreground/30 hover:bg-muted-foreground/50 w-2"
             }`}
             onClick={() => scrollTo(index)}
