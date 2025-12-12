@@ -7,6 +7,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { SpeciesDetailPanel } from './SpeciesDetailPanel';
+import { SpeciesWaitlistButton } from './SpeciesWaitlistButton';
 
 interface SpeciesMobileViewProps {
   species: Species[];

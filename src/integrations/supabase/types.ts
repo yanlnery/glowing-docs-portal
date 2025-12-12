@@ -480,6 +480,72 @@ export type Database = {
         }
         Relationships: []
       }
+      species_waitlist: {
+        Row: {
+          contact_preference: string | null
+          cpf: string | null
+          created_at: string | null
+          email: string
+          id: string
+          migrated_at: string | null
+          name: string
+          notes: string | null
+          phone: string
+          previous_species_id: string | null
+          priority: number | null
+          species_id: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          contact_preference?: string | null
+          cpf?: string | null
+          created_at?: string | null
+          email: string
+          id?: string
+          migrated_at?: string | null
+          name: string
+          notes?: string | null
+          phone: string
+          previous_species_id?: string | null
+          priority?: number | null
+          species_id: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          contact_preference?: string | null
+          cpf?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          migrated_at?: string | null
+          name?: string
+          notes?: string | null
+          phone?: string
+          previous_species_id?: string | null
+          priority?: number | null
+          species_id?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "species_waitlist_previous_species_id_fkey"
+            columns: ["previous_species_id"]
+            isOneToOne: false
+            referencedRelation: "species"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "species_waitlist_species_id_fkey"
+            columns: ["species_id"]
+            isOneToOne: false
+            referencedRelation: "species"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       system_settings: {
         Row: {
           created_at: string | null

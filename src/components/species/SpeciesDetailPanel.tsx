@@ -1,6 +1,7 @@
 import React from 'react';
 import { Species } from '@/types/species';
 import { SpeciesGallery } from './SpeciesGallery';
+import { SpeciesWaitlistButton } from './SpeciesWaitlistButton';
 
 interface SpeciesDetailPanelProps {
   species: Species | null;
@@ -83,6 +84,17 @@ export function SpeciesDetailPanel({ species }: SpeciesDetailPanelProps) {
             </ul>
           </div>
         )}
+
+        {/* Waitlist CTA */}
+        <div className="mt-8 pt-6 border-t border-border">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold text-serpente-400">Interessado nesta espécie?</h3>
+              <p className="text-sm text-muted-foreground">Cadastre-se para ser avisado quando houver disponibilidade.</p>
+            </div>
+            <SpeciesWaitlistButton species={species} />
+          </div>
+        </div>
       </div>
         </div>
       )}
