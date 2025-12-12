@@ -10,17 +10,19 @@ import {
 import { Check, Loader2, Settings } from 'lucide-react';
 
 interface AcademyPricingProps {
-  onSubscribe: () => void;
+  onAction: () => void;
   isLoading?: boolean;
   hasAccess?: boolean;
   onManageSubscription?: () => void;
+  isOpenForSubscription?: boolean;
 }
 
 const AcademyPricing: React.FC<AcademyPricingProps> = ({ 
-  onSubscribe, 
+  onAction, 
   isLoading, 
   hasAccess,
-  onManageSubscription 
+  onManageSubscription,
+  isOpenForSubscription
 }) => {
   const benefits = [
     'Acesso a todos os cursos de herpecultura',
@@ -33,6 +35,12 @@ const AcademyPricing: React.FC<AcademyPricingProps> = ({
     'Acesso antecipado ao plantel',
     'Preferência na compra de animais',
   ];
+
+  const getButtonText = () => {
+    if (isLoading) return 'Carregando...';
+    if (isOpenForSubscription) return 'Assinar Agora';
+    return 'Entrar para Lista de Espera';
+  };
 
   return (
     <div className="mb-16">
@@ -80,7 +88,7 @@ const AcademyPricing: React.FC<AcademyPricingProps> = ({
             ) : (
               <Button 
                 className="w-full btn-premium py-6 text-lg font-semibold" 
-                onClick={onSubscribe}
+                onClick={onAction}
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -89,7 +97,7 @@ const AcademyPricing: React.FC<AcademyPricingProps> = ({
                     Carregando...
                   </>
                 ) : (
-                  'Assinar Agora'
+                  getButtonText()
                 )}
               </Button>
             )}

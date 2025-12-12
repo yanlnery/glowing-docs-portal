@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import WaitlistForm from '@/components/WaitlistForm';
@@ -13,12 +13,17 @@ import AcademyCTA from '@/components/academy/AcademyCTA';
 import AcademySubscriberBanner from '@/components/academy/AcademySubscriberBanner';
 import { useSubscription, STRIPE_PRODUCTS } from '@/hooks/useSubscription';
 import { useAuth } from '@/hooks/useAuth';
+import { useSettings } from '@/hooks/useSettings';
+import { waitlistService } from '@/services/waitlistService';
 import { toast } from 'sonner';
 
 const Academy = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
+  const { isAcademyOpenForSubscription, isLoading: settingsLoading } = useSettings();
+  const [isWaitlistDialogOpen, setIsWaitlistDialogOpen] = useState(false);
+  
   const { 
     isLoading, 
     hasAcademyAccess, 
@@ -71,6 +76,30 @@ const Academy = () => {
     }
   };
 
+  const handleWaitlistSubmit = async (data: any) => {
+    try {
+      const { error } = await waitlistService.addToWaitlist({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        contact_preference: data.contactPreference
+      });
+
+      if (error) throw error;
+
+      setIsWaitlistDialogOpen(false);
+      navigate('/confirmacao-inscricao');
+    } catch (error) {
+      toast.error("Erro ao fazer inscrição. Tente novamente.");
+    }
+  };
+
+  const openWaitlistDialog = () => setIsWaitlistDialogOpen(true);
+
+  // Determine which action to use based on settings
+  const handleAction = isAcademyOpenForSubscription ? handleSubscribe : openWaitlistDialog;
+  const actionLoading = isAcademyOpenForSubscription ? isLoading : false;
+
   return (
     <div className="container py-12 px-4 sm:px-6">
       {/* Subscriber Banner */}
@@ -82,35 +111,50 @@ const Academy = () => {
       )}
 
       <AcademyHero 
-        onSubscribe={handleSubscribe} 
-        isLoading={isLoading}
+        onAction={handleAction} 
+        isLoading={actionLoading}
         hasAccess={hasAcademyAccess}
+        isOpenForSubscription={isAcademyOpenForSubscription}
       />
       <AcademyFeatures />
       <AcademyCommunityMotto 
-        onSubscribe={handleSubscribe}
-        isLoading={isLoading}
+        onAction={handleAction}
+        isLoading={actionLoading}
         hasAccess={hasAcademyAccess}
+        isOpenForSubscription={isAcademyOpenForSubscription}
       />
       <AcademyCoursePreview />
       <AcademyBenefitsCard 
-        onSubscribe={handleSubscribe}
-        isLoading={isLoading}
+        onAction={handleAction}
+        isLoading={actionLoading}
         hasAccess={hasAcademyAccess}
+        isOpenForSubscription={isAcademyOpenForSubscription}
       />
       <AcademyPricing 
-        onSubscribe={handleSubscribe}
-        isLoading={isLoading}
+        onAction={handleAction}
+        isLoading={actionLoading}
         hasAccess={hasAcademyAccess}
         onManageSubscription={handleManageSubscription}
+        isOpenForSubscription={isAcademyOpenForSubscription}
       />
       <AcademyGuarantee />
       {!hasAcademyAccess && (
         <AcademyCTA 
-          onSubscribe={handleSubscribe}
-          isLoading={isLoading}
+          onAction={handleAction}
+          isLoading={actionLoading}
+          isOpenForSubscription={isAcademyOpenForSubscription}
         />
       )}
+
+      {/* Waitlist Dialog */}
+      <Dialog open={isWaitlistDialogOpen} onOpenChange={setIsWaitlistDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <WaitlistForm
+            onSubmit={handleWaitlistSubmit}
+            onCancel={() => setIsWaitlistDialogOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

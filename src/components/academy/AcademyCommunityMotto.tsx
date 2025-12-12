@@ -3,12 +3,23 @@ import { Button } from '@/components/ui/button';
 import { Users, BookOpen, MapPin, Loader2 } from 'lucide-react';
 
 interface AcademyCommunityMottoProps {
-  onSubscribe: () => void;
+  onAction: () => void;
   isLoading?: boolean;
   hasAccess?: boolean;
+  isOpenForSubscription?: boolean;
 }
 
-const AcademyCommunityMotto: React.FC<AcademyCommunityMottoProps> = ({ onSubscribe, isLoading, hasAccess }) => {
+const AcademyCommunityMotto: React.FC<AcademyCommunityMottoProps> = ({ 
+  onAction, 
+  isLoading, 
+  hasAccess,
+  isOpenForSubscription 
+}) => {
+  const getButtonText = () => {
+    if (isLoading) return 'Carregando...';
+    return 'Quero fazer parte';
+  };
+
   return (
     <section className="py-16 px-4 bg-gradient-to-br from-serpente-50 to-serpente-100 dark:from-serpente-950 dark:to-gray-900 rounded-2xl mb-16">
       <div className="max-w-4xl mx-auto text-center">
@@ -51,7 +62,7 @@ const AcademyCommunityMotto: React.FC<AcademyCommunityMottoProps> = ({ onSubscri
           <Button 
             size="lg" 
             className="btn-premium px-10 py-6 text-base font-semibold"
-            onClick={onSubscribe}
+            onClick={onAction}
             disabled={isLoading}
           >
             {isLoading ? (
@@ -60,7 +71,7 @@ const AcademyCommunityMotto: React.FC<AcademyCommunityMottoProps> = ({ onSubscri
                 Carregando...
               </>
             ) : (
-              'Quero fazer parte'
+              getButtonText()
             )}
           </Button>
         )}
