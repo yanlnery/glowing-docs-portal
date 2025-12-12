@@ -8,24 +8,22 @@ interface AcademyBenefitsCardProps {
 
 const AcademyBenefitsCard: React.FC<AcademyBenefitsCardProps> = ({ onOpenWaitlistDialog }) => {
   const educationBenefits = [
-    'Cursos completos de criação e manejo',
-    'Aulas sobre reprodução e genética',
-    'Conteúdo sobre alimentação e nutrição',
-    'Técnicas avançadas de herpecultura',
+    'Conteúdos educativos sobre herpetocultura responsável',
+    'Orientações gerais sobre manejo e cuidados básicos',
+    'Boas práticas de rotina, ambiente e bem-estar',
   ];
 
   const communityBenefits = [
-    'Comunidade exclusiva de discussão',
-    'Mentorias com especialistas',
-    'Suporte direto com criadores experientes',
-    'Networking com outros membros',
+    'Comunidade exclusiva para troca de experiências',
+    'Discussões moderadas e informativas',
+    'Contato com criadores experientes para troca de vivências',
+    'Networking entre membros da comunidade',
   ];
 
   const exclusiveBenefits = [
     'Acesso antecipado ao plantel',
     'Preferência na compra de animais',
     'Download de materiais exclusivos',
-    'Certificados de conclusão',
     'Atualizações de conteúdo',
   ];
 
