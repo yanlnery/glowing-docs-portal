@@ -126,13 +126,13 @@ export default function HeroCarouselUI({
         </Carousel>
 
         {/* Overlay com conteúdo - inferior esquerdo */}
-        <div className="absolute inset-0 z-30 flex flex-col items-start justify-end pb-20 md:pb-24 pointer-events-none bg-gradient-to-r from-black/30 via-black/5 to-transparent">
+        <div className="absolute inset-0 z-30 flex flex-col items-start justify-end pb-20 md:pb-24 pointer-events-none bg-gradient-to-r from-black/50 via-black/20 to-transparent">
           <div className="container py-4 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto flex justify-start">
-            <div className="p-3 md:p-4">
-              <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-1 sm:mb-3 max-w-[250px] md:max-w-2xl animate-fade-in text-balance text-left">
+            <div className="p-4 md:p-6 rounded-lg bg-black/40 backdrop-blur-sm">
+              <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-1 sm:mb-3 max-w-[250px] md:max-w-2xl animate-fade-in text-balance text-left drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                 {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
               </h1>
-              <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/95 font-medium max-w-[200px] md:max-w-xl mb-0 animate-fade-in text-balance line-clamp-3 sm:line-clamp-none text-left">
+              <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white font-medium max-w-[200px] md:max-w-xl mb-0 animate-fade-in text-balance line-clamp-3 sm:line-clamp-none text-left drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
                 {currentSlideData.subtitle || "Conheça nossa coleção de répteis exóticos"}
               </p>
             </div>
