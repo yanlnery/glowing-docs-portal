@@ -246,7 +246,6 @@ const ProductDetail = () => {
                   <CheckCircle className="h-4 w-4 text-serpente-600 mt-0.5 flex-shrink-0" />
                   <p className="text-muted-foreground">
                     Todos os animais são registrados no IBAMA e possuem documentação legal completa.
-                    Para adquirir um animal, é necessário estar cadastrado no sistema oficial.
                     <Link to="/contato" className="text-serpente-600 hover:underline ml-1">Saiba mais</Link>
                   </p>
                 </div>
