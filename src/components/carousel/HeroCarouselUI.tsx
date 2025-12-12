@@ -9,7 +9,7 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { OptimizedImage } from "@/components/ui/optimized-image";
+
 import type { CarouselItem as CarouselItemData } from "@/services/carouselService";
 import { getCarouselImageUrl } from "@/services/carouselService";
 import type { AutoplayType } from "embla-carousel-autoplay";
@@ -91,17 +91,11 @@ export default function HeroCarouselUI({
                   <div className="relative h-full w-full">
                     {/* Imagem do slide */}
                     {processedImageUrl && processedImageUrl !== "/placeholder.svg" ? (
-                       <OptimizedImage
+                      <img
                         src={processedImageUrl}
                         alt={item.alt_text || "Imagem do carrossel"}
-                        priority={true}
-                        quality={85}
-                        sizes="100vw"
-                        className="absolute inset-0 w-full h-full"
-                        style={{
-                          objectFit: "cover",
-                          objectPosition: "center",
-                        }}
+                        loading={index === 0 ? "eager" : "lazy"}
+                        className="absolute inset-0 w-full h-full object-cover"
                       />
                     ) : (
                       <div className="absolute inset-0 w-full h-full bg-gray-300 flex items-center justify-center">
