@@ -31,6 +31,7 @@ import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
+import AuthCallback from "./pages/auth/AuthCallback";
 
 // Admin pages
 import { AuthProvider } from "./contexts/AuthContext"; 
@@ -111,6 +112,7 @@ function App() {
                   <Route path="/signup" element={<SignupPage />} />
                   <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                   <Route path="/reset-password" element={<ResetPasswordPage />} />
+                  <Route path="/auth/callback" element={<AuthCallback />} />
                   
                   {/* Protected Client Route - Stays under WebsiteLayout */}
                   <Route element={<ProtectedClientRoute />}>

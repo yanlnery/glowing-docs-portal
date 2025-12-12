@@ -66,7 +66,15 @@ export const loginService = async (email: string, password: string): Promise<{ d
 
 // signupService deve usar AuthResponse['data'] que contém user e session
 export const signupService = async (payload: { email: string, password: string, options?: { data: any } }): Promise<{ data: AuthResponse['data'] | null, error: AuthError | null }> => {
-  const response: AuthResponse = await supabase.auth.signUp(payload);
+  const redirectUrl = `${window.location.origin}/auth/callback`;
+  
+  const response: AuthResponse = await supabase.auth.signUp({
+    ...payload,
+    options: {
+      ...payload.options,
+      emailRedirectTo: redirectUrl,
+    }
+  });
   // response.data já é { user, session }
   return { data: response.data, error: response.error };
 };
