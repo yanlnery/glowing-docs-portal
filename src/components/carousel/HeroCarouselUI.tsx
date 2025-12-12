@@ -85,12 +85,11 @@ export default function HeroCarouselUI({
           <CarouselContent className="h-full -ml-0">
             {carouselImagesData.map((item, index) => {
               const processedImageUrl = getCarouselImageUrl(item.image_url);
-              const isCurrentSlide = index === currentImageIndex;
-              const shouldPrioritize = Math.abs(index - currentImageIndex) <= 1;
 
               return (
                 <CarouselItem key={item.id || index} className="h-full pl-0">
                   <div className="relative h-full w-full">
+                    {/* Imagem do slide */}
                     {processedImageUrl && processedImageUrl !== "/placeholder.svg" ? (
                        <OptimizedImage
                         src={processedImageUrl}
@@ -98,52 +97,40 @@ export default function HeroCarouselUI({
                         priority={true}
                         quality={85}
                         sizes="100vw"
-                        className="w-full h-full opacity-100"
+                        className="absolute inset-0 w-full h-full"
                         style={{
-                          width: "100%",
-                          height: "100%",
                           objectFit: "cover",
-                          objectPosition: "65% center",
-                          position: "relative",
-                          zIndex: 10,
-                          opacity: 1,
+                          objectPosition: "center",
                         }}
                       />
                     ) : (
                       <div className="absolute inset-0 w-full h-full bg-gray-300 flex items-center justify-center">
                         <div className="text-center text-gray-600">
-                          <p className="text-lg">⚠️ Imagem indisponível</p>
-                          <p className="text-sm">{item.title || "Slide sem título"}</p>
+                          <p className="text-lg">Imagem indisponível</p>
                         </div>
                       </div>
                     )}
-                    <div className="hidden md:block absolute inset-y-0 left-0 w-full sm:w-[55%] bg-gradient-to-r from-black/70 via-black/50 to-transparent z-20" />
+                    
+                    {/* Gradiente sobre a imagem */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                    
+                    {/* Texto sobre a imagem - dentro de cada slide */}
+                    <div className="absolute inset-0 flex flex-col justify-end p-4 pb-16 sm:p-6 sm:pb-20 md:p-8 md:pb-24">
+                      <div className="max-w-[90%] sm:max-w-md md:max-w-2xl">
+                        <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                          {item.title || "Bem-vindo à Pet Serpentes"}
+                        </h2>
+                        <p className="text-sm sm:text-base md:text-lg text-white/90 font-medium line-clamp-2 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+                          {item.subtitle || "Conheça nossa coleção de répteis exóticos"}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </CarouselItem>
               );
             })}
           </CarouselContent>
         </Carousel>
-
-        {/* Overlay com conteúdo - sobre a imagem, parte inferior */}
-        <div className="absolute inset-0 z-30 flex flex-col justify-end pointer-events-none">
-          {/* Gradiente de fundo para legibilidade - mais forte no mobile */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-          
-          {/* Container do texto - garantir que fique sobre a imagem */}
-          <div className="relative z-10 pb-14 sm:pb-16 md:pb-20 px-4 sm:px-6 md:px-8 lg:px-10 pointer-events-auto">
-            <div className="container mx-auto">
-              <div className="max-w-[90%] sm:max-w-md md:max-w-2xl">
-                <h1 className="text-lg sm:text-xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-1 sm:mb-2 md:mb-3 animate-fade-in text-left drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
-                  {currentSlideData.title || "Bem-vindo à Pet Serpentes"}
-                </h1>
-                <p className="text-xs sm:text-sm md:text-lg text-white/95 font-medium animate-fade-in line-clamp-2 sm:line-clamp-3 md:line-clamp-none text-left drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
-                  {currentSlideData.subtitle || "Conheça nossa coleção de répteis exóticos"}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
         
         {/* Indicadores - DENTRO do carrossel, na parte inferior sobre a imagem */}
         {carouselImagesData.length > 1 && (
