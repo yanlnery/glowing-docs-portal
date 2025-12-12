@@ -47,6 +47,7 @@ import ShoppingCartAnalytics from "./pages/admin/ShoppingCartAnalytics";
 import ContactSubmissions from "./pages/admin/ContactSubmissions";
 import SpeciesAdmin from "./pages/admin/SpeciesAdmin";
 import AdminCarousel from "./pages/admin/AdminCarousel";
+import SpeciesWaitlistAdmin from "./pages/admin/SpeciesWaitlistAdmin";
 import AdminProtectedRoute from "./components/admin/AdminProtectedRoute";
 
 // Function for conditional Academy route based on settings
@@ -137,6 +138,7 @@ function App() {
                   <Route path="/admin/species" element={<SpeciesAdmin />} />
                   <Route path="/admin/carousel" element={<AdminCarousel />} />
                   <Route path="/admin/cart-analytics" element={<ShoppingCartAnalytics />} />
+                  <Route path="/admin/species-waitlist" element={<SpeciesWaitlistAdmin />} />
                 </Route>
               </Routes>
             </TooltipProvider>
