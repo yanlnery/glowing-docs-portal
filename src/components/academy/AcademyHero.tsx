@@ -1,12 +1,14 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, Crown, Sparkles } from 'lucide-react';
+import { ChevronRight, Crown, Sparkles, Loader2 } from 'lucide-react';
 
 interface AcademyHeroProps {
-  onOpenWaitlistDialog: () => void;
+  onSubscribe: () => void;
+  isLoading?: boolean;
+  hasAccess?: boolean;
 }
 
-const AcademyHero: React.FC<AcademyHeroProps> = ({ onOpenWaitlistDialog }) => {
+const AcademyHero: React.FC<AcademyHeroProps> = ({ onSubscribe, isLoading, hasAccess }) => {
   return (
     <div className="flex flex-col lg:flex-row items-center gap-8 mb-16">
       <div className="flex-1">
@@ -37,17 +39,41 @@ const AcademyHero: React.FC<AcademyHeroProps> = ({ onOpenWaitlistDialog }) => {
         <p className="text-lg text-muted-foreground mb-8">
           Conecte-se com criadores apaixonados, aprenda com especialistas e tenha acesso exclusivo ao melhor conteúdo sobre criação de répteis.
         </p>
-        <Button
-          size="lg"
-          className="btn-premium px-8 py-6 text-base font-semibold"
-          onClick={onOpenWaitlistDialog}
-        >
-          Faça parte da P.S.A
-          <ChevronRight className="ml-2 h-4 w-4" />
-        </Button>
-        <p className="text-sm text-muted-foreground mt-4">
-          Vagas limitadas. Entre para a lista de espera e seja avisado.
-        </p>
+        
+        {hasAccess ? (
+          <Button
+            size="lg"
+            className="btn-premium px-8 py-6 text-base font-semibold"
+            onClick={() => {}}
+          >
+            Acessar Conteúdo
+            <ChevronRight className="ml-2 h-4 w-4" />
+          </Button>
+        ) : (
+          <>
+            <Button
+              size="lg"
+              className="btn-premium px-8 py-6 text-base font-semibold"
+              onClick={onSubscribe}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Carregando...
+                </>
+              ) : (
+                <>
+                  Assinar Agora - R$17,90/mês
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </>
+              )}
+            </Button>
+            <p className="text-sm text-muted-foreground mt-4">
+              Cancele a qualquer momento. Sem compromisso.
+            </p>
+          </>
+        )}
       </div>
     </div>
   );

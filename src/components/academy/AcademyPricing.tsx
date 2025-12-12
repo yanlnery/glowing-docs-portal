@@ -7,13 +7,21 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Check } from 'lucide-react';
+import { Check, Loader2, Settings } from 'lucide-react';
 
 interface AcademyPricingProps {
-  onOpenWaitlistDialog: () => void;
+  onSubscribe: () => void;
+  isLoading?: boolean;
+  hasAccess?: boolean;
+  onManageSubscription?: () => void;
 }
 
-const AcademyPricing: React.FC<AcademyPricingProps> = ({ onOpenWaitlistDialog }) => {
+const AcademyPricing: React.FC<AcademyPricingProps> = ({ 
+  onSubscribe, 
+  isLoading, 
+  hasAccess,
+  onManageSubscription 
+}) => {
   const benefits = [
     'Acesso a todos os cursos de herpecultura',
     'Comunidade exclusiva de discussão',
@@ -36,10 +44,10 @@ const AcademyPricing: React.FC<AcademyPricingProps> = ({ onOpenWaitlistDialog })
       </div>
 
       <div className="max-w-lg mx-auto">
-        <Card className="bg-serpente-50 dark:bg-serpente-900/20 border-serpente-200 dark:border-serpente-800 relative overflow-hidden">
+        <Card className={`bg-serpente-50 dark:bg-serpente-900/20 border-serpente-200 dark:border-serpente-800 relative overflow-hidden ${hasAccess ? 'ring-2 ring-serpente-500' : ''}`}>
           <div className="absolute top-0 right-0">
             <div className="bg-serpente-600 text-white text-xs px-4 py-1.5 rounded-bl-lg font-medium">
-              Plano Único
+              {hasAccess ? 'Seu Plano' : 'Plano Único'}
             </div>
           </div>
           <CardHeader className="text-center pb-2">
@@ -60,12 +68,31 @@ const AcademyPricing: React.FC<AcademyPricingProps> = ({ onOpenWaitlistDialog })
             </ul>
           </CardContent>
           <CardFooter className="pt-4">
-            <Button 
-              className="w-full btn-premium py-6 text-lg font-semibold" 
-              onClick={onOpenWaitlistDialog}
-            >
-              Entrar para Lista de Espera
-            </Button>
+            {hasAccess ? (
+              <Button 
+                className="w-full py-6 text-lg font-semibold" 
+                variant="outline"
+                onClick={onManageSubscription}
+              >
+                <Settings className="mr-2 h-5 w-5" />
+                Gerenciar Assinatura
+              </Button>
+            ) : (
+              <Button 
+                className="w-full btn-premium py-6 text-lg font-semibold" 
+                onClick={onSubscribe}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Carregando...
+                  </>
+                ) : (
+                  'Assinar Agora'
+                )}
+              </Button>
+            )}
           </CardFooter>
         </Card>
       </div>
