@@ -98,13 +98,25 @@ export default function FeaturedProductsGrid({ products }: FeaturedProductsGridP
         <ChevronRight className="h-4 w-4" />
       </Button>
 
-      {/* Carousel - Cards maiores e mais espaçados */}
-      <div className="overflow-hidden mx-0 sm:mx-12" ref={emblaRef}>
+      {/* Grid no mobile (2 colunas), Carousel no desktop */}
+      {/* Mobile: Grid 2 colunas */}
+      <div className="grid grid-cols-2 gap-3 sm:hidden">
+        {displayedProducts.slice(0, 6).map((product, index) => (
+          <FeaturedProductCard 
+            key={product.id}
+            product={product} 
+            index={index} 
+          />
+        ))}
+      </div>
+
+      {/* Desktop: Carousel */}
+      <div className="hidden sm:block overflow-hidden mx-0 sm:mx-12" ref={emblaRef}>
         <div className="flex">
           {displayedProducts.map((product, index) => (
             <div 
               key={product.id} 
-              className="flex-none w-[85%] sm:w-[45%] lg:w-[30%] xl:w-[30%] pr-6 lg:pr-8"
+              className="flex-none sm:w-[45%] lg:w-[30%] xl:w-[30%] pr-6 lg:pr-8"
             >
               <FeaturedProductCard 
                 product={product} 
@@ -115,8 +127,8 @@ export default function FeaturedProductsGrid({ products }: FeaturedProductsGridP
         </div>
       </div>
 
-      {/* Dots Indicators */}
-      <div className="flex justify-center gap-2 mt-6">
+      {/* Dots Indicators - apenas desktop */}
+      <div className="hidden sm:flex justify-center gap-2 mt-6">
         {displayedProducts.map((_, index) => (
           <button
             key={index}
