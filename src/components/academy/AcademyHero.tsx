@@ -22,7 +22,7 @@ const AcademyHero: React.FC<AcademyHeroProps> = ({ onOpenWaitlistDialog }) => {
         <div className="inline-flex items-center gap-2 px-4 py-2 mb-6 bg-gradient-to-r from-amber-500/10 via-amber-400/5 to-amber-500/10 border border-amber-500/30 rounded-full animate-fade-in">
           <Crown className="w-4 h-4 text-amber-500" />
           <span className="text-sm font-semibold bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 bg-clip-text text-transparent uppercase tracking-wider">
-            PSA One
+            P.S. Academy
           </span>
           <span className="text-xs text-amber-600/80 dark:text-amber-400/80">•</span>
           <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
@@ -32,17 +32,17 @@ const AcademyHero: React.FC<AcademyHeroProps> = ({ onOpenWaitlistDialog }) => {
         </div>
 
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-          Faça parte da maior comunidade de herpecultura do Brasil
+          A comunidade que todo criador de répteis precisa conhecer
         </h1>
         <p className="text-lg text-muted-foreground mb-8">
           Conecte-se com criadores apaixonados, aprenda com especialistas e tenha acesso exclusivo ao melhor conteúdo sobre criação de répteis.
         </p>
         <Button
           size="lg"
-          className="bg-serpente-600 hover:bg-serpente-700 text-white"
+          className="btn-premium px-8 py-6 text-base font-semibold"
           onClick={onOpenWaitlistDialog}
         >
-          Quero fazer parte
+          Faça parte da P.S.A
           <ChevronRight className="ml-2 h-4 w-4" />
         </Button>
         <p className="text-sm text-muted-foreground mt-4">

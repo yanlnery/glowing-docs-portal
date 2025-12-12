@@ -15,10 +15,10 @@ const AcademyCTA: React.FC<AcademyCTAProps> = ({ onOpenWaitlistDialog }) => {
       </p>
       <Button
         size="lg"
-        className="bg-serpente-600 hover:bg-serpente-700 px-10 py-6 text-lg"
+        className="btn-premium px-12 py-7 text-lg font-semibold"
         onClick={onOpenWaitlistDialog}
       >
-        Quero fazer parte
+        Entrar para Lista de Espera
       </Button>
     </div>
   );

@@ -47,7 +47,7 @@ const AcademyCommunityMotto: React.FC<AcademyCommunityMottoProps> = ({ onOpenWai
         
         <Button 
           size="lg" 
-          className="bg-serpente-600 hover:bg-serpente-700 text-white px-8"
+          className="btn-premium px-10 py-6 text-base font-semibold"
           onClick={onOpenWaitlistDialog}
         >
           Quero fazer parte
