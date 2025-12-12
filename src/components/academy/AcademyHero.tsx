@@ -3,12 +3,24 @@ import { Button } from '@/components/ui/button';
 import { ChevronRight, Crown, Sparkles, Loader2 } from 'lucide-react';
 
 interface AcademyHeroProps {
-  onSubscribe: () => void;
+  onAction: () => void;
   isLoading?: boolean;
   hasAccess?: boolean;
+  isOpenForSubscription?: boolean;
 }
 
-const AcademyHero: React.FC<AcademyHeroProps> = ({ onSubscribe, isLoading, hasAccess }) => {
+const AcademyHero: React.FC<AcademyHeroProps> = ({ onAction, isLoading, hasAccess, isOpenForSubscription }) => {
+  const getButtonText = () => {
+    if (isLoading) return 'Carregando...';
+    if (isOpenForSubscription) return 'Assinar Agora - R$17,90/mês';
+    return 'Faça parte da P.S.A';
+  };
+
+  const getSubtext = () => {
+    if (isOpenForSubscription) return 'Cancele a qualquer momento. Sem compromisso.';
+    return 'Vagas limitadas. Entre para a lista de espera e seja avisado.';
+  };
+
   return (
     <div className="flex flex-col lg:flex-row items-center gap-8 mb-16">
       <div className="flex-1">
@@ -54,7 +66,7 @@ const AcademyHero: React.FC<AcademyHeroProps> = ({ onSubscribe, isLoading, hasAc
             <Button
               size="lg"
               className="btn-premium px-8 py-6 text-base font-semibold"
-              onClick={onSubscribe}
+              onClick={onAction}
               disabled={isLoading}
             >
               {isLoading ? (
@@ -64,13 +76,13 @@ const AcademyHero: React.FC<AcademyHeroProps> = ({ onSubscribe, isLoading, hasAc
                 </>
               ) : (
                 <>
-                  Assinar Agora - R$17,90/mês
+                  {getButtonText()}
                   <ChevronRight className="ml-2 h-4 w-4" />
                 </>
               )}
             </Button>
             <p className="text-sm text-muted-foreground mt-4">
-              Cancele a qualquer momento. Sem compromisso.
+              {getSubtext()}
             </p>
           </>
         )}

@@ -3,12 +3,18 @@ import { Button } from '@/components/ui/button';
 import { Check, GraduationCap, Users, Star, Loader2 } from 'lucide-react';
 
 interface AcademyBenefitsCardProps {
-  onSubscribe: () => void;
+  onAction: () => void;
   isLoading?: boolean;
   hasAccess?: boolean;
+  isOpenForSubscription?: boolean;
 }
 
-const AcademyBenefitsCard: React.FC<AcademyBenefitsCardProps> = ({ onSubscribe, isLoading, hasAccess }) => {
+const AcademyBenefitsCard: React.FC<AcademyBenefitsCardProps> = ({ 
+  onAction, 
+  isLoading, 
+  hasAccess,
+  isOpenForSubscription 
+}) => {
   const educationBenefits = [
     'Conteúdos educativos sobre herpetocultura responsável',
     'Orientações gerais sobre manejo e cuidados básicos',
@@ -28,6 +34,11 @@ const AcademyBenefitsCard: React.FC<AcademyBenefitsCardProps> = ({ onSubscribe, 
     'Download de materiais exclusivos',
     'Atualizações de conteúdo',
   ];
+
+  const getButtonText = () => {
+    if (isLoading) return 'Carregando...';
+    return 'Quero fazer parte';
+  };
 
   return (
     <section className="mb-16">
@@ -103,7 +114,7 @@ const AcademyBenefitsCard: React.FC<AcademyBenefitsCardProps> = ({ onSubscribe, 
             <Button 
               size="lg" 
               className="btn-premium px-12 py-6 text-lg font-semibold"
-              onClick={onSubscribe}
+              onClick={onAction}
               disabled={isLoading}
             >
               {isLoading ? (
@@ -112,7 +123,7 @@ const AcademyBenefitsCard: React.FC<AcademyBenefitsCardProps> = ({ onSubscribe, 
                   Carregando...
                 </>
               ) : (
-                'Quero fazer parte'
+                getButtonText()
               )}
             </Button>
           )}

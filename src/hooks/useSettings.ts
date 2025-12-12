@@ -3,10 +3,12 @@ import { settingsService } from '@/services/settingsService';
 
 export interface Settings {
   isAcademyVisible: boolean;
+  isAcademyOpenForSubscription: boolean;
 }
 
 const defaultSettings: Settings = {
   isAcademyVisible: true,
+  isAcademyOpenForSubscription: false, // Default to waitlist mode
 };
 
 export const useSettings = () => {
@@ -17,10 +19,11 @@ export const useSettings = () => {
   const loadSettings = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { data } = await settingsService.getSettings(['isAcademyVisible']);
+      const { data } = await settingsService.getSettings(['isAcademyVisible', 'isAcademyOpenForSubscription']);
       
       setSettings({
         isAcademyVisible: data?.isAcademyVisible ?? defaultSettings.isAcademyVisible,
+        isAcademyOpenForSubscription: data?.isAcademyOpenForSubscription ?? defaultSettings.isAcademyOpenForSubscription,
       });
     } catch (error) {
       setSettings(defaultSettings);
@@ -47,6 +50,7 @@ export const useSettings = () => {
     settings,
     updateSettings,
     isAcademyVisible: settings.isAcademyVisible,
+    isAcademyOpenForSubscription: settings.isAcademyOpenForSubscription,
     isLoading,
     refetch: loadSettings,
   };
@@ -55,9 +59,10 @@ export const useSettings = () => {
 // Function to get settings directly (returns a promise now)
 export const getSettings = async (): Promise<Settings> => {
   try {
-    const { data } = await settingsService.getSettings(['isAcademyVisible']);
+    const { data } = await settingsService.getSettings(['isAcademyVisible', 'isAcademyOpenForSubscription']);
     return {
       isAcademyVisible: data?.isAcademyVisible ?? defaultSettings.isAcademyVisible,
+      isAcademyOpenForSubscription: data?.isAcademyOpenForSubscription ?? defaultSettings.isAcademyOpenForSubscription,
     };
   } catch (error) {
     return defaultSettings;
