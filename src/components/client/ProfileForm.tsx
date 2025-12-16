@@ -16,6 +16,7 @@ export const ProfileForm: React.FC<{
   
   const [firstName, setFirstName] = useState(profile?.first_name || '');
   const [lastName, setLastName] = useState(profile?.last_name || '');
+  const [phone, setPhone] = useState(profile?.phone || '');
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   
@@ -24,6 +25,7 @@ export const ProfileForm: React.FC<{
     if (profile) {
       setFirstName(profile.first_name || '');
       setLastName(profile.last_name || '');
+      setPhone(profile.phone || '');
     }
   }, [profile]);
   
@@ -36,6 +38,7 @@ export const ProfileForm: React.FC<{
       const { error } = await updateProfile({
         first_name: firstName,
         last_name: lastName,
+        phone: phone,
       });
       
       if (error) {
@@ -112,6 +115,15 @@ export const ProfileForm: React.FC<{
             readOnly 
             disabled 
             className="bg-muted/50" 
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="phone">Telefone / WhatsApp</Label>
+          <Input 
+            id="phone" 
+            placeholder="(00) 00000-0000"
+            value={phone} 
+            onChange={(e) => setPhone(e.target.value)} 
           />
         </div>
       </div>
