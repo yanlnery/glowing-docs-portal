@@ -15,6 +15,17 @@ interface NotifyRequest {
   message?: string;
 }
 
+// Escape HTML to prevent XSS/injection attacks
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+    .replace(/\n/g, '<br>');
+}
+
 const handler = async (req: Request): Promise<Response> => {
   console.log("notify-waitlist function called");
 
@@ -25,7 +36,63 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    
+    // Verify admin authorization
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      console.error("No authorization header provided");
+      return new Response(
+        JSON.stringify({ error: "Unauthorized: No authorization header" }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Create client with user's token to verify identity
+    const supabaseUser = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    // Get the authenticated user
+    const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
+    
+    if (userError || !user) {
+      console.error("Failed to get user:", userError?.message);
+      return new Response(
+        JSON.stringify({ error: "Unauthorized: Invalid token" }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    console.log(`User authenticated: ${user.id}`);
+
+    // Check if user has admin role using service role client
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
+    const { data: roleData, error: roleError } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    if (roleError) {
+      console.error("Error checking user role:", roleError);
+      return new Response(
+        JSON.stringify({ error: "Failed to verify permissions" }),
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    if (!roleData) {
+      console.error(`User ${user.id} is not an admin`);
+      return new Response(
+        JSON.stringify({ error: "Forbidden: Admin access required" }),
+        { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    console.log(`Admin access verified for user: ${user.id}`);
 
     const { species_id, species_name, message }: NotifyRequest = await req.json();
     console.log(`Notifying waitlist for species: ${species_name} (${species_id})`);
@@ -54,7 +121,9 @@ const handler = async (req: Request): Promise<Response> => {
 
     const emailPromises = waitlistEntries.map(async (entry) => {
       try {
-        const customMessage = message || `Temos uma ótima notícia! O animal ${species_name} que você demonstrou interesse está disponível para aquisição.`;
+        // Sanitize the custom message to prevent HTML injection
+        const defaultMessage = `Temos uma ótima notícia! O animal ${escapeHtml(species_name)} que você demonstrou interesse está disponível para aquisição.`;
+        const customMessage = message ? escapeHtml(message) : defaultMessage;
         
         const emailResponse = await resend.emails.send({
           from: "Reptilianos <onboarding@resend.dev>",
@@ -75,7 +144,7 @@ const handler = async (req: Request): Promise<Response> => {
                 </div>
                 
                 <div style="padding: 30px;">
-                  <h2 style="color: #2d5a27; margin-top: 0;">Olá, ${entry.name}!</h2>
+                  <h2 style="color: #2d5a27; margin-top: 0;">Olá, ${escapeHtml(entry.name)}!</h2>
                   
                   <p style="color: #333; font-size: 16px; line-height: 1.6;">
                     ${customMessage}
@@ -83,7 +152,7 @@ const handler = async (req: Request): Promise<Response> => {
                   
                   <div style="background: #f0f7ef; border-left: 4px solid #2d5a27; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
                     <strong style="color: #2d5a27;">Espécie:</strong>
-                    <span style="color: #333;">${species_name}</span>
+                    <span style="color: #333;">${escapeHtml(species_name)}</span>
                   </div>
                   
                   <p style="color: #333; font-size: 16px; line-height: 1.6;">
