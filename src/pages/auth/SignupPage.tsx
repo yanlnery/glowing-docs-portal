@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { ShoppingCart } from 'lucide-react';
 
 const SignupPage: React.FC = () => {
   const [firstName, setFirstName] = useState('');
@@ -15,7 +16,10 @@ const SignupPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const { signup, isLoading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+
+  const fromCheckout = location.state?.fromCheckout === true;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,13 +50,14 @@ const SignupPage: React.FC = () => {
     }
      else {
       const isEmailConfirmationRequired = data?.user?.email_confirmed_at === null && data?.session === null;
+      const redirectTo = fromCheckout ? '/carrinho' : '/login';
 
       if (isEmailConfirmationRequired) {
         toast({ title: 'Cadastro realizado!', description: 'Enviamos um e-mail de confirmação para você. Por favor, verifique sua caixa de entrada e spam.' });
-        navigate('/login');
+        navigate(redirectTo);
       } else {
-        toast({ title: 'Cadastro bem-sucedido!', description: 'Você já pode fazer login.' });
-        navigate('/login');
+        toast({ title: 'Cadastro bem-sucedido!', description: fromCheckout ? 'Agora você pode finalizar sua compra!' : 'Você já pode fazer login.' });
+        navigate(redirectTo);
       }
     }
   };
@@ -66,8 +71,19 @@ const SignupPage: React.FC = () => {
             alt="PET SERPENTES" 
             className="w-20 h-20 mx-auto mb-4 rounded-full" 
           />
-          <CardTitle className="text-2xl font-bold">Criar sua Conta</CardTitle>
-          <CardDescription>Junte-se à Pet Serpentes para uma experiência exclusiva.</CardDescription>
+          <CardTitle className="text-2xl font-bold">
+            {fromCheckout ? 'Crie sua conta para continuar' : 'Criar sua Conta'}
+          </CardTitle>
+          <CardDescription>
+            {fromCheckout ? (
+              <span className="flex items-center justify-center gap-2">
+                <ShoppingCart className="h-4 w-4" />
+                Após o cadastro, você voltará ao carrinho
+              </span>
+            ) : (
+              'Junte-se à Pet Serpentes para uma experiência exclusiva.'
+            )}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -100,7 +116,11 @@ const SignupPage: React.FC = () => {
         </CardContent>
         <CardFooter className="text-center text-sm">
           <p>Já tem uma conta?{' '}
-            <Link to="/login" className="font-medium text-primary hover:underline">
+            <Link 
+              to="/login" 
+              state={fromCheckout ? { fromCheckout: true } : undefined}
+              className="font-medium text-primary hover:underline"
+            >
               Faça login
             </Link>
           </p>

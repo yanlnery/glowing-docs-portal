@@ -106,19 +106,9 @@ const CartPage = () => {
   };
 
   const handleCheckout = async () => {
-    // Check authentication first
+    // Check authentication first - redirect to checkout auth page
     if (!user) {
-      toast({
-        title: "Login necessário",
-        description: "Você precisa estar logado para finalizar a compra. Redirecionando para o login...",
-        variant: "destructive",
-        duration: 3000,
-      });
-      
-      setTimeout(() => {
-        navigate('/login', { state: { from: '/carrinho' } });
-      }, 1500);
-      
+      navigate('/checkout-cadastro');
       return;
     }
 
@@ -368,12 +358,7 @@ const CartPage = () => {
                   className="w-full" 
                   onClick={() => {
                     if (!user) {
-                      toast({
-                        title: "Login necessário",
-                        description: "Você precisa estar logado para finalizar a compra.",
-                        variant: "destructive",
-                      });
-                      navigate('/login', { state: { from: '/carrinho' } });
+                      navigate('/checkout-cadastro');
                       return;
                     }
                     setIsDialogOpen(true);
