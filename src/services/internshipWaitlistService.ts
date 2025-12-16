@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { InternshipWaitlistEntry, InternshipWaitlistStatus } from "@/types/internshipWaitlist";
+import { rateLimitService } from "./rateLimitService";
 
 export const internshipWaitlistService = {
   async addToWaitlist(entry: {
@@ -14,15 +15,30 @@ export const internshipWaitlistService = {
     motivation?: string;
     linkedin_url?: string;
   }): Promise<{ data: InternshipWaitlistEntry | null; error: any }> {
-    // Check if email already exists
+    // Rate limiting: prevent abuse (5 submissions per 15 minutes per email)
+    const rateLimit = rateLimitService.checkLoginLimit(entry.email);
+    if (!rateLimit.allowed) {
+      return { 
+        data: null, 
+        error: { message: `Aguarde ${rateLimit.retryAfter} segundos antes de tentar novamente.` } 
+      };
+    }
+
+    // Check if email already exists (silently - don't reveal if email exists to prevent enumeration)
     const { data: existing } = await supabase
       .from('internship_waitlist')
       .select('id')
       .eq('email', entry.email)
       .maybeSingle();
 
+    // Return success even if email exists to prevent timing attacks / email enumeration
     if (existing) {
-      return { data: null, error: { message: 'Este email já está cadastrado na lista de estágio.' } };
+      // Simulate a small delay to match normal insert time
+      await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 200));
+      return { 
+        data: { id: 'existing', ...entry } as unknown as InternshipWaitlistEntry, 
+        error: null 
+      };
     }
 
     const { data, error } = await supabase
