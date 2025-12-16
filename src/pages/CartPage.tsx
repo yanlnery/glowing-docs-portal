@@ -116,7 +116,7 @@ const CartPage = () => {
       });
       
       setTimeout(() => {
-        navigate('/auth/login', { state: { from: '/carrinho' } });
+        navigate('/login', { state: { from: '/carrinho' } });
       }, 1500);
       
       return;
@@ -373,7 +373,7 @@ const CartPage = () => {
                         description: "Você precisa estar logado para finalizar a compra.",
                         variant: "destructive",
                       });
-                      navigate('/auth/login', { state: { from: '/carrinho' } });
+                      navigate('/login', { state: { from: '/carrinho' } });
                       return;
                     }
                     setIsDialogOpen(true);
