@@ -53,31 +53,42 @@ export const getAllProducts = async (): Promise<Product[]> => {
   }
 };
 
-// Get product by ID
-export const getProductById = async (id: string): Promise<Product | null> => {
+// Helper to check if string is a valid UUID
+const isUUID = (str: string): boolean => {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+};
+
+// Get product by ID or Slug
+export const getProductById = async (idOrSlug: string): Promise<Product | null> => {
   try {
-    console.log(`🔄 Fetching product ${id} from Supabase...`);
+    console.log(`🔄 Fetching product ${idOrSlug} from Supabase...`);
+    
+    // Determine if we're searching by UUID or slug
+    const isIdSearch = isUUID(idOrSlug);
+    const column = isIdSearch ? 'id' : 'slug';
+    
     const { data, error } = await supabase
       .from('products')
       .select('*')
-      .eq('id', id)
-      .single();
+      .eq(column, idOrSlug)
+      .maybeSingle();
 
     if (error) {
-      console.error(`❌ Error fetching product ${id}:`, error);
+      console.error(`❌ Error fetching product ${idOrSlug}:`, error);
       return null;
     }
 
     if (!data) {
-      console.log(`📭 Product ${id} not found`);
+      console.log(`📭 Product ${idOrSlug} not found`);
       return null;
     }
 
     const product = transformSupabaseProduct(data);
-    console.log(`✅ Product ${id} fetched from Supabase`);
+    console.log(`✅ Product ${idOrSlug} fetched from Supabase`);
     return product;
   } catch (error) {
-    console.error(`❌ Failed to get product with ID ${id}`, error);
+    console.error(`❌ Failed to get product with ID/slug ${idOrSlug}`, error);
     return null;
   }
 };
