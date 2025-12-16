@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,6 +6,7 @@ import type { Session, AuthError, User } from '@supabase/supabase-js';
 
 interface AdminAuthContextType {
   isAdminLoggedIn: boolean;
+  isVerifiedAdmin: boolean;
   adminUser: User | null;
   adminSession: Session | null;
   adminLoginLoading: boolean;
@@ -18,10 +19,33 @@ const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefin
 export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [adminSession, setAdminSession] = useState<Session | null>(null);
   const [adminUser, setAdminUser] = useState<User | null>(null);
+  const [isVerifiedAdmin, setIsVerifiedAdmin] = useState<boolean>(false);
   const [adminLoginLoading, setAdminLoginLoading] = useState<boolean>(true);
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Verify admin role from database
+  const verifyAdminRole = useCallback(async (userId: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error verifying admin role:', error);
+        return false;
+      }
+
+      return !!data;
+    } catch (err) {
+      console.error('Failed to verify admin role:', err);
+      return false;
+    }
+  }, []);
 
   useEffect(() => {
     const getSession = async () => {
@@ -30,53 +54,104 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         console.error("Error getting admin session:", error);
         toast({ title: "Erro de Sessão", description: "Não foi possível verificar a sessão do administrador.", variant: "destructive" });
       }
+      
       setAdminSession(session);
       setAdminUser(session?.user ?? null);
-      setAdminLoginLoading(false);
 
-      // Redirect logic based on session and current path
-      if (session && (location.pathname === '/admin' || location.pathname === '/admin/login')) {
-        navigate('/admin/dashboard', { replace: true });
+      // Verify admin role if user is authenticated
+      if (session?.user) {
+        const isAdmin = await verifyAdminRole(session.user.id);
+        setIsVerifiedAdmin(isAdmin);
+        
+        // Only redirect to dashboard if verified admin
+        if (isAdmin && (location.pathname === '/admin' || location.pathname === '/admin/login')) {
+          navigate('/admin/dashboard', { replace: true });
+        }
+      } else {
+        setIsVerifiedAdmin(false);
       }
-      // Protected route redirection is handled by AdminProtectedRoute
+      
+      setAdminLoginLoading(false);
     };
     getSession();
 
     const { data: authListenerData } = supabase.auth.onAuthStateChange((_event, session) => {
       setAdminSession(session);
       setAdminUser(session?.user ?? null);
-      setAdminLoginLoading(false);
       
       const currentPath = location.pathname;
-      if (_event === 'SIGNED_IN') {
-        if (currentPath === '/admin' || currentPath === '/admin/login') {
-           const from = location.state?.from?.pathname || "/admin/dashboard";
-           navigate(from, { replace: true });
-        }
+      
+      if (_event === 'SIGNED_IN' && session?.user) {
+        // Defer admin role verification to avoid Supabase deadlock
+        setTimeout(async () => {
+          const isAdmin = await verifyAdminRole(session.user.id);
+          setIsVerifiedAdmin(isAdmin);
+          setAdminLoginLoading(false);
+          
+          if (isAdmin) {
+            if (currentPath === '/admin' || currentPath === '/admin/login') {
+              const from = location.state?.from?.pathname || "/admin/dashboard";
+              navigate(from, { replace: true });
+            }
+          } else {
+            // Not an admin - sign out and show error
+            toast({ 
+              title: "Acesso Negado", 
+              description: "Você não tem permissão de administrador.", 
+              variant: "destructive" 
+            });
+            supabase.auth.signOut();
+          }
+        }, 0);
       } else if (_event === 'SIGNED_OUT') {
+        setIsVerifiedAdmin(false);
+        setAdminLoginLoading(false);
         if (currentPath.startsWith('/admin/') && currentPath !== '/admin' && currentPath !== '/admin/login') {
           navigate('/admin', { replace: true });
         }
+      } else {
+        setAdminLoginLoading(false);
       }
     });
 
     return () => {
       authListenerData?.subscription?.unsubscribe();
     };
-  }, [navigate, location, toast]);
+  }, [navigate, location, toast, verifyAdminRole]);
 
   const adminLogin = async (email: string, password: string): Promise<{ error: AuthError | null }> => {
     setAdminLoginLoading(true);
     const { error, data } = await supabase.auth.signInWithPassword({ email, password });
-    // The onAuthStateChange listener will handle setting session and user
-    setAdminLoginLoading(false);
-    if (!error && data.session) {
-        // Explicitly navigate after successful login if onAuthStateChange doesn't cover all cases quickly
-        // This helps ensure redirection even if onAuthStateChange is slightly delayed
-        const from = location.state?.from?.pathname || "/admin/dashboard";
-        navigate(from, { replace: true });
+    
+    if (error) {
+      setAdminLoginLoading(false);
+      return { error };
     }
-    return { error };
+    
+    // Verify admin role after successful authentication
+    if (data.session?.user) {
+      const isAdmin = await verifyAdminRole(data.session.user.id);
+      
+      if (!isAdmin) {
+        // Sign out non-admin users
+        await supabase.auth.signOut();
+        setAdminLoginLoading(false);
+        return { 
+          error: { 
+            message: 'Você não tem permissão de administrador.',
+            name: 'AuthApiError',
+            status: 403
+          } as AuthError 
+        };
+      }
+      
+      setIsVerifiedAdmin(true);
+      const from = location.state?.from?.pathname || "/admin/dashboard";
+      navigate(from, { replace: true });
+    }
+    
+    setAdminLoginLoading(false);
+    return { error: null };
   };
 
   const adminLogout = async () => {
@@ -85,13 +160,14 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     if (error) {
       toast({ title: "Erro ao Sair", description: error.message, variant: "destructive"});
     }
-    // onAuthStateChange handles navigation to /admin on SIGNED_OUT
+    setIsVerifiedAdmin(false);
     setAdminLoginLoading(false);
   };
 
   return (
     <AdminAuthContext.Provider value={{ 
-      isAdminLoggedIn: !!adminUser && !!adminSession, 
+      isAdminLoggedIn: !!adminUser && !!adminSession && isVerifiedAdmin, 
+      isVerifiedAdmin,
       adminUser,
       adminSession,
       adminLoginLoading, 
