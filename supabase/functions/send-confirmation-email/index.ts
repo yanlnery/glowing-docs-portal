@@ -9,6 +9,16 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+// HTML escape function to prevent XSS
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 interface ConfirmationEmailRequest {
   name: string;
   email: string;
@@ -22,6 +32,9 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const { name, email, confirmationUrl }: ConfirmationEmailRequest = await req.json();
+    
+    // Sanitize user input to prevent XSS
+    const safeName = escapeHtml(name || 'Criador');
 
     const emailResponse = await resend.emails.send({
       from: "Pet Serpentes <noreply@petserpentes.com.br>",
@@ -47,7 +60,7 @@ const handler = async (req: Request): Promise<Response> => {
                   </tr>
                   <tr>
                     <td style="padding: 40px;">
-                      <h2 style="color: #1a1a2e; margin: 0 0 20px; font-size: 22px;">Olá, ${name || 'Criador'}!</h2>
+                      <h2 style="color: #1a1a2e; margin: 0 0 20px; font-size: 22px;">Olá, ${safeName}!</h2>
                       <p style="color: #444444; font-size: 16px; line-height: 1.6; margin: 0 0 20px;">
                         Obrigado por se cadastrar na Pet Serpentes! Estamos muito felizes em tê-lo conosco.
                       </p>

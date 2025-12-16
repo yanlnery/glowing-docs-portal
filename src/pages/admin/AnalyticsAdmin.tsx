@@ -12,6 +12,7 @@ import {
   Eye,
   Download
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function AnalyticsAdmin() {
   const [cartAnalytics, setCartAnalytics] = useState<any[]>([]);
@@ -21,13 +22,32 @@ export default function AnalyticsAdmin() {
     fetchAnalyticsData();
   }, []);
 
-  const fetchAnalyticsData = () => {
+  const fetchAnalyticsData = async () => {
     setIsLoading(true);
     
     try {
-      // Buscar dados de analytics do localStorage
-      const analyticsData = JSON.parse(localStorage.getItem('cartAnalytics') || '[]');
-      setCartAnalytics(analyticsData);
+      // Buscar dados de analytics do banco de dados (requer admin)
+      const { data, error } = await supabase
+        .from('cart_analytics')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Erro ao carregar analytics:', error);
+        setCartAnalytics([]);
+      } else {
+        // Transform database format to expected format
+        const transformedData = (data || []).map(item => ({
+          timestamp: item.created_at,
+          action: item.action,
+          productId: item.items?.[0]?.id,
+          productName: item.items?.[0]?.name,
+          price: item.items?.[0]?.price || 0,
+          itemCount: item.item_count,
+          totalValue: item.total_value
+        }));
+        setCartAnalytics(transformedData);
+      }
     } catch (error) {
       console.error('Erro ao carregar analytics:', error);
       setCartAnalytics([]);
