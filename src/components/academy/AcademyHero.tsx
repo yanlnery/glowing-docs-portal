@@ -13,7 +13,7 @@ const AcademyHero: React.FC<AcademyHeroProps> = ({ onAction, isLoading, hasAcces
   const getButtonText = () => {
     if (isLoading) return 'Carregando...';
     if (isOpenForSubscription) return 'Assinar Agora - R$17,90/mês';
-    return 'Faça parte da P.S.A';
+    return 'Faça parte da PSA';
   };
 
   const getSubtext = () => {
@@ -36,7 +36,7 @@ const AcademyHero: React.FC<AcademyHeroProps> = ({ onAction, isLoading, hasAcces
         <div className="inline-flex items-center gap-2 px-4 py-2 mb-6 bg-gradient-to-r from-amber-500/10 via-amber-400/5 to-amber-500/10 border border-amber-500/30 rounded-full animate-fade-in">
           <Crown className="w-4 h-4 text-amber-500" />
           <span className="text-sm font-semibold bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 bg-clip-text text-transparent uppercase tracking-wider">
-            P.S. Academy
+            PS Academy
           </span>
           <span className="text-xs text-amber-600/80 dark:text-amber-400/80">•</span>
           <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
