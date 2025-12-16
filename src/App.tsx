@@ -21,6 +21,7 @@ import ClientArea from "./pages/ClientArea";
 import NotFound from "./pages/NotFound";
 import WaitlistForm from "./pages/WaitlistForm";
 import CartPage from "./pages/CartPage";
+import CheckoutAuthPage from "./pages/CheckoutAuthPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfUsePage from "./pages/TermsOfUsePage";
 import { Button } from "@/components/ui/button";
@@ -120,6 +121,7 @@ function App() {
                   </Route>
                   
                   <Route path="carrinho" element={<CartPage />} />
+                  <Route path="checkout-cadastro" element={<CheckoutAuthPage />} />
                   <Route path="manuais-de-criacao" element={<Manuals />} />
                   
                   

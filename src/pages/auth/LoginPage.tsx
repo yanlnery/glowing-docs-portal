@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { ShoppingCart } from 'lucide-react';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -16,7 +17,8 @@ const LoginPage: React.FC = () => {
   const location = useLocation();
   const { toast } = useToast();
 
-  const from = location.state?.from?.pathname || "/area-cliente";
+  const fromCheckout = location.state?.fromCheckout === true;
+  const from = fromCheckout ? "/carrinho" : (location.state?.from?.pathname || "/area-cliente");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +26,10 @@ const LoginPage: React.FC = () => {
     if (error) {
       toast({ title: 'Erro no Login', description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: 'Login bem-sucedido!', description: 'Redirecionando...' });
+      toast({ 
+        title: 'Login bem-sucedido!', 
+        description: fromCheckout ? 'Agora você pode finalizar sua compra!' : 'Redirecionando...' 
+      });
       navigate(from, { replace: true });
     }
   };
@@ -38,8 +43,19 @@ const LoginPage: React.FC = () => {
             alt="PET SERPENTES" 
             className="w-20 h-20 mx-auto mb-4 rounded-full" 
           />
-          <CardTitle className="text-2xl font-bold">Acessar sua Conta</CardTitle>
-          <CardDescription>Bem-vindo de volta! Faça login para continuar.</CardDescription>
+          <CardTitle className="text-2xl font-bold">
+            {fromCheckout ? 'Faça login para continuar' : 'Acessar sua Conta'}
+          </CardTitle>
+          <CardDescription>
+            {fromCheckout ? (
+              <span className="flex items-center justify-center gap-2">
+                <ShoppingCart className="h-4 w-4" />
+                Após o login, você voltará ao carrinho
+              </span>
+            ) : (
+              'Bem-vindo de volta! Faça login para continuar.'
+            )}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -63,7 +79,11 @@ const LoginPage: React.FC = () => {
         </CardContent>
         <CardFooter className="text-center text-sm">
           <p>Não tem uma conta?{' '}
-            <Link to="/signup" className="font-medium text-primary hover:underline">
+            <Link 
+              to="/signup" 
+              state={fromCheckout ? { fromCheckout: true } : undefined}
+              className="font-medium text-primary hover:underline"
+            >
               Cadastre-se
             </Link>
           </p>
