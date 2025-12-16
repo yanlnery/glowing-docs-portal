@@ -48,7 +48,7 @@ const AcademyCommunityMotto: React.FC<AcademyCommunityMottoProps> = ({
           </div>
           <div className="flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-serpente-600" />
-            <span className="font-bold text-xl">50+</span>
+            <span className="font-bold text-xl">20+</span>
             <span className="text-muted-foreground">Espécies</span>
           </div>
           <div className="flex items-center gap-2">
