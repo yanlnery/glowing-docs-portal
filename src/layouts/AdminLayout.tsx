@@ -56,6 +56,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { name: 'Manuais', href: '/admin/manuals', icon: FileText, requiredRole: 'admin' },
     { name: 'Lista de Espera (Academy)', href: '/admin/waitlist', icon: Users, requiredRole: 'admin' },
     { name: 'Lista de Espera (Espécies)', href: '/admin/species-waitlist', icon: Users, requiredRole: 'admin', badge: true },
+    { name: 'Lista de Espera (Estágio)', href: '/admin/internship-waitlist', icon: Users, requiredRole: 'admin' },
     { name: 'Analytics Carrinho', href: '/admin/cart-analytics', icon: ShoppingCart, requiredRole: 'admin' },
     { name: 'Configurações', href: '/admin/settings', icon: Settings, requiredRole: 'admin' },
   ];

@@ -48,8 +48,10 @@ import {
   Search,
   Users,
   Send,
-  Bell
+  Bell,
+  Plus
 } from 'lucide-react';
+import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
@@ -76,6 +78,16 @@ export default function SpeciesWaitlistAdmin() {
   const [notifySpecies, setNotifySpecies] = useState<{ id: string; name: string } | null>(null);
   const [notifyMessage, setNotifyMessage] = useState('');
   const [isSendingNotification, setIsSendingNotification] = useState(false);
+
+  // Manual entry dialog
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [newEntry, setNewEntry] = useState({
+    species_id: '',
+    name: '',
+    email: '',
+    phone: '',
+    contact_preference: 'whatsapp'
+  });
 
   useEffect(() => {
     fetchData();
@@ -214,6 +226,24 @@ export default function SpeciesWaitlistAdmin() {
     }
   };
 
+  const handleAddManualEntry = async () => {
+    if (!newEntry.species_id || !newEntry.name || !newEntry.email || !newEntry.phone) {
+      toast({ title: 'Erro', description: 'Preencha todos os campos obrigatórios.', variant: 'destructive' });
+      return;
+    }
+
+    const { error } = await speciesWaitlistService.addToWaitlist(newEntry);
+    if (error) {
+      toast({ title: 'Erro', description: error.message || 'Não foi possível adicionar.', variant: 'destructive' });
+      return;
+    }
+
+    toast({ title: 'Adicionado com sucesso!' });
+    setShowAddDialog(false);
+    setNewEntry({ species_id: '', name: '', email: '', phone: '', contact_preference: 'whatsapp' });
+    fetchData();
+  };
+
   const filteredEntries = entries.filter(entry => {
     const matchesSearch = 
       entry.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -234,10 +264,16 @@ export default function SpeciesWaitlistAdmin() {
             <h1 className="text-2xl font-bold">Lista de Espera - Espécies</h1>
             <p className="text-muted-foreground">Gerencie os interessados em cada espécie</p>
           </div>
+        <div className="flex gap-2">
+          <Button onClick={() => setShowAddDialog(true)} variant="default">
+            <Plus className="w-4 h-4 mr-2" />
+            Adicionar
+          </Button>
           <Button onClick={exportCSV} variant="outline">
             <FileDown className="w-4 h-4 mr-2" />
             Exportar CSV
           </Button>
+        </div>
         </div>
 
         {/* Summary cards */}
@@ -496,6 +532,56 @@ export default function SpeciesWaitlistAdmin() {
                   </>
                 )}
               </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Add Manual Entry Dialog */}
+        <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Adicionar à Lista de Espera</DialogTitle>
+              <DialogDescription>Adicione manualmente um interessado na lista de espera.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Espécie *</Label>
+                <Select value={newEntry.species_id} onValueChange={(v) => setNewEntry({ ...newEntry, species_id: v })}>
+                  <SelectTrigger><SelectValue placeholder="Selecione a espécie" /></SelectTrigger>
+                  <SelectContent>
+                    {allSpecies.map(sp => (
+                      <SelectItem key={sp.id} value={sp.id}>{sp.commonname}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Nome completo *</Label>
+                <Input value={newEntry.name} onChange={(e) => setNewEntry({ ...newEntry, name: e.target.value })} placeholder="Nome do interessado" />
+              </div>
+              <div>
+                <Label>Email *</Label>
+                <Input type="email" value={newEntry.email} onChange={(e) => setNewEntry({ ...newEntry, email: e.target.value })} placeholder="email@exemplo.com" />
+              </div>
+              <div>
+                <Label>Telefone *</Label>
+                <Input value={newEntry.phone} onChange={(e) => setNewEntry({ ...newEntry, phone: e.target.value })} placeholder="(00) 00000-0000" />
+              </div>
+              <div>
+                <Label>Preferência de contato</Label>
+                <Select value={newEntry.contact_preference} onValueChange={(v) => setNewEntry({ ...newEntry, contact_preference: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                    <SelectItem value="email">Email</SelectItem>
+                    <SelectItem value="both">Ambos</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="flex gap-3 justify-end">
+              <Button variant="outline" onClick={() => setShowAddDialog(false)}>Cancelar</Button>
+              <Button onClick={handleAddManualEntry}>Adicionar</Button>
             </div>
           </DialogContent>
         </Dialog>

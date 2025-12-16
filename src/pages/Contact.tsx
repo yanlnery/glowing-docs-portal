@@ -3,13 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Phone, Mail, MessageSquare, Instagram, Youtube } from "lucide-react";
+import { Phone, Mail, MessageSquare, Instagram, Youtube, GraduationCap } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { contactService } from "@/services/contactService";
+import { InternshipWaitlistForm } from "@/components/internship/InternshipWaitlistForm";
 
 export default function Contact() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showInternshipForm, setShowInternshipForm] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,12 +20,12 @@ export default function Contact() {
     message: ""
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({ ...prev, [id]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
@@ -219,8 +221,46 @@ export default function Contact() {
               </div>
             </div>
           </div>
+
+          {/* Internship Section */}
+          <div className="bg-gradient-to-br from-serpente-50 to-serpente-100 dark:from-serpente-900/20 dark:to-serpente-800/20 border border-serpente-200 dark:border-serpente-800 rounded-lg p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-serpente-600 rounded-full flex items-center justify-center">
+                <GraduationCap className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-serpente-800 dark:text-serpente-200">Estágio Voluntário 2026</h3>
+                <p className="text-sm text-serpente-600 dark:text-serpente-400">Programa de formação</p>
+              </div>
+            </div>
+            
+            <p className="text-muted-foreground mb-4">
+              Estamos abrindo vagas para o programa de estágio voluntário! Se você é estudante de 
+              <strong> Biologia, Veterinária, Zootecnia</strong> ou áreas afins, inscreva-se na nossa lista de espera.
+            </p>
+            
+            <ul className="text-sm text-muted-foreground mb-6 space-y-1">
+              <li>✓ Experiência prática com manejo de répteis</li>
+              <li>✓ Acompanhamento de profissionais experientes</li>
+              <li>✓ Certificado de horas complementares</li>
+              <li>✓ Networking na área de conservação</li>
+            </ul>
+            
+            <Button 
+              onClick={() => setShowInternshipForm(true)}
+              className="w-full bg-serpente-600 hover:bg-serpente-700"
+            >
+              <GraduationCap className="w-4 h-4 mr-2" />
+              Quero me inscrever
+            </Button>
+          </div>
         </div>
       </div>
+
+      <InternshipWaitlistForm 
+        isOpen={showInternshipForm} 
+        onClose={() => setShowInternshipForm(false)} 
+      />
     </div>
   );
 }
