@@ -23,13 +23,11 @@ export const speciesWaitlistService = {
       return { data: null, error: { message: 'Você já está na lista de espera desta espécie.' } };
     }
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('species_waitlist')
-      .insert(entry)
-      .select()
-      .single();
+      .insert(entry);
 
-    return { data: data as SpeciesWaitlistEntry | null, error };
+    return { data: null, error };
   },
 
   // Get all waitlist entries with species info
