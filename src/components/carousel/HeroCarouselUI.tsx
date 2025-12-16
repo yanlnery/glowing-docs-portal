@@ -46,8 +46,48 @@ export default function HeroCarouselUI({
 
   if (isLoading) {
     return (
-      <div className="relative min-h-[calc(100vh-200px)] md:h-[60vh] lg:h-[70vh] overflow-hidden flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4 text-center">
-        <p className="text-gray-500 dark:text-gray-400 text-lg">Carregando carrossel...</p>
+      <div className="relative w-full">
+        {/* Skeleton do carrossel com mesmas dimensões */}
+        <div className="relative h-[400px] sm:h-[450px] md:h-[65vh] lg:h-[75vh] overflow-hidden bg-muted animate-pulse">
+          {/* Gradiente simulado */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+          
+          {/* Placeholder do texto */}
+          <div className="absolute inset-0 flex flex-col justify-end p-4 pb-16 sm:p-6 sm:pb-20 md:p-8 md:pb-24">
+            <div className="max-w-[90%] sm:max-w-md md:max-w-2xl space-y-3">
+              <div className="h-8 sm:h-10 md:h-12 bg-muted-foreground/20 rounded-lg w-3/4" />
+              <div className="h-4 sm:h-5 md:h-6 bg-muted-foreground/15 rounded w-1/2" />
+            </div>
+          </div>
+          
+          {/* Placeholder dos indicadores */}
+          <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 left-0 right-0 flex justify-center space-x-2">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="w-3 h-3 md:w-4 md:h-4 rounded-full bg-muted-foreground/30" />
+            ))}
+          </div>
+        </div>
+
+        {/* Seção Nossas Espécies visível durante loading */}
+        <div className="bg-muted/20 py-6 sm:py-8 md:py-10 pb-12 sm:pb-16 md:pb-20">
+          <div className="container px-4 sm:px-6 md:px-8 lg:px-10">
+            <div className="flex justify-center mb-4 sm:mb-6">
+              <div className="docs-section-title">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
+                  Nossas Espécies
+                </h2>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4 sm:gap-8 md:gap-12 max-w-5xl mx-auto">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="flex flex-col items-center justify-center">
+                  <div className="w-full max-w-[280px] aspect-square mb-1 bg-muted rounded-full animate-pulse" />
+                  <div className="h-6 w-20 bg-muted rounded animate-pulse" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
