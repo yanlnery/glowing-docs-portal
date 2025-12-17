@@ -32,7 +32,7 @@ export default function ThemeToggle() {
       size="icon"
       onClick={toggleTheme}
       title={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
-      className="rounded-full text-foreground hover:text-foreground"
+      className="rounded-full bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground"
     >
       {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
       <span className="sr-only">Toggle theme</span>

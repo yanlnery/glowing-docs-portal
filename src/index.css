@@ -145,18 +145,6 @@
       background-position: 100% 0%, 0% 100%, 0% 0%, 100% 100%;
     }
   }
-
-  /* Specific styles for mobile navigation */
-  .mobile-nav {
-    background-color: #000000 !important; /* Força fundo preto sólido */
-    opacity: 1 !important; /* Garante opacidade total */
-    backdrop-filter: none !important; /* Remove qualquer desfoque */
-    color: white !important; /* Garante texto branco para contraste */
-    height: calc(100vh - 4rem) !important; /* Altura total menos o header */
-    overflow-y: auto !important; /* Permite rolagem vertical */
-    padding-bottom: 2rem !important; /* Espaço extra no final do menu */
-    box-sizing: border-box !important; /* Inclui padding no cálculo da altura */
-  }
 }
 
 .docs-section-title {
