@@ -39,7 +39,7 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
   };
 
   return (
-    <div className="fixed inset-0 top-16 z-[100] bg-background text-foreground md:hidden animate-fade-in mobile-nav h-[calc(100vh-4rem)] overflow-y-auto">
+    <div className="fixed inset-0 top-16 z-[200] isolate bg-background text-foreground md:hidden animate-fade-in h-[calc(100vh-4rem)] overflow-y-auto">
       <nav className="container py-6 h-full px-5">
         
         {/* Header actions - design mais elegante */}
@@ -86,7 +86,7 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
             <Button 
               variant="outline" 
               size="icon"
-              className="h-12 w-12 border-border relative text-foreground"
+              className="h-12 w-12 border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground relative"
               asChild
             >
               <Link to="/carrinho" onClick={handleLinkClick}>
@@ -99,7 +99,7 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
               </Link>
             </Button>
             
-            <div className="h-12 w-12 flex items-center justify-center border border-border rounded-md text-foreground">
+            <div className="h-12 w-12 flex items-center justify-center border border-border rounded-md bg-background">
               <ThemeToggle />
             </div>
           </div>
