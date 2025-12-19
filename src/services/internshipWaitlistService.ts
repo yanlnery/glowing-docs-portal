@@ -24,15 +24,14 @@ export const internshipWaitlistService = {
       };
     }
 
-    // Check if email already exists (silently - don't reveal if email exists to prevent enumeration)
-    const { data: existing } = await supabase
+    // Insert directly - unique constraint on email handles duplicates
+    // No .select() call as anonymous users don't have SELECT permission
+    const { error } = await supabase
       .from('internship_waitlist')
-      .select('id')
-      .eq('email', entry.email)
-      .maybeSingle();
+      .insert(entry);
 
-    // Return success even if email exists to prevent timing attacks / email enumeration
-    if (existing) {
+    // Handle unique violation silently (security - don't reveal if email exists)
+    if (error?.code === '23505') {
       // Simulate a small delay to match normal insert time
       await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 200));
       return { 
@@ -41,13 +40,7 @@ export const internshipWaitlistService = {
       };
     }
 
-    const { data, error } = await supabase
-      .from('internship_waitlist')
-      .insert(entry)
-      .select()
-      .single();
-
-    return { data: data as InternshipWaitlistEntry | null, error };
+    return { data: entry as unknown as InternshipWaitlistEntry, error };
   },
 
   async getAllEntries(): Promise<{ data: InternshipWaitlistEntry[] | null; error: any }> {
