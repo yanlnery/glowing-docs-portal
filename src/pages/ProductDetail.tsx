@@ -4,16 +4,18 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useCartStore } from '@/stores/cartStore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, ShoppingCart, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
+import { Star, ShoppingCart, ArrowLeft, CheckCircle, AlertCircle, ChevronDown, ChevronUp, Package, FileText } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { productService } from '@/services/productService';
 import { Product } from '@/types/product';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [showSpeciesDetails, setShowSpeciesDetails] = useState(false);
   const { addToCart } = useCartStore();
   const navigate = useNavigate();
 
@@ -70,6 +72,16 @@ const ProductDetail = () => {
       style: 'currency',
       currency: 'BRL'
     }).format(price);
+  };
+
+  const getSexLabel = (sex: string | undefined) => {
+    if (!sex) return null;
+    switch (sex) {
+      case 'male': return 'Macho';
+      case 'female': return 'Fêmea';
+      case 'undefined': return 'Indefinido';
+      default: return sex;
+    }
   };
   
   const handleAddToCart = () => {
@@ -169,7 +181,14 @@ const ProductDetail = () => {
             </div>
             
             <div>
-              <h1 className="text-3xl font-bold">{product.name}</h1>
+              <h1 className="text-3xl font-bold">
+                {product.name}
+                {product.meta?.productId && (
+                  <span className="text-lg text-muted-foreground ml-2 font-normal">
+                    #{product.meta.productId}
+                  </span>
+                )}
+              </h1>
               <p className="text-xl text-muted-foreground italic mt-1">
                 <em>{product.speciesName}</em>
               </p>
@@ -196,12 +215,29 @@ const ProductDetail = () => {
               )}
             </div>
             
-            <div className="pt-4 border-t">
-              <h2 className="font-semibold mb-2">Descrição</h2>
-              <p className="text-muted-foreground whitespace-pre-line">
-                {product.description}
-              </p>
-            </div>
+            {/* Species Details - Collapsible */}
+            {product.description && (
+              <Collapsible open={showSpeciesDetails} onOpenChange={setShowSpeciesDetails}>
+                <CollapsibleTrigger asChild>
+                  <Button variant="outline" className="w-full justify-between">
+                    <span>Detalhes da Espécie</span>
+                    {showSpeciesDetails ? (
+                      <ChevronUp className="h-4 w-4 ml-2" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 ml-2" />
+                    )}
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="pt-4">
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <h2 className="font-semibold mb-2">Descrição</h2>
+                    <p className="text-muted-foreground whitespace-pre-line">
+                      {product.description}
+                    </p>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            )}
             
             <div className="pt-4 border-t">
               <h2 className="font-semibold mb-2">Características</h2>
@@ -217,7 +253,7 @@ const ProductDetail = () => {
                 {product.meta?.sex && (
                   <div>
                     <p className="text-sm text-muted-foreground">Sexo</p>
-                    <p className="font-medium">{product.meta.sex === 'male' ? 'Macho' : 'Fêmea'}</p>
+                    <p className="font-medium">{getSexLabel(product.meta.sex)}</p>
                   </div>
                 )}
                 {product.meta?.age && (
@@ -227,6 +263,33 @@ const ProductDetail = () => {
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* Fixed Shipping Section */}
+            <div className="pt-4 border-t">
+              <div className="flex items-center gap-2 mb-2">
+                <Package className="h-5 w-5 text-serpente-600" />
+                <h2 className="font-semibold">Envio</h2>
+              </div>
+              <p className="text-sm font-medium mb-2">Custo do envio por conta do comprador.</p>
+              <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                <li>Serviço de envio garantido com as companhias aéreas Gollog e Latam.</li>
+                <li>Custos adicionais de envio variam conforme região e horário de chegada do voo.</li>
+                <li>Custos de envio: <strong className="text-foreground">Valores mínimos de R$250,00 e máximos de R$365,00</strong>, incluindo consulta prévia com veterinário, emissão de GTA (Guia de Trânsito Animal), Caixa de Transporte e Aéreo.</li>
+              </ul>
+            </div>
+
+            {/* Fixed Documents Section */}
+            <div className="pt-4 border-t">
+              <div className="flex items-center gap-2 mb-2">
+                <FileText className="h-5 w-5 text-serpente-600" />
+                <h2 className="font-semibold">Documentos Inclusos</h2>
+              </div>
+              <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                <li>Nota Fiscal.</li>
+                <li>Certificado de Origem (Emitido via Sisfauna - Sistema Nacional de Gestão de Fauna Silvestre).</li>
+                <li>Licença de Transporte (Emitido via Sisfauna).</li>
+              </ul>
             </div>
             
             {/* Add to Cart */}
@@ -253,7 +316,7 @@ const ProductDetail = () => {
                 <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-md text-sm flex items-start gap-2">
                   <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
                   <p className="text-yellow-800 dark:text-yellow-300">
-                    ⚠️ O frete é sujeito à disponibilidade logística e valores variam por região. Consulte condições antes de finalizar a compra.
+                    ⚠️ O frete é sujeito à disponibilidade logística e valores variam por região. Prossiga para mais detalhes.
                   </p>
                 </div>
               </div>
