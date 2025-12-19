@@ -32,7 +32,12 @@ const productFormSchema = z.object({
   paymentLink: z.string().optional(),
   images: z.array(z.any()).default([]),
   details: z.array(z.any()).default([]),
-  meta: z.record(z.any()).default({}),
+  meta: z.object({
+    productId: z.string().optional(),
+    sex: z.enum(['male', 'female', 'undefined']).optional(),
+    characteristics: z.array(z.string()).optional(),
+    curiosities: z.array(z.string()).optional(),
+  }).default({}),
 });
 
 export const useProductForm = () => {
@@ -64,7 +69,10 @@ export const useProductForm = () => {
       paymentLink: '',
       images: [],
       details: [],
-      meta: {},
+      meta: {
+        productId: '',
+        sex: undefined,
+      },
     },
   });
 

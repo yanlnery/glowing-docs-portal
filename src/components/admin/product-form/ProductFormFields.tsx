@@ -105,6 +105,51 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
         </CardContent>
       </Card>
 
+      {/* ID do Produto e Sexo */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormField
+          control={form.control}
+          name="meta.productId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>ID do Produto</FormLabel>
+              <FormControl>
+                <Input 
+                  placeholder="Ex: PS001" 
+                  {...field} 
+                  value={field.value || ''}
+                />
+              </FormControl>
+              <FormDescription>Aparecerá ao lado do nome do animal (Ex: #PS001)</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="meta.sex"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Sexo do Animal</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value || ''}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o sexo" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="male">Macho</SelectItem>
+                  <SelectItem value="female">Fêmea</SelectItem>
+                  <SelectItem value="undefined">Indefinido</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
           control={form.control}
