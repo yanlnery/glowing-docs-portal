@@ -150,16 +150,10 @@ const Academy = () => {
             <img 
               src="/lovable-uploads/481f8f82-22b1-407d-9e88-623e453faf6a.png" 
               alt="PS Academy"
-              className="w-full h-auto transition-opacity duration-500"
-              style={{ opacity: 1 }}
-              onLoad={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.opacity = '1';
-              }}
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.opacity = '1';
-              }}
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
+              className="w-full h-auto"
             />
           </div>
         </div>
