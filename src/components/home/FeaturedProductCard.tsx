@@ -46,11 +46,10 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
       key={product.id} 
       className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md group w-full"
       style={{
-        minHeight: "200px",
+        minHeight: "280px",
         height: "auto",
         overflow: "visible"
       }}
-      onLoad={() => console.log(`📱 Product ${index} container loaded`)}
     >
       <Link to={`/produtos/${product.id}`} className="block relative overflow-hidden aspect-square group/image cursor-pointer">
         <OptimizedImage

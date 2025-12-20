@@ -71,7 +71,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
           style={{
             width: "100%",
             height: "auto",
-            minHeight: "120px"
+            minHeight: "180px"
           }}
         >
           <OptimizedImage

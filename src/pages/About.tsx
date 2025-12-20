@@ -1,13 +1,15 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Leaf, BookOpen, Award, Heart } from 'lucide-react';
+import { Leaf, BookOpen, Award, Heart, Shield, Target } from 'lucide-react';
+import { ImageWithLoader } from '@/components/ui/image-with-loader';
 
 const About = () => {
-  const origemText = {
-    title: "A Origem do Criadouro",
+  const sobreCriadouroText = {
+    title: "Sobre o Criadouro",
     paragraphs: [
-      "O Pet Serpentes & Companhia nasceu da paixão por répteis e do desejo de trabalhar com criação legalizada no Brasil. O que começou como um interesse pessoal em terrários e aquários se transformou em um criadouro comercial focado em espécies nativas.",
-      "O projeto começou oficialmente em 2015 com aves exóticas, mas foi em 2019 que os répteis se tornaram o foco principal da operação. Desde então, o criadouro vem crescendo e se consolidando no mercado de herpetocultura."
+      "O Pet Serpentes & Companhia é um criadouro comercial legalizado que atua com a criação de répteis silvestres nativos no Brasil, devidamente inscrito no Cadastro Técnico Federal do IBAMA CTF nº 6654937. A operação foi adquirida e segue em processo contínuo de aprimoramento estrutural e operacional, com Yan Nery atuando na gestão técnica do criadouro.",
+      "O projeto teve início em 2015, com foco inicial em aves exóticas, e passou a atuar prioritariamente com répteis a partir de 2019. Atualmente, o criadouro opera de forma regularizada e vem passando por ajustes graduais, com planos de aprimoramento dos recintos, do manejo e dos protocolos técnicos ao longo do tempo.",
+      "O objetivo é elevar progressivamente o padrão da operação, mantendo conformidade legal, responsabilidade no manejo e compromisso com o bem-estar animal."
     ]
   };
 
@@ -29,22 +31,22 @@ const About = () => {
 
   const missaoItens = [
     {
-      icon: <Leaf size={40} className="mb-4 text-serpente-500" />,
+      icon: <Leaf size={36} className="text-serpente-500" />,
       title: "Conservação",
       text: "Promovemos práticas sustentáveis de criação que contribuem para a conservação das espécies."
     },
     {
-      icon: <BookOpen size={40} className="mb-4 text-serpente-500" />,
+      icon: <BookOpen size={36} className="text-serpente-500" />,
       title: "Educação",
       text: "Compartilhamos conhecimento para formar tutores mais conscientes e promover a posse responsável no Brasil."
     },
     {
-      icon: <Award size={40} className="mb-4 text-serpente-500" />,
+      icon: <Award size={36} className="text-serpente-500" />,
       title: "Excelência",
       text: "Asseguramos os mais altos padrões de qualidade no manejo, reprodução e venda de répteis para criadores responsáveis."
     },
     {
-      icon: <Heart size={40} className="mb-4 text-serpente-500" />,
+      icon: <Heart size={36} className="text-serpente-500" />,
       title: "Bem-estar Animal",
       text: "Garantimos ambiente, alimentação e estímulos adequados para o desenvolvimento saudável de cada animal."
     }
@@ -87,111 +89,182 @@ const About = () => {
           content="Conheça a história do Pet Serpentes & Companhia, criadouro comercial legalizado no Rio de Janeiro. Nossa missão, valores e trajetória na criação responsável de répteis nativos." 
         />
       </Helmet>
-      <div className="bg-background text-foreground py-12 md:py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-
-        {/* Nossa História Section - Header */}
-        <section className="mb-16 md:mb-24">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Quem Somos</h2>
-            <p className="text-muted-foreground mb-8 text-lg mx-auto max-w-2xl">
-              Conheça a trajetória e a missão do Pet Serpentes & Companhia
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center mb-16">
-            <div className="order-1 md:order-1">
-              <img 
-                src="/lovable-uploads/13113c77-f713-4585-9041-1766e67545b8.png" 
-                alt="Yan Nery, CEO e Biólogo do Pet Serpentes & Companhia" 
-                className="w-full h-auto rounded-lg shadow-lg object-cover aspect-[4/5] md:aspect-auto" 
-              />
-            </div>
-            <div className="order-2 md:order-2 prose prose-invert max-w-none text-foreground">
-              <h3 className="text-2xl font-semibold text-foreground mb-4">{origemText.title}</h3>
-              {origemText.paragraphs.map((p, index) => (
-                <p key={index} className="mb-4 leading-relaxed text-foreground/90">{p}</p>
-              ))}
-            </div>
-          </div>
-
-          {/* O Que Fazemos */}
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center mb-16">
-            <div className="order-2 md:order-1 prose prose-invert max-w-none text-foreground">
-              <h3 className="text-2xl font-semibold text-foreground mb-4">{oQueFazemosText.title}</h3>
-              {oQueFazemosText.paragraphs.map((p, index) => (
-                <p key={index} className="mb-4 leading-relaxed text-foreground/90">{p}</p>
-              ))}
-            </div>
-            <div className="order-1 md:order-2">
-              <img 
-                src="/lovable-uploads/c988fe8f-9ba2-4b94-a8e7-a7347e0d0a84.png" 
-                alt="Instalações do Pet Serpentes & Companhia" 
-                className="w-full h-auto rounded-lg shadow-lg object-cover aspect-[4/3]" 
-              />
-            </div>
-          </div>
-
-          {/* Nosso Propósito */}
-          <div className="bg-card p-8 rounded-lg shadow-md">
-            <h3 className="text-2xl font-semibold text-foreground mb-4 text-center">{propositoText.title}</h3>
-            <div className="max-w-3xl mx-auto">
-              {propositoText.paragraphs.map((p, index) => (
-                <p key={index} className="mb-4 leading-relaxed text-foreground/90 text-center">{p}</p>
-              ))}
+      
+      <div className="bg-background text-foreground">
+        {/* Hero Section */}
+        <section className="relative py-16 md:py-24 bg-gradient-to-b from-serpente-50/50 to-background dark:from-serpente-950/20 dark:to-background">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
+                Quem Somos
+              </h1>
+              <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
+                Conheça a trajetória e a missão do Pet Serpentes & Companhia, 
+                criadouro comercial legalizado focado em criação responsável de répteis nativos.
+              </p>
             </div>
           </div>
         </section>
 
-        {/* Nossa Missão Section */}
-        <section className="mb-16 md:mb-24">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Nossa Missão</h2>
-            <p className="text-muted-foreground mt-2 text-lg mx-auto max-w-2xl">Trabalhamos com pilares fundamentais que orientam todas as nossas atividades.</p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {missaoItens.map((item, index) => (
-              <div key={index} className="bg-card p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow duration-300">
-                <div className="flex justify-center">{item.icon}</div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">{item.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">{item.text}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Nossa Trajetória Section */}
-        <section>
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Nossa Trajetória</h2>
-            <p className="text-muted-foreground mt-2 text-lg mx-auto max-w-2xl">Conheça os principais marcos na história do Pet Serpentes & Companhia.</p>
-          </div>
-          
-          <div className="relative">
-            {/* Central line */}
-            <div className="hidden md:block absolute top-0 bottom-0 left-1/2 w-0.5 bg-border transform -translate-x-1/2"></div>
-            
-            {trajetoriaItens.map((item, index) => (
-              <div key={index} className={`mb-12 md:flex ${index % 2 === 0 ? 'md:flex-row-reverse' : ''} items-center w-full`}>
-                <div className="md:w-1/2"></div>
-                <div className={`md:w-1/2 ${index % 2 === 0 ? 'md:pl-8 lg:pl-12' : 'md:pr-8 lg:pr-12 md:text-right'} relative`}>
-                  <div className="hidden md:block absolute top-1/2 -mt-2.5 transform -translate-y-1/2 z-10">
-                    <div className={`w-5 h-5 rounded-full bg-primary border-4 border-background ${index % 2 === 0 ? 'md:-ml-[calc(50%+0.625rem)]' : 'md:-mr-[calc(50%+0.625rem)] md:left-auto md:right-0' } `}></div>
-                  </div>
-                  <div className="md:hidden absolute top-0 left-0 w-0.5 h-full bg-border -ml-2.5"></div>
-                  <div className="md:hidden absolute top-4 left-0 w-5 h-5 rounded-full bg-primary border-4 border-background transform -translate-x-1/2 -ml-0.5"></div>
-
-                  <div className="bg-card p-6 rounded-lg shadow-md ml-4 md:ml-0">
-                    <p className="text-sm font-semibold text-primary mb-1">{item.year}</p>
-                    <h3 className="text-xl font-bold text-foreground mb-2">{item.title}</h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{item.text}</p>
-                  </div>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+          {/* Sobre o Criadouro Section */}
+          <section className="mb-20 md:mb-28">
+            <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+              <div className="order-2 lg:order-1">
+                <div className="inline-flex items-center gap-2 bg-serpente-100 dark:bg-serpente-900/30 text-serpente-700 dark:text-serpente-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
+                  <Shield size={16} />
+                  <span>CTF IBAMA nº 6654937</span>
+                </div>
+                
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+                  {sobreCriadouroText.title}
+                </h2>
+                
+                <div className="space-y-5">
+                  {sobreCriadouroText.paragraphs.map((p, index) => (
+                    <p key={index} className="text-lg text-foreground/80 leading-relaxed">
+                      {p}
+                    </p>
+                  ))}
                 </div>
               </div>
-            ))}
-          </div>
-        </section>
+              
+              <div className="order-1 lg:order-2">
+                <ImageWithLoader
+                  src="/lovable-uploads/13113c77-f713-4585-9041-1766e67545b8.png" 
+                  alt="Yan Nery, CEO e Biólogo do Pet Serpentes & Companhia"
+                  containerClassName="rounded-2xl shadow-2xl overflow-hidden"
+                  className="w-full h-auto object-cover aspect-[4/5]"
+                />
+              </div>
+            </div>
+          </section>
 
+          {/* O Que Fazemos Section */}
+          <section className="mb-20 md:mb-28">
+            <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+              <div>
+                <ImageWithLoader
+                  src="/lovable-uploads/c988fe8f-9ba2-4b94-a8e7-a7347e0d0a84.png" 
+                  alt="Instalações do Pet Serpentes & Companhia"
+                  containerClassName="rounded-2xl shadow-2xl overflow-hidden"
+                  className="w-full h-auto object-cover aspect-[4/3]"
+                />
+              </div>
+              
+              <div>
+                <div className="inline-flex items-center gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
+                  <Target size={16} />
+                  <span>Nossa Atuação</span>
+                </div>
+                
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+                  {oQueFazemosText.title}
+                </h2>
+                
+                <div className="space-y-5">
+                  {oQueFazemosText.paragraphs.map((p, index) => (
+                    <p key={index} className="text-lg text-foreground/80 leading-relaxed">
+                      {p}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Nosso Propósito Section */}
+          <section className="mb-20 md:mb-28">
+            <div className="bg-gradient-to-br from-serpente-50 to-serpente-100/50 dark:from-serpente-950/40 dark:to-serpente-900/20 rounded-3xl p-8 md:p-12 lg:p-16">
+              <div className="max-w-4xl mx-auto text-center">
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8">
+                  {propositoText.title}
+                </h2>
+                
+                <div className="space-y-6">
+                  {propositoText.paragraphs.map((p, index) => (
+                    <p key={index} className="text-lg md:text-xl text-foreground/80 leading-relaxed">
+                      {p}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Nossa Missão Section */}
+          <section className="mb-20 md:mb-28">
+            <div className="text-center mb-12 md:mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Nossa Missão</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Trabalhamos com pilares fundamentais que orientam todas as nossas atividades.
+              </p>
+            </div>
+            
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+              {missaoItens.map((item, index) => (
+                <div 
+                  key={index} 
+                  className="bg-card border border-border/50 p-6 md:p-8 rounded-2xl text-center hover:shadow-xl hover:border-serpente-200 dark:hover:border-serpente-800 transition-all duration-300 group"
+                >
+                  <div className="w-16 h-16 bg-serpente-100 dark:bg-serpente-900/50 rounded-2xl flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform duration-300">
+                    {item.icon}
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-3">{item.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">{item.text}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Nossa Trajetória Section */}
+          <section>
+            <div className="text-center mb-12 md:mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Nossa Trajetória</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Conheça os principais marcos na história do Pet Serpentes & Companhia.
+              </p>
+            </div>
+            
+            <div className="relative max-w-4xl mx-auto">
+              {/* Central line - Desktop */}
+              <div className="hidden md:block absolute top-0 bottom-0 left-1/2 w-0.5 bg-gradient-to-b from-serpente-300 via-serpente-500 to-serpente-300 dark:from-serpente-700 dark:via-serpente-500 dark:to-serpente-700 transform -translate-x-1/2" />
+              
+              {trajetoriaItens.map((item, index) => (
+                <div 
+                  key={index} 
+                  className={`relative mb-8 md:mb-12 md:flex ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
+                >
+                  {/* Timeline dot - Desktop */}
+                  <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 z-10">
+                    <div className="w-12 h-12 bg-serpente-500 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                      {item.year.slice(2)}
+                    </div>
+                  </div>
+                  
+                  {/* Content */}
+                  <div className={`md:w-1/2 ${index % 2 === 0 ? 'md:pr-16 md:text-right' : 'md:pl-16'}`}>
+                    {/* Mobile timeline */}
+                    <div className="md:hidden flex items-center gap-4 mb-3">
+                      <div className="w-10 h-10 bg-serpente-500 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg flex-shrink-0">
+                        {item.year.slice(2)}
+                      </div>
+                      <span className="text-serpente-600 dark:text-serpente-400 font-bold">{item.year}</span>
+                    </div>
+                    
+                    <div className="bg-card border border-border/50 p-6 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 ml-14 md:ml-0">
+                      <p className="hidden md:block text-sm font-bold text-serpente-600 dark:text-serpente-400 mb-2">{item.year}</p>
+                      <h3 className="text-lg md:text-xl font-bold text-foreground mb-2">{item.title}</h3>
+                      <p className="text-muted-foreground leading-relaxed">{item.text}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Spacer for the other side */}
+                  <div className="hidden md:block md:w-1/2" />
+                </div>
+              ))}
+            </div>
+          </section>
         </div>
       </div>
     </>
