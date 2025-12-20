@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -66,16 +67,24 @@ export default function Contact() {
   };
 
   return (
-    <div className="container px-4 py-12 sm:px-6">
-      <div className="flex flex-col items-center mb-12 text-center">
-        <div className="docs-section-title">
-          <h1 className="text-4xl font-bold">Fale Conosco</h1>
+    <>
+      <Helmet>
+        <title>Contato | Pet Serpentes & Companhia</title>
+        <meta 
+          name="description" 
+          content="Entre em contato com o Pet Serpentes & Companhia. Tire dúvidas sobre répteis, consulte disponibilidade de animais ou agende uma visita ao criadouro no Rio de Janeiro." 
+        />
+      </Helmet>
+      <div className="container px-4 py-12 sm:px-6">
+        <div className="flex flex-col items-center mb-12 text-center">
+          <div className="docs-section-title">
+            <h1 className="text-4xl font-bold">Fale Conosco</h1>
+          </div>
+          <p className="text-muted-foreground max-w-2xl mt-4">
+            Entre em contato com nossa equipe para esclarecer dúvidas, consultar disponibilidade ou agendar uma visita
+          </p>
         </div>
-        <p className="text-muted-foreground max-w-2xl mt-4">
-          Entre em contato com nossa equipe para esclarecer dúvidas, consultar disponibilidade ou agendar uma visita
-        </p>
-      </div>
-      
+        
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         {/* Contact Form */}
         <div className="order-2 lg:order-1">
@@ -257,10 +266,11 @@ export default function Contact() {
         </div>
       </div>
 
-      <InternshipWaitlistForm 
-        isOpen={showInternshipForm} 
-        onClose={() => setShowInternshipForm(false)} 
-      />
-    </div>
+        <InternshipWaitlistForm 
+          isOpen={showInternshipForm} 
+          onClose={() => setShowInternshipForm(false)} 
+        />
+      </div>
+    </>
   );
 }

@@ -1,5 +1,5 @@
-
 import React, { useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useCatalogData } from '@/hooks/useCatalogData';
 import CatalogHeader from '@/components/catalog/CatalogHeader';
 import CatalogFilters from '@/components/catalog/CatalogFilters';
@@ -37,8 +37,16 @@ const Catalog = () => {
   }, [loadProducts]);
 
   return (
-    <div className="container mx-auto px-4 py-6 sm:py-8 md:py-12 sm:px-6">
-      <CatalogHeader />
+    <>
+      <Helmet>
+        <title>Catálogo de Répteis | Pet Serpentes & Companhia</title>
+        <meta 
+          name="description" 
+          content="Confira nosso catálogo de répteis silvestres nativos disponíveis. Serpentes, lagartos e quelônios com procedência legal, certificados pelo IBAMA e INEA-RJ." 
+        />
+      </Helmet>
+      <div className="container mx-auto px-4 py-6 sm:py-8 md:py-12 sm:px-6">
+        <CatalogHeader />
 
       <CatalogFilters
         searchQuery={searchQuery}
@@ -58,7 +66,8 @@ const Catalog = () => {
       ) : (
         <CatalogProductsGrid products={filteredProducts} />
       )}
-    </div>
+      </div>
+    </>
   );
 };
 
