@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import HeroCarousel from "@/components/HeroCarousel";
 import FeaturedProductsSection from "@/components/home/FeaturedProductsSection";
@@ -13,7 +14,15 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col w-full">
+    <>
+      <Helmet>
+        <title>PET SERPENTES & COMPANHIA</title>
+        <meta 
+          name="description" 
+          content="O Pet Serpentes & Companhia é um criadouro comercial legalizado localizado no Rio de Janeiro, certificado pelo IBAMA e INEA-RJ. Trabalhamos exclusivamente com répteis silvestres nativos." 
+        />
+      </Helmet>
+      <div className="flex flex-col w-full">
       {/* Hero Carousel Section - com fade in inicial */}
       <motion.section 
         className="relative mb-0 pb-0"
@@ -43,6 +52,7 @@ export default function Home() {
       <AnimatedSection delay={0.1}>
         <CtaSection />
       </AnimatedSection>
-    </div>
+      </div>
+    </>
   );
 }
