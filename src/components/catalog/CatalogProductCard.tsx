@@ -20,12 +20,6 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
   const { addToCart, isProductInCart } = useCartStore();
   const { toast } = useToast();
 
-  console.log(`📱 CATALOG MOBILE - Renderizando produto ${index}:`, { 
-    id: product.id, 
-    name: product.name, 
-    hasImages: product.images && product.images.length > 0 
-  });
-
   const isInCart = isProductInCart(product.id);
   const isUnavailable = product.status === 'indisponivel' || product.status === 'vendido';
   const imageUrl = getProductImageUrl(product);
@@ -58,14 +52,14 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
 
   return (
     <Card 
-      className="flex flex-col h-full docs-card-gradient hover:shadow-lg transition-shadow duration-300"
+      className="flex flex-col h-full docs-card-gradient"
       style={{
         minHeight: "300px",
         height: "auto",
         overflow: "visible"
       }}
     >
-      <Link to={`/produtos/${product.id}`} className="block relative group cursor-pointer">
+      <Link to={`/produtos/${product.id}`} className="block relative cursor-pointer">
         <div 
           className="aspect-[4/3] overflow-hidden rounded-t-lg"
           style={{
@@ -77,18 +71,15 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
           <OptimizedImage
             src={imageUrl || '/placeholder.svg'}
             alt={product.name}
-            priority={index < 8}
-            quality={100}
+            priority={index < 4}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="w-full h-full group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full"
             style={{
               objectFit: "cover",
               objectPosition: "center",
               width: "100%",
-              height: "100%",
-              imageRendering: "auto"
+              height: "100%"
             }}
-            onLoad={() => console.log(`✅ CATALOG MOBILE - Produto ${product.name} imagem carregada no catálogo`)}
           />
         </div>
         
@@ -124,7 +115,6 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
       <CardContent className="p-2 sm:p-3 pt-0 pb-1 sm:pb-2 flex-1">
         <p className="text-xs sm:text-sm text-muted-foreground italic mb-2 line-clamp-1">{product.speciesName}</p>
         
-        {/* Preços - PIX em destaque primeiro */}
         <div className="space-y-1">
           {product.originalPrice && (
             <p className="text-[10px] sm:text-xs text-muted-foreground line-through">
@@ -132,14 +122,12 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
             </p>
           )}
           
-          {/* Preço PIX em destaque */}
           {product.pixPrice && (
             <div className="text-base sm:text-lg font-bold text-green-600 dark:text-green-400">
               {formatPrice(product.pixPrice)} <span className="text-xs font-semibold">no PIX</span>
             </div>
           )}
           
-          {/* Preço parcelado */}
           <div className="space-y-0">
             <p className="text-[10px] sm:text-xs text-muted-foreground dark:text-gray-300">
               ou {formatPrice(product.price)} em até 10x s/ juros
@@ -152,7 +140,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
         <div className="flex gap-2 w-full">
           <Button 
             variant="default" 
-            className="flex-1 min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm font-semibold"
+            className="flex-1 min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm font-semibold touch-manipulation"
             asChild
           >
             <Link to={`/produtos/${product.id}`}>
@@ -162,7 +150,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
           {!isUnavailable && (
             <Button 
               variant={isInCart ? "secondary" : "default"}
-              className="min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm"
+              className="min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm touch-manipulation"
               onClick={() => handleAddToCart(product)}
               disabled={isInCart}
             >
