@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Leaf, BookOpen, Award, Heart } from 'lucide-react';
 
 const About = () => {
@@ -78,8 +79,16 @@ const About = () => {
   ];
 
   return (
-    <div className="bg-background text-foreground py-12 md:py-20">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <>
+      <Helmet>
+        <title>Quem Somos | Pet Serpentes & Companhia</title>
+        <meta 
+          name="description" 
+          content="Conheça a história do Pet Serpentes & Companhia, criadouro comercial legalizado no Rio de Janeiro. Nossa missão, valores e trajetória na criação responsável de répteis nativos." 
+        />
+      </Helmet>
+      <div className="bg-background text-foreground py-12 md:py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Nossa História Section - Header */}
         <section className="mb-16 md:mb-24">
@@ -183,8 +192,9 @@ const About = () => {
           </div>
         </section>
 
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

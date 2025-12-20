@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Species } from '@/types/species';
@@ -125,15 +126,23 @@ export default function SpeciesPage() {
   }
 
   return (
-    <div className="container px-4 md:px-6 py-8 sm:py-12 min-h-[60vh]">
-      {/* Header centralizado com barra verde */}
-      <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">
-        <div className="docs-section-title">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-balance">Espécies Criadas</h1>
-        </div>
-        <p className="text-muted-foreground max-w-2xl mt-3 sm:mt-4 text-sm sm:text-base">
-          Conheça as espécies que criamos em nosso criadouro legalizado
-        </p>
+    <>
+      <Helmet>
+        <title>Espécies Criadas | Pet Serpentes & Companhia</title>
+        <meta 
+          name="description" 
+          content="Conheça as espécies de répteis silvestres nativos criadas no Pet Serpentes & Companhia. Serpentes, lagartos e quelônios com informações detalhadas sobre cada espécie." 
+        />
+      </Helmet>
+      <div className="container px-4 md:px-6 py-8 sm:py-12 min-h-[60vh]">
+        {/* Header centralizado com barra verde */}
+        <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">
+          <div className="docs-section-title">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-balance">Espécies Criadas</h1>
+          </div>
+          <p className="text-muted-foreground max-w-2xl mt-3 sm:mt-4 text-sm sm:text-base">
+            Conheça as espécies que criamos em nosso criadouro legalizado
+          </p>
       </div>
 
       {/* Busca + Filtros na mesma linha (desktop) */}
@@ -171,17 +180,18 @@ export default function SpeciesPage() {
           <SpeciesMobileView species={filteredSpecies} />
         </>
       ) : (
-        <div className="flex gap-6 min-h-[calc(100vh-24rem)]">
-          <div className="w-full lg:w-[320px] flex-shrink-0">
-            <SpeciesSidebar
-              species={filteredSpecies}
-              selectedId={selectedSpecies?.id || null}
-              onSelect={handleSelectSpecies}
-            />
+          <div className="flex gap-6 min-h-[calc(100vh-24rem)]">
+            <div className="w-full lg:w-[320px] flex-shrink-0">
+              <SpeciesSidebar
+                species={filteredSpecies}
+                selectedId={selectedSpecies?.id || null}
+                onSelect={handleSelectSpecies}
+              />
+            </div>
+            <SpeciesDetailPanel species={selectedSpecies} />
           </div>
-          <SpeciesDetailPanel species={selectedSpecies} />
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 }
