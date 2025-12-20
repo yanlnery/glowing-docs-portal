@@ -168,7 +168,7 @@ export default function HeroCarouselUI({
         
         {/* Indicadores - DENTRO do carrossel, na parte inferior sobre a imagem */}
         {carouselImagesData.length > 1 && (
-          <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 left-0 right-0 flex justify-center space-x-2 z-50">
+          <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 left-0 right-0 flex justify-center space-x-2 z-10">
             {carouselImagesData.map((_, index) => (
               <button
                 key={`indicator-${index}`}
