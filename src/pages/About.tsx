@@ -111,6 +111,15 @@ const About = () => {
           <section className="mb-20 md:mb-28">
             <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
               <div className="order-2 lg:order-1">
+                <ImageWithLoader
+                  src="/lovable-uploads/13113c77-f713-4585-9041-1766e67545b8.png" 
+                  alt="Yan Nery, CEO e Biólogo do Pet Serpentes & Companhia"
+                  containerClassName="rounded-2xl shadow-2xl overflow-hidden"
+                  className="w-full h-auto object-contain"
+                />
+              </div>
+              
+              <div className="order-1 lg:order-2">
                 <div className="inline-flex items-center gap-2 bg-serpente-100 dark:bg-serpente-900/30 text-serpente-700 dark:text-serpente-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
                   <Shield size={16} />
                   <span>CTF IBAMA nº 6654937</span>
@@ -128,31 +137,13 @@ const About = () => {
                   ))}
                 </div>
               </div>
-              
-              <div className="order-1 lg:order-2">
-                <ImageWithLoader
-                  src="/lovable-uploads/13113c77-f713-4585-9041-1766e67545b8.png" 
-                  alt="Yan Nery, CEO e Biólogo do Pet Serpentes & Companhia"
-                  containerClassName="rounded-2xl shadow-2xl overflow-hidden"
-                  className="w-full h-auto object-cover aspect-[4/5]"
-                />
-              </div>
             </div>
           </section>
 
           {/* O Que Fazemos Section */}
           <section className="mb-20 md:mb-28">
             <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-              <div>
-                <ImageWithLoader
-                  src="/lovable-uploads/c988fe8f-9ba2-4b94-a8e7-a7347e0d0a84.png" 
-                  alt="Instalações do Pet Serpentes & Companhia"
-                  containerClassName="rounded-2xl shadow-2xl overflow-hidden"
-                  className="w-full h-auto object-cover aspect-[4/3]"
-                />
-              </div>
-              
-              <div>
+              <div className="order-2 lg:order-1">
                 <div className="inline-flex items-center gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
                   <Target size={16} />
                   <span>Nossa Atuação</span>
@@ -169,6 +160,15 @@ const About = () => {
                     </p>
                   ))}
                 </div>
+              </div>
+              
+              <div className="order-1 lg:order-2">
+                <ImageWithLoader
+                  src="/lovable-uploads/c988fe8f-9ba2-4b94-a8e7-a7347e0d0a84.png" 
+                  alt="Instalações do Pet Serpentes & Companhia"
+                  containerClassName="rounded-2xl shadow-2xl overflow-hidden"
+                  className="w-full h-auto object-contain"
+                />
               </div>
             </div>
           </section>

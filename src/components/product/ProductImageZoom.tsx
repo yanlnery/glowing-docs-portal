@@ -185,9 +185,9 @@ export function ProductImageZoom({
       <div 
         ref={containerRef}
         className={`aspect-square bg-muted rounded-lg overflow-hidden relative group select-none ${
-          isZoomed ? 'cursor-grab' : 'cursor-zoom-in'
-        } ${isDragging ? 'cursor-grabbing' : ''}`}
-        onClick={!isZoomed ? toggleZoom : undefined}
+          isZoomed ? (isDragging ? 'cursor-grabbing' : 'cursor-pointer') : 'cursor-zoom-in'
+        }`}
+        onClick={toggleZoom}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
