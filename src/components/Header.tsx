@@ -22,8 +22,8 @@ interface StaticMenuItem extends Omit<MenuItem, 'icon'> {
 
 const staticBaseMenuItems: StaticMenuItem[] = [
   { title: "Início", path: "/", iconName: "Home" },
-  { title: "P. S. Academy", path: "/academy", iconName: "Book", id: "academy" },
   { title: "Animais Disponíveis", path: "/catalogo", iconName: "Syringe" },
+  { title: "P. S. Academy", path: "/academy", iconName: "Book", id: "academy" },
   { title: "Espécies Criadas", path: "/especies", iconName: "FileText" },
   { title: "Manuais de Criação", path: "/manuais", iconName: "Book" },
   { title: "Quem Somos", path: "/sobre", iconName: "Users" },

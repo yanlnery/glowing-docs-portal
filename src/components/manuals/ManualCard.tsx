@@ -14,7 +14,7 @@ export default function ManualCard({ manual, onDownload }: ManualCardProps) {
   
   return (
     <div key={manual.id} className="docs-card-gradient border rounded-lg overflow-hidden transition-all hover:shadow-md flex flex-col">
-      <div className="relative h-40 sm:h-48 overflow-hidden bg-muted">
+      <div className="relative h-52 sm:h-64 overflow-hidden bg-muted">
         {manual.image ? (
           <img 
             src={manual.image}
