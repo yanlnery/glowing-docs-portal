@@ -19,11 +19,14 @@
     
     <link rel="icon" type="image/png" href="/lovable-uploads/7cf1001e-0989-475f-aaf5-fb56c4fb22a4.png" />
     
-    <!-- Preload imagens importantes -->
-    <link rel="preload" as="image" href="/lovable-uploads/481f8f82-22b1-407d-9e88-623e453faf6a.png" />
+    <!-- Preload critical images -->
+    <link rel="preload" as="image" href="/lovable-uploads/481f8f82-22b1-407d-9e88-623e453faf6a.png" fetchpriority="high" />
     <link rel="preload" as="image" href="/lovable-uploads/species-snake.png" />
     <link rel="preload" as="image" href="/lovable-uploads/species-lizard.png" />
     <link rel="preload" as="image" href="/lovable-uploads/species-turtle.png" />
+    
+    <!-- Preconnect to Supabase for faster API calls -->
+    <link rel="preconnect" href="https://ixnhskqhppxcwiwdsijd.supabase.co" crossorigin />
   </head>
 
   <body>

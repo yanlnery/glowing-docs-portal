@@ -17,7 +17,7 @@ export function OptimizedImage({
   src,
   alt,
   priority = false,
-  quality = 95,
+  quality = 80,
   sizes = '100vw',
   className,
   onLoad,
@@ -30,7 +30,6 @@ export function OptimizedImage({
   const [isInView, setIsInView] = useState(priority);
   const imgRef = useRef<HTMLImageElement>(null);
 
-  // Para carrossel e produtos em destaque, sempre carrega imediatamente
   useEffect(() => {
     if (priority) {
       setIsInView(true);
@@ -45,8 +44,8 @@ export function OptimizedImage({
         }
       },
       {
-        threshold: 0.1,
-        rootMargin: '50px',
+        threshold: 0.01,
+        rootMargin: '200px',
       }
     );
 
@@ -61,47 +60,49 @@ export function OptimizedImage({
     setIsLoaded(true);
     setHasError(false);
     onLoad?.();
-    console.log(`✅ Imagem carregada com sucesso: ${src}`);
   };
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.error('❌ Erro ao carregar imagem:', src);
     setHasError(true);
     setIsLoaded(false);
     onError?.(e);
   };
 
-  // Validar se src é uma URL válida ou caminho válido
   const isValidSrc = src && src.trim() !== '' && src !== '/placeholder.svg';
   const shouldLoad = isInView || priority;
 
   return (
     <div className={cn('relative overflow-hidden w-full h-full', className)} ref={imgRef}>
-      {/* Placeholder mínimo para carregamento */}
+      {/* Blur placeholder - lighter weight than animate-pulse */}
       {!isLoaded && shouldLoad && !hasError && isValidSrc && (
         <div 
-          className="absolute inset-0 bg-gray-200 dark:bg-gray-800 w-full h-full animate-pulse" 
-          style={style}
+          className="absolute inset-0 bg-muted w-full h-full" 
+          style={{
+            ...style,
+            backdropFilter: 'blur(8px)',
+          }}
         />
       )}
       
-      {/* Imagem principal - sempre visível quando carregada */}
+      {/* Main image */}
       {shouldLoad && isValidSrc && !hasError && (
         <img
           src={src}
           alt={alt}
           className={cn(
-            'w-full h-full transition-opacity duration-200',
+            'w-full h-full',
             isLoaded ? 'opacity-100' : 'opacity-0'
           )}
           style={{
             objectFit: 'cover',
             width: '100%',
             height: '100%',
+            transition: 'opacity 0.2s ease-out',
             ...style
           }}
           loading={priority ? 'eager' : 'lazy'}
           decoding={priority ? 'sync' : 'async'}
+          fetchPriority={priority ? 'high' : 'auto'}
           onLoad={handleLoad}
           onError={handleError}
           sizes={sizes}
@@ -109,14 +110,14 @@ export function OptimizedImage({
         />
       )}
       
-      {/* Fallback para erro ou imagem inválida */}
+      {/* Fallback for error or invalid image */}
       {(hasError || !isValidSrc) && (
         <div 
-          className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800 w-full h-full"
+          className="absolute inset-0 flex flex-col items-center justify-center bg-muted w-full h-full"
           style={style}
         >
-          <div className="text-gray-400 dark:text-gray-500 text-center">
-            <div className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
+          <div className="text-muted-foreground text-center">
+            <div className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2 bg-muted-foreground/20 rounded-full flex items-center justify-center">
               <span className="text-xs sm:text-sm">📷</span>
             </div>
             <span className="text-xs sm:text-sm">Sem imagem</span>
