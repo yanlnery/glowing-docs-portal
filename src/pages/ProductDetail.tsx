@@ -4,22 +4,19 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useCartStore } from '@/stores/cartStore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, ShoppingCart, ArrowLeft, CheckCircle, AlertCircle, ChevronDown, ChevronUp, Package, FileText, ZoomIn, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Star, ShoppingCart, ArrowLeft, CheckCircle, AlertCircle, ChevronDown, ChevronUp, Package, FileText } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { productService } from '@/services/productService';
 import { Product } from '@/types/product';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { ProductImageZoom } from '@/components/product/ProductImageZoom';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showSpeciesDetails, setShowSpeciesDetails] = useState(false);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(1);
   const { addToCart } = useCartStore();
   const navigate = useNavigate();
 
@@ -32,10 +29,7 @@ const ProductDetail = () => {
           setLoading(true);
           const foundProduct = await productService.getProductById(id);
           setProduct(foundProduct);
-          if (foundProduct?.images && foundProduct.images.length > 0) {
-            setSelectedImage(foundProduct.images[0].url);
-            setSelectedImageIndex(0);
-          }
+          setSelectedImageIndex(0);
         } catch (error) {
           console.error("Error loading product:", error);
         } finally {
@@ -77,36 +71,6 @@ const ProductDetail = () => {
       style: 'currency',
       currency: 'BRL'
     }).format(price);
-  };
-
-  const handleImageSelect = (url: string, index: number) => {
-    setSelectedImage(url);
-    setSelectedImageIndex(index);
-  };
-
-  const openLightbox = () => {
-    setZoomLevel(1);
-    setLightboxOpen(true);
-  };
-
-  const navigateImage = (direction: 'prev' | 'next') => {
-    if (!product?.images) return;
-    const totalImages = product.images.length;
-    let newIndex = selectedImageIndex;
-    
-    if (direction === 'prev') {
-      newIndex = selectedImageIndex === 0 ? totalImages - 1 : selectedImageIndex - 1;
-    } else {
-      newIndex = selectedImageIndex === totalImages - 1 ? 0 : selectedImageIndex + 1;
-    }
-    
-    setSelectedImageIndex(newIndex);
-    setSelectedImage(product.images[newIndex].url);
-    setZoomLevel(1);
-  };
-
-  const toggleZoom = () => {
-    setZoomLevel(prev => prev === 1 ? 2 : 1);
   };
 
   const getSexLabel = (sex: string | undefined) => {
@@ -156,55 +120,15 @@ const ProductDetail = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Product Images */}
-          <div className="space-y-4">
-            <div 
-              className="aspect-square bg-muted rounded-lg overflow-hidden relative group cursor-zoom-in"
-              onClick={openLightbox}
-            >
-              {selectedImage ? (
-                <>
-                  <img 
-                    src={selectedImage} 
-                    alt={product.name} 
-                    className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
-                    loading="eager"
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-background/80 backdrop-blur-sm rounded-full p-3">
-                      <ZoomIn className="h-6 w-6 text-foreground" />
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-muted-foreground">Imagem não disponível</span>
-                </div>
-              )}
-            </div>
-            
-            {/* Thumbnail Gallery */}
-            {product.images && product.images.length > 1 && (
-              <div className="grid grid-cols-4 gap-2">
-                {product.images.map((image, index) => (
-                  <div 
-                    key={image.id || index} 
-                    className={`aspect-square bg-muted rounded-md overflow-hidden cursor-pointer border-2 transition-all duration-200 hover:scale-105 ${
-                      selectedImageIndex === index ? 'border-serpente-500 ring-2 ring-serpente-500/20' : 'border-transparent hover:border-serpente-300'
-                    }`}
-                    onClick={() => handleImageSelect(image.url, index)}
-                  >
-                    <img 
-                      src={image.url}
-                      alt={image.alt || `${product.name} - imagem ${index + 1}`} 
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* Product Images with In-place Zoom */}
+          {product.images && product.images.length > 0 && (
+            <ProductImageZoom
+              images={product.images}
+              productName={product.name}
+              selectedIndex={selectedImageIndex}
+              onIndexChange={setSelectedImageIndex}
+            />
+          )}
           
           {/* Product Information */}
           <div className="space-y-6">
@@ -370,95 +294,6 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      {/* Lightbox Modal */}
-      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] w-full h-full p-0 bg-black/95 border-none">
-          <div className="relative w-full h-full flex items-center justify-center">
-            {/* Close Button */}
-            <button
-              onClick={() => setLightboxOpen(false)}
-              className="absolute top-4 right-4 z-50 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-            >
-              <X className="h-6 w-6 text-white" />
-            </button>
-
-            {/* Image Counter */}
-            {product.images && product.images.length > 1 && (
-              <div className="absolute top-4 left-4 z-50 px-3 py-1 rounded-full bg-white/10 text-white text-sm">
-                {selectedImageIndex + 1} / {product.images.length}
-              </div>
-            )}
-
-            {/* Navigation Arrows */}
-            {product.images && product.images.length > 1 && (
-              <>
-                <button
-                  onClick={() => navigateImage('prev')}
-                  className="absolute left-4 z-50 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-                >
-                  <ChevronLeft className="h-8 w-8 text-white" />
-                </button>
-                <button
-                  onClick={() => navigateImage('next')}
-                  className="absolute right-4 z-50 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-                >
-                  <ChevronRight className="h-8 w-8 text-white" />
-                </button>
-              </>
-            )}
-
-            {/* Main Image */}
-            <div 
-              className={`overflow-auto max-w-full max-h-full ${zoomLevel > 1 ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
-              onClick={toggleZoom}
-            >
-              <img
-                src={selectedImage || ''}
-                alt={product.name}
-                className="max-w-none transition-transform duration-300"
-                style={{ 
-                  transform: `scale(${zoomLevel})`,
-                  maxHeight: zoomLevel === 1 ? '85vh' : 'none',
-                  maxWidth: zoomLevel === 1 ? '85vw' : 'none'
-                }}
-              />
-            </div>
-
-            {/* Zoom Indicator */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-white/10 text-white text-sm flex items-center gap-2">
-              <ZoomIn className="h-4 w-4" />
-              <span>{zoomLevel === 1 ? 'Clique para ampliar' : 'Clique para reduzir'}</span>
-            </div>
-
-            {/* Thumbnails */}
-            {product.images && product.images.length > 1 && (
-              <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-50 flex gap-2 p-2 rounded-lg bg-white/10 backdrop-blur-sm">
-                {product.images.map((image, index) => (
-                  <button
-                    key={image.id || index}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleImageSelect(image.url, index);
-                      setZoomLevel(1);
-                    }}
-                    className={`w-12 h-12 rounded overflow-hidden border-2 transition-all ${
-                      selectedImageIndex === index 
-                        ? 'border-white ring-2 ring-white/30' 
-                        : 'border-transparent opacity-60 hover:opacity-100'
-                    }`}
-                  >
-                    <img
-                      src={image.url}
-                      alt={`Miniatura ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
