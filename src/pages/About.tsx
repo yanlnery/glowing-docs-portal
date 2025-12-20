@@ -92,21 +92,18 @@ const About = () => {
       
       <div className="bg-background text-foreground">
         {/* Hero Section */}
-        <section className="relative py-16 md:py-24 bg-gradient-to-b from-serpente-50/50 to-background dark:from-serpente-950/20 dark:to-background">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
-                Quem Somos
-              </h1>
-              <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-                Conheça a trajetória e a missão do Pet Serpentes & Companhia, 
-                criadouro comercial legalizado focado em criação responsável de répteis nativos.
-              </p>
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">
+            <div className="docs-section-title">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-balance">Quem Somos</h1>
             </div>
+            <p className="text-muted-foreground max-w-2xl mt-3 sm:mt-4 text-sm sm:text-base">
+              Conheça a trajetória e a missão do Pet Serpentes & Companhia, criadouro comercial legalizado focado em criação responsável de répteis nativos.
+            </p>
           </div>
         </section>
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-12 md:pb-20">
           {/* Sobre o Criadouro Section */}
           <section className="mb-20 md:mb-28">
             <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
