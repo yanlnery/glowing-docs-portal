@@ -233,3 +233,17 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Infinite scroll carousel animation */
+@keyframes scroll-carousel {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll-carousel {
+  animation: scroll-carousel 25s linear infinite;
+}
