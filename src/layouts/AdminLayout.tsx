@@ -15,7 +15,8 @@ import {
   ShoppingCart,
   FileText,
   Image,
-  MessageSquare
+  MessageSquare,
+  Images
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -53,6 +54,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { name: 'Mensagens', href: '/admin/contact-submissions', icon: MessageSquare },
     { name: 'Gestão de Espécies', href: '/admin/species', icon: ClipboardList, requiredRole: 'admin' },
     { name: 'Carrossel da Home', href: '/admin/carousel', icon: Image, requiredRole: 'admin' },
+    { name: 'Galeria Quem Somos', href: '/admin/about-gallery', icon: Images, requiredRole: 'admin' },
     { name: 'Manuais', href: '/admin/manuals', icon: FileText, requiredRole: 'admin' },
     { name: 'Lista de Espera (Academy)', href: '/admin/waitlist', icon: Users, requiredRole: 'admin' },
     { name: 'Lista de Espera (Espécies)', href: '/admin/species-waitlist', icon: Users, requiredRole: 'admin', badge: true },

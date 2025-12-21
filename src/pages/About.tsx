@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Leaf, BookOpen, Award, Heart, Shield, Target } from 'lucide-react';
 import { ImageWithLoader } from '@/components/ui/image-with-loader';
 import { OptimizedImage } from '@/components/ui/optimized-image';
+import { AboutImageCarousel } from '@/components/about/AboutImageCarousel';
 
 const About = () => {
   const sobreCriadouroText = {
@@ -108,7 +109,13 @@ const About = () => {
           {/* Sobre o Criadouro Section */}
           <section className="mb-20 md:mb-28">
             <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-              <div className="order-2 lg:order-1 rounded-2xl shadow-2xl overflow-hidden">
+              {/* Mobile: Carrossel de imagens */}
+              <div className="order-2 lg:order-1 md:hidden">
+                <AboutImageCarousel />
+              </div>
+              
+              {/* Desktop: Imagem estática */}
+              <div className="order-2 lg:order-1 hidden md:block rounded-2xl shadow-2xl overflow-hidden">
                 <OptimizedImage
                   src="/lovable-uploads/13113c77-f713-4585-9041-1766e67545b8.png" 
                   alt="Yan Nery, CEO e Biólogo do Pet Serpentes & Companhia"

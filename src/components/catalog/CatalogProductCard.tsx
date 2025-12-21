@@ -128,7 +128,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
           )}
           
           <div className="space-y-0">
-            <p className="text-[10px] sm:text-xs text-muted-foreground dark:text-gray-300">
+            <p className="text-[10px] sm:text-xs text-muted-foreground dark:text-gray-300 whitespace-nowrap">
               ou {formatPrice(product.price)} em até 10x s/ juros
             </p>
           </div>
