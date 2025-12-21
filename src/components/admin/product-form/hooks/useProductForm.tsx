@@ -295,6 +295,14 @@ export const useProductForm = () => {
     setImageList(prev => [...prev, ...newImages]);
   };
 
+  const handleImageFocusChange = (index: number, focusDesktop: string, focusMobile: string) => {
+    setImageList(prev => prev.map((img, i) => 
+      i === index 
+        ? { ...img, focus_desktop: focusDesktop, focus_mobile: focusMobile }
+        : img
+    ));
+  };
+
   return {
     form,
     loading,
@@ -303,6 +311,7 @@ export const useProductForm = () => {
     imageList,
     setImageList,
     handleImageUpload,
+    handleImageFocusChange,
     navigate,
     onSubmit,
     handleDelete,

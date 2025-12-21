@@ -13,6 +13,8 @@ const FALLBACK_SLIDE_DATA: CarouselItem = {
   item_order: 0,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
+  focus_desktop: "center",
+  focus_mobile: "center",
 };
 
 // Check if device is mobile

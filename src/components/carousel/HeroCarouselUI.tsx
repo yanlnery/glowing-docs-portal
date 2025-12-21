@@ -13,6 +13,8 @@ import {
 import type { CarouselItem as CarouselItemData } from "@/services/carouselService";
 import { getCarouselImageUrl } from "@/services/carouselService";
 import type { AutoplayType } from "embla-carousel-autoplay";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { getObjectPosition } from "@/components/admin/ImageFocusSelector";
 
 interface HeroCarouselUIProps {
   isLoading: boolean;
@@ -35,6 +37,7 @@ export default function HeroCarouselUI({
   autoplayPlugin,
   handleIndicatorClick,
 }: HeroCarouselUIProps) {
+  const isMobile = useIsMobile();
 
   if (error) {
     return (
@@ -123,6 +126,9 @@ export default function HeroCarouselUI({
           <CarouselContent className="h-full -ml-0">
             {carouselImagesData.map((item, index) => {
               const processedImageUrl = getCarouselImageUrl(item.image_url);
+              const objectPosition = isMobile 
+                ? getObjectPosition(item.focus_mobile) 
+                : getObjectPosition(item.focus_desktop);
 
               return (
                 <CarouselItem key={item.id || index} className="h-full pl-0">
@@ -136,6 +142,7 @@ export default function HeroCarouselUI({
                         decoding={index === 0 ? "sync" : "async"}
                         fetchPriority={index === 0 ? "high" : "auto"}
                         className="absolute inset-0 w-full h-full object-cover"
+                        style={{ objectPosition }}
                       />
                     ) : (
                       <div className="absolute inset-0 w-full h-full bg-muted flex items-center justify-center">

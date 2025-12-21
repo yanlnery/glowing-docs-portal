@@ -13,4 +13,6 @@ export interface Species {
   slug: string; // slug TEXT UNIQUE
   created_at?: string; // TIMESTAMPTZ
   updated_at?: string; // TIMESTAMPTZ
+  focus_desktop?: string; // Focal point for main image on desktop
+  focus_mobile?: string; // Focal point for main image on mobile
 }

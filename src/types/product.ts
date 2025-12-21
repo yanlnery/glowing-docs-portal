@@ -16,6 +16,8 @@ export interface ProductImage {
   filename: string;
   altText?: string;
   alt?: string; // For backward compatibility
+  focus_desktop?: string;
+  focus_mobile?: string;
 }
 
 export interface ProductDetail {

@@ -63,6 +63,8 @@ export type Database = {
         Row: {
           alt_text: string
           created_at: string | null
+          focus_desktop: string | null
+          focus_mobile: string | null
           id: string
           image_url: string
           item_order: number | null
@@ -73,6 +75,8 @@ export type Database = {
         Insert: {
           alt_text: string
           created_at?: string | null
+          focus_desktop?: string | null
+          focus_mobile?: string | null
           id?: string
           image_url: string
           item_order?: number | null
@@ -83,6 +87,8 @@ export type Database = {
         Update: {
           alt_text?: string
           created_at?: string | null
+          focus_desktop?: string | null
+          focus_mobile?: string | null
           id?: string
           image_url?: string
           item_order?: number | null
@@ -496,6 +502,8 @@ export type Database = {
           created_at: string | null
           curiosities: Json | null
           description: string | null
+          focus_desktop: string | null
+          focus_mobile: string | null
           gallery: Json | null
           id: string
           image: string | null
@@ -511,6 +519,8 @@ export type Database = {
           created_at?: string | null
           curiosities?: Json | null
           description?: string | null
+          focus_desktop?: string | null
+          focus_mobile?: string | null
           gallery?: Json | null
           id?: string
           image?: string | null
@@ -526,6 +536,8 @@ export type Database = {
           created_at?: string | null
           curiosities?: Json | null
           description?: string | null
+          focus_desktop?: string | null
+          focus_mobile?: string | null
           gallery?: Json | null
           id?: string
           image?: string | null
