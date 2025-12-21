@@ -10,7 +10,7 @@ export default function Logo() {
         alt="Pet Serpentes"
         className="h-12 w-12 rounded-full object-contain mr-2"
       />
-      <span className="hidden md:inline-flex font-semibold text-xl">PET SERPENTES</span>
+      <span className="font-semibold text-lg md:text-xl">PET SERPENTES</span>
     </Link>
   );
 }
