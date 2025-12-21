@@ -90,14 +90,17 @@ export default function AboutSection() {
 
             {/* Mobile: Carrossel automático infinito com touch */}
             <div className="md:hidden overflow-x-auto mt-8 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
-              <div className="flex gap-4 animate-scroll-carousel w-max">
+              <div className="flex gap-3 animate-scroll-carousel w-max">
                 {[...features, ...features].map((item, index) => (
-                  <div key={index} className="flex-shrink-0 w-[70vw] flex gap-3 items-start bg-card border border-border/50 rounded-xl p-4">
-                    <div className="mt-1">{item.icon}</div>
-                    <div>
-                      <h3 className="font-bold">{item.title}</h3>
-                      <p className="text-sm text-muted-foreground">{item.description}</p>
+                  <div 
+                    key={index} 
+                    className="flex-shrink-0 w-[42vw] flex flex-col items-center text-center bg-card border border-border/50 rounded-xl p-4 shadow-sm"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-serpente-100 dark:bg-serpente-900/30 flex items-center justify-center mb-3">
+                      {item.icon}
                     </div>
+                    <h3 className="font-bold text-sm leading-tight">{item.title}</h3>
+                    <p className="text-xs text-muted-foreground mt-1 leading-snug">{item.description}</p>
                   </div>
                 ))}
               </div>
