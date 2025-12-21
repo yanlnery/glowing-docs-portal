@@ -245,5 +245,9 @@
 }
 
 .animate-scroll-carousel {
-  animation: scroll-carousel 25s linear infinite;
+  animation: scroll-carousel 8s linear infinite;
+}
+.animate-scroll-carousel:hover,
+.animate-scroll-carousel:active {
+  animation-play-state: paused;
 }
