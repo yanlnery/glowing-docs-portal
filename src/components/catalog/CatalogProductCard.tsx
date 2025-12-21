@@ -61,11 +61,10 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
     >
       <Link to={`/produtos/${product.id}`} className="block relative cursor-pointer">
         <div 
-          className="aspect-[4/3] overflow-hidden rounded-t-lg"
+          className="aspect-square md:aspect-[4/3] overflow-hidden rounded-t-lg"
           style={{
             width: "100%",
-            height: "auto",
-            minHeight: "180px"
+            height: "auto"
           }}
         >
           <OptimizedImage
