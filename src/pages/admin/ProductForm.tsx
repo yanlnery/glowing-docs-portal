@@ -18,6 +18,7 @@ const ProductForm = () => {
     imageList,
     setImageList,
     handleImageUpload,
+    handleImageFocusChange,
     navigate,
     onSubmit,
     handleDelete,
@@ -59,6 +60,7 @@ const ProductForm = () => {
                       imageList={imageList}
                       onRemoveExistingImage={removeExistingImage}
                       onImageUpload={handleImageUpload}
+                      onImageFocusChange={handleImageFocusChange}
                       toast={toast}
                     />
                   </div>

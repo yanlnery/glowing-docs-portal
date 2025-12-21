@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Trash2 } from 'lucide-react';
 import type { CarouselItem } from '@/services/carouselService';
+import { ImageFocusSelector } from '@/components/admin/ImageFocusSelector';
 
 interface CarouselItemFormProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ interface CarouselItemFormProps {
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRemoveImagePreview: () => void;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onFocusChange?: (field: 'focus_desktop' | 'focus_mobile', value: string) => void;
 }
 
 export default function CarouselItemForm({
@@ -32,12 +34,23 @@ export default function CarouselItemForm({
   onFileChange,
   onRemoveImagePreview,
   onInputChange,
+  onFocusChange,
 }: CarouselItemFormProps) {
   if (!currentImage) return null;
 
+  const handleFocusDesktopChange = (value: string) => {
+    onFocusChange?.('focus_desktop', value);
+  };
+
+  const handleFocusMobileChange = (value: string) => {
+    onFocusChange?.('focus_mobile', value);
+  };
+
+  const previewImageUrl = imagePreview || currentImage.image_url;
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!isLoading) onOpenChange(open); }}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {isNewImage ? 'Adicionar Nova Imagem' : 'Editar Imagem do Carrossel'}
@@ -87,6 +100,19 @@ export default function CarouselItemForm({
               <p className="text-xs text-muted-foreground">Sem imagem associada.</p>
             )}
           </div>
+
+          {/* Image Focus Selector */}
+          {previewImageUrl && (
+            <ImageFocusSelector
+              focusDesktop={currentImage.focus_desktop || 'center'}
+              focusMobile={currentImage.focus_mobile || 'center'}
+              onFocusDesktopChange={handleFocusDesktopChange}
+              onFocusMobileChange={handleFocusMobileChange}
+              disabled={isLoading}
+              showPreview={true}
+              imageUrl={previewImageUrl}
+            />
+          )}
           
           <div className="space-y-2">
             <Label htmlFor="title">Título</Label>

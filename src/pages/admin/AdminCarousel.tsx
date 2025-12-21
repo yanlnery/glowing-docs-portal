@@ -56,6 +56,8 @@ export default function AdminCarousel() {
       title: '',
       subtitle: '',
       item_order: images.length > 0 ? Math.max(...images.map(img => img.item_order || 0)) + 1 : 1,
+      focus_desktop: 'center',
+      focus_mobile: 'center',
     });
     setIsNewImage(true);
     setImagePreview(null);
@@ -108,6 +110,12 @@ export default function AdminCarousel() {
     }
   };
 
+  const handleFocusChange = (field: 'focus_desktop' | 'focus_mobile', value: string) => {
+    if (currentImage) {
+      setCurrentImage({ ...currentImage, [field]: value });
+    }
+  };
+
   const handleSaveImage = async () => {
     if (!currentImage || !currentImage.alt_text) {
       toast({ 
@@ -157,6 +165,8 @@ export default function AdminCarousel() {
       title: currentImage.title?.trim() || '',
       subtitle: currentImage.subtitle?.trim() || '',
       item_order: currentImage.item_order || 0,
+      focus_desktop: currentImage.focus_desktop || 'center',
+      focus_mobile: currentImage.focus_mobile || 'center',
     };
 
     setIsLoading(true);
@@ -273,6 +283,7 @@ export default function AdminCarousel() {
           onFileChange={handleFileChange}
           onRemoveImagePreview={handleRemoveImagePreview}
           onInputChange={handleInputChange}
+          onFocusChange={handleFocusChange}
         />
       )}
     </div>
