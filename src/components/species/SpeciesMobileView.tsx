@@ -33,7 +33,7 @@ export function SpeciesMobileView({ species }: SpeciesMobileViewProps) {
           <AccordionTrigger className="px-4 hover:bg-muted/50 [&[data-state=open]]:bg-serpente-600/10">
             <div className="flex items-center gap-3 text-left">
               {speciesItem.image && (
-                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border border-border">
+                <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 border border-border">
                   <img 
                     src={speciesItem.image} 
                     alt={speciesItem.commonname}
