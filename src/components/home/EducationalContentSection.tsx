@@ -84,7 +84,48 @@ export default function EducationalContentSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Mobile: Carrossel horizontal estilo Apple */}
+        <div className="flex md:hidden overflow-x-auto gap-4 snap-x snap-mandatory pb-4 -mx-4 px-4 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
+          {cards.map((card, index) => (
+            <div key={index} className="flex-shrink-0 w-[80vw] snap-center docs-card-gradient rounded-lg border hover:shadow-md transition-all group overflow-hidden flex flex-col">
+              <div className="aspect-[4/3] overflow-hidden">
+                <img 
+                  src={card.image} 
+                  alt={card.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <div className="p-4 flex flex-col flex-1">
+                <h3 className="font-bold text-lg mb-2">{card.title}</h3>
+                <p className="text-muted-foreground text-sm mb-4 flex-1">
+                  {card.description}
+                </p>
+                {card.isLink ? (
+                  <Button
+                    className="w-full"
+                    size="sm"
+                    asChild
+                  >
+                    <Link to={card.linkTo!} className="flex items-center justify-center">
+                      {card.buttonText} <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button
+                    className="w-full"
+                    size="sm"
+                    onClick={() => setIsWaitlistOpen(true)}
+                  >
+                    {card.buttonText} <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop: Grid normal */}
+        <div className="hidden md:grid md:grid-cols-3 gap-8">
           {cards.map((card, index) => (
             <div key={index} className="docs-card-gradient rounded-lg border hover:shadow-md transition-all group overflow-hidden flex flex-col">
               <div className="aspect-square overflow-hidden">
