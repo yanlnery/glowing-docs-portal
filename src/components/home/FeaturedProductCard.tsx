@@ -80,8 +80,8 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
           )}
           
           {product.pixPrice && (
-            <p className="text-lg sm:text-xl font-bold text-green-600 dark:text-green-400">
-              R$ {product.pixPrice.toFixed(2).replace('.', ',')} <span className="text-sm font-semibold">no PIX</span>
+            <p className="text-base sm:text-xl font-bold text-green-600 dark:text-green-400 whitespace-nowrap">
+              R$ {product.pixPrice.toFixed(2).replace('.', ',')} <span className="text-xs sm:text-sm font-semibold">no PIX</span>
             </p>
           )}
           

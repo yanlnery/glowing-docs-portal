@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      about_gallery: {
+        Row: {
+          active: boolean
+          alt_text: string | null
+          created_at: string | null
+          id: string
+          image_url: string
+          order_index: number
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean
+          alt_text?: string | null
+          created_at?: string | null
+          id?: string
+          image_url: string
+          order_index?: number
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean
+          alt_text?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string
+          order_index?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       addresses: {
         Row: {
           city: string

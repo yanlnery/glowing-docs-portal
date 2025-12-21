@@ -51,6 +51,7 @@ import SpeciesAdmin from "./pages/admin/SpeciesAdmin";
 import AdminCarousel from "./pages/admin/AdminCarousel";
 import SpeciesWaitlistAdmin from "./pages/admin/SpeciesWaitlistAdmin";
 import InternshipWaitlistAdmin from "./pages/admin/InternshipWaitlistAdmin";
+import AboutGalleryAdmin from "./pages/admin/AboutGalleryAdmin";
 import AdminProtectedRoute from "./components/admin/AdminProtectedRoute";
 
 // Function for conditional Academy route based on settings
@@ -145,6 +146,7 @@ function App() {
                   <Route path="/admin/cart-analytics" element={<ShoppingCartAnalytics />} />
                   <Route path="/admin/species-waitlist" element={<SpeciesWaitlistAdmin />} />
                   <Route path="/admin/internship-waitlist" element={<InternshipWaitlistAdmin />} />
+                  <Route path="/admin/about-gallery" element={<AboutGalleryAdmin />} />
                 </Route>
               </Routes>
             </TooltipProvider>

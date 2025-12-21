@@ -31,10 +31,21 @@ export function SpeciesMobileView({ species }: SpeciesMobileViewProps) {
           className="border border-border rounded-lg overflow-hidden"
         >
           <AccordionTrigger className="px-4 hover:bg-muted/50 [&[data-state=open]]:bg-serpente-600/10">
-            <div className="text-left">
-              <div className="font-medium">{speciesItem.commonname}</div>
-              <div className="text-sm italic text-muted-foreground">
-                {speciesItem.name}
+            <div className="flex items-center gap-3 text-left">
+              {speciesItem.image && (
+                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border border-border">
+                  <img 
+                    src={speciesItem.image} 
+                    alt={speciesItem.commonname}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+              <div>
+                <div className="font-medium">{speciesItem.commonname}</div>
+                <div className="text-sm italic text-muted-foreground">
+                  {speciesItem.name}
+                </div>
               </div>
             </div>
           </AccordionTrigger>
