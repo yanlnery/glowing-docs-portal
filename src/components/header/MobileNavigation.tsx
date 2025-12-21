@@ -115,7 +115,7 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
           </div>
         </div>
 
-        {/* Navigation menu - mais elegante */}
+        {/* Navigation menu - design limpo */}
         <ul className="flex flex-col space-y-1">
           {menuItems.map((item) => (
             <li key={item.title}>
@@ -125,22 +125,22 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
                   "flex w-full rounded-xl px-4 py-4 text-base font-medium items-center transition-all duration-200", 
                   isActive(item.path)
                     ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
-                    : "text-foreground hover:bg-muted/80" 
+                    : "text-foreground hover:bg-muted/50" 
                 )}
                 onClick={handleLinkClick}
               >
                 {item.icon && (
-                  <div className={cn(
-                    "w-10 h-10 rounded-lg flex items-center justify-center mr-4 transition-colors",
+                  <span className={cn(
+                    "mr-4 transition-colors",
                     isActive(item.path) 
-                      ? "bg-primary-foreground/20" 
-                      : "bg-muted"
+                      ? "text-primary-foreground" 
+                      : "text-primary"
                   )}>
                     {React.cloneElement(item.icon as React.ReactElement, { 
                       className: "h-5 w-5",
-                      strokeWidth: 1.5
+                      strokeWidth: 2
                     })}
-                  </div>
+                  </span>
                 )}
                 {item.title}
               </Link>
