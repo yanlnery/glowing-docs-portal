@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronRight, Crown, Sparkles, Loader2 } from 'lucide-react';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 
 interface AcademyHeroProps {
   onAction: () => void;
@@ -24,11 +25,11 @@ const AcademyHero: React.FC<AcademyHeroProps> = ({ onAction, isLoading, hasAcces
   return (
     <div className="flex flex-col lg:flex-row items-center gap-8 mb-16">
       <div className="flex-1">
-        <img
+        <OptimizedImage
           src="/lovable-uploads/bf008d0e-9874-4dad-9871-fb0c80c0efd4.png"
           alt="PS Academy - Comunidade de Herpecultura"
           className="rounded-lg shadow-lg border dark:border-gray-800"
-          loading="lazy"
+          priority={true}
         />
       </div>
       <div className="flex-1">

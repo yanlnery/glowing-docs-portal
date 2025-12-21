@@ -5,6 +5,7 @@ interface ImageWithLoaderProps extends React.ImgHTMLAttributes<HTMLImageElement>
   src: string;
   alt: string;
   containerClassName?: string;
+  priority?: boolean;
 }
 
 export function ImageWithLoader({
@@ -12,6 +13,7 @@ export function ImageWithLoader({
   alt,
   className,
   containerClassName,
+  priority = false,
   ...props
 }: ImageWithLoaderProps) {
   const [isLoading, setIsLoading] = useState(true);
@@ -19,11 +21,12 @@ export function ImageWithLoader({
 
   return (
     <div className={cn("relative overflow-hidden", containerClassName)}>
-      {/* Skeleton loader */}
+      {/* Blur placeholder */}
       {isLoading && (
-        <div className="absolute inset-0 bg-muted animate-pulse">
-          <div className="w-full h-full bg-gradient-to-r from-muted via-muted-foreground/10 to-muted animate-shimmer" />
-        </div>
+        <div 
+          className="absolute inset-0 bg-muted"
+          style={{ backdropFilter: 'blur(8px)' }}
+        />
       )}
       
       {/* Actual image */}
@@ -31,10 +34,13 @@ export function ImageWithLoader({
         src={hasError ? "/placeholder.svg" : src}
         alt={alt}
         className={cn(
-          "transition-opacity duration-500",
+          "transition-opacity duration-200",
           isLoading ? "opacity-0" : "opacity-100",
           className
         )}
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
+        decoding={priority ? "sync" : "async"}
         onLoad={() => setIsLoading(false)}
         onError={() => {
           setIsLoading(false);

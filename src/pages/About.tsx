@@ -2,6 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Leaf, BookOpen, Award, Heart, Shield, Target } from 'lucide-react';
 import { ImageWithLoader } from '@/components/ui/image-with-loader';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 
 const About = () => {
   const sobreCriadouroText = {
@@ -107,12 +108,13 @@ const About = () => {
           {/* Sobre o Criadouro Section */}
           <section className="mb-20 md:mb-28">
             <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-              <div className="order-2 lg:order-1">
-                <ImageWithLoader
+              <div className="order-2 lg:order-1 rounded-2xl shadow-2xl overflow-hidden">
+                <OptimizedImage
                   src="/lovable-uploads/13113c77-f713-4585-9041-1766e67545b8.png" 
                   alt="Yan Nery, CEO e Biólogo do Pet Serpentes & Companhia"
-                  containerClassName="rounded-2xl shadow-2xl overflow-hidden"
-                  className="w-full h-auto object-contain"
+                  className="w-full h-auto"
+                  style={{ objectFit: 'contain' }}
+                  priority={true}
                 />
               </div>
               
