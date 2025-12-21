@@ -87,8 +87,8 @@ export default function EducationalContentSection() {
         {/* Mobile: Carrossel horizontal estilo Apple */}
         <div className="flex md:hidden overflow-x-auto gap-4 snap-x snap-mandatory pb-4 -mx-4 px-4 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
           {cards.map((card, index) => (
-            <div key={index} className="flex-shrink-0 w-[80vw] snap-center docs-card-gradient rounded-lg border hover:shadow-md transition-all group overflow-hidden flex flex-col">
-              <div className="aspect-[4/3] overflow-hidden">
+            <div key={index} className="flex-shrink-0 w-[85vw] snap-center docs-card-gradient rounded-lg border hover:shadow-md transition-all group overflow-hidden flex flex-col">
+              <div className="aspect-[3/2] overflow-hidden">
                 <img 
                   src={card.image} 
                   alt={card.title}

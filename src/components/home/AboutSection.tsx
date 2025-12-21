@@ -88,9 +88,9 @@ export default function AboutSection() {
               Nosso trabalho vai além da venda de animais. Fazemos questão de compartilhar conhecimento sobre as espécies que criamos, ajudando novos tutores a entenderem as necessidades reais de cada animal. Também colaboramos com pesquisadores e instituições que estudam répteis brasileiros.
             </p>
 
-            {/* Mobile: Carrossel automático infinito */}
-            <div className="md:hidden overflow-hidden mt-8">
-              <div className="flex gap-4 animate-scroll-carousel">
+            {/* Mobile: Carrossel automático infinito com touch */}
+            <div className="md:hidden overflow-x-auto mt-8 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
+              <div className="flex gap-4 animate-scroll-carousel w-max">
                 {[...features, ...features].map((item, index) => (
                   <div key={index} className="flex-shrink-0 w-[70vw] flex gap-3 items-start bg-card border border-border/50 rounded-xl p-4">
                     <div className="mt-1">{item.icon}</div>
