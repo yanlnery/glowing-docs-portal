@@ -109,11 +109,6 @@ const About = () => {
           {/* Sobre o Criadouro Section */}
           <section className="mb-20 md:mb-28">
             <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-              {/* Mobile: Carrossel de imagens */}
-              <div className="order-2 lg:order-1 md:hidden">
-                <AboutImageCarousel />
-              </div>
-              
               {/* Desktop: Imagem estática */}
               <div className="order-2 lg:order-1 hidden md:block rounded-2xl shadow-2xl overflow-hidden">
                 <OptimizedImage
@@ -136,7 +131,18 @@ const About = () => {
                 </h2>
                 
                 <div className="space-y-5">
-                  {sobreCriadouroText.paragraphs.map((p, index) => (
+                  {/* Primeiro parágrafo */}
+                  <p className="text-lg text-foreground/80 leading-relaxed">
+                    {sobreCriadouroText.paragraphs[0]}
+                  </p>
+                  
+                  {/* Mobile: Carrossel após primeiro parágrafo */}
+                  <div className="md:hidden my-6">
+                    <AboutImageCarousel />
+                  </div>
+                  
+                  {/* Parágrafos restantes */}
+                  {sobreCriadouroText.paragraphs.slice(1).map((p, index) => (
                     <p key={index} className="text-lg text-foreground/80 leading-relaxed">
                       {p}
                     </p>
@@ -168,7 +174,8 @@ const About = () => {
                 </div>
               </div>
               
-              <div className="order-1 lg:order-2">
+              {/* Desktop only: Segunda imagem */}
+              <div className="order-1 lg:order-2 hidden md:block">
                 <ImageWithLoader
                   src="/lovable-uploads/c988fe8f-9ba2-4b94-a8e7-a7347e0d0a84.png" 
                   alt="Instalações do Pet Serpentes & Companhia"
@@ -207,7 +214,24 @@ const About = () => {
               </p>
             </div>
             
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+            {/* Mobile: Carrossel horizontal com Bem-estar primeiro */}
+            <div className="flex md:hidden overflow-x-auto gap-4 snap-x snap-mandatory pb-4 -mx-4 px-4 scrollbar-hide">
+              {[missaoItens[3], missaoItens[0], missaoItens[1], missaoItens[2]].map((item, index) => (
+                <div 
+                  key={index} 
+                  className="flex-shrink-0 w-[80vw] snap-center bg-card border border-border/50 p-6 rounded-2xl text-center"
+                >
+                  <div className="w-16 h-16 bg-serpente-100 dark:bg-serpente-900/50 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                    {item.icon}
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-3">{item.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">{item.text}</p>
+                </div>
+              ))}
+            </div>
+            
+            {/* Desktop: Grid normal */}
+            <div className="hidden md:grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
               {missaoItens.map((item, index) => (
                 <div 
                   key={index} 
