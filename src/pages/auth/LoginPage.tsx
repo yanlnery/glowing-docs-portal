@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, BookOpen } from 'lucide-react';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -18,7 +17,38 @@ const LoginPage: React.FC = () => {
   const { toast } = useToast();
 
   const fromCheckout = location.state?.fromCheckout === true;
-  const from = fromCheckout ? "/carrinho" : (location.state?.from?.pathname || "/area-cliente");
+  const pendingDownload = location.state?.pendingDownload === true;
+  const fromPath = location.state?.from || (fromCheckout ? "/carrinho" : "/area-cliente");
+
+  // Handle pending download after successful login
+  const handlePendingDownload = () => {
+    const pendingData = sessionStorage.getItem("pending_manual_download");
+    if (pendingData) {
+      try {
+        const { pdfUrl, title } = JSON.parse(pendingData);
+        sessionStorage.removeItem("pending_manual_download");
+        
+        // Trigger download
+        const link = document.createElement("a");
+        link.href = pdfUrl;
+        const filename = title
+          .replace(/[^a-z0-9_ \-]/gi, "")
+          .replace(/\s+/g, "-")
+          .toLowerCase() + ".pdf";
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        toast({
+          title: "Download iniciado!",
+          description: `O material "${title}" está sendo baixado.`,
+        });
+      } catch (e) {
+        console.error("Error processing pending download:", e);
+      }
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +60,11 @@ const LoginPage: React.FC = () => {
         title: 'Login bem-sucedido!', 
         description: fromCheckout ? 'Agora você pode finalizar sua compra!' : 'Redirecionando...' 
       });
-      navigate(from, { replace: true });
+      
+      // Handle any pending download
+      handlePendingDownload();
+      
+      navigate(fromPath, { replace: true });
     }
   };
 
@@ -44,13 +78,18 @@ const LoginPage: React.FC = () => {
             className="w-20 h-20 mx-auto mb-4 rounded-full" 
           />
           <CardTitle className="text-2xl font-bold">
-            {fromCheckout ? 'Faça login para continuar' : 'Acessar sua Conta'}
+            {fromCheckout ? 'Faça login para continuar' : pendingDownload ? 'Faça login para baixar' : 'Acessar sua Conta'}
           </CardTitle>
           <CardDescription>
             {fromCheckout ? (
               <span className="flex items-center justify-center gap-2">
                 <ShoppingCart className="h-4 w-4" />
                 Após o login, você voltará ao carrinho
+              </span>
+            ) : pendingDownload ? (
+              <span className="flex items-center justify-center gap-2">
+                <BookOpen className="h-4 w-4" />
+                Após o login, o download será iniciado automaticamente
               </span>
             ) : (
               'Bem-vindo de volta! Faça login para continuar.'
@@ -68,7 +107,7 @@ const LoginPage: React.FC = () => {
               <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
             <div className="text-sm text-right">
-              <Link to="/forgot-password"className="font-medium text-primary hover:underline">
+              <Link to="/forgot-password" className="font-medium text-primary hover:underline">
                 Esqueceu sua senha?
               </Link>
             </div>
@@ -80,8 +119,8 @@ const LoginPage: React.FC = () => {
         <CardFooter className="text-center text-sm">
           <p>Não tem uma conta?{' '}
             <Link 
-              to="/signup" 
-              state={fromCheckout ? { fromCheckout: true } : undefined}
+              to="/auth/signup" 
+              state={fromCheckout ? { fromCheckout: true } : pendingDownload ? { pendingDownload: true, from: fromPath } : undefined}
               className="font-medium text-primary hover:underline"
             >
               Cadastre-se

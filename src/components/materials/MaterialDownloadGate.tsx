@@ -10,10 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Loader2, Download, ArrowRight } from "lucide-react";
+import { Loader2, Download, UserPlus, LogIn, ArrowLeft } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { materialLeadService } from "@/services/materialLeadService";
-import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 
@@ -31,6 +30,8 @@ interface MaterialDownloadGateProps {
   onDownloadComplete?: () => void;
 }
 
+type ViewState = "options" | "lead-form";
+
 export default function MaterialDownloadGate({
   isOpen,
   onClose,
@@ -38,27 +39,23 @@ export default function MaterialDownloadGate({
   pdfUrl,
   onDownloadComplete,
 }: MaterialDownloadGateProps) {
+  const [viewState, setViewState] = useState<ViewState>("options");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [consent, setConsent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ name?: string; email?: string; consent?: string }>({});
-  const [downloadCompleted, setDownloadCompleted] = useState(false);
   
   const { toast } = useToast();
-  const { isAuthenticated, user, profile } = useAuth();
   const navigate = useNavigate();
 
-  // Pre-fill form if user is authenticated
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      setEmail(user.email || "");
-      if (profile) {
-        const fullName = [profile.first_name, profile.last_name].filter(Boolean).join(" ");
-        setName(fullName);
-      }
-    }
-  }, [isAuthenticated, user, profile]);
+  // Store pending download info in sessionStorage for post-login retrieval
+  const storePendingDownload = () => {
+    sessionStorage.setItem("pending_manual_download", JSON.stringify({
+      pdfUrl,
+      title: materialTitle,
+    }));
+  };
 
   const triggerDownload = () => {
     const link = document.createElement("a");
@@ -73,11 +70,22 @@ export default function MaterialDownloadGate({
     document.body.removeChild(link);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleGoToSignup = () => {
+    storePendingDownload();
+    onClose();
+    navigate("/auth/signup", { state: { from: "/manuais", pendingDownload: true } });
+  };
+
+  const handleGoToLogin = () => {
+    storePendingDownload();
+    onClose();
+    navigate("/login", { state: { from: "/manuais", pendingDownload: true } });
+  };
+
+  const handleLeadFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
 
-    // Validate form
     const result = leadSchema.safeParse({ name, email, consent });
     if (!result.success) {
       const fieldErrors: typeof errors = {};
@@ -106,10 +114,9 @@ export default function MaterialDownloadGate({
         description: "Seu download começará em instantes.",
       });
       
-      // Trigger download
       triggerDownload();
-      setDownloadCompleted(true);
       onDownloadComplete?.();
+      handleClose();
     } else {
       toast({
         title: "Erro ao cadastrar",
@@ -119,13 +126,8 @@ export default function MaterialDownloadGate({
     }
   };
 
-  const handleGoToSignup = () => {
-    onClose();
-    navigate("/auth/signup");
-  };
-
   const handleClose = () => {
-    setDownloadCompleted(false);
+    setViewState("options");
     setName("");
     setEmail("");
     setConsent(false);
@@ -133,19 +135,78 @@ export default function MaterialDownloadGate({
     onClose();
   };
 
+  // Reset view state when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setViewState("options");
+    }
+  }, [isOpen]);
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
-        {!downloadCompleted ? (
+        {viewState === "options" ? (
           <>
             <DialogHeader>
-              <DialogTitle className="text-xl">Cadastre-se para baixar</DialogTitle>
+              <DialogTitle className="text-xl">Baixar Material</DialogTitle>
+              <DialogDescription className="text-sm">
+                Para baixar <strong>{materialTitle}</strong>, escolha uma opção:
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="flex flex-col gap-3 mt-6">
+              <Button onClick={handleGoToSignup} className="w-full gap-2">
+                <UserPlus className="h-4 w-4" />
+                Criar conta gratuita
+              </Button>
+              
+              <Button onClick={handleGoToLogin} variant="outline" className="w-full gap-2">
+                <LogIn className="h-4 w-4" />
+                Já tenho conta
+              </Button>
+
+              <div className="relative my-2">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">ou</span>
+                </div>
+              </div>
+
+              <Button 
+                onClick={() => setViewState("lead-form")} 
+                variant="ghost" 
+                className="w-full text-muted-foreground hover:text-foreground"
+              >
+                Baixar sem criar conta
+              </Button>
+            </div>
+
+            <p className="text-xs text-muted-foreground text-center mt-4">
+              Ao criar uma conta você terá acesso a mais materiais exclusivos.
+            </p>
+          </>
+        ) : (
+          <>
+            <DialogHeader>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8" 
+                  onClick={() => setViewState("options")}
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                <DialogTitle className="text-xl">Cadastro Rápido</DialogTitle>
+              </div>
               <DialogDescription className="text-sm">
                 Preencha seus dados para acessar: <strong>{materialTitle}</strong>
               </DialogDescription>
             </DialogHeader>
 
-            <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+            <form onSubmit={handleLeadFormSubmit} className="space-y-4 mt-4">
               <div className="space-y-2">
                 <Label htmlFor="lead-name">Nome completo</Label>
                 <Input
@@ -217,25 +278,6 @@ export default function MaterialDownloadGate({
                 )}
               </Button>
             </form>
-          </>
-        ) : (
-          <>
-            <DialogHeader>
-              <DialogTitle className="text-xl text-center">Download iniciado!</DialogTitle>
-              <DialogDescription className="text-center">
-                O material está sendo baixado. Que tal criar uma conta completa para ter acesso a mais benefícios?
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="flex flex-col gap-3 mt-6">
-              <Button onClick={handleGoToSignup} className="w-full">
-                Criar conta completa
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              <Button variant="outline" onClick={handleClose} className="w-full">
-                Continuar navegando
-              </Button>
-            </div>
           </>
         )}
       </DialogContent>
