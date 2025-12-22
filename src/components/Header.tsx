@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Book, Syringe, Home, FileText, Users, Phone } from "lucide-react";
+import { Menu, X, Book, Home, FileText, Users, Phone, Worm, MonitorPlay, Bug } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/hooks/useSettings";
 import type { MenuItem } from './header/menuItem.type';
@@ -12,7 +12,7 @@ import HeaderActions from './header/HeaderActions';
 import MobileNavigation from './header/MobileNavigation';
 
 const iconComponents = {
-  Home, Book, Syringe, FileText, Users, Phone
+  Home, Book, FileText, Users, Phone, Worm, MonitorPlay, Bug
 };
 
 // Define a more specific type for static menu items
@@ -22,9 +22,9 @@ interface StaticMenuItem extends Omit<MenuItem, 'icon'> {
 
 const staticBaseMenuItems: StaticMenuItem[] = [
   { title: "Início", path: "/", iconName: "Home" },
-  { title: "Animais Disponíveis", path: "/catalogo", iconName: "Syringe" },
-  { title: "P. S. Academy", path: "/academy", iconName: "Book", id: "academy" },
-  { title: "Espécies Criadas", path: "/especies", iconName: "FileText" },
+  { title: "Animais Disponíveis", path: "/catalogo", iconName: "Worm" },
+  { title: "P. S. Academy", path: "/academy", iconName: "MonitorPlay", id: "academy" },
+  { title: "Espécies Criadas", path: "/especies", iconName: "Bug" },
   { title: "Manuais de Criação", path: "/manuais", iconName: "Book" },
   { title: "Quem Somos", path: "/sobre", iconName: "Users" },
   { title: "Contato", path: "/contato", iconName: "Phone" },
