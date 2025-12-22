@@ -12,14 +12,33 @@ import Logo from './header/Logo';
 import HeaderActions from './header/HeaderActions';
 import MobileNavigation from './header/MobileNavigation';
 
+// Mobile menu icons (PNG images)
+import menuHomeIcon from '@/assets/icons/menu-home.png';
+import menuSnakeIcon from '@/assets/icons/menu-snake.png';
+import menuAcademyIcon from '@/assets/icons/menu-academy.png';
+import menuLizardIcon from '@/assets/icons/menu-lizard.png';
+import menuBookIcon from '@/assets/icons/menu-book.png';
+import menuUsersIcon from '@/assets/icons/menu-users.png';
+import menuPhoneIcon from '@/assets/icons/menu-phone.png';
+
 const iconComponents = {
   Home, Book, FileText, Users, Phone, MonitorPlay,
   Snake: SnakeIcon,
   Lizard: LizardIcon,
 };
 
+const mobileIconImages: Record<string, string> = {
+  Home: menuHomeIcon,
+  Snake: menuSnakeIcon,
+  MonitorPlay: menuAcademyIcon,
+  Lizard: menuLizardIcon,
+  Book: menuBookIcon,
+  Users: menuUsersIcon,
+  Phone: menuPhoneIcon,
+};
+
 // Define a more specific type for static menu items
-interface StaticMenuItem extends Omit<MenuItem, 'icon'> {
+interface StaticMenuItem extends Omit<MenuItem, 'icon' | 'mobileIcon'> {
   iconName: keyof typeof iconComponents | null;
 }
 
@@ -39,6 +58,18 @@ export default function Header() {
   const { settings } = useSettings(); 
   const isAcademyVisible = settings.isAcademyVisible;
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMenuOpen]);
+
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location.pathname]);
@@ -51,9 +82,11 @@ export default function Header() {
     return staticBaseMenuItems.map(item => {
       const { iconName, ...menuItemProps } = item; 
       const IconComponent = iconName ? iconComponents[iconName] : null;
+      const mobileIcon = iconName ? mobileIconImages[iconName] : undefined;
       return {
         ...menuItemProps, 
         icon: IconComponent ? <IconComponent size={16} className="mr-2" /> : undefined,
+        mobileIcon,
       };
     });
   }, []);
