@@ -171,7 +171,7 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
                     src={item.mobileIcon} 
                     alt="" 
                     className={cn(
-                      "w-10 h-10 mr-4 object-contain transition-all",
+                      "w-7 h-7 mr-4 object-contain transition-all",
                       isActive(item.path) 
                         ? "brightness-0 invert" 
                         : ""
