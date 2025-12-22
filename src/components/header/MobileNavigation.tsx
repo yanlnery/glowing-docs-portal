@@ -39,8 +39,8 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
   };
 
   return (
-    <div className="fixed inset-0 top-16 z-[200] isolate bg-background text-foreground md:hidden animate-fade-in h-[calc(100vh-4rem)] overflow-y-auto">
-      <nav className="container py-6 h-full px-5">
+    <div className="fixed inset-0 top-16 z-[200] isolate bg-background text-foreground md:hidden animate-fade-in overflow-hidden">
+      <nav className="container py-6 h-full px-5 overflow-y-auto overscroll-contain">
         
         {/* Header actions - design mais elegante */}
         <div className="flex items-center justify-between gap-3 mb-8">
@@ -129,18 +129,17 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
                 )}
                 onClick={handleLinkClick}
               >
-                {item.icon && (
-                  <span className={cn(
-                    "mr-4 transition-colors",
-                    isActive(item.path) 
-                      ? "text-primary-foreground" 
-                      : "text-primary"
-                  )}>
-                    {React.cloneElement(item.icon as React.ReactElement, { 
-                      className: "h-5 w-5",
-                      strokeWidth: 2
-                    })}
-                  </span>
+                {item.mobileIcon && (
+                  <img 
+                    src={item.mobileIcon} 
+                    alt="" 
+                    className={cn(
+                      "w-6 h-6 mr-4 object-contain transition-all",
+                      isActive(item.path) 
+                        ? "brightness-0 invert" 
+                        : ""
+                    )}
+                  />
                 )}
                 {item.title}
               </Link>
