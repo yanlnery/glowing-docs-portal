@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, BookOpen } from 'lucide-react';
 
 const SignupPage: React.FC = () => {
   const [firstName, setFirstName] = useState('');
@@ -20,6 +20,38 @@ const SignupPage: React.FC = () => {
   const { toast } = useToast();
 
   const fromCheckout = location.state?.fromCheckout === true;
+  const pendingDownload = location.state?.pendingDownload === true;
+  const fromPath = location.state?.from || (fromCheckout ? "/carrinho" : "/manuais");
+
+  // Handle pending download after successful signup
+  const handlePendingDownload = () => {
+    const pendingData = sessionStorage.getItem("pending_manual_download");
+    if (pendingData) {
+      try {
+        const { pdfUrl, title } = JSON.parse(pendingData);
+        sessionStorage.removeItem("pending_manual_download");
+        
+        // Trigger download
+        const link = document.createElement("a");
+        link.href = pdfUrl;
+        const filename = title
+          .replace(/[^a-z0-9_ \-]/gi, "")
+          .replace(/\s+/g, "-")
+          .toLowerCase() + ".pdf";
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        toast({
+          title: "Download iniciado!",
+          description: `O material "${title}" está sendo baixado.`,
+        });
+      } catch (e) {
+        console.error("Error processing pending download:", e);
+      }
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,17 +79,26 @@ const SignupPage: React.FC = () => {
       toast({ title: 'Erro no Cadastro', description: error.message, variant: 'destructive' });
     } else if (data?.user?.identities?.length === 0) {
       toast({ title: 'Erro no Cadastro', description: "Este e-mail já pode estar cadastrado mas não confirmado. Tente fazer login ou recuperar senha.", variant: 'destructive' });
-    }
-     else {
+    } else {
       const isEmailConfirmationRequired = data?.user?.email_confirmed_at === null && data?.session === null;
-      const redirectTo = fromCheckout ? '/carrinho' : '/login';
 
       if (isEmailConfirmationRequired) {
-        toast({ title: 'Cadastro realizado!', description: 'Enviamos um e-mail de confirmação para você. Por favor, verifique sua caixa de entrada e spam.' });
-        navigate(redirectTo);
+        toast({ 
+          title: 'Cadastro realizado!', 
+          description: 'Enviamos um e-mail de confirmação para você. Por favor, verifique sua caixa de entrada e spam.' 
+        });
+        // Keep pending download in session storage for when user confirms email
+        navigate('/login', { state: pendingDownload ? { pendingDownload: true, from: fromPath } : undefined });
       } else {
-        toast({ title: 'Cadastro bem-sucedido!', description: fromCheckout ? 'Agora você pode finalizar sua compra!' : 'Você já pode fazer login.' });
-        navigate(redirectTo);
+        toast({ 
+          title: 'Cadastro bem-sucedido!', 
+          description: fromCheckout ? 'Agora você pode finalizar sua compra!' : 'Bem-vindo à Pet Serpentes!' 
+        });
+        
+        // Handle any pending download
+        handlePendingDownload();
+        
+        navigate(fromPath, { replace: true });
       }
     }
   };
@@ -72,13 +113,18 @@ const SignupPage: React.FC = () => {
             className="w-20 h-20 mx-auto mb-4 rounded-full" 
           />
           <CardTitle className="text-2xl font-bold">
-            {fromCheckout ? 'Crie sua conta para continuar' : 'Criar sua Conta'}
+            {fromCheckout ? 'Crie sua conta para continuar' : pendingDownload ? 'Crie sua conta para baixar' : 'Criar sua Conta'}
           </CardTitle>
           <CardDescription>
             {fromCheckout ? (
               <span className="flex items-center justify-center gap-2">
                 <ShoppingCart className="h-4 w-4" />
                 Após o cadastro, você voltará ao carrinho
+              </span>
+            ) : pendingDownload ? (
+              <span className="flex items-center justify-center gap-2">
+                <BookOpen className="h-4 w-4" />
+                Após o cadastro, o download será iniciado automaticamente
               </span>
             ) : (
               'Junte-se à Pet Serpentes para uma experiência exclusiva.'
@@ -118,7 +164,7 @@ const SignupPage: React.FC = () => {
           <p>Já tem uma conta?{' '}
             <Link 
               to="/login" 
-              state={fromCheckout ? { fromCheckout: true } : undefined}
+              state={fromCheckout ? { fromCheckout: true } : pendingDownload ? { pendingDownload: true, from: fromPath } : undefined}
               className="font-medium text-primary hover:underline"
             >
               Faça login
