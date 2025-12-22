@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, User, LogOut } from "lucide-react";
@@ -22,6 +22,15 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
   const cartQuantity = useCartStore(state => state.getTotalItems());
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Lock body scroll when menu is mounted
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
 
   const handleLogout = async () => {
     const { error } = await logout();
