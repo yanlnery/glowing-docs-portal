@@ -156,30 +156,30 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
         <ul className="flex flex-col space-y-1">
           {menuItems.map((item) => (
             <li key={item.title}>
-              <Link
-                to={item.path}
-                className={cn(
-                  "flex w-full rounded-xl px-4 py-4 text-base font-medium items-center transition-all duration-200", 
-                  isActive(item.path)
-                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
-                    : "text-foreground hover:bg-muted/50" 
-                )}
-                onClick={handleLinkClick}
-              >
-                {item.mobileIcon && (
-                  <img 
-                    src={item.mobileIcon} 
-                    alt="" 
-                    className={cn(
-                      "w-28 h-28 mr-4 object-contain transition-all",
-                      isActive(item.path) 
-                        ? "brightness-0 invert" 
-                        : ""
-                    )}
-                  />
-                )}
-                {item.title}
-              </Link>
+                <Link
+                  to={item.path}
+                  className={cn(
+                    "flex w-full rounded-xl px-4 py-3 text-base font-medium items-center transition-all duration-200", 
+                    isActive(item.path)
+                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                      : "text-foreground hover:bg-muted/50" 
+                  )}
+                  onClick={handleLinkClick}
+                >
+                  {item.mobileIcon && (
+                    <img 
+                      src={item.mobileIcon} 
+                      alt="" 
+                      className={cn(
+                        "w-7 h-7 mr-4 object-contain transition-all",
+                        isActive(item.path) 
+                          ? "brightness-0 invert" 
+                          : ""
+                      )}
+                    />
+                  )}
+                  {item.title}
+                </Link>
             </li>
           ))}
         </ul>
