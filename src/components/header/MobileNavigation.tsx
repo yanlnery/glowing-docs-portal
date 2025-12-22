@@ -159,7 +159,7 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
                 <Link
                   to={item.path}
                   className={cn(
-                    "flex w-full rounded-xl px-4 py-3 text-base font-medium items-center transition-all duration-200", 
+                    "flex w-full rounded-xl px-4 h-14 text-base font-medium items-center transition-all duration-200 overflow-hidden", 
                     isActive(item.path)
                       ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
                       : "text-foreground hover:bg-muted/50" 
@@ -167,16 +167,18 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
                   onClick={handleLinkClick}
                 >
                   {item.mobileIcon && (
-                    <img 
-                      src={item.mobileIcon} 
-                      alt="" 
-                      className={cn(
-                        "w-7 h-7 mr-4 object-contain transition-all",
-                        isActive(item.path) 
-                          ? "brightness-0 invert" 
-                          : ""
-                      )}
-                    />
+                    <div className="w-12 h-12 mr-4 flex-shrink-0 flex items-center justify-center">
+                      <img 
+                        src={item.mobileIcon} 
+                        alt="" 
+                        className={cn(
+                          "w-28 h-28 object-contain transition-all",
+                          isActive(item.path) 
+                            ? "brightness-0 invert" 
+                            : ""
+                        )}
+                      />
+                    </div>
                   )}
                   {item.title}
                 </Link>
