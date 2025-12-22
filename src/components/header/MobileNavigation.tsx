@@ -1,5 +1,6 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, User, LogOut } from "lucide-react";
@@ -23,12 +24,36 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Lock body scroll when menu is mounted
+  // Robust scroll lock for iOS/Android
   useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    const scrollY = window.scrollY;
+    const html = document.documentElement;
+    const body = document.body;
+    
+    // Save original styles
+    const originalHtmlOverflow = html.style.overflow;
+    const originalBodyOverflow = body.style.overflow;
+    const originalBodyPosition = body.style.position;
+    const originalBodyTop = body.style.top;
+    const originalBodyWidth = body.style.width;
+    
+    // Apply scroll lock
+    html.style.overflow = 'hidden';
+    body.style.overflow = 'hidden';
+    body.style.position = 'fixed';
+    body.style.top = `-${scrollY}px`;
+    body.style.width = '100%';
+    
     return () => {
-      document.body.style.overflow = originalOverflow;
+      // Restore original styles
+      html.style.overflow = originalHtmlOverflow;
+      body.style.overflow = originalBodyOverflow;
+      body.style.position = originalBodyPosition;
+      body.style.top = originalBodyTop;
+      body.style.width = originalBodyWidth;
+      
+      // Restore scroll position
+      window.scrollTo(0, scrollY);
     };
   }, []);
 
@@ -47,8 +72,11 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
     setIsMenuOpen(false);
   };
 
-  return (
-    <div className="fixed inset-0 top-16 z-[200] isolate bg-background text-foreground md:hidden animate-fade-in overflow-hidden">
+  const menuContent = (
+    <div 
+      className="fixed inset-0 top-16 z-[9999] bg-background text-foreground md:hidden animate-fade-in"
+      style={{ isolation: 'isolate' }}
+    >
       <nav className="container py-6 h-full px-5 overflow-y-auto overscroll-contain">
         
         {/* Header actions - design mais elegante */}
@@ -165,4 +193,7 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
       </nav>
     </div>
   );
+
+  // Render via portal to escape any stacking context issues
+  return createPortal(menuContent, document.body);
 }

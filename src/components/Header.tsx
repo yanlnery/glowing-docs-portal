@@ -121,7 +121,10 @@ export default function Header() {
             variant="ghost" 
             size="icon"
             className="md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsMenuOpen(prev => !prev);
+            }}
             aria-expanded={isMenuOpen}
             aria-controls="mobile-menu"
           >
