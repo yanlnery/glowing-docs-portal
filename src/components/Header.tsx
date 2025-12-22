@@ -58,17 +58,6 @@ export default function Header() {
   const { settings } = useSettings(); 
   const isAcademyVisible = settings.isAcademyVisible;
 
-  // Lock body scroll when mobile menu is open
-  useEffect(() => {
-    if (isMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isMenuOpen]);
 
   useEffect(() => {
     setIsMenuOpen(false);
