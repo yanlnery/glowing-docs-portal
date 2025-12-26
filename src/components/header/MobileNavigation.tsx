@@ -1,9 +1,9 @@
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, User, LogOut } from "lucide-react";
+import { ShoppingCart, User, LogOut, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import ThemeToggle from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
@@ -74,10 +74,29 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
 
   const menuContent = (
     <div 
-      className="fixed inset-0 top-16 z-[9999] bg-background text-foreground md:hidden animate-fade-in"
+      className="fixed inset-0 z-[9999] bg-background text-foreground md:hidden animate-fade-in"
       style={{ isolation: 'isolate' }}
     >
-      <nav className="container py-6 h-full px-5 overflow-y-auto overscroll-contain">
+      {/* Header fixo dentro do menu - sempre visível independente do scroll */}
+      <div className="h-16 border-b border-border bg-background flex items-center justify-between px-4 sm:px-6">
+        <div className="flex items-center gap-2">
+          <img 
+            src="/lovable-uploads/6dcc0ef5-dc47-4f3c-9020-54ecc65ed390.png" 
+            alt="Reptilianos Logo" 
+            className="h-8 w-auto"
+          />
+          <span className="font-display text-lg font-semibold text-foreground">Reptilianos</span>
+        </div>
+        <button
+          onClick={() => setIsMenuOpen(false)}
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md text-foreground hover:bg-accent transition-colors"
+          aria-label="Fechar menu"
+        >
+          <X size={24} />
+        </button>
+      </div>
+
+      <nav className="container py-6 h-[calc(100%-4rem)] px-5 overflow-y-auto overscroll-contain">
         
         {/* Header actions - design mais elegante */}
         <div className="flex items-center justify-between gap-3 mb-8">
