@@ -79,14 +79,14 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
     >
       {/* Header fixo dentro do menu - sempre visível independente do scroll */}
       <div className="h-16 border-b border-border bg-background flex items-center justify-between px-4 sm:px-6">
-        <div className="flex items-center gap-2">
-          <img 
-            src="/lovable-uploads/6dcc0ef5-dc47-4f3c-9020-54ecc65ed390.png" 
-            alt="Reptilianos Logo" 
-            className="h-8 w-auto"
+        <Link to="/" className="flex items-center" onClick={handleLinkClick}>
+          <img
+            src="/lovable-uploads/4d77b820-b366-45b8-b64b-1568abded363.png"
+            alt="Pet Serpentes"
+            className="h-9 w-9 rounded-full object-contain mr-1.5"
           />
-          <span className="font-display text-lg font-semibold text-foreground">Reptilianos</span>
-        </div>
+          <span className="font-semibold text-lg">PET SERPENTES</span>
+        </Link>
         <button
           onClick={() => setIsMenuOpen(false)}
           className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md text-foreground hover:bg-accent transition-colors"
