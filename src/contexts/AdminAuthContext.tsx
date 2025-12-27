@@ -90,7 +90,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       const onAdminRoute = isAdminRoute(currentPath);
       
       if (_event === 'SIGNED_IN' && session?.user) {
-        // Only verify admin role if on admin routes
+        // Only verify admin role and handle admin-specific logic if on admin routes
         if (onAdminRoute) {
           setTimeout(async () => {
             const isAdmin = await verifyAdminRole(session.user.id);
@@ -102,18 +102,12 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                 const from = location.state?.from?.pathname || "/admin/dashboard";
                 navigate(from, { replace: true });
               }
-            } else {
-              // Not an admin trying to access admin area - sign out and show error
-              toast({ 
-                title: "Acesso Negado", 
-                description: "Você não tem permissão de administrador.", 
-                variant: "destructive" 
-              });
-              supabase.auth.signOut();
             }
+            // If not admin on admin route, AdminProtectedRoute will handle the redirect
+            // No toast or sign out here - let the protected route handle it
           }, 0);
         } else {
-          // Not on admin route - don't verify admin role, don't sign out
+          // Not on admin route - don't verify admin role, don't sign out, no error messages
           setIsVerifiedAdmin(false);
           setAdminLoginLoading(false);
         }

@@ -8,6 +8,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShoppingCart, BookOpen } from 'lucide-react';
 import { downloadAnalyticsService } from '@/services/downloadAnalyticsService';
+import PasswordRequirements, { validatePassword } from '@/components/auth/PasswordRequirements';
 
 const SignupPage: React.FC = () => {
   const [firstName, setFirstName] = useState('');
@@ -15,6 +16,7 @@ const SignupPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
   const { signup, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -60,12 +62,15 @@ const SignupPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (password !== confirmPassword) {
       toast({ title: 'Erro', description: 'As senhas não coincidem.', variant: 'destructive' });
       return;
     }
-    if (password.length < 8) {
-      toast({ title: 'Erro', description: 'A senha deve ter pelo menos 8 caracteres.', variant: 'destructive'});
+    
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
+      toast({ title: 'Senha inválida', description: passwordValidation.message, variant: 'destructive' });
       return;
     }
 
@@ -154,7 +159,15 @@ const SignupPage: React.FC = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Senha</Label>
-              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <Input 
+                id="password" 
+                type="password" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+                onFocus={() => setShowPasswordRequirements(true)}
+                required 
+              />
+              <PasswordRequirements password={password} show={showPasswordRequirements} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirmar Senha</Label>
