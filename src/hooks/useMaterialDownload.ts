@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { materialLeadService } from "@/services/materialLeadService";
+import { downloadAnalyticsService } from "@/services/downloadAnalyticsService";
 import { useToast } from "@/hooks/use-toast";
 
 interface PendingDownload {
@@ -15,7 +16,7 @@ export function useMaterialDownload() {
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
 
-  const triggerDownload = useCallback((pdfUrl: string, title: string) => {
+  const triggerDownload = useCallback((pdfUrl: string, title: string, source: 'lead_form' | 'authenticated' = 'authenticated') => {
     const link = document.createElement("a");
     link.href = pdfUrl;
     const filename = title
@@ -26,6 +27,9 @@ export function useMaterialDownload() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    // Track download event
+    downloadAnalyticsService.trackDownloadStarted(title, source);
   }, []);
 
   const handleDownload = useCallback((pdfUrl: string | null, title: string) => {
@@ -38,21 +42,30 @@ export function useMaterialDownload() {
       return;
     }
 
-    // If user is authenticated, allow direct download
+    // If user is authenticated, allow direct download (skip modal)
     if (isAuthenticated) {
-      triggerDownload(pdfUrl, title);
+      triggerDownload(pdfUrl, title, 'authenticated');
+      toast({
+        title: "Download iniciado!",
+        description: `O material "${title}" está sendo baixado.`,
+      });
       return;
     }
 
     // Check if user already registered as lead
     if (materialLeadService.isLeadRegistered()) {
-      triggerDownload(pdfUrl, title);
+      triggerDownload(pdfUrl, title, 'lead_form');
+      toast({
+        title: "Download iniciado!",
+        description: `O material "${title}" está sendo baixado.`,
+      });
       return;
     }
 
-    // Show the gate modal
+    // Show the gate modal and track analytics
     setPendingDownload({ pdfUrl, title });
     setIsGateOpen(true);
+    downloadAnalyticsService.trackModalOpen(title);
   }, [isAuthenticated, toast, triggerDownload]);
 
   const closeGate = useCallback(() => {
@@ -70,5 +83,6 @@ export function useMaterialDownload() {
     handleDownload,
     closeGate,
     onDownloadComplete,
+    triggerDownload,
   };
 }
