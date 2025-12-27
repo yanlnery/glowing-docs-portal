@@ -185,7 +185,7 @@ const CartPage = () => {
       console.log("✅ Order items added successfully");
 
       // Prepare WhatsApp message
-      const message = encodeURIComponent(
+      const message = 
         `Olá! Acabei de finalizar um pedido no site Pet Serpentes.\n\n` +
         `Pedido: #${orderResult.id.substring(0, 8)}\n` +
         `Nome do comprador: ${formData.fullName}\n` +
@@ -194,7 +194,24 @@ const CartPage = () => {
         `Endereço: ${formData.address}\n\n` +
         `Animal(is) solicitado(s):\n${items.map(item => `- ${item.product.name} (${item.product.speciesName || "Não especificado"}) - ${formatPrice(item.product.price)}`).join('\n')}\n\n` +
         `Total: ${formatPrice(total)}\n\n` +
-        `Gostaria de confirmar o pedido e combinar os detalhes do envio.`
+        `Gostaria de confirmar o pedido e combinar os detalhes do envio.`;
+
+      const whatsappUrl = `https://wa.me/5521967802174?text=${encodeURIComponent(message)}`;
+
+      // Persist order data before redirect (for recovery if needed)
+      localStorage.setItem(
+        "pendingOrder",
+        JSON.stringify({
+          createdAt: Date.now(),
+          orderId: orderResult.id,
+          cartItems: items.map(item => ({
+            id: item.product.id,
+            name: item.product.name,
+            price: item.product.price
+          })),
+          formData,
+          message
+        })
       );
 
       // Close dialog and show success message
@@ -202,25 +219,23 @@ const CartPage = () => {
       
       toast({
         title: "Pedido criado com sucesso!",
-        description: "Você será redirecionado para o WhatsApp para confirmar o pedido.",
-        duration: 3000,
+        description: "Abrindo o WhatsApp...",
+        duration: 2000,
       });
 
       console.log("✅ Checkout completed successfully, redirecting to WhatsApp...");
       
-      // Redirect to WhatsApp and clear cart
-      setTimeout(() => {
-        window.open(`https://wa.me/5521967802174?text=${message}`, '_blank');
-        clearCart();
-        
-        // Reset form for next use
-        setFormData({
-          fullName: '',
-          cpf: '',
-          cep: '',
-          address: ''
-        });
-      }, 1500);
+      // Clear cart and reset form before redirect
+      clearCart();
+      setFormData({
+        fullName: '',
+        cpf: '',
+        cep: '',
+        address: ''
+      });
+
+      // Immediate redirect - mobile-safe (no setTimeout, no window.open)
+      window.location.assign(whatsappUrl);
       
     } catch (error) {
       console.error("❌ Checkout process failed:", error);
