@@ -15,7 +15,7 @@ export default function Logo() {
       <img
         src="/lovable-uploads/logo-hq.jpg"
         alt="Pet Serpentes"
-        className="hidden md:block h-14 w-14 rounded-full object-cover mr-2"
+        className="hidden md:block h-14 w-14 rounded-full object-cover mr-4 transition-transform duration-200 hover:scale-110"
       />
       <span className="font-semibold text-lg md:text-xl">PET SERPENTES</span>
     </Link>
