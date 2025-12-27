@@ -16,7 +16,8 @@ import {
   FileText,
   Image,
   MessageSquare,
-  Images
+  Images,
+  TrendingUp
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -61,6 +62,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { name: 'Lista de Espera (Estágio)', href: '/admin/internship-waitlist', icon: Users, requiredRole: 'admin' },
     { name: 'Leads de Materiais', href: '/admin/material-leads', icon: FileText, requiredRole: 'admin' },
     { name: 'Analytics Carrinho', href: '/admin/cart-analytics', icon: ShoppingCart, requiredRole: 'admin' },
+    { name: 'Analytics Downloads', href: '/admin/download-analytics', icon: TrendingUp, requiredRole: 'admin' },
     { name: 'Configurações', href: '/admin/settings', icon: Settings, requiredRole: 'admin' },
   ];
 
