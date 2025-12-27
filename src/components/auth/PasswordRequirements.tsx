@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, X } from 'lucide-react';
+import { Check, Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PasswordRequirement {
@@ -9,26 +9,24 @@ interface PasswordRequirement {
 
 interface PasswordRequirementsProps {
   password: string;
-  show?: boolean;
 }
 
-const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({ password, show = true }) => {
-  const requirements: PasswordRequirement[] = [
-    { label: 'Mínimo de 8 caracteres', met: password.length >= 8 },
-    { label: 'Pelo menos 1 letra minúscula', met: /[a-z]/.test(password) },
-    { label: 'Pelo menos 1 letra maiúscula', met: /[A-Z]/.test(password) },
-    { label: 'Pelo menos 1 número', met: /[0-9]/.test(password) },
-    { label: 'Pelo menos 1 caractere especial (!@#$%^&*)', met: /[!@#$%^&*(),.?":{}|<>]/.test(password) },
-  ];
+export const getPasswordRequirements = (password: string): PasswordRequirement[] => [
+  { label: 'Mínimo de 8 caracteres', met: password.length >= 8 },
+  { label: 'Pelo menos 1 letra minúscula', met: /[a-z]/.test(password) },
+  { label: 'Pelo menos 1 letra maiúscula', met: /[A-Z]/.test(password) },
+  { label: 'Pelo menos 1 número', met: /[0-9]/.test(password) },
+  { label: 'Pelo menos 1 caractere especial (!@#$%^&*)', met: /[!@#$%^&*(),.?":{}|<>]/.test(password) },
+];
 
+const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({ password }) => {
+  const requirements = getPasswordRequirements(password);
   const allMet = requirements.every((req) => req.met);
 
-  if (!show || password.length === 0) return null;
-
   return (
-    <div className="mt-2 p-3 rounded-lg bg-muted/50 border border-border">
-      <p className="text-sm font-medium text-foreground mb-2">Sua senha deve conter:</p>
-      <ul className="space-y-1.5">
+    <div className="p-3 space-y-2">
+      <p className="text-sm font-medium text-foreground">Sua senha deve conter:</p>
+      <ul className="space-y-1">
         {requirements.map((req, index) => (
           <li
             key={index}
@@ -38,16 +36,16 @@ const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({ password, s
             )}
           >
             {req.met ? (
-              <Check className="h-4 w-4 shrink-0" />
+              <Check className="h-3.5 w-3.5 shrink-0" />
             ) : (
-              <X className="h-4 w-4 shrink-0 text-muted-foreground/50" />
+              <Circle className="h-3.5 w-3.5 shrink-0 opacity-40" />
             )}
             <span>{req.label}</span>
           </li>
         ))}
       </ul>
       {allMet && (
-        <p className="mt-2 text-sm text-green-600 dark:text-green-400 font-medium">
+        <p className="text-sm text-green-600 dark:text-green-400 font-medium pt-1">
           ✓ Senha segura!
         </p>
       )}

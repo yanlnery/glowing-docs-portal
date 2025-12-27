@@ -6,9 +6,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ShoppingCart, BookOpen } from 'lucide-react';
 import { downloadAnalyticsService } from '@/services/downloadAnalyticsService';
-import PasswordRequirements, { validatePassword } from '@/components/auth/PasswordRequirements';
+import PasswordRequirements, { validatePassword, getPasswordRequirements } from '@/components/auth/PasswordRequirements';
+import { cn } from '@/lib/utils';
 
 const SignupPage: React.FC = () => {
   const [firstName, setFirstName] = useState('');
@@ -16,7 +18,9 @@ const SignupPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
+  const [passwordTouched, setPasswordTouched] = useState(false);
+  const [confirmPasswordTouched, setConfirmPasswordTouched] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const { signup, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,6 +29,10 @@ const SignupPage: React.FC = () => {
   const fromCheckout = location.state?.fromCheckout === true;
   const pendingDownload = location.state?.pendingDownload === true;
   const fromPath = location.state?.from || (fromCheckout ? "/carrinho" : "/manuais");
+
+  const passwordValidation = validatePassword(password);
+  const isPasswordInvalid = passwordTouched && !passwordValidation.valid;
+  const isConfirmPasswordInvalid = confirmPasswordTouched && password !== confirmPassword;
 
   // Handle pending download after successful signup
   const handlePendingDownload = () => {
@@ -63,15 +71,16 @@ const SignupPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Mark fields as touched on submit
+    setPasswordTouched(true);
+    setConfirmPasswordTouched(true);
+    
     if (password !== confirmPassword) {
-      toast({ title: 'Erro', description: 'As senhas não coincidem.', variant: 'destructive' });
-      return;
+      return; // Visual feedback via red border is enough
     }
     
-    const passwordValidation = validatePassword(password);
     if (!passwordValidation.valid) {
-      toast({ title: 'Senha inválida', description: passwordValidation.message, variant: 'destructive' });
-      return;
+      return; // Visual feedback via red border is enough
     }
 
     const { error, data } = await signup({
@@ -159,19 +168,50 @@ const SignupPage: React.FC = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Senha</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)} 
-                onFocus={() => setShowPasswordRequirements(true)}
-                required 
-              />
-              <PasswordRequirements password={password} show={showPasswordRequirements} />
+              <Popover open={isPasswordFocused && password.length > 0}>
+                <PopoverTrigger asChild>
+                  <Input 
+                    id="password" 
+                    type="password" 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                    onFocus={() => setIsPasswordFocused(true)}
+                    onBlur={() => {
+                      setIsPasswordFocused(false);
+                      setPasswordTouched(true);
+                    }}
+                    className={cn(
+                      isPasswordInvalid && "border-destructive focus-visible:ring-destructive"
+                    )}
+                    required 
+                  />
+                </PopoverTrigger>
+                <PopoverContent 
+                  className="w-80" 
+                  side="top" 
+                  align="start"
+                  onOpenAutoFocus={(e) => e.preventDefault()}
+                >
+                  <PasswordRequirements password={password} />
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirmar Senha</Label>
-              <Input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+              <Input 
+                id="confirmPassword" 
+                type="password" 
+                value={confirmPassword} 
+                onChange={(e) => setConfirmPassword(e.target.value)} 
+                onBlur={() => setConfirmPasswordTouched(true)}
+                className={cn(
+                  isConfirmPasswordInvalid && "border-destructive focus-visible:ring-destructive"
+                )}
+                required 
+              />
+              {isConfirmPasswordInvalid && (
+                <p className="text-sm text-destructive">As senhas não coincidem.</p>
+              )}
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? 'Criando conta...' : 'Criar Conta'}
