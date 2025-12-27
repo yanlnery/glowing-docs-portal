@@ -34,24 +34,26 @@ export const materialLeadService = {
   },
 
   /**
-   * Register a new material download lead
+   * Register a new material download lead (insert-only to avoid RLS issues)
    */
   async registerLead(lead: MaterialLead): Promise<{ success: boolean; error?: string }> {
     try {
       const { error } = await supabase
         .from('material_leads')
-        .upsert(
-          {
-            name: lead.name.trim(),
-            email: lead.email.trim().toLowerCase(),
-            consent: lead.consent,
-            downloaded_material: lead.downloaded_material,
-            source: 'material_download',
-          },
-          { onConflict: 'email' }
-        );
+        .insert({
+          name: lead.name.trim(),
+          email: lead.email.trim().toLowerCase(),
+          consent: lead.consent,
+          downloaded_material: lead.downloaded_material,
+          source: 'material_download',
+        });
 
       if (error) {
+        // Duplicate email error - treat as success since user already registered
+        if (error.code === '23505') {
+          this.markAsRegistered();
+          return { success: true };
+        }
         console.error('Error registering lead:', error);
         return { success: false, error: error.message };
       }

@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShoppingCart, BookOpen } from 'lucide-react';
+import { downloadAnalyticsService } from '@/services/downloadAnalyticsService';
 
 const SignupPage: React.FC = () => {
   const [firstName, setFirstName] = useState('');
@@ -42,6 +43,10 @@ const SignupPage: React.FC = () => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+
+        // Track analytics
+        downloadAnalyticsService.trackAuthComplete('signup');
+        downloadAnalyticsService.trackDownloadStarted(title, 'authenticated');
 
         toast({
           title: "Download iniciado!",

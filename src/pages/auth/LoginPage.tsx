@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShoppingCart, BookOpen } from 'lucide-react';
+import { downloadAnalyticsService } from '@/services/downloadAnalyticsService';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -39,6 +40,10 @@ const LoginPage: React.FC = () => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+
+        // Track analytics
+        downloadAnalyticsService.trackAuthComplete('login');
+        downloadAnalyticsService.trackDownloadStarted(title, 'authenticated');
 
         toast({
           title: "Download iniciado!",
@@ -119,7 +124,7 @@ const LoginPage: React.FC = () => {
         <CardFooter className="text-center text-sm">
           <p>Não tem uma conta?{' '}
             <Link 
-              to="/auth/signup" 
+              to="/signup" 
               state={fromCheckout ? { fromCheckout: true } : pendingDownload ? { pendingDownload: true, from: fromPath } : undefined}
               className="font-medium text-primary hover:underline"
             >

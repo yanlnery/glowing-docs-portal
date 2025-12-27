@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, Download, UserPlus, LogIn, ArrowLeft } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { materialLeadService } from "@/services/materialLeadService";
+import { downloadAnalyticsService } from "@/services/downloadAnalyticsService";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 
@@ -71,15 +72,22 @@ export default function MaterialDownloadGate({
   };
 
   const handleGoToSignup = () => {
+    downloadAnalyticsService.trackOptionClicked('signup', materialTitle);
     storePendingDownload();
     onClose();
-    navigate("/auth/signup", { state: { from: "/manuais", pendingDownload: true } });
+    navigate("/signup", { state: { from: "/manuais", pendingDownload: true } });
   };
 
   const handleGoToLogin = () => {
+    downloadAnalyticsService.trackOptionClicked('login', materialTitle);
     storePendingDownload();
     onClose();
     navigate("/login", { state: { from: "/manuais", pendingDownload: true } });
+  };
+
+  const handleShowLeadForm = () => {
+    downloadAnalyticsService.trackOptionClicked('lead_form', materialTitle);
+    setViewState("lead-form");
   };
 
   const handleLeadFormSubmit = async (e: React.FormEvent) => {
@@ -109,6 +117,9 @@ export default function MaterialDownloadGate({
     setIsSubmitting(false);
 
     if (success) {
+      downloadAnalyticsService.trackLeadFormSubmitted(materialTitle);
+      downloadAnalyticsService.trackDownloadStarted(materialTitle, 'lead_form');
+      
       toast({
         title: "Cadastro realizado!",
         description: "Seu download começará em instantes.",
@@ -175,7 +186,7 @@ export default function MaterialDownloadGate({
               </div>
 
               <Button 
-                onClick={() => setViewState("lead-form")} 
+                onClick={handleShowLeadForm} 
                 variant="ghost" 
                 className="w-full text-muted-foreground hover:text-foreground"
               >
