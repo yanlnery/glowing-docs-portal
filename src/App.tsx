@@ -85,76 +85,84 @@ const ProtectedClientRoute = () => {
 };
 
 
+// Wrapper for admin routes with AdminAuthProvider
+const AdminRoutes = () => {
+  return (
+    <AdminAuthProvider>
+      <Routes>
+        <Route path="/" element={<AdminLogin />} />
+        <Route element={<AdminProtectedRoute />}>
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="products" element={<ProductList />} />
+          <Route path="products/new" element={<ProductForm />} />
+          <Route path="products/edit/:id" element={<ProductForm />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="waitlist" element={<WaitlistAdmin />} />
+          <Route path="manuals" element={<ManualsAdmin />} />
+          <Route path="contact-submissions" element={<ContactSubmissions />} />
+          <Route path="species" element={<SpeciesAdmin />} />
+          <Route path="carousel" element={<AdminCarousel />} />
+          <Route path="cart-analytics" element={<ShoppingCartAnalytics />} />
+          <Route path="species-waitlist" element={<SpeciesWaitlistAdmin />} />
+          <Route path="internship-waitlist" element={<InternshipWaitlistAdmin />} />
+          <Route path="about-gallery" element={<AboutGalleryAdmin />} />
+          <Route path="material-leads" element={<MaterialLeadsAdmin />} />
+          <Route path="download-analytics" element={<DownloadAnalyticsAdmin />} />
+        </Route>
+      </Routes>
+    </AdminAuthProvider>
+  );
+};
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
         <AuthProvider>
-          <AdminAuthProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <Routes>
-                {/* Public Routes, Auth Routes, and Protected Client Area now share WebsiteLayout */}
-                <Route element={<WebsiteLayout />}>
-                  <Route path="/" element={<Home />} />
-                  <Route path="catalogo" element={<Catalog />} />
-                  <Route path="produtos/:id" element={<ProductDetail />} />
-                  <Route path="especies" element={<Species />} />
-                  <Route path="especies-criadas/:slug" element={<SpeciesDetailRedirect />} />
-                  <Route path="manuais" element={<Manuals />} />
-                  <Route path="sobre" element={<About />} />
-                  <Route path="educacao" element={<Education />} />
-                  <Route path="academy" element={<AcademyRoute />} />
-                  <Route path="lista-de-espera" element={<WaitlistForm />} />
-                  <Route path="confirmacao-inscricao" element={<AcademyConfirmation />} />
-                  <Route path="contato" element={<Contact />} />
-                  <Route path="politica-de-privacidade" element={<PrivacyPolicyPage />} />
-                  <Route path="termos-de-uso" element={<TermsOfUsePage />} />
-                  
-                  {/* Auth Routes - Now under WebsiteLayout */}
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/signup" element={<SignupPage />} />
-                  <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                  <Route path="/reset-password" element={<ResetPasswordPage />} />
-                  <Route path="/auth/callback" element={<AuthCallback />} />
-                  
-                  {/* Protected Client Route - Stays under WebsiteLayout */}
-                  <Route element={<ProtectedClientRoute />}>
-                    <Route path="area-cliente" element={<ClientArea />} />
-                  </Route>
-                  
-                  <Route path="carrinho" element={<CartPage />} />
-                  <Route path="checkout-cadastro" element={<CheckoutAuthPage />} />
-                  <Route path="manuais-de-criacao" element={<Manuals />} />
-                  
-                  
-                  <Route path="*" element={<NotFound />} />
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <Routes>
+              {/* Public Routes, Auth Routes, and Protected Client Area now share WebsiteLayout */}
+              <Route element={<WebsiteLayout />}>
+                <Route path="/" element={<Home />} />
+                <Route path="catalogo" element={<Catalog />} />
+                <Route path="produtos/:id" element={<ProductDetail />} />
+                <Route path="especies" element={<Species />} />
+                <Route path="especies-criadas/:slug" element={<SpeciesDetailRedirect />} />
+                <Route path="manuais" element={<Manuals />} />
+                <Route path="sobre" element={<About />} />
+                <Route path="educacao" element={<Education />} />
+                <Route path="academy" element={<AcademyRoute />} />
+                <Route path="lista-de-espera" element={<WaitlistForm />} />
+                <Route path="confirmacao-inscricao" element={<AcademyConfirmation />} />
+                <Route path="contato" element={<Contact />} />
+                <Route path="politica-de-privacidade" element={<PrivacyPolicyPage />} />
+                <Route path="termos-de-uso" element={<TermsOfUsePage />} />
+                
+                {/* Auth Routes - Now under WebsiteLayout */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignupPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
+                
+                {/* Protected Client Route - Stays under WebsiteLayout */}
+                <Route element={<ProtectedClientRoute />}>
+                  <Route path="area-cliente" element={<ClientArea />} />
                 </Route>
                 
-                {/* Admin Routes - Remain separate */}
-                <Route path="/admin" element={<AdminLogin />} />
-                <Route element={<AdminProtectedRoute />}>
-                  <Route path="/admin/dashboard" element={<Dashboard />} />
-                  <Route path="/admin/products" element={<ProductList />} />
-                  <Route path="/admin/products/new" element={<ProductForm />} />
-                  <Route path="/admin/products/edit/:id" element={<ProductForm />} />
-                  <Route path="/admin/settings" element={<Settings />} />
-                  <Route path="/admin/waitlist" element={<WaitlistAdmin />} />
-                  <Route path="/admin/manuals" element={<ManualsAdmin />} />
-                  <Route path="/admin/contact-submissions" element={<ContactSubmissions />} />
-                  <Route path="/admin/species" element={<SpeciesAdmin />} />
-                  <Route path="/admin/carousel" element={<AdminCarousel />} />
-                  <Route path="/admin/cart-analytics" element={<ShoppingCartAnalytics />} />
-                  <Route path="/admin/species-waitlist" element={<SpeciesWaitlistAdmin />} />
-                  <Route path="/admin/internship-waitlist" element={<InternshipWaitlistAdmin />} />
-                  <Route path="/admin/about-gallery" element={<AboutGalleryAdmin />} />
-                  <Route path="/admin/material-leads" element={<MaterialLeadsAdmin />} />
-                  <Route path="/admin/download-analytics" element={<DownloadAnalyticsAdmin />} />
-                </Route>
-              </Routes>
-            </TooltipProvider>
-          </AdminAuthProvider>
+                <Route path="carrinho" element={<CartPage />} />
+                <Route path="checkout-cadastro" element={<CheckoutAuthPage />} />
+                <Route path="manuais-de-criacao" element={<Manuals />} />
+                
+                <Route path="*" element={<NotFound />} />
+              </Route>
+              
+              {/* Admin Routes - Wrapped in separate AdminAuthProvider */}
+              <Route path="/admin/*" element={<AdminRoutes />} />
+            </Routes>
+          </TooltipProvider>
         </AuthProvider>
       </Router>
     </QueryClientProvider>
