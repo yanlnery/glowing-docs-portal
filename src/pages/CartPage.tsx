@@ -75,14 +75,36 @@ const CartPage = () => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
-    }).format(price);
+  }).format(price);
+  };
+
+  // Mask functions for CPF and CEP
+  const formatCPF = (value: string): string => {
+    const digits = value.replace(/\D/g, '').slice(0, 11);
+    return digits
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  };
+
+  const formatCEP = (value: string): string => {
+    const digits = value.replace(/\D/g, '').slice(0, 8);
+    return digits.replace(/(\d{5})(\d)/, '$1-$2');
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    
+    let formattedValue = value;
+    if (name === 'cpf') {
+      formattedValue = formatCPF(value);
+    } else if (name === 'cep') {
+      formattedValue = formatCEP(value);
+    }
+    
     setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: formattedValue
     }));
     
     // Clear error for this field when user starts typing
