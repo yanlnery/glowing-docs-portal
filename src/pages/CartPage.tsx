@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCartStore } from '@/stores/cartStore';
 import { useAuth } from '@/hooks/useAuth';
@@ -11,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Trash2, ShoppingCart, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Trash2, ShoppingCart, ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
 import { 
   Dialog, 
   DialogContent, 
@@ -25,13 +24,19 @@ import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/use-toast';
 import { orderService } from '@/services/orderService';
 import { cartAnalyticsService } from '@/services/cartAnalyticsService';
+import { validateCPF, formatCPF, cleanCPF } from '@/utils/cpfValidator';
+import { fetchAddressByCep, formatCEP, cleanCEP } from '@/services/viaCepService';
 
-// Define proper interfaces for our form data and errors
 interface CheckoutFormData {
   fullName: string;
   cpf: string;
   cep: string;
-  address: string;
+  logradouro: string;
+  numero: string;
+  complemento: string;
+  bairro: string;
+  cidade: string;
+  uf: string;
 }
 
 interface FormErrors {
@@ -48,12 +53,22 @@ const CartPage = () => {
     fullName: '',
     cpf: '',
     cep: '',
-    address: ''
+    logradouro: '',
+    numero: '',
+    complemento: '',
+    bairro: '',
+    cidade: '',
+    uf: ''
   });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
+  const [isLoadingCep, setIsLoadingCep] = useState(false);
+  const [cepError, setCepError] = useState<string | null>(null);
+  const [cpfTouched, setCpfTouched] = useState(false);
+  
+  // Debounce ref for CEP search
+  const cepDebounceRef = useRef<NodeJS.Timeout | null>(null);
   
   useEffect(() => {
-    // Record cart view for analytics
     cartAnalyticsService.recordEvent({
       action: 'view_cart',
       item_count: items.length,
@@ -65,31 +80,73 @@ const CartPage = () => {
       }))
     });
   }, []);
+
+  // CEP auto-fill with debounce
+  useEffect(() => {
+    const cleanedCep = cleanCEP(formData.cep);
+    
+    // Clear previous timeout
+    if (cepDebounceRef.current) {
+      clearTimeout(cepDebounceRef.current);
+    }
+
+    // Only search when CEP has 8 digits
+    if (cleanedCep.length === 8) {
+      setCepError(null);
+      setIsLoadingCep(true);
+      
+      cepDebounceRef.current = setTimeout(async () => {
+        const address = await fetchAddressByCep(cleanedCep);
+        setIsLoadingCep(false);
+        
+        if (address) {
+          setFormData(prev => ({
+            ...prev,
+            logradouro: address.logradouro,
+            bairro: address.bairro,
+            cidade: address.cidade,
+            uf: address.uf
+          }));
+          setCepError(null);
+          // Clear address errors since we auto-filled
+          setFormErrors(prev => {
+            const { logradouro, bairro, cidade, uf, ...rest } = prev;
+            return rest;
+          });
+        } else {
+          setCepError('CEP não encontrado');
+        }
+      }, 300);
+    } else {
+      setIsLoadingCep(false);
+      setCepError(null);
+      // Clear auto-filled fields when CEP changes
+      if (cleanedCep.length < 8) {
+        setFormData(prev => ({
+          ...prev,
+          logradouro: '',
+          bairro: '',
+          cidade: '',
+          uf: ''
+        }));
+      }
+    }
+
+    return () => {
+      if (cepDebounceRef.current) {
+        clearTimeout(cepDebounceRef.current);
+      }
+    };
+  }, [formData.cep]);
   
-  // Calculate total
   const total = items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
   
-  // Format price
   const formatPrice = (price: number) => {
     if (price === 0) return "Sob consulta";
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
-  }).format(price);
-  };
-
-  // Mask functions for CPF and CEP
-  const formatCPF = (value: string): string => {
-    const digits = value.replace(/\D/g, '').slice(0, 11);
-    return digits
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-  };
-
-  const formatCEP = (value: string): string => {
-    const digits = value.replace(/\D/g, '').slice(0, 8);
-    return digits.replace(/(\d{5})(\d)/, '$1-$2');
+    }).format(price);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,7 +164,6 @@ const CartPage = () => {
       [name]: formattedValue
     }));
     
-    // Clear error for this field when user starts typing
     if (formErrors[name]) {
       setFormErrors((prev) => ({
         ...prev,
@@ -116,76 +172,102 @@ const CartPage = () => {
     }
   };
 
+  const handleCpfBlur = useCallback(() => {
+    setCpfTouched(true);
+    const cleanedCpf = cleanCPF(formData.cpf);
+    
+    if (cleanedCpf.length === 11 && !validateCPF(cleanedCpf)) {
+      setFormErrors(prev => ({ ...prev, cpf: 'CPF inválido' }));
+    } else if (cleanedCpf.length > 0 && cleanedCpf.length < 11) {
+      setFormErrors(prev => ({ ...prev, cpf: 'CPF incompleto' }));
+    } else {
+      setFormErrors(prev => ({ ...prev, cpf: '' }));
+    }
+  }, [formData.cpf]);
+
   const validateForm = () => {
     const errors: FormErrors = {};
+    
     if (!formData.fullName.trim()) errors.fullName = "Nome completo é obrigatório";
-    if (!formData.cpf.trim()) errors.cpf = "CPF é obrigatório";
-    if (!formData.cep.trim()) errors.cep = "CEP é obrigatório";
-    if (!formData.address.trim()) errors.address = "Endereço completo é obrigatório";
+    
+    // CPF validation
+    const cleanedCpf = cleanCPF(formData.cpf);
+    if (!cleanedCpf) {
+      errors.cpf = "CPF é obrigatório";
+    } else if (cleanedCpf.length !== 11) {
+      errors.cpf = "CPF incompleto";
+    } else if (!validateCPF(cleanedCpf)) {
+      errors.cpf = "CPF inválido";
+    }
+    
+    // CEP validation
+    const cleanedCep = cleanCEP(formData.cep);
+    if (!cleanedCep) {
+      errors.cep = "CEP é obrigatório";
+    } else if (cleanedCep.length !== 8) {
+      errors.cep = "CEP incompleto";
+    }
+    
+    // Address fields
+    if (!formData.logradouro.trim()) errors.logradouro = "Logradouro é obrigatório";
+    if (!formData.numero.trim()) errors.numero = "Número é obrigatório";
+    if (!formData.bairro.trim()) errors.bairro = "Bairro é obrigatório";
+    if (!formData.cidade.trim()) errors.cidade = "Cidade é obrigatória";
+    if (!formData.uf.trim()) errors.uf = "UF é obrigatória";
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleCheckout = async () => {
-    // Check authentication first - redirect to checkout auth page
     if (!user) {
       navigate('/checkout-cadastro');
       return;
     }
 
     if (!validateForm()) {
-      console.log("❌ Form validation failed");
       return;
     }
 
     if (isProcessing) {
-      console.log("⚠️ Already processing checkout, ignoring duplicate request");
       return;
     }
 
-    console.log("🔄 Starting checkout process...");
     setIsProcessing(true);
 
     try {
-      // Prepare order data with user_id
+      const cleanedCep = cleanCEP(formData.cep);
+      const cleanedCpf = cleanCPF(formData.cpf);
+      
       const orderData = {
         user_id: user.id,
         customer_name: formData.fullName.trim(),
-        customer_cpf: formData.cpf.trim(),
+        customer_cpf: cleanedCpf,
         customer_phone: '',
         shipping_address: {
-          street: formData.address.split(',')[0]?.trim() || formData.address.trim(),
-          number: '0',
-          complement: '',
-          neighborhood: '',
-          city: formData.address.split(',')[1]?.trim() || '',
-          state: '',
-          zipcode: formData.cep.trim()
+          street: formData.logradouro.trim(),
+          number: formData.numero.trim(),
+          complement: formData.complemento.trim(),
+          neighborhood: formData.bairro.trim(),
+          city: formData.cidade.trim(),
+          state: formData.uf.trim().toUpperCase(),
+          zipcode: cleanedCep
         },
         payment_method: 'whatsapp',
         total_amount: total,
-        status: 'pending' as const // Order starts as pending until confirmed via WhatsApp
+        status: 'pending' as const
       };
 
-      console.log("🔄 Creating order in database...", orderData);
-
-      // Create order in database
       const { data: orderResult, error: orderError } = await orderService.createOrder(orderData);
       
       if (orderError) {
-        console.error("❌ Error creating order:", orderError);
         throw new Error(`Erro ao criar pedido: ${orderError.message}`);
       }
 
       if (!orderResult?.id) {
-        console.error("❌ Order creation returned no ID");
         throw new Error("Erro ao criar pedido: ID não retornado");
       }
 
-      console.log("✅ Order created successfully:", orderResult.id);
-
-      // Add order items
       const orderItems = items.map(item => ({
         order_id: orderResult.id,
         product_id: item.product.id,
@@ -196,31 +278,33 @@ const CartPage = () => {
         price: item.product.price
       }));
 
-      console.log("🔄 Adding order items...", orderItems);
       const { error: itemsError } = await orderService.addOrderItems(orderItems);
       
       if (itemsError) {
-        console.error("❌ Error adding order items:", itemsError);
         throw new Error(`Erro ao adicionar itens do pedido: ${itemsError.message}`);
       }
 
-      console.log("✅ Order items added successfully");
+      // Build formatted address for WhatsApp
+      const enderecoCompleto = [
+        `${formData.logradouro}, ${formData.numero}`,
+        formData.complemento ? `Complemento: ${formData.complemento}` : '',
+        `Bairro: ${formData.bairro}`,
+        `${formData.cidade} - ${formData.uf.toUpperCase()}`,
+        `CEP: ${formData.cep}`
+      ].filter(Boolean).join('\n');
 
-      // Prepare WhatsApp message
       const message = 
         `Olá! Acabei de finalizar um pedido no site Pet Serpentes.\n\n` +
         `Pedido: #${orderResult.id.substring(0, 8)}\n` +
         `Nome do comprador: ${formData.fullName}\n` +
-        `CPF: ${formData.cpf}\n` +
-        `CEP: ${formData.cep}\n` +
-        `Endereço: ${formData.address}\n\n` +
+        `CPF: ${formData.cpf}\n\n` +
+        `Endereço de entrega:\n${enderecoCompleto}\n\n` +
         `Animal(is) solicitado(s):\n${items.map(item => `- ${item.product.name} (${item.product.speciesName || "Não especificado"}) - ${formatPrice(item.product.price)}`).join('\n')}\n\n` +
         `Total: ${formatPrice(total)}\n\n` +
         `Gostaria de confirmar o pedido e combinar os detalhes do envio.`;
 
       const whatsappUrl = `https://wa.me/5521967802174?text=${encodeURIComponent(message)}`;
 
-      // Persist order data before redirect (for recovery if needed)
       localStorage.setItem(
         "pendingOrder",
         JSON.stringify({
@@ -236,7 +320,6 @@ const CartPage = () => {
         })
       );
 
-      // Close dialog and show success message
       setIsDialogOpen(false);
       
       toast({
@@ -244,24 +327,23 @@ const CartPage = () => {
         description: "Abrindo o WhatsApp...",
         duration: 2000,
       });
-
-      console.log("✅ Checkout completed successfully, redirecting to WhatsApp...");
       
-      // Clear cart and reset form before redirect
       clearCart();
       setFormData({
         fullName: '',
         cpf: '',
         cep: '',
-        address: ''
+        logradouro: '',
+        numero: '',
+        complemento: '',
+        bairro: '',
+        cidade: '',
+        uf: ''
       });
 
-      // Immediate redirect - mobile-safe (no setTimeout, no window.open)
       window.location.assign(whatsappUrl);
       
     } catch (error) {
-      console.error("❌ Checkout process failed:", error);
-      
       let errorMessage = "Ocorreu um erro inesperado. Por favor, tente novamente.";
       
       if (error instanceof Error) {
@@ -411,7 +493,7 @@ const CartPage = () => {
       )}
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Informações de envio</DialogTitle>
             <DialogDescription>
@@ -427,6 +509,7 @@ const CartPage = () => {
           </div>
 
           <div className="grid gap-4 py-4">
+            {/* Nome completo */}
             <div className="grid gap-2">
               <Label htmlFor="fullName">Nome completo</Label>
               <Input
@@ -434,61 +517,155 @@ const CartPage = () => {
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleInputChange}
-                className={formErrors.fullName ? "border-red-500" : ""}
+                className={formErrors.fullName ? "border-destructive" : ""}
                 disabled={isProcessing}
               />
               {formErrors.fullName && (
-                <p className="text-red-500 text-xs">{formErrors.fullName}</p>
+                <p className="text-destructive text-xs">{formErrors.fullName}</p>
               )}
             </div>
 
+            {/* CPF */}
             <div className="grid gap-2">
               <Label htmlFor="cpf">CPF</Label>
               <Input
                 id="cpf"
                 name="cpf"
+                placeholder="000.000.000-00"
                 value={formData.cpf}
                 onChange={handleInputChange}
-                className={formErrors.cpf ? "border-red-500" : ""}
+                onBlur={handleCpfBlur}
+                className={formErrors.cpf && cpfTouched ? "border-destructive" : ""}
                 disabled={isProcessing}
               />
-              {formErrors.cpf && (
-                <p className="text-red-500 text-xs">{formErrors.cpf}</p>
+              {formErrors.cpf && cpfTouched && (
+                <p className="text-destructive text-xs">{formErrors.cpf}</p>
               )}
             </div>
 
+            {/* CEP */}
             <div className="grid gap-2">
               <Label htmlFor="cep">CEP</Label>
-              <Input
-                id="cep"
-                name="cep"
-                value={formData.cep}
-                onChange={handleInputChange}
-                className={formErrors.cep ? "border-red-500" : ""}
-                disabled={isProcessing}
-              />
+              <div className="relative">
+                <Input
+                  id="cep"
+                  name="cep"
+                  placeholder="00000-000"
+                  value={formData.cep}
+                  onChange={handleInputChange}
+                  className={formErrors.cep || cepError ? "border-destructive pr-10" : "pr-10"}
+                  disabled={isProcessing}
+                />
+                {isLoadingCep && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  </div>
+                )}
+              </div>
               {formErrors.cep && (
-                <p className="text-red-500 text-xs">{formErrors.cep}</p>
+                <p className="text-destructive text-xs">{formErrors.cep}</p>
+              )}
+              {cepError && !formErrors.cep && (
+                <p className="text-yellow-600 dark:text-yellow-400 text-xs">{cepError} - preencha o endereço manualmente</p>
               )}
             </div>
 
+            {/* Logradouro + Número */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="col-span-2 grid gap-2">
+                <Label htmlFor="logradouro">Logradouro</Label>
+                <Input
+                  id="logradouro"
+                  name="logradouro"
+                  placeholder="Rua, Avenida..."
+                  value={formData.logradouro}
+                  onChange={handleInputChange}
+                  className={formErrors.logradouro ? "border-destructive" : ""}
+                  disabled={isProcessing}
+                />
+                {formErrors.logradouro && (
+                  <p className="text-destructive text-xs">{formErrors.logradouro}</p>
+                )}
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="numero">Número</Label>
+                <Input
+                  id="numero"
+                  name="numero"
+                  placeholder="Nº"
+                  value={formData.numero}
+                  onChange={handleInputChange}
+                  className={formErrors.numero ? "border-destructive" : ""}
+                  disabled={isProcessing}
+                />
+                {formErrors.numero && (
+                  <p className="text-destructive text-xs">{formErrors.numero}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Complemento */}
             <div className="grid gap-2">
-              <Label htmlFor="address">Endereço completo</Label>
+              <Label htmlFor="complemento">Complemento <span className="text-muted-foreground">(opcional)</span></Label>
               <Input
-                id="address"
-                name="address"
-                value={formData.address}
+                id="complemento"
+                name="complemento"
+                placeholder="Apto, Bloco..."
+                value={formData.complemento}
                 onChange={handleInputChange}
-                className={formErrors.address ? "border-red-500" : ""}
                 disabled={isProcessing}
               />
-              {formErrors.address && (
-                <p className="text-red-500 text-xs">{formErrors.address}</p>
-              )}
+            </div>
+
+            {/* Bairro + Cidade + UF */}
+            <div className="grid grid-cols-6 gap-3">
+              <div className="col-span-2 grid gap-2">
+                <Label htmlFor="bairro">Bairro</Label>
+                <Input
+                  id="bairro"
+                  name="bairro"
+                  value={formData.bairro}
+                  onChange={handleInputChange}
+                  className={formErrors.bairro ? "border-destructive" : ""}
+                  disabled={isProcessing}
+                />
+                {formErrors.bairro && (
+                  <p className="text-destructive text-xs">{formErrors.bairro}</p>
+                )}
+              </div>
+              <div className="col-span-3 grid gap-2">
+                <Label htmlFor="cidade">Cidade</Label>
+                <Input
+                  id="cidade"
+                  name="cidade"
+                  value={formData.cidade}
+                  onChange={handleInputChange}
+                  className={formErrors.cidade ? "border-destructive" : ""}
+                  disabled={isProcessing}
+                />
+                {formErrors.cidade && (
+                  <p className="text-destructive text-xs">{formErrors.cidade}</p>
+                )}
+              </div>
+              <div className="col-span-1 grid gap-2">
+                <Label htmlFor="uf">UF</Label>
+                <Input
+                  id="uf"
+                  name="uf"
+                  maxLength={2}
+                  value={formData.uf}
+                  onChange={handleInputChange}
+                  className={formErrors.uf ? "border-destructive" : ""}
+                  disabled={isProcessing}
+                />
+                {formErrors.uf && (
+                  <p className="text-destructive text-xs">{formErrors.uf}</p>
+                )}
+              </div>
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button 
               variant="outline" 
               onClick={() => setIsDialogOpen(false)}
@@ -500,7 +677,14 @@ const CartPage = () => {
               onClick={handleCheckout}
               disabled={isProcessing}
             >
-              {isProcessing ? "Processando..." : "Finalizar e enviar por WhatsApp"}
+              {isProcessing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processando...
+                </>
+              ) : (
+                "Finalizar e enviar por WhatsApp"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
