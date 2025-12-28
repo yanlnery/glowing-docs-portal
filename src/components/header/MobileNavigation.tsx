@@ -186,12 +186,12 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
                   onClick={handleLinkClick}
                 >
                   {item.mobileIcon && (
-                    <div className="w-10 h-10 mr-4 flex-shrink-0 flex items-center justify-center">
+                    <div className="w-[60px] h-[60px] mr-4 flex-shrink-0 flex items-center justify-center">
                       <img 
                         src={item.mobileIcon} 
                         alt="" 
                         className={cn(
-                          "w-10 h-10 object-contain transition-all",
+                          "w-[60px] h-[60px] object-contain transition-all",
                           isActive(item.path) 
                             ? "brightness-0 invert" 
                             : ""
