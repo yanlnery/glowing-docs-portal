@@ -178,7 +178,7 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
                 <Link
                   to={item.path}
                   className={cn(
-                    "flex w-full rounded-xl px-4 h-14 text-base font-medium items-center transition-all duration-200 overflow-hidden", 
+                    "flex w-full rounded-xl px-4 h-14 text-sm font-sans tracking-wide items-end pb-3 transition-all duration-200 overflow-hidden", 
                     isActive(item.path)
                       ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
                       : "text-foreground hover:bg-muted/50" 
@@ -186,7 +186,7 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
                   onClick={handleLinkClick}
                 >
                   {item.mobileIcon && (
-                    <div className="w-12 h-12 mr-4 flex-shrink-0 flex items-center justify-center">
+                    <div className="w-12 h-12 mr-4 flex-shrink-0 flex items-end justify-center pb-0.5">
                       <img 
                         src={item.mobileIcon} 
                         alt="" 
