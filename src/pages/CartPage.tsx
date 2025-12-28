@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCartStore } from '@/stores/cartStore';
 import { useAuth } from '@/hooks/useAuth';
@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Trash2, ShoppingCart, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Trash2, ShoppingCart, ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
 import { 
   Dialog, 
   DialogContent, 
@@ -31,12 +31,47 @@ interface CheckoutFormData {
   fullName: string;
   cpf: string;
   cep: string;
-  address: string;
+  street: string;
+  number: string;
+  complement: string;
+  neighborhood: string;
+  city: string;
+  state: string;
 }
 
 interface FormErrors {
   [key: string]: string;
 }
+
+// CPF validation with verification digits
+const validateCPF = (cpf: string): boolean => {
+  const cleanCPF = cpf.replace(/\D/g, '');
+  
+  if (cleanCPF.length !== 11) return false;
+  
+  // Reject CPFs with all same digits
+  if (/^(\d)\1{10}$/.test(cleanCPF)) return false;
+  
+  // Validate first verification digit
+  let sum = 0;
+  for (let i = 0; i < 9; i++) {
+    sum += parseInt(cleanCPF[i]) * (10 - i);
+  }
+  let remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(cleanCPF[9])) return false;
+  
+  // Validate second verification digit
+  sum = 0;
+  for (let i = 0; i < 10; i++) {
+    sum += parseInt(cleanCPF[i]) * (11 - i);
+  }
+  remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(cleanCPF[10])) return false;
+  
+  return true;
+};
 
 const CartPage = () => {
   const { items, removeFromCart, clearCart } = useCartStore();
@@ -44,11 +79,19 @@ const CartPage = () => {
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isFetchingCep, setIsFetchingCep] = useState(false);
+  const cepDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  
   const [formData, setFormData] = useState<CheckoutFormData>({
     fullName: '',
     cpf: '',
     cep: '',
-    address: ''
+    street: '',
+    number: '',
+    complement: '',
+    neighborhood: '',
+    city: '',
+    state: ''
   });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   
@@ -92,6 +135,47 @@ const CartPage = () => {
     return digits.replace(/(\d{5})(\d)/, '$1-$2');
   };
 
+  // Fetch address from ViaCEP
+  const fetchAddressFromCEP = useCallback(async (cep: string) => {
+    const cleanCEP = cep.replace(/\D/g, '');
+    if (cleanCEP.length !== 8) return;
+    
+    setIsFetchingCep(true);
+    setFormErrors(prev => ({ ...prev, cep: '' }));
+    
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cleanCEP}/json/`);
+      const data = await response.json();
+      
+      if (data.erro) {
+        setFormErrors(prev => ({ ...prev, cep: 'CEP não encontrado' }));
+        // Clear auto-filled fields on error
+        setFormData(prev => ({
+          ...prev,
+          street: '',
+          neighborhood: '',
+          city: '',
+          state: ''
+        }));
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          street: data.logradouro || '',
+          neighborhood: data.bairro || '',
+          city: data.localidade || '',
+          state: data.uf || ''
+        }));
+        // Clear any previous CEP error
+        setFormErrors(prev => ({ ...prev, cep: '' }));
+      }
+    } catch (error) {
+      console.error('Error fetching CEP:', error);
+      setFormErrors(prev => ({ ...prev, cep: 'Não foi possível buscar o CEP' }));
+    } finally {
+      setIsFetchingCep(false);
+    }
+  }, []);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
@@ -100,15 +184,47 @@ const CartPage = () => {
       formattedValue = formatCPF(value);
     } else if (name === 'cep') {
       formattedValue = formatCEP(value);
+      
+      // Clear auto-filled address fields when CEP changes
+      const cleanCEP = value.replace(/\D/g, '');
+      if (cleanCEP.length < 8) {
+        setFormData(prev => ({
+          ...prev,
+          cep: formattedValue,
+          street: '',
+          neighborhood: '',
+          city: '',
+          state: ''
+        }));
+        setFormErrors(prev => ({ ...prev, cep: '' }));
+      }
+      
+      // Debounced CEP lookup
+      if (cepDebounceRef.current) {
+        clearTimeout(cepDebounceRef.current);
+      }
+      
+      if (cleanCEP.length === 8) {
+        cepDebounceRef.current = setTimeout(() => {
+          fetchAddressFromCEP(cleanCEP);
+        }, 300);
+      }
     }
     
-    setFormData((prev) => ({
-      ...prev,
-      [name]: formattedValue
-    }));
+    if (name !== 'cep') {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: formattedValue
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        cep: formattedValue
+      }));
+    }
     
     // Clear error for this field when user starts typing
-    if (formErrors[name]) {
+    if (formErrors[name] && name !== 'cep') {
       setFormErrors((prev) => ({
         ...prev,
         [name]: ''
@@ -116,12 +232,38 @@ const CartPage = () => {
     }
   };
 
+  const handleCpfBlur = () => {
+    const cleanCPF = formData.cpf.replace(/\D/g, '');
+    if (cleanCPF.length > 0 && !validateCPF(cleanCPF)) {
+      setFormErrors(prev => ({ ...prev, cpf: 'CPF inválido' }));
+    } else {
+      setFormErrors(prev => ({ ...prev, cpf: '' }));
+    }
+  };
+
   const validateForm = () => {
     const errors: FormErrors = {};
     if (!formData.fullName.trim()) errors.fullName = "Nome completo é obrigatório";
-    if (!formData.cpf.trim()) errors.cpf = "CPF é obrigatório";
-    if (!formData.cep.trim()) errors.cep = "CEP é obrigatório";
-    if (!formData.address.trim()) errors.address = "Endereço completo é obrigatório";
+    
+    const cleanCPF = formData.cpf.replace(/\D/g, '');
+    if (!cleanCPF) {
+      errors.cpf = "CPF é obrigatório";
+    } else if (!validateCPF(cleanCPF)) {
+      errors.cpf = "CPF inválido";
+    }
+    
+    const cleanCEP = formData.cep.replace(/\D/g, '');
+    if (!cleanCEP) {
+      errors.cep = "CEP é obrigatório";
+    } else if (cleanCEP.length !== 8) {
+      errors.cep = "CEP deve ter 8 dígitos";
+    }
+    
+    if (!formData.street.trim()) errors.street = "Rua é obrigatória";
+    if (!formData.number.trim()) errors.number = "Número é obrigatório";
+    if (!formData.neighborhood.trim()) errors.neighborhood = "Bairro é obrigatório";
+    if (!formData.city.trim()) errors.city = "Cidade é obrigatória";
+    if (!formData.state.trim()) errors.state = "Estado é obrigatório";
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -149,19 +291,21 @@ const CartPage = () => {
 
     try {
       // Prepare order data with user_id
+      const formattedAddress = `${formData.street}, ${formData.number}${formData.complement ? ` - ${formData.complement}` : ''}, ${formData.neighborhood}, ${formData.city} - ${formData.state}, CEP: ${formData.cep}`;
+      
       const orderData = {
         user_id: user.id,
         customer_name: formData.fullName.trim(),
         customer_cpf: formData.cpf.trim(),
         customer_phone: '',
         shipping_address: {
-          street: formData.address.split(',')[0]?.trim() || formData.address.trim(),
-          number: '0',
-          complement: '',
-          neighborhood: '',
-          city: formData.address.split(',')[1]?.trim() || '',
-          state: '',
-          zipcode: formData.cep.trim()
+          street: formData.street.trim(),
+          number: formData.number.trim(),
+          complement: formData.complement.trim(),
+          neighborhood: formData.neighborhood.trim(),
+          city: formData.city.trim(),
+          state: formData.state.trim(),
+          zipcode: formData.cep.replace(/\D/g, '')
         },
         payment_method: 'whatsapp',
         total_amount: total,
@@ -206,14 +350,15 @@ const CartPage = () => {
 
       console.log("✅ Order items added successfully");
 
-      // Prepare WhatsApp message
+      // Prepare WhatsApp message with formatted address
+      const fullAddress = `${formData.street}, ${formData.number}${formData.complement ? ` - ${formData.complement}` : ''}, ${formData.neighborhood}, ${formData.city} - ${formData.state}, CEP: ${formData.cep}`;
+      
       const message = 
         `Olá! Acabei de finalizar um pedido no site Pet Serpentes.\n\n` +
         `Pedido: #${orderResult.id.substring(0, 8)}\n` +
         `Nome do comprador: ${formData.fullName}\n` +
         `CPF: ${formData.cpf}\n` +
-        `CEP: ${formData.cep}\n` +
-        `Endereço: ${formData.address}\n\n` +
+        `Endereço: ${fullAddress}\n\n` +
         `Animal(is) solicitado(s):\n${items.map(item => `- ${item.product.name} (${item.product.speciesName || "Não especificado"}) - ${formatPrice(item.product.price)}`).join('\n')}\n\n` +
         `Total: ${formatPrice(total)}\n\n` +
         `Gostaria de confirmar o pedido e combinar os detalhes do envio.`;
@@ -253,7 +398,12 @@ const CartPage = () => {
         fullName: '',
         cpf: '',
         cep: '',
-        address: ''
+        street: '',
+        number: '',
+        complement: '',
+        neighborhood: '',
+        city: '',
+        state: ''
       });
 
       // Immediate redirect - mobile-safe (no setTimeout, no window.open)
@@ -447,44 +597,127 @@ const CartPage = () => {
               <Input
                 id="cpf"
                 name="cpf"
+                placeholder="000.000.000-00"
                 value={formData.cpf}
                 onChange={handleInputChange}
-                className={formErrors.cpf ? "border-red-500" : ""}
+                onBlur={handleCpfBlur}
+                className={formErrors.cpf ? "border-destructive focus-visible:ring-destructive" : ""}
                 disabled={isProcessing}
               />
               {formErrors.cpf && (
-                <p className="text-red-500 text-xs">{formErrors.cpf}</p>
+                <p className="text-destructive text-xs">{formErrors.cpf}</p>
               )}
             </div>
 
             <div className="grid gap-2">
               <Label htmlFor="cep">CEP</Label>
-              <Input
-                id="cep"
-                name="cep"
-                value={formData.cep}
-                onChange={handleInputChange}
-                className={formErrors.cep ? "border-red-500" : ""}
-                disabled={isProcessing}
-              />
+              <div className="relative">
+                <Input
+                  id="cep"
+                  name="cep"
+                  placeholder="00000-000"
+                  value={formData.cep}
+                  onChange={handleInputChange}
+                  className={formErrors.cep ? "border-destructive focus-visible:ring-destructive pr-8" : "pr-8"}
+                  disabled={isProcessing}
+                />
+                {isFetchingCep && (
+                  <Loader2 className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+                )}
+              </div>
               {formErrors.cep && (
-                <p className="text-red-500 text-xs">{formErrors.cep}</p>
+                <p className="text-destructive text-xs">{formErrors.cep}</p>
               )}
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="address">Endereço completo</Label>
+              <Label htmlFor="street">Rua / Logradouro</Label>
               <Input
-                id="address"
-                name="address"
-                value={formData.address}
+                id="street"
+                name="street"
+                value={formData.street}
                 onChange={handleInputChange}
-                className={formErrors.address ? "border-red-500" : ""}
+                className={formErrors.street ? "border-destructive focus-visible:ring-destructive" : ""}
                 disabled={isProcessing}
               />
-              {formErrors.address && (
-                <p className="text-red-500 text-xs">{formErrors.address}</p>
+              {formErrors.street && (
+                <p className="text-destructive text-xs">{formErrors.street}</p>
               )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="number">Número</Label>
+                <Input
+                  id="number"
+                  name="number"
+                  value={formData.number}
+                  onChange={handleInputChange}
+                  className={formErrors.number ? "border-destructive focus-visible:ring-destructive" : ""}
+                  disabled={isProcessing}
+                />
+                {formErrors.number && (
+                  <p className="text-destructive text-xs">{formErrors.number}</p>
+                )}
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="complement">Complemento</Label>
+                <Input
+                  id="complement"
+                  name="complement"
+                  placeholder="Opcional"
+                  value={formData.complement}
+                  onChange={handleInputChange}
+                  disabled={isProcessing}
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="neighborhood">Bairro</Label>
+              <Input
+                id="neighborhood"
+                name="neighborhood"
+                value={formData.neighborhood}
+                onChange={handleInputChange}
+                className={formErrors.neighborhood ? "border-destructive focus-visible:ring-destructive" : ""}
+                disabled={isProcessing}
+              />
+              {formErrors.neighborhood && (
+                <p className="text-destructive text-xs">{formErrors.neighborhood}</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="grid gap-2 col-span-2">
+                <Label htmlFor="city">Cidade</Label>
+                <Input
+                  id="city"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleInputChange}
+                  className={formErrors.city ? "border-destructive focus-visible:ring-destructive" : ""}
+                  disabled={isProcessing}
+                />
+                {formErrors.city && (
+                  <p className="text-destructive text-xs">{formErrors.city}</p>
+                )}
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="state">UF</Label>
+                <Input
+                  id="state"
+                  name="state"
+                  maxLength={2}
+                  value={formData.state}
+                  onChange={handleInputChange}
+                  className={formErrors.state ? "border-destructive focus-visible:ring-destructive" : ""}
+                  disabled={isProcessing}
+                />
+                {formErrors.state && (
+                  <p className="text-destructive text-xs">{formErrors.state}</p>
+                )}
+              </div>
             </div>
           </div>
 
