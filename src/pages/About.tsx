@@ -256,14 +256,14 @@ const About = () => {
               </p>
             </div>
             
-            <div className="relative max-w-4xl mx-auto">
+            <div className="relative max-w-4xl mx-auto px-2 sm:px-4">
               {/* Central line - Desktop */}
               <div className="hidden md:block absolute top-0 bottom-0 left-1/2 w-0.5 bg-gradient-to-b from-serpente-300 via-serpente-500 to-serpente-300 dark:from-serpente-700 dark:via-serpente-500 dark:to-serpente-700 transform -translate-x-1/2" />
               
               {trajetoriaItens.map((item, index) => (
                 <div 
                   key={index} 
-                  className={`relative mb-8 md:mb-12 md:flex ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
+                  className={`relative mb-6 md:mb-12 md:flex ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
                 >
                   {/* Timeline dot - Desktop */}
                   <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 z-10">
@@ -274,16 +274,30 @@ const About = () => {
                   
                   {/* Content */}
                   <div className={`md:w-1/2 ${index % 2 === 0 ? 'md:pr-16 md:text-right' : 'md:pl-16'}`}>
-                    {/* Mobile timeline */}
-                    <div className="md:hidden flex items-center gap-4 mb-3">
-                      <div className="w-10 h-10 bg-serpente-500 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg flex-shrink-0">
-                        {item.year.slice(2)}
+                    {/* Mobile timeline - improved layout */}
+                    <div className="md:hidden flex items-start gap-3 mb-0">
+                      <div className="flex flex-col items-center flex-shrink-0">
+                        <div className="w-11 h-11 bg-serpente-500 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg">
+                          {item.year.slice(2)}
+                        </div>
+                        {/* Connecting line for mobile */}
+                        {index < trajetoriaItens.length - 1 && (
+                          <div className="w-0.5 h-full min-h-[60px] bg-gradient-to-b from-serpente-400 to-serpente-200 dark:from-serpente-600 dark:to-serpente-800 mt-2" />
+                        )}
                       </div>
-                      <span className="text-serpente-600 dark:text-serpente-400 font-bold">{item.year}</span>
+                      
+                      <div className="bg-card border border-border/50 p-4 rounded-xl shadow-sm flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-serpente-600 dark:text-serpente-400 font-bold text-sm">{item.year}</span>
+                        </div>
+                        <h3 className="text-base font-bold text-foreground mb-1.5 leading-tight">{item.title}</h3>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{item.text}</p>
+                      </div>
                     </div>
                     
-                    <div className="bg-card border border-border/50 p-6 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 ml-14 md:ml-0">
-                      <p className="hidden md:block text-sm font-bold text-serpente-600 dark:text-serpente-400 mb-2">{item.year}</p>
+                    {/* Desktop card */}
+                    <div className="hidden md:block bg-card border border-border/50 p-6 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300">
+                      <p className="text-sm font-bold text-serpente-600 dark:text-serpente-400 mb-2">{item.year}</p>
                       <h3 className="text-lg md:text-xl font-bold text-foreground mb-2">{item.title}</h3>
                       <p className="text-muted-foreground leading-relaxed">{item.text}</p>
                     </div>

@@ -121,7 +121,7 @@ export default function HeroCarouselUI({
             slidesToScroll: 1,
           }}
           plugins={carouselImagesData.length > 1 ? [autoplayPlugin.current] : []}
-          className="h-full touch-pan-x"
+          className="h-full"
         >
           <CarouselContent className="h-full -ml-0">
             {carouselImagesData.map((item, index) => {
