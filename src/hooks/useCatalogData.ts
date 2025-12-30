@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { productService } from '@/services/productService';
@@ -9,90 +8,107 @@ export const useCatalogData = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState<ProductCategory | 'all'>('all');
-  const [subcategoryFilter, setSubcategoryFilter] = useState<ProductSubcategory | 'all'>('all');
-  const [speciesFilter, setSpeciesFilter] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Ler filtros da URL na montagem do componente
+  // Inicializar filtros diretamente dos searchParams
+  const getInitialCategory = (): ProductCategory | 'all' => {
+    const param = searchParams.get('category');
+    if (param && ['serpente', 'lagarto', 'quelonio'].includes(param)) {
+      return param as ProductCategory;
+    }
+    return 'all';
+  };
+
+  const [categoryFilter, setCategoryFilter] = useState<ProductCategory | 'all'>(getInitialCategory);
+  const [subcategoryFilter, setSubcategoryFilter] = useState<ProductSubcategory | 'all'>('all');
+  const [speciesFilter, setSpeciesFilter] = useState<string | null>(
+    searchParams.get('especie') || null
+  );
+
+  // Sincronizar com mudanças na URL (navegação browser)
   useEffect(() => {
-    const categoryParam = searchParams.get('category') as ProductCategory | null;
-    if (categoryParam && ['serpente', 'lagarto', 'quelonio'].includes(categoryParam)) {
-      setCategoryFilter(categoryParam);
-    }
-    
+    const categoryParam = searchParams.get('category');
     const speciesParam = searchParams.get('especie');
-    if (speciesParam) {
-      setSpeciesFilter(speciesParam);
+
+    if (categoryParam && ['serpente', 'lagarto', 'quelonio'].includes(categoryParam)) {
+      setCategoryFilter(categoryParam as ProductCategory);
+    } else if (!categoryParam) {
+      setCategoryFilter('all');
     }
+
+    setSpeciesFilter(speciesParam || null);
   }, [searchParams]);
 
-  const applyFilters = useCallback((
-    productList: Product[],
-    query: string,
-    category: ProductCategory | 'all',
-    subcategory: ProductSubcategory | 'all',
-    speciesId: string | null
-  ) => {
-    if (!productList || productList.length === 0) {
+  // Carregar produtos (apenas uma vez)
+  const loadProducts = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const visibleProducts = await productService.getAvailableProducts();
+      console.log('📦 Produtos carregados:', visibleProducts.length);
+      setProducts(visibleProducts);
+    } catch (error) {
+      console.error("Erro ao carregar produtos:", error);
+      setProducts([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Aplicar filtros sempre que produtos ou filtros mudarem
+  useEffect(() => {
+    if (products.length === 0) {
       setFilteredProducts([]);
       return;
     }
-    
-    let result = [...productList];
-    
-    // Apply species filter (from URL param)
-    if (speciesId) {
-      result = result.filter(product => product.speciesId === speciesId);
+
+    console.log('🔍 Aplicando filtros:', { 
+      category: categoryFilter, 
+      subcategory: subcategoryFilter, 
+      species: speciesFilter,
+      search: searchQuery 
+    });
+
+    let result = [...products];
+
+    // Filtro por espécie
+    if (speciesFilter) {
+      result = result.filter(product => product.speciesId === speciesFilter);
     }
-    
-    // Apply search filter
-    if (query) {
-      const lowerQuery = query.toLowerCase();
+
+    // Filtro por busca
+    if (searchQuery) {
+      const lowerQuery = searchQuery.toLowerCase();
       result = result.filter(product =>
         product.name.toLowerCase().includes(lowerQuery) ||
         product.speciesName.toLowerCase().includes(lowerQuery) ||
         (product.description && product.description.toLowerCase().includes(lowerQuery))
       );
     }
-    
-    // Apply category filter
-    if (category !== 'all') {
-      result = result.filter(product => product.category === category);
+
+    // Filtro por categoria
+    if (categoryFilter !== 'all') {
+      result = result.filter(product => product.category === categoryFilter);
     }
-    
-    // Apply subcategory filter
-    if (subcategory !== 'all') {
-      result = result.filter(product => product.subcategory === subcategory);
+
+    // Filtro por subcategoria
+    if (subcategoryFilter !== 'all') {
+      result = result.filter(product => product.subcategory === subcategoryFilter);
     }
-    
+
+    console.log('✅ Produtos filtrados:', result.length);
     setFilteredProducts(result);
-  }, []);
+  }, [products, searchQuery, categoryFilter, subcategoryFilter, speciesFilter]);
 
-  const loadProducts = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const visibleProducts = await productService.getAvailableProducts();
-      setProducts(visibleProducts);
-      applyFilters(visibleProducts, searchQuery, categoryFilter, subcategoryFilter, speciesFilter);
-    } catch (error) {
-      console.error("Erro ao carregar produtos:", error);
-      setProducts([]);
-      setFilteredProducts([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [applyFilters, searchQuery, categoryFilter, subcategoryFilter, speciesFilter]);
-
+  // Handlers
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    applyFilters(products, query, categoryFilter, subcategoryFilter, speciesFilter);
   };
 
   const handleFilterClick = (category: ProductCategory | 'all', subcategory: ProductSubcategory | 'all') => {
     setCategoryFilter(category);
     setSubcategoryFilter(subcategory);
-    applyFilters(products, searchQuery, category, subcategory, speciesFilter);
+    // Limpar filtro de espécie quando mudar categoria manualmente
+    setSpeciesFilter(null);
   };
 
   const clearFilters = () => {
@@ -100,7 +116,6 @@ export const useCatalogData = () => {
     setCategoryFilter('all');
     setSubcategoryFilter('all');
     setSpeciesFilter(null);
-    applyFilters(products, '', 'all', 'all', null);
   };
 
   return {
