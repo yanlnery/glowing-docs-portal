@@ -48,7 +48,11 @@ export interface Product {
   details?: ProductDetail[];
   createdAt: string;
   updatedAt: string;
-  meta?: Record<string, any>;
+  meta?: {
+    productId?: string;
+    sex?: string;
+    [key: string]: any;
+  };
 }
 
 export type ProductFormData = Omit<Product, 'id' | 'createdAt' | 'updatedAt'>;

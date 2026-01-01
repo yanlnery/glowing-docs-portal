@@ -70,7 +70,12 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
         <h3 className="font-bold text-sm sm:text-base md:text-lg mb-1 line-clamp-1">
           <em>{product.speciesName}</em>
         </h3>
-        <p className="text-muted-foreground text-xs sm:text-sm mb-2 line-clamp-1">{product.name}</p>
+        <p className="text-muted-foreground text-xs sm:text-sm mb-2 line-clamp-1">
+          {product.name}
+          {product.meta?.productId && (
+            <span className="text-xs ml-1">#{product.meta.productId}</span>
+          )}
+        </p>
         
         <div className="space-y-1 mb-3">
           {product.originalPrice && (
