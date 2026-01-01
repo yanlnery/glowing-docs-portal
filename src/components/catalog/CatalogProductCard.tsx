@@ -111,15 +111,13 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
         <CardTitle className="text-sm sm:text-base text-balance line-clamp-2">
           {product.name}
           {product.meta?.productId && (
-            <span className="text-muted-foreground font-normal text-xs ml-1">
-              #{product.meta.productId}
-            </span>
+            <span className="text-muted-foreground font-normal text-xs ml-1">{product.meta.productId}</span>
           )}
         </CardTitle>
       </CardHeader>
       
       <CardContent className="p-2 sm:p-3 pt-0 pb-1 sm:pb-2 flex-1">
-        <p className="text-xs sm:text-sm text-muted-foreground italic mb-2 line-clamp-1">{product.speciesName}</p>
+        <p className="text-xs sm:text-sm text-muted-foreground italic mb-2 line-clamp-1 opacity-70">{product.speciesName}</p>
         
         <div className="space-y-1">
           {product.originalPrice && (
