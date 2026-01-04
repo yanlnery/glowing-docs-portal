@@ -101,9 +101,9 @@ export default function AboutSection() {
                 {[...features, ...features].map((item, index) => (
                   <div 
                     key={index} 
-                    className="flex-shrink-0 w-[42vw] flex flex-col items-center text-center bg-card border border-border/50 rounded-xl p-4 shadow-sm"
+                    className="flex-shrink-0 w-[42vw] flex flex-col items-center text-center bg-card border border-border/50 rounded-xl p-3 shadow-sm"
                   >
-                    <div className="w-40 h-40 flex items-center justify-center mb-3">
+                    <div className="w-20 h-20 flex items-center justify-center mb-2">
                       <img src={item.icon} alt={item.title} className="w-full h-full object-contain" />
                     </div>
                     <h3 className="font-bold text-sm leading-tight">{item.title}</h3>
