@@ -39,6 +39,7 @@ import { toast } from 'sonner';
 const ShoppingCartAnalytics = () => {
   const [analyticsData, setAnalyticsData] = useState<CartAnalyticsEntry[]>([]);
   const [timeFilter, setTimeFilter] = useState('all');
+  const [visitorFilter, setVisitorFilter] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
   
   // Colors for charts
@@ -63,21 +64,42 @@ const ShoppingCartAnalytics = () => {
   };
   
   const getFilteredData = () => {
-    if (timeFilter === 'all') {
-      return analyticsData;
+    let data = analyticsData;
+    
+    // Time filter
+    if (timeFilter !== 'all') {
+      const cutoffDate = subDays(new Date(), parseInt(timeFilter));
+      data = data.filter(entry => {
+        try {
+          return entry.created_at && isAfter(parseISO(entry.created_at), cutoffDate);
+        } catch {
+          return false;
+        }
+      });
     }
     
-    const cutoffDate = subDays(new Date(), parseInt(timeFilter));
-    return analyticsData.filter(entry => {
-      try {
-        return entry.created_at && isAfter(parseISO(entry.created_at), cutoffDate);
-      } catch {
-        return false;
-      }
-    });
+    // Visitor type filter
+    if (visitorFilter === 'logged') {
+      data = data.filter(entry => entry.user_email);
+    } else if (visitorFilter === 'visitor') {
+      data = data.filter(entry => !entry.user_email);
+    }
+    
+    return data;
   };
   
   const filteredData = getFilteredData();
+  
+  // Device distribution for chart
+  const deviceCounts = filteredData.reduce((acc: {[key: string]: number}, entry) => {
+    const device = entry.device_type || 'Desconhecido';
+    acc[device] = (acc[device] || 0) + 1;
+    return acc;
+  }, {});
+  
+  const deviceDistribution = Object.entries(deviceCounts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count);
   
   // Calculate metrics
   const totalCartVisits = filteredData.filter(entry => entry.action === 'view_cart').length;
@@ -150,7 +172,21 @@ const ShoppingCartAnalytics = () => {
             </p>
           </div>
           
-          <div className="flex justify-end">
+          <div className="flex flex-wrap justify-end gap-3">
+            <Select
+              value={visitorFilter}
+              onValueChange={setVisitorFilter}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Tipo de visitante" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                <SelectItem value="logged">Usuários logados</SelectItem>
+                <SelectItem value="visitor">Visitantes</SelectItem>
+              </SelectContent>
+            </Select>
+            
             <Select
               value={timeFilter}
               onValueChange={setTimeFilter}
@@ -200,28 +236,34 @@ const ShoppingCartAnalytics = () => {
             </Card>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Sessions Chart */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Device Distribution Chart */}
             <Card>
               <CardHeader>
-                <CardTitle>Sessões Mais Ativas</CardTitle>
-                <CardDescription>Top 5 sessões com mais interações</CardDescription>
+                <CardTitle>Dispositivos</CardTitle>
+                <CardDescription>Distribuição por tipo de dispositivo</CardDescription>
               </CardHeader>
               <CardContent>
-                {topSessions.length > 0 ? (
+                {deviceDistribution.length > 0 ? (
                   <div className="w-full h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <RechartsBar
-                        data={topSessions}
-                        margin={{ top: 5, right: 20, left: 20, bottom: 60 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" angle={-45} textAnchor="end" />
-                        <YAxis />
+                      <RechartsPie>
+                        <Pie
+                          data={deviceDistribution}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="count"
+                        >
+                          {deviceDistribution.map((entry, index) => (
+                            <Cell key={`cell-device-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
                         <Tooltip />
-                        <Legend />
-                        <Bar dataKey="count" fill="#8884d8" name="Interações" />
-                      </RechartsBar>
+                      </RechartsPie>
                     </ResponsiveContainer>
                   </div>
                 ) : (
@@ -259,6 +301,37 @@ const ShoppingCartAnalytics = () => {
                         </Pie>
                         <Tooltip />
                       </RechartsPie>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <div className="flex justify-center items-center h-[300px] bg-muted/30 rounded-lg">
+                    <p className="text-muted-foreground">Sem dados suficientes</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            
+            {/* Sessions Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Sessões Mais Ativas</CardTitle>
+                <CardDescription>Top 5 sessões com mais interações</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {topSessions.length > 0 ? (
+                  <div className="w-full h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RechartsBar
+                        data={topSessions}
+                        margin={{ top: 5, right: 20, left: 20, bottom: 60 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" angle={-45} textAnchor="end" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="count" fill="#8884d8" name="Interações" />
+                      </RechartsBar>
                     </ResponsiveContainer>
                   </div>
                 ) : (
