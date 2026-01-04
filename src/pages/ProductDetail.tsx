@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useCartStore } from '@/stores/cartStore';
@@ -10,6 +9,7 @@ import { productService } from '@/services/productService';
 import { Product } from '@/types/product';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ProductImageZoom } from '@/components/product/ProductImageZoom';
+import { siteAnalyticsService } from '@/services/siteAnalyticsService';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -30,6 +30,15 @@ const ProductDetail = () => {
           const foundProduct = await productService.getProductById(id);
           setProduct(foundProduct);
           setSelectedImageIndex(0);
+          
+          // Track product view
+          if (foundProduct) {
+            siteAnalyticsService.trackProductView({
+              id: foundProduct.id,
+              name: foundProduct.name,
+              price: foundProduct.price,
+            });
+          }
         } catch (error) {
           console.error("Error loading product:", error);
         } finally {

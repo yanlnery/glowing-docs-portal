@@ -1,8 +1,8 @@
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Product } from '@/types/product';
 import { markProductAsSold } from '@/services/productMutations';
+import { siteAnalyticsService } from '@/services/siteAnalyticsService';
 
 export interface CartItem {
   product: Product;
@@ -31,12 +31,17 @@ export const useCartStore = create<CartStore>()(
           const existingItem = state.items.find((item) => item.product.id === product.id);
           
           if (existingItem) {
-            // Para produtos únicos, não adicionar novamente se já está no carrinho
             console.log(`⚠️ Produto ${product.name} já está no carrinho`);
             return state;
           }
           
-          // Como cada produto é único, sempre adiciona com quantidade 1
+          // Track add to cart event
+          siteAnalyticsService.trackAddToCart({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+          });
+          
           console.log(`✅ Adicionando produto ${product.name} ao carrinho`);
           return {
             items: [...state.items, { product, quantity: 1 }],
@@ -45,6 +50,18 @@ export const useCartStore = create<CartStore>()(
       },
 
       removeFromCart: (productId: string) => {
+        const state = get();
+        const item = state.items.find(i => i.product.id === productId);
+        
+        if (item) {
+          // Track remove from cart event
+          siteAnalyticsService.trackRemoveFromCart({
+            id: item.product.id,
+            name: item.product.name,
+            price: item.product.price,
+          });
+        }
+        
         console.log(`🗑️ Removendo produto ${productId} do carrinho`);
         set((state) => ({
           items: state.items.filter((item) => item.product.id !== productId),

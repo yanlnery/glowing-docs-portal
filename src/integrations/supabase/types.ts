@@ -537,6 +537,69 @@ export type Database = {
         }
         Relationships: []
       }
+      site_events: {
+        Row: {
+          browser: string | null
+          created_at: string | null
+          device_type: string | null
+          event_category: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          page_path: string | null
+          product_id: string | null
+          product_name: string | null
+          product_price: number | null
+          referrer: string | null
+          session_id: string
+          user_email: string | null
+          user_id: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          browser?: string | null
+          created_at?: string | null
+          device_type?: string | null
+          event_category: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          page_path?: string | null
+          product_id?: string | null
+          product_name?: string | null
+          product_price?: number | null
+          referrer?: string | null
+          session_id: string
+          user_email?: string | null
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          browser?: string | null
+          created_at?: string | null
+          device_type?: string | null
+          event_category?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          page_path?: string | null
+          product_id?: string | null
+          product_name?: string | null
+          product_price?: number | null
+          referrer?: string | null
+          session_id?: string
+          user_email?: string | null
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: []
+      }
       species: {
         Row: {
           characteristics: Json | null

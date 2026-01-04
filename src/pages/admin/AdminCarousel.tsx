@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,6 +15,7 @@ import {
 } from '@/services/carouselService';
 import CarouselItemForm from '@/components/admin/carousel/CarouselItemForm';
 import CarouselItemsTable from '@/components/admin/carousel/CarouselItemsTable';
+import AdminLayout from '@/layouts/AdminLayout';
 
 export default function AdminCarousel() {
   const [images, setImages] = useState<CarouselItem[]>([]);
@@ -248,7 +248,7 @@ export default function AdminCarousel() {
   };
 
   return (
-    <div className="p-6">
+    <AdminLayout>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Gerenciar Carrossel da Home</h1>
         <Button onClick={openNewImageDialog} disabled={isLoading}>
@@ -286,6 +286,6 @@ export default function AdminCarousel() {
           onFocusChange={handleFocusChange}
         />
       )}
-    </div>
+    </AdminLayout>
   );
 }
