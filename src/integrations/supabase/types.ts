@@ -131,30 +131,42 @@ export type Database = {
       cart_analytics: {
         Row: {
           action: string
+          browser: string | null
           created_at: string
+          device_type: string | null
           id: string
           item_count: number
           items: Json
           session_id: string | null
           total_value: number
+          user_email: string | null
+          user_id: string | null
         }
         Insert: {
           action: string
+          browser?: string | null
           created_at?: string
+          device_type?: string | null
           id?: string
           item_count?: number
           items?: Json
           session_id?: string | null
           total_value?: number
+          user_email?: string | null
+          user_id?: string | null
         }
         Update: {
           action?: string
+          browser?: string | null
           created_at?: string
+          device_type?: string | null
           id?: string
           item_count?: number
           items?: Json
           session_id?: string | null
           total_value?: number
+          user_email?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }

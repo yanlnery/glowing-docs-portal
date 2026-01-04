@@ -27,7 +27,10 @@ import {
   ShoppingCart, 
   BarChart, 
   Clock, 
-  ExternalLink
+  Monitor,
+  Smartphone,
+  Tablet,
+  User
 } from 'lucide-react';
 import { PieChart as RechartsPie, Pie, BarChart as RechartsBar, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import { cartAnalyticsService, CartAnalyticsEntry } from '@/services/cartAnalyticsService';
@@ -288,35 +291,53 @@ const ShoppingCartAnalytics = () => {
                         <TableHead>Itens</TableHead>
                         <TableHead>Qtd</TableHead>
                         <TableHead>Valor Total</TableHead>
-                        <TableHead>Sessão</TableHead>
+                        <TableHead>Cliente</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredData.slice(0, 10).map((entry, index) => (
-                        <TableRow key={entry.id || index}>
-                          <TableCell>
-                            <div className="flex items-center">
-                              <Clock className="h-4 w-4 mr-1 text-muted-foreground" />
-                              {entry.created_at ? formatDateTime(entry.created_at) : '-'}
-                            </div>
-                          </TableCell>
-                          <TableCell>{
-                            entry.action === 'add_to_cart' ? 'Adição ao Carrinho' :
-                            entry.action === 'remove_from_cart' ? 'Remoção do Carrinho' :
-                            entry.action === 'update_quantity' ? 'Atualização de Quantidade' :
-                            entry.action === 'view_cart' ? 'Visualização do Carrinho' :
-                            entry.action
-                          }</TableCell>
-                          <TableCell>{getProductName(entry)}</TableCell>
-                          <TableCell>{entry.item_count || '-'}</TableCell>
-                          <TableCell>{entry.total_value ? formatPrice(entry.total_value) : '-'}</TableCell>
-                          <TableCell>
-                            <div className="flex items-center text-xs text-muted-foreground">
-                              {entry.session_id ? entry.session_id.substring(0, 12) + '...' : '-'}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                      {filteredData.slice(0, 10).map((entry, index) => {
+                        const DeviceIcon = entry.device_type === 'Mobile' ? Smartphone : 
+                                          entry.device_type === 'Tablet' ? Tablet : Monitor;
+                        
+                        return (
+                          <TableRow key={entry.id || index}>
+                            <TableCell>
+                              <div className="flex items-center">
+                                <Clock className="h-4 w-4 mr-1 text-muted-foreground" />
+                                {entry.created_at ? formatDateTime(entry.created_at) : '-'}
+                              </div>
+                            </TableCell>
+                            <TableCell>{
+                              entry.action === 'add_to_cart' ? 'Adição ao Carrinho' :
+                              entry.action === 'remove_from_cart' ? 'Remoção do Carrinho' :
+                              entry.action === 'update_quantity' ? 'Atualização de Quantidade' :
+                              entry.action === 'view_cart' ? 'Visualização do Carrinho' :
+                              entry.action
+                            }</TableCell>
+                            <TableCell>{getProductName(entry)}</TableCell>
+                            <TableCell>{entry.item_count || '-'}</TableCell>
+                            <TableCell>{entry.total_value ? formatPrice(entry.total_value) : '-'}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                {entry.user_email ? (
+                                  <div className="flex items-center gap-1">
+                                    <User className="h-3 w-3 text-primary" />
+                                    <span className="text-xs font-medium">{entry.user_email}</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-xs text-muted-foreground">Visitante</span>
+                                )}
+                                <div className="flex items-center gap-1 text-muted-foreground">
+                                  <DeviceIcon className="h-3 w-3" />
+                                  {entry.browser && (
+                                    <span className="text-[10px]">{entry.browser}</span>
+                                  )}
+                                </div>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
                     </TableBody>
                   </Table>
                 </div>
