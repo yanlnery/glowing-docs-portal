@@ -25,6 +25,7 @@ import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/use-toast';
 import { orderService } from '@/services/orderService';
 import { cartAnalyticsService } from '@/services/cartAnalyticsService';
+import { siteAnalyticsService } from '@/services/siteAnalyticsService';
 
 // Define proper interfaces for our form data and errors
 interface CheckoutFormData {
@@ -97,15 +98,23 @@ const CartPage = () => {
   
   useEffect(() => {
     // Record cart view for analytics
+    const totalValue = items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+    
     cartAnalyticsService.recordEvent({
       action: 'view_cart',
       item_count: items.length,
-      total_value: items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0),
+      total_value: totalValue,
       items: items.map(item => ({
         id: item.product.id,
         name: item.product.name,
         price: item.product.price
       }))
+    });
+
+    // Track view cart in site analytics
+    siteAnalyticsService.trackViewCart({
+      itemCount: items.length,
+      totalValue,
     });
   }, []);
   
@@ -276,8 +285,23 @@ const CartPage = () => {
       return;
     }
 
+    // Track checkout start
+    siteAnalyticsService.trackCheckoutStart({
+      itemCount: items.length,
+      totalValue: total,
+    });
+
     if (!validateForm()) {
       console.log("❌ Form validation failed");
+      
+      // Track form validation errors
+      const errorTypes = Object.keys(formErrors);
+      if (errorTypes.length > 0) {
+        errorTypes.forEach(errorType => {
+          siteAnalyticsService.trackCheckoutFormError(errorType, formErrors[errorType]);
+        });
+      }
+      
       return;
     }
 
@@ -381,6 +405,13 @@ const CartPage = () => {
         })
       );
 
+      // Track checkout success
+      siteAnalyticsService.trackCheckoutSuccess({
+        orderId: orderResult.id,
+        totalValue: total,
+        itemCount: items.length,
+      });
+
       // Close dialog and show success message
       setIsDialogOpen(false);
       
@@ -391,6 +422,12 @@ const CartPage = () => {
       });
 
       console.log("✅ Checkout completed successfully, redirecting to WhatsApp...");
+      
+      // Track WhatsApp redirect
+      siteAnalyticsService.trackWhatsAppRedirect({
+        orderId: orderResult.id,
+        totalValue: total,
+      });
       
       // Clear cart and reset form before redirect
       clearCart();

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -15,7 +14,8 @@ import { SpeciesTable } from '@/components/admin/species/SpeciesTable';
 import { SpeciesDialog } from '@/components/admin/species/SpeciesDialog';
 import { useSpeciesManagement } from '@/hooks/useSpeciesManagement';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
-import { useSpeciesDialogManager } from '@/hooks/useSpeciesDialogManager'; // Novo hook
+import { useSpeciesDialogManager } from '@/hooks/useSpeciesDialogManager';
+import AdminLayout from '@/layouts/AdminLayout';
 
 // A função generateSlug e a constante BUCKET_NAME não são usadas aqui e foram removidas.
 // generateSlug é tratado pelo speciesService.ts
@@ -65,7 +65,7 @@ export default function SpeciesAdmin() {
   }
 
   return (
-    <div className="p-6">
+    <AdminLayout>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Gerenciar Espécies Criadas</h1>
         <Button onClick={dialogManager.openNewSpeciesDialog}>
@@ -102,8 +102,7 @@ export default function SpeciesAdmin() {
         <SpeciesDialog
           isOpen={dialogManager.isDialogOpen}
           onOpenChange={(isOpen) => {
-            if (!isOpen) dialogManager.setIsDialogOpen(); // Chama a função de fechar do hook
-            // Se precisar de lógica mais complexa para onOpenChange, ajuste o hook
+            if (!isOpen) dialogManager.setIsDialogOpen();
           }}
           isNewSpecies={dialogManager.isNewSpecies}
           currentSpeciesData={dialogManager.currentSpecies}
@@ -126,6 +125,6 @@ export default function SpeciesAdmin() {
           isLoading={speciesLoading}
         />
       )}
-    </div>
+    </AdminLayout>
   );
 }
