@@ -106,8 +106,8 @@ export default function AboutSection() {
                     <div className="w-40 flex items-center justify-center">
                       <img src={item.icon} alt={item.title} className="w-full h-full object-contain" />
                     </div>
-                    <h3 className="font-bold text-sm leading-tight">{item.title}</h3>
-                    <p className="text-xs text-muted-foreground mt-1 leading-snug">{item.description}</p>
+                    <h3 className="font-semibold text-sm whitespace-nowrap">{item.title}</h3>
+                    <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{item.description}</p>
                   </div>
                 ))}
               </div>
