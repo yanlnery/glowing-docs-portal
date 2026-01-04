@@ -76,7 +76,7 @@ const About = () => {
       text: "Yan Nery assume a liderança do criadouro, promovendo modernização, foco em bem-estar animal e projetos educacionais."
     },
     {
-      year: "2025",
+      year: "2026",
       title: "Visão de Futuro",
       text: "Em processo de crescimento e transformação, a Pet Serpentes segue com o objetivo de se tornar referência nacional em bem-estar animal, estrutura de manejo e educação ambiental."
     }
