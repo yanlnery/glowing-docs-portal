@@ -26,7 +26,7 @@ const About = () => {
   const propositoText = {
     title: "Nosso Propósito",
     paragraphs: [
-      "Queremos ser referência em criação responsável de répteis no Brasil. Isso significa investir constantemente em bem-estar animal, recintos melhores, compartilhar conhecimento de forma honesta e contribuir para que mais pessoas entendam e respeitem nossa fauna nativa.",
+      "Nosso propósito é a criação responsável de répteis no Brasil. Isso significa investir constantemente em bem-estar animal, recintos melhores, compartilhar conhecimento de forma honesta e contribuir para que mais pessoas entendam e respeitem nossa fauna nativa.",
       "Trabalhamos para elevar o padrão da herpetocultura brasileira, mostrando que é possível criar répteis com qualidade, dentro da lei e com respeito aos animais."
     ]
   };
