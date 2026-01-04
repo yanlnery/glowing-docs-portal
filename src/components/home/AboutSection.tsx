@@ -103,7 +103,7 @@ export default function AboutSection() {
                     key={index} 
                     className="flex-shrink-0 w-[42vw] flex flex-col items-center text-center bg-card border border-border/50 rounded-xl p-4 shadow-sm"
                   >
-                    <div className="w-20 h-20 flex items-center justify-center mb-3">
+                    <div className="w-40 h-40 flex items-center justify-center mb-3">
                       <img src={item.icon} alt={item.title} className="w-full h-full object-contain" />
                     </div>
                     <h3 className="font-bold text-sm leading-tight">{item.title}</h3>
@@ -117,7 +117,7 @@ export default function AboutSection() {
             <div className="hidden md:grid grid-cols-2 gap-4 mt-8">
               {features.map((item, index) => (
                 <div key={index} className="flex gap-4 items-center">
-                  <div className="w-16 h-16 flex-shrink-0">
+                  <div className="w-40 h-40 flex-shrink-0">
                     <img src={item.icon} alt={item.title} className="w-full h-full object-contain" />
                   </div>
                   <div>
