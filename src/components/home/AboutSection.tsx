@@ -1,37 +1,44 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Award, Calendar, CreditCard, PawPrint, Shield, Syringe } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/optimized-image";
+
+// Ícones personalizados
+import iconCertificado from "@/assets/icons/about-certificado.png";
+import iconExpertise from "@/assets/icons/about-expertise.png";
+import icon10Anos from "@/assets/icons/about-10anos.png";
+import iconPix from "@/assets/icons/about-pix.png";
+import iconVeterinario from "@/assets/icons/about-veterinario.png";
+import iconTrafico from "@/assets/icons/about-trafico.png";
 
 const features = [
   {
-    icon: <Shield className="text-serpente-600 h-6 w-6" />,
+    icon: iconCertificado,
     title: "Criadouro Certificado",
     description: "Registro oficial IBAMA e INEA"
   },
   {
-    icon: <Award className="text-serpente-600 h-6 w-6" />,
+    icon: iconExpertise,
     title: "Expertise",
     description: "Equipe qualificada em herpetocultura"
   },
   {
-    icon: <Calendar className="text-serpente-600 h-6 w-6" />,
+    icon: icon10Anos,
     title: "+10 Anos",
     description: "De experiência no mercado"
   },
   {
-    icon: <CreditCard className="text-serpente-600 h-6 w-6" />,
+    icon: iconPix,
     title: "10% OFF no PIX",
     description: "Ou 10x sem juros no cartão"
   },
   {
-    icon: <Syringe className="text-serpente-600 h-6 w-6" />,
+    icon: iconVeterinario,
     title: "Acompanhamento Veterinário",
     description: "Suporte em saúde animal"
   },
   {
-    icon: <PawPrint className="text-serpente-600 h-6 w-6" />,
+    icon: iconTrafico,
     title: "Combate ao Tráfico de Fauna",
     description: "Conservação e criação legalizada"
   }
@@ -96,8 +103,8 @@ export default function AboutSection() {
                     key={index} 
                     className="flex-shrink-0 w-[42vw] flex flex-col items-center text-center bg-card border border-border/50 rounded-xl p-4 shadow-sm"
                   >
-                    <div className="w-12 h-12 rounded-full bg-serpente-100 dark:bg-serpente-900/30 flex items-center justify-center mb-3">
-                      {item.icon}
+                    <div className="w-14 h-14 flex items-center justify-center mb-3">
+                      <img src={item.icon} alt={item.title} className="w-full h-full object-contain" />
                     </div>
                     <h3 className="font-bold text-sm leading-tight">{item.title}</h3>
                     <p className="text-xs text-muted-foreground mt-1 leading-snug">{item.description}</p>
@@ -110,7 +117,9 @@ export default function AboutSection() {
             <div className="hidden md:grid grid-cols-2 gap-4 mt-8">
               {features.map((item, index) => (
                 <div key={index} className="flex gap-3 items-start">
-                  <div className="mt-1">{item.icon}</div>
+                  <div className="w-10 h-10 flex-shrink-0">
+                    <img src={item.icon} alt={item.title} className="w-full h-full object-contain" />
+                  </div>
                   <div>
                     <h3 className="font-bold">{item.title}</h3>
                     <p className="text-sm text-muted-foreground">{item.description}</p>
