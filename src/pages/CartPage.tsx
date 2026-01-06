@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '@/stores/cartStore';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -489,54 +490,69 @@ const CartPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <div className="space-y-4">
-              {items.map((item) => (
-                <Card key={item.product.id} className="overflow-hidden">
-                  <div className="flex flex-row">
-                    {/* Imagem compacta */}
-                    <div className="w-20 h-20 sm:w-32 sm:h-32 flex-shrink-0">
-                      {item.product.images && item.product.images.length > 0 ? (
-                        <img 
-                          src={item.product.images[0].url} 
-                          alt={item.product.name}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-muted flex items-center justify-center">
-                          <span className="text-muted-foreground text-xs">Sem imagem</span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Conteúdo */}
-                    <div className="flex-1 p-3 sm:p-4 flex flex-col justify-between min-w-0">
-                      <div className="flex justify-between items-start gap-2">
-                        <div className="min-w-0 flex-1">
-                          <h3 className="font-bold text-sm sm:text-base line-clamp-1">{item.product.name}</h3>
-                          <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
-                            <em>{item.product.speciesName}</em>
-                          </p>
+              <AnimatePresence mode="popLayout">
+                {items.map((item, index) => (
+                  <motion.div
+                    key={item.product.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20, scale: 0.95 }}
+                    transition={{ 
+                      duration: 0.3, 
+                      delay: index * 0.05,
+                      ease: "easeOut"
+                    }}
+                    layout
+                  >
+                    <Card className="overflow-hidden">
+                      <div className="flex flex-row">
+                        {/* Imagem compacta */}
+                        <div className="w-20 h-20 sm:w-32 sm:h-32 flex-shrink-0">
+                          {item.product.images && item.product.images.length > 0 ? (
+                            <img 
+                              src={item.product.images[0].url} 
+                              alt={item.product.name}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-muted flex items-center justify-center">
+                              <span className="text-muted-foreground text-xs">Sem imagem</span>
+                            </div>
+                          )}
                         </div>
                         
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          className="h-8 w-8 flex-shrink-0"
-                          onClick={() => removeFromCart(item.product.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                      
-                      <div className="flex justify-end mt-2">
-                        <div className="text-sm sm:text-base font-semibold">
-                          {formatPrice(item.product.price)}
+                        {/* Conteúdo */}
+                        <div className="flex-1 p-3 sm:p-4 flex flex-col justify-between min-w-0">
+                          <div className="flex justify-between items-start gap-2">
+                            <div className="min-w-0 flex-1">
+                              <h3 className="font-bold text-sm sm:text-base line-clamp-1">{item.product.name}</h3>
+                              <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
+                                <em>{item.product.speciesName}</em>
+                              </p>
+                            </div>
+                            
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              className="h-8 w-8 flex-shrink-0"
+                              onClick={() => removeFromCart(item.product.id)}
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
+                          
+                          <div className="flex justify-end mt-2">
+                            <div className="text-sm sm:text-base font-semibold">
+                              {formatPrice(item.product.price)}
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                </Card>
-              ))}
+                    </Card>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
             
             <div className="flex justify-between mt-6">
