@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { OptimizedImage } from "@/components/ui/optimized-image";
@@ -19,6 +19,7 @@ interface CatalogProductCardProps {
 export default function CatalogProductCard({ product, index }: CatalogProductCardProps) {
   const { addToCart, isProductInCart } = useCartStore();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const isInCart = isProductInCart(product.id);
   const isUnavailable = product.status === 'indisponivel' || product.status === 'vendido';
@@ -31,6 +32,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
         description: `${product.name} já foi adicionado ao carrinho`,
         variant: "default",
       });
+      navigate('/carrinho');
       return;
     }
 
@@ -40,6 +42,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
       description: `${product.name} foi adicionado ao carrinho`,
       variant: "default",
     });
+    navigate('/carrinho');
   };
 
   const formatPrice = (price: number) => {
