@@ -491,8 +491,9 @@ const CartPage = () => {
             <div className="space-y-4">
               {items.map((item) => (
                 <Card key={item.product.id} className="overflow-hidden">
-                  <div className="flex flex-col sm:flex-row">
-                    <div className="sm:w-40 h-40 sm:h-auto">
+                  <div className="flex flex-row">
+                    {/* Imagem compacta */}
+                    <div className="w-20 h-20 sm:w-32 sm:h-32 flex-shrink-0">
                       {item.product.images && item.product.images.length > 0 ? (
                         <img 
                           src={item.product.images[0].url} 
@@ -502,33 +503,33 @@ const CartPage = () => {
                         />
                       ) : (
                         <div className="w-full h-full bg-muted flex items-center justify-center">
-                          <span className="text-muted-foreground">Sem imagem</span>
+                          <span className="text-muted-foreground text-xs">Sem imagem</span>
                         </div>
                       )}
                     </div>
                     
-                    <div className="flex-1 p-4">
-                      <div className="flex flex-col sm:flex-row sm:justify-between">
-                        <div>
-                          <h3 className="font-bold text-lg">{item.product.name}</h3>
-                          <p className="text-sm text-muted-foreground mb-2">
+                    {/* Conteúdo */}
+                    <div className="flex-1 p-3 sm:p-4 flex flex-col justify-between min-w-0">
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-bold text-sm sm:text-base line-clamp-1">{item.product.name}</h3>
+                          <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
                             <em>{item.product.speciesName}</em>
                           </p>
                         </div>
                         
-                        <div className="flex items-center gap-2 mt-2 sm:mt-0">
-                          <Button 
-                            variant="ghost" 
-                            size="icon"
-                            onClick={() => removeFromCart(item.product.id)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          className="h-8 w-8 flex-shrink-0"
+                          onClick={() => removeFromCart(item.product.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
                       </div>
                       
-                      <div className="flex justify-end mt-4">
-                        <div className="text-lg font-semibold">
+                      <div className="flex justify-end mt-2">
+                        <div className="text-sm sm:text-base font-semibold">
                           {formatPrice(item.product.price)}
                         </div>
                       </div>

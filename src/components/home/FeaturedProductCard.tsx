@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { Product } from "@/types/product";
@@ -17,6 +17,7 @@ interface FeaturedProductCardProps {
 export default function FeaturedProductCard({ product, index }: FeaturedProductCardProps) {
   const addToCart = useCartStore((state) => state.addToCart);
   const [isAdding, setIsAdding] = useState(false);
+  const navigate = useNavigate();
   
   const imageUrl = getProductImageUrl(product);
   
@@ -28,9 +29,10 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
         duration: 2000,
       });
       
+      // Redirecionar para o carrinho
       setTimeout(() => {
-        setIsAdding(false);
-      }, 1500);
+        navigate('/carrinho');
+      }, 400);
     }
   };
   
