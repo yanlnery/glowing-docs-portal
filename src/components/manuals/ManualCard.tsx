@@ -19,7 +19,7 @@ export default function ManualCard({ manual, onDownload }: ManualCardProps) {
           <img 
             src={manual.image}
             alt={manual.title} 
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-cover object-center md:object-[center_70%]"
             loading="lazy"
           />
         ) : (
