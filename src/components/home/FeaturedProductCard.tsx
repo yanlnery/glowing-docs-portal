@@ -50,15 +50,9 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
         <OptimizedImage
           src={imageUrl || "/placeholder.svg"}
           alt={product.name}
-          priority={index === 0}
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className="w-full h-full"
-          style={{
-            objectFit: "cover",
-            objectPosition: "center",
-            width: "100%",
-            height: "100%"
-          }}
+          priority={index < 4}
+          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1280px) 25vw, 320px"
+          className="w-full h-full object-cover"
         />
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 sm:p-4">
           {product.status === 'disponivel' ? (
