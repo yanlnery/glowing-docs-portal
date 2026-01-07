@@ -214,7 +214,7 @@ export default function HeroCarouselUI({
               to="/catalogo?category=serpente" 
               className="flex flex-col items-center justify-center touch-manipulation"
             >
-              <div className="relative w-full max-w-[280px] aspect-square mb-1">
+              <div className="relative w-full max-w-[280px] aspect-square mb-1 transition-transform duration-200 hover:scale-110">
                 <img
                   src="/lovable-uploads/species-snake.png"
                   alt="Serpente"
@@ -233,7 +233,7 @@ export default function HeroCarouselUI({
               to="/catalogo?category=lagarto" 
               className="flex flex-col items-center justify-center touch-manipulation"
             >
-              <div className="relative w-full max-w-[280px] aspect-square mb-1">
+              <div className="relative w-full max-w-[280px] aspect-square mb-1 transition-transform duration-200 hover:scale-110">
                 <img
                   src="/lovable-uploads/species-lizard.png"
                   alt="Lagarto"
@@ -252,7 +252,7 @@ export default function HeroCarouselUI({
               to="/catalogo?category=quelonio" 
               className="flex flex-col items-center justify-center touch-manipulation"
             >
-              <div className="relative w-full max-w-[280px] aspect-square mb-1">
+              <div className="relative w-full max-w-[280px] aspect-square mb-1 transition-transform duration-200 hover:scale-110">
                 <img
                   src="/lovable-uploads/species-turtle.png"
                   alt="Quelônio"
