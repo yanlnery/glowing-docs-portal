@@ -17,30 +17,21 @@ const FALLBACK_SLIDE_DATA: CarouselItem = {
   focus_mobile: "center",
 };
 
-// Check if device is mobile
-const isMobileDevice = () => {
-  if (typeof window === 'undefined') return false;
-  return window.matchMedia('(max-width: 768px)').matches || 
-         'ontouchstart' in window ||
-         navigator.maxTouchPoints > 0;
-};
-
 export function useHeroCarousel() {
   const [carouselImagesData, setCarouselImagesData] = useState<CarouselItem[]>([]);
   const [api, setApi] = useState<CarouselApi>();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isMobile] = useState(isMobileDevice);
 
-  // Only use autoplay on desktop
+  // Autoplay for all devices
   const autoplayPlugin = useRef(
     Autoplay({ 
       delay: 5000, 
       stopOnInteraction: false, 
       stopOnMouseEnter: true,
       rootNode: (emblaRoot) => emblaRoot.parentElement,
-      playOnInit: !isMobile, // Don't autoplay on mobile
+      playOnInit: true,
     })
   );
 
@@ -75,8 +66,8 @@ export function useHeroCarousel() {
     };
 
     const onPointerUp = () => {
-      // Resume autoplay after user interaction (only on desktop)
-      if (!isMobile && autoplayPlugin.current && carouselImagesData.length > 1) {
+      // Resume autoplay after user interaction
+      if (autoplayPlugin.current && carouselImagesData.length > 1) {
         setTimeout(() => {
           autoplayPlugin.current.play();
         }, 1000);
@@ -87,8 +78,8 @@ export function useHeroCarousel() {
     api.on("select", onSelect);
     api.on("pointerUp", onPointerUp);
 
-    // Start autoplay if there are multiple items (only on desktop)
-    if (!isMobile && carouselImagesData.length > 1) {
+    // Start autoplay if there are multiple items
+    if (carouselImagesData.length > 1) {
       autoplayPlugin.current.play();
     }
 
@@ -98,11 +89,11 @@ export function useHeroCarousel() {
         api.off("pointerUp", onPointerUp);
       }
     };
-  }, [api, carouselImagesData.length, isMobile]);
+  }, [api, carouselImagesData.length]);
 
-  // Keyboard navigation (only on desktop)
+  // Keyboard navigation
   useEffect(() => {
-    if (!api || carouselImagesData.length === 0 || isMobile) return;
+    if (!api || carouselImagesData.length === 0) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowLeft') {
@@ -135,13 +126,13 @@ export function useHeroCarousel() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [api, carouselImagesData.length, isMobile]);
+  }, [api, carouselImagesData.length]);
 
   const handleIndicatorClick = (index: number) => {
     if (api) {
       api.scrollTo(index);
-      // Resume autoplay after manual navigation (only on desktop)
-      if (!isMobile && autoplayPlugin.current && carouselImagesData.length > 1) {
+      // Resume autoplay after manual navigation
+      if (autoplayPlugin.current && carouselImagesData.length > 1) {
         setTimeout(() => {
           autoplayPlugin.current.play();
         }, 1000);
