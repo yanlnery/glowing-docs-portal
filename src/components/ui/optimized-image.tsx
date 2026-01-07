@@ -98,6 +98,7 @@ export function OptimizedImage({
             width: '100%',
             height: '100%',
             transition: 'opacity 0.2s ease-out',
+            imageRendering: 'auto',
             ...style
           }}
           loading={priority ? 'eager' : 'lazy'}

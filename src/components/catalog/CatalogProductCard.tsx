@@ -65,23 +65,13 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
       <Link to={`/produtos/${product.id}`} className="block relative cursor-pointer">
         <div 
           className="aspect-square md:aspect-[4/3] overflow-hidden rounded-t-lg"
-          style={{
-            width: "100%",
-            height: "auto"
-          }}
         >
           <OptimizedImage
             src={imageUrl || '/placeholder.svg'}
             alt={product.name}
-            priority={index < 4}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="w-full h-full"
-            style={{
-              objectFit: "cover",
-              objectPosition: "center",
-              width: "100%",
-              height: "100%"
-            }}
+            priority={index < 8}
+            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1280px) 33vw, 400px"
+            className="w-full h-full object-cover"
           />
         </div>
         
