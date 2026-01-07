@@ -61,7 +61,7 @@ const AcademyPricing: React.FC<AcademyPricingProps> = ({
           <CardHeader className="text-center pb-2">
             <CardTitle className="text-2xl">PSA One</CardTitle>
             <div className="mt-4">
-              <span className="text-4xl font-bold">R$ 17,90</span>
+              <span className="text-4xl font-bold">R$ 27,90</span>
               <span className="text-muted-foreground ml-1">/mês</span>
             </div>
           </CardHeader>

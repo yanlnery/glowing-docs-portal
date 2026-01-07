@@ -125,7 +125,7 @@ const Academy = () => {
                   </>
                 ) : (
                   <>
-                    Assinar Agora - R$17,90/mês
+                    Assinar Agora - R$27,90/mês
                     <ChevronRight className="ml-2 h-4 w-4" />
                   </>
                 )}
@@ -308,7 +308,7 @@ const Academy = () => {
             <CardHeader>
               <CardTitle>PS Academy Professional</CardTitle>
               <div className="mt-4">
-                <span className="text-3xl font-bold">R$17,90</span>
+                <span className="text-3xl font-bold">R$27,90</span>
                 <span className="text-muted-foreground ml-1">/mês</span>
               </div>
             </CardHeader>
