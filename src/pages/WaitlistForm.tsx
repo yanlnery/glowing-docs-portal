@@ -139,7 +139,7 @@ const WaitlistForm = () => {
                 >
                   <div>
                     <h3 className="font-medium">Professional</h3>
-                    <p className="text-sm text-muted-foreground">R$17,90/mês</p>
+                    <p className="text-sm text-muted-foreground">R$27,90/mês</p>
                   </div>
                   <div className={`h-4 w-4 rounded-full ${
                     selectedPlan === 'professional' ? 'bg-serpente-500' : 'border'

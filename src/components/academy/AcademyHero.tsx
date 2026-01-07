@@ -13,7 +13,7 @@ interface AcademyHeroProps {
 const AcademyHero: React.FC<AcademyHeroProps> = ({ onAction, isLoading, hasAccess, isOpenForSubscription }) => {
   const getButtonText = () => {
     if (isLoading) return 'Carregando...';
-    if (isOpenForSubscription) return 'Assinar Agora - R$17,90/mês';
+    if (isOpenForSubscription) return 'Assinar Agora - R$27,90/mês';
     return 'Faça parte da PSA';
   };
 

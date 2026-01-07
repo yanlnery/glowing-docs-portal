@@ -11,7 +11,7 @@ interface AcademyCTAProps {
 const AcademyCTA: React.FC<AcademyCTAProps> = ({ onAction, isLoading, isOpenForSubscription }) => {
   const getButtonText = () => {
     if (isLoading) return 'Carregando...';
-    if (isOpenForSubscription) return 'Começar Agora - R$17,90/mês';
+    if (isOpenForSubscription) return 'Começar Agora - R$27,90/mês';
     return 'Entrar para Lista de Espera';
   };
 
