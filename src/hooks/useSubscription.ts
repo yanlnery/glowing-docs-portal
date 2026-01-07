@@ -8,7 +8,7 @@ export const STRIPE_PRODUCTS = {
     product_id: 'prod_TapgRAsjsT5SlS',
     price_id: 'price_1Sde1YRtgvUJvytjQTGxsHD6',
     name: 'PetSerpentes Academy',
-    price: 17.90,
+    price: 27.90,
   },
 } as const;
 
