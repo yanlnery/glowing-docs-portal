@@ -46,12 +46,12 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
         overflow: "visible"
       }}
     >
-      <Link to={`/produtos/${product.id}`} className="block relative overflow-hidden aspect-square cursor-pointer">
-        <OptimizedImage
+      <Link to={`/produtos/${product.id}`} className="block relative overflow-hidden aspect-square cursor-pointer bg-muted">
+        <img
           src={imageUrl || "/placeholder.svg"}
           alt={product.name}
-          priority={index < 4}
-          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1280px) 25vw, 320px"
+          loading={index < 4 ? 'eager' : 'lazy'}
+          decoding={index < 4 ? 'sync' : 'async'}
           className="w-full h-full object-cover"
         />
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 sm:p-4">
