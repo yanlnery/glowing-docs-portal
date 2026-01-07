@@ -80,8 +80,8 @@ const Settings = () => {
               <div className="space-y-0.5">
                 <Label htmlFor="subscription-mode">Abrir para Assinaturas</Label>
                 <p className="text-sm text-muted-foreground">
-                  {isAcademyOpenForSubscription 
-                    ? 'Os visitantes podem assinar diretamente via Stripe (R$17,90/mês).' 
+                    {isAcademyOpenForSubscription 
+                    ? 'Os visitantes podem assinar diretamente via Stripe (R$27,90/mês).' 
                     : 'Os visitantes são direcionados para a lista de espera.'}
                 </p>
               </div>

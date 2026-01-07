@@ -107,7 +107,7 @@ const AcademyBenefitsCard: React.FC<AcademyBenefitsCardProps> = ({
         <div className="border-t border-gray-700 pt-8 text-center">
           <p className="text-gray-400 mb-2">Tudo isso por apenas</p>
           <div className="mb-6">
-            <span className="text-4xl md:text-5xl font-bold">R$ 17,90</span>
+            <span className="text-4xl md:text-5xl font-bold">R$ 27,90</span>
             <span className="text-gray-400 text-lg">/mês</span>
           </div>
           {!hasAccess && (
