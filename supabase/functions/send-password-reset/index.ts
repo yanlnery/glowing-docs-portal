@@ -19,10 +19,10 @@ function escapeHtml(text: string): string {
     .replace(/'/g, '&#039;');
 }
 
-interface ConfirmationEmailRequest {
-  name: string;
+interface PasswordResetRequest {
   email: string;
-  confirmationUrl: string;
+  resetUrl: string;
+  name?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -31,7 +31,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { name, email, confirmationUrl }: ConfirmationEmailRequest = await req.json();
+    const { email, resetUrl, name }: PasswordResetRequest = await req.json();
     
     // Sanitize user input to prevent XSS
     const safeName = escapeHtml(name || 'Criador');
@@ -39,7 +39,7 @@ const handler = async (req: Request): Promise<Response> => {
     const emailResponse = await resend.emails.send({
       from: "Pet Serpentes <noreply@send.petserpentes.com.br>",
       to: [email],
-      subject: "Confirme seu cadastro - Pet Serpentes",
+      subject: "Redefinição de senha - Pet Serpentes",
       html: `
         <!DOCTYPE html>
         <html>
@@ -62,27 +62,30 @@ const handler = async (req: Request): Promise<Response> => {
                     <td style="padding: 40px;">
                       <h2 style="color: #1a1a2e; margin: 0 0 20px; font-size: 22px;">Olá, ${safeName}!</h2>
                       <p style="color: #444444; font-size: 16px; line-height: 1.6; margin: 0 0 20px;">
-                        Obrigado por se cadastrar na Pet Serpentes! Estamos muito felizes em tê-lo conosco.
+                        Recebemos uma solicitação para redefinir a senha da sua conta na Pet Serpentes.
                       </p>
                       <p style="color: #444444; font-size: 16px; line-height: 1.6; margin: 0 0 30px;">
-                        Para confirmar seu e-mail e ativar sua conta, clique no botão abaixo:
+                        Clique no botão abaixo para criar uma nova senha:
                       </p>
                       <table role="presentation" style="width: 100%; border-collapse: collapse;">
                         <tr>
                           <td align="center">
-                            <a href="${confirmationUrl}" style="display: inline-block; padding: 16px 40px; background-color: #10b981; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: bold; border-radius: 8px;">
-                              Confirmar meu e-mail
+                            <a href="${resetUrl}" style="display: inline-block; padding: 16px 40px; background-color: #f59e0b; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: bold; border-radius: 8px;">
+                              Redefinir minha senha
                             </a>
                           </td>
                         </tr>
                       </table>
                       <p style="color: #888888; font-size: 14px; line-height: 1.6; margin: 30px 0 0;">
-                        Se você não criou uma conta na Pet Serpentes, pode ignorar este e-mail com segurança.
+                        Este link expira em 1 hora por motivos de segurança.
+                      </p>
+                      <p style="color: #888888; font-size: 14px; line-height: 1.6; margin: 20px 0 0;">
+                        Se você não solicitou a redefinição de senha, pode ignorar este e-mail. Sua senha permanecerá inalterada.
                       </p>
                       <p style="color: #888888; font-size: 14px; line-height: 1.6; margin: 20px 0 0;">
                         Se o botão não funcionar, copie e cole este link no seu navegador:
                         <br>
-                        <a href="${confirmationUrl}" style="color: #10b981; word-break: break-all;">${confirmationUrl}</a>
+                        <a href="${resetUrl}" style="color: #f59e0b; word-break: break-all;">${resetUrl}</a>
                       </p>
                     </td>
                   </tr>
@@ -102,14 +105,14 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Confirmation email sent successfully:", emailResponse);
+    console.log("Password reset email sent successfully:", emailResponse);
 
     return new Response(JSON.stringify(emailResponse), {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (error: any) {
-    console.error("Error in send-confirmation-email function:", error);
+    console.error("Error in send-password-reset function:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {

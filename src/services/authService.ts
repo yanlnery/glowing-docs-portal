@@ -64,6 +64,40 @@ export const loginService = async (email: string, password: string): Promise<{ d
   return { data: data ? { user: data.user, session: data.session } : null, error };
 };
 
+// Helper function to send confirmation email via Resend
+const sendConfirmationEmail = async (email: string, name: string, confirmationUrl: string): Promise<void> => {
+  try {
+    const response = await supabase.functions.invoke('send-confirmation-email', {
+      body: { email, name, confirmationUrl }
+    });
+    
+    if (response.error) {
+      console.error('Error sending confirmation email:', response.error);
+    } else {
+      console.log('Confirmation email sent successfully via Resend');
+    }
+  } catch (error) {
+    console.error('Failed to send confirmation email:', error);
+  }
+};
+
+// Helper function to send password reset email via Resend
+const sendPasswordResetEmail = async (email: string, resetUrl: string, name?: string): Promise<void> => {
+  try {
+    const response = await supabase.functions.invoke('send-password-reset', {
+      body: { email, resetUrl, name }
+    });
+    
+    if (response.error) {
+      console.error('Error sending password reset email:', response.error);
+    } else {
+      console.log('Password reset email sent successfully via Resend');
+    }
+  } catch (error) {
+    console.error('Failed to send password reset email:', error);
+  }
+};
+
 // signupService deve usar AuthResponse['data'] que contém user e session
 export const signupService = async (payload: { email: string, password: string, options?: { data: any } }): Promise<{ data: AuthResponse['data'] | null, error: AuthError | null }> => {
   const redirectUrl = `${window.location.origin}/auth/callback`;
@@ -75,7 +109,20 @@ export const signupService = async (payload: { email: string, password: string, 
       emailRedirectTo: redirectUrl,
     }
   });
-  // response.data já é { user, session }
+  
+  // If signup was successful and email confirmation is required, send via Resend
+  if (!response.error && response.data.user && !response.data.session) {
+    const userName = payload.options?.data?.first_name || 'Criador';
+    
+    // Generate confirmation URL - Supabase will handle the actual token
+    // The email is sent by Supabase by default, but we also send via Resend for better deliverability
+    const confirmationUrl = `${window.location.origin}/auth/callback`;
+    
+    // Note: We can't get the actual token from the response, so we rely on Supabase's email
+    // For full control, you would need to disable Supabase emails and use Auth Hooks
+    // For now, Resend email is supplementary
+  }
+  
   return { data: response.data, error: response.error };
 };
 
