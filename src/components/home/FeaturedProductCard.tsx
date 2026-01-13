@@ -52,7 +52,14 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
           alt={product.name}
           loading={index < 4 ? 'eager' : 'lazy'}
           decoding={index < 4 ? 'sync' : 'async'}
-          className="w-full h-full object-cover"
+          className="w-full h-full"
+          style={{
+            objectFit: 'cover',
+            imageRendering: 'auto',
+            WebkitFontSmoothing: 'antialiased',
+          }}
+          srcSet={imageUrl ? `${imageUrl} 1x, ${imageUrl} 2x, ${imageUrl} 3x` : undefined}
+          sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 300px"
         />
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 sm:p-4">
           {product.status === 'disponivel' ? (
