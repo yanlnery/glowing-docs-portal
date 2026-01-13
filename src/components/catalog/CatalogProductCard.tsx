@@ -133,15 +133,25 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
       
       <CardFooter className="p-2 sm:p-3 pt-1 sm:pt-2">
         <div className="flex gap-2 w-full">
-          <Button 
-            variant="default" 
-            className="flex-1 min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm font-semibold touch-manipulation"
-            asChild
-          >
-            <Link to={`/produtos/${product.id}`}>
-              Adquirir
-            </Link>
-          </Button>
+          {product.status === 'vendido' ? (
+            <Button 
+              variant="secondary" 
+              className="flex-1 min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm font-semibold touch-manipulation opacity-60 cursor-not-allowed"
+              disabled
+            >
+              Vendido
+            </Button>
+          ) : (
+            <Button 
+              variant="default" 
+              className="flex-1 min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm font-semibold touch-manipulation"
+              asChild
+            >
+              <Link to={`/produtos/${product.id}`}>
+                Adquirir
+              </Link>
+            </Button>
+          )}
           {!isUnavailable && (
             <Button 
               variant={isInCart ? "secondary" : "default"}
