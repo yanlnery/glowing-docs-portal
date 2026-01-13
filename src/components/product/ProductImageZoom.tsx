@@ -205,20 +205,14 @@ export function ProductImageZoom({
               ref={imageRef}
               src={selectedImage} 
               alt={productName} 
-              className="w-full h-full pointer-events-none"
+              className="w-full h-full object-contain pointer-events-none"
               style={{ 
-                objectFit: 'contain',
                 transform: `scale(${zoomScale}) translate(${position.x / zoomScale}px, ${position.y / zoomScale}px)`,
                 transformOrigin: 'center center',
                 transition: isDragging ? 'none' : 'transform 0.2s',
-                imageRendering: 'auto',
-                backfaceVisibility: 'hidden',
-                WebkitBackfaceVisibility: 'hidden',
               }}
               loading="eager"
               draggable={false}
-              srcSet={`${selectedImage} 1x, ${selectedImage} 2x, ${selectedImage} 3x`}
-              sizes="(max-width: 1024px) 100vw, 50vw"
             />
             
             {/* Zoom Indicator Overlay */}
@@ -292,18 +286,12 @@ export function ProductImageZoom({
               }`}
               onClick={() => onIndexChange(index)}
             >
-                  <img 
-                    src={image.url}
-                    alt={image.alt || `${productName} - imagem ${index + 1}`} 
-                    className="w-full h-full"
-                    style={{
-                      objectFit: 'cover',
-                      imageRendering: 'auto',
-                    }}
-                    loading="lazy"
-                    srcSet={`${image.url} 1x, ${image.url} 2x`}
-                    sizes="100px"
-                  />
+              <img 
+                src={image.url}
+                alt={image.alt || `${productName} - imagem ${index + 1}`} 
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
             </div>
           ))}
         </div>
