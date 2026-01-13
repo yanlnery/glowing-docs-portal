@@ -64,13 +64,20 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
     >
       <Link to={`/produtos/${product.id}`} className="block relative cursor-pointer">
         <div className="aspect-square md:aspect-[4/3] overflow-hidden rounded-t-lg bg-muted">
-          <img
-            src={imageUrl || '/placeholder.svg'}
-            alt={product.name}
-            loading={index < 8 ? 'eager' : 'lazy'}
-            decoding={index < 8 ? 'sync' : 'async'}
-            className="w-full h-full object-cover"
-          />
+        <img
+          src={imageUrl || '/placeholder.svg'}
+          alt={product.name}
+          loading={index < 8 ? 'eager' : 'lazy'}
+          decoding={index < 8 ? 'sync' : 'async'}
+          className="w-full h-full"
+          style={{
+            objectFit: 'cover',
+            imageRendering: 'auto',
+            WebkitFontSmoothing: 'antialiased',
+          }}
+          srcSet={imageUrl ? `${imageUrl} 1x, ${imageUrl} 2x, ${imageUrl} 3x` : undefined}
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+        />
         </div>
         
         <div className="absolute top-2 left-2 flex flex-col gap-1.5">
