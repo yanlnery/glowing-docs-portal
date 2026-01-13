@@ -47,12 +47,12 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
       }}
     >
       <Link to={`/produtos/${product.id}`} className="block relative overflow-hidden aspect-square cursor-pointer bg-muted">
-        <img
+        <OptimizedImage
           src={imageUrl || "/placeholder.svg"}
           alt={product.name}
-          loading={index < 4 ? 'eager' : 'lazy'}
-          decoding={index < 4 ? 'sync' : 'async'}
-          className="w-full h-full object-cover"
+          priority={index < 4}
+          className="w-full h-full"
+          style={{ objectFit: 'cover' }}
         />
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 sm:p-4">
           {product.status === 'disponivel' ? (

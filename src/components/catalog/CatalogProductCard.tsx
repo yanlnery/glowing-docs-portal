@@ -64,12 +64,12 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
     >
       <Link to={`/produtos/${product.id}`} className="block relative cursor-pointer">
         <div className="aspect-square md:aspect-[4/3] overflow-hidden rounded-t-lg bg-muted">
-          <img
+          <OptimizedImage
             src={imageUrl || '/placeholder.svg'}
             alt={product.name}
-            loading={index < 8 ? 'eager' : 'lazy'}
-            decoding={index < 8 ? 'sync' : 'async'}
-            className="w-full h-full object-cover"
+            priority={index < 8}
+            className="w-full h-full"
+            style={{ objectFit: 'cover' }}
           />
         </div>
         
