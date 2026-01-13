@@ -91,29 +91,40 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
           </p>
         </div>
         
-        <Button
-          variant={product.status === 'indisponivel' ? "secondary" : "default"}
-          size="sm"
-          className={`w-full min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm touch-manipulation ${
-            isAdding ? 'bg-green-600 hover:bg-green-600' : ''
-          }`}
-          onClick={handleAddToCart}
-          disabled={product.status === 'indisponivel'}
-        >
-          {product.status === 'indisponivel' ? (
-            'Esgotado'
-          ) : isAdding ? (
-            <>
-              <Check className="w-4 h-4 mr-1" />
-              Adicionado!
-            </>
-          ) : (
-            <>
-              <ShoppingCart className="w-4 h-4 mr-1" />
-              Adicionar
-            </>
-          )}
-        </Button>
+        {product.status === 'vendido' ? (
+          <Button
+            variant="secondary"
+            size="sm"
+            className="w-full min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm touch-manipulation opacity-60 cursor-not-allowed"
+            disabled
+          >
+            Vendido
+          </Button>
+        ) : (
+          <Button
+            variant={product.status === 'indisponivel' ? "secondary" : "default"}
+            size="sm"
+            className={`w-full min-h-[40px] sm:min-h-[44px] text-xs sm:text-sm touch-manipulation ${
+              isAdding ? 'bg-green-600 hover:bg-green-600' : ''
+            }`}
+            onClick={handleAddToCart}
+            disabled={product.status === 'indisponivel'}
+          >
+            {product.status === 'indisponivel' ? (
+              'Esgotado'
+            ) : isAdding ? (
+              <>
+                <Check className="w-4 h-4 mr-1" />
+                Adicionado!
+              </>
+            ) : (
+              <>
+                <ShoppingCart className="w-4 h-4 mr-1" />
+                Adicionar
+              </>
+            )}
+          </Button>
+        )}
       </div>
     </div>
   );
