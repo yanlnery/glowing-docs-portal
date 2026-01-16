@@ -23,10 +23,11 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 import { orderService } from '@/services/orderService';
 import { cartAnalyticsService } from '@/services/cartAnalyticsService';
 import { siteAnalyticsService } from '@/services/siteAnalyticsService';
+import { CheckoutAbandonmentDialog } from '@/components/cart/CheckoutAbandonmentDialog';
 
 // Define proper interfaces for our form data and errors
 interface CheckoutFormData {
@@ -97,6 +98,8 @@ const CartPage = () => {
   });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [formOpenTime, setFormOpenTime] = useState<number | null>(null);
+  const [showAbandonDialog, setShowAbandonDialog] = useState(false);
+  const [pendingClose, setPendingClose] = useState(false);
   
   useEffect(() => {
     // Record cart view for analytics
@@ -622,15 +625,50 @@ const CartPage = () => {
         </div>
       )}
 
+      {/* Abandonment Confirmation Dialog */}
+      <CheckoutAbandonmentDialog
+        open={showAbandonDialog}
+        filledFieldsCount={Object.values(formData).filter(v => v.trim() !== '').length}
+        onConfirmLeave={() => {
+          // Track abandonment
+          const filledFields = Object.entries(formData)
+            .filter(([_, value]) => value.trim() !== '')
+            .map(([key]) => key);
+          
+          const timeSpent = formOpenTime 
+            ? Math.round((Date.now() - formOpenTime) / 1000) 
+            : undefined;
+          
+          siteAnalyticsService.trackCheckoutFormAbandon({
+            itemCount: items.length,
+            totalValue: total,
+            filledFields,
+            timeSpentSeconds: timeSpent,
+          });
+          
+          setFormOpenTime(null);
+          setShowAbandonDialog(false);
+          setIsDialogOpen(false);
+        }}
+        onContinue={() => {
+          setShowAbandonDialog(false);
+        }}
+      />
+
       <Dialog 
         open={isDialogOpen} 
         onOpenChange={(open) => {
           if (!open && isDialogOpen) {
-            // User is closing the dialog (abandon)
-            const filledFields = Object.entries(formData)
-              .filter(([_, value]) => value.trim() !== '')
-              .map(([key]) => key);
+            // User is trying to close the dialog
+            const filledFieldsCount = Object.values(formData).filter(v => v.trim() !== '').length;
             
+            if (filledFieldsCount > 0) {
+              // Show confirmation dialog
+              setShowAbandonDialog(true);
+              return; // Don't close yet
+            }
+            
+            // No fields filled, track and close directly
             const timeSpent = formOpenTime 
               ? Math.round((Date.now() - formOpenTime) / 1000) 
               : undefined;
@@ -638,7 +676,7 @@ const CartPage = () => {
             siteAnalyticsService.trackCheckoutFormAbandon({
               itemCount: items.length,
               totalValue: total,
-              filledFields,
+              filledFields: [],
               timeSpentSeconds: timeSpent,
             });
             setFormOpenTime(null);

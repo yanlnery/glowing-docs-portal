@@ -7,6 +7,7 @@ import { DeviceAnalysis } from '@/components/admin/analytics/DeviceAnalysis';
 import { TrafficSources } from '@/components/admin/analytics/TrafficSources';
 import { CheckoutAnalysis } from '@/components/admin/analytics/CheckoutAnalysis';
 import { CartAnalysis } from '@/components/admin/analytics/CartAnalysis';
+import { FormAbandonmentAnalysis } from '@/components/admin/analytics/FormAbandonmentAnalysis';
 import { AnalyticsFilters } from '@/components/admin/analytics/AnalyticsFilters';
 import { Loader2 } from 'lucide-react';
 
@@ -199,6 +200,52 @@ const AnalyticsDashboard: React.FC = () => {
     };
   }, [filteredEvents]);
 
+  // Calculate form abandonment data
+  const formAbandonmentData = useMemo(() => {
+    const formOpens = filteredEvents.filter(e => e.event_type === 'checkout_form_open').length;
+    const formAbandons = filteredEvents.filter(e => e.event_type === 'checkout_form_abandon').length;
+    const successfulSubmissions = filteredEvents.filter(e => e.event_type === 'checkout_success').length;
+    
+    // Calculate avg time before abandon
+    const abandonEvents = filteredEvents.filter(e => e.event_type === 'checkout_form_abandon');
+    let totalTime = 0;
+    let timeCount = 0;
+    
+    abandonEvents.forEach(event => {
+      const time = (event.metadata as any)?.timeSpentSeconds;
+      if (time && typeof time === 'number') {
+        totalTime += time;
+        timeCount++;
+      }
+    });
+    
+    const avgTimeBeforeAbandon = timeCount > 0 ? Math.round(totalTime / timeCount) : 0;
+    
+    // Calculate fields filled before abandon
+    const fieldCountMap = new Map<string, number>();
+    abandonEvents.forEach(event => {
+      const filledFields = (event.metadata as any)?.filledFields;
+      if (Array.isArray(filledFields)) {
+        filledFields.forEach((field: string) => {
+          fieldCountMap.set(field, (fieldCountMap.get(field) || 0) + 1);
+        });
+      }
+    });
+    
+    const fieldsFilled = Array.from(fieldCountMap.entries()).map(([field, count]) => ({
+      field,
+      count,
+    }));
+
+    return {
+      formOpens,
+      formAbandons,
+      successfulSubmissions,
+      avgTimeBeforeAbandon,
+      fieldsFilled,
+    };
+  }, [filteredEvents]);
+
   // Calculate cart analysis data
   const cartData = useMemo(() => {
     // Top added products
@@ -278,6 +325,9 @@ const AnalyticsDashboard: React.FC = () => {
 
         {/* Checkout Analysis */}
         <CheckoutAnalysis data={checkoutData} />
+
+        {/* Form Abandonment Analysis */}
+        <FormAbandonmentAnalysis data={formAbandonmentData} />
 
         {/* Cart Analysis */}
         <CartAnalysis data={cartData} />
