@@ -96,6 +96,7 @@ const CartPage = () => {
     state: ''
   });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
+  const [formOpenTime, setFormOpenTime] = useState<number | null>(null);
   
   useEffect(() => {
     // Record cart view for analytics
@@ -432,6 +433,7 @@ const CartPage = () => {
       
       // Clear cart and reset form before redirect
       clearCart();
+      setFormOpenTime(null);
       setFormData({
         fullName: '',
         cpf: '',
@@ -602,6 +604,12 @@ const CartPage = () => {
                       navigate('/checkout-cadastro');
                       return;
                     }
+                    // Track checkout form open
+                    siteAnalyticsService.trackCheckoutFormOpen({
+                      itemCount: items.length,
+                      totalValue: total,
+                    });
+                    setFormOpenTime(Date.now());
                     setIsDialogOpen(true);
                   }}
                   disabled={isProcessing}
@@ -614,7 +622,30 @@ const CartPage = () => {
         </div>
       )}
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog 
+        open={isDialogOpen} 
+        onOpenChange={(open) => {
+          if (!open && isDialogOpen) {
+            // User is closing the dialog (abandon)
+            const filledFields = Object.entries(formData)
+              .filter(([_, value]) => value.trim() !== '')
+              .map(([key]) => key);
+            
+            const timeSpent = formOpenTime 
+              ? Math.round((Date.now() - formOpenTime) / 1000) 
+              : undefined;
+            
+            siteAnalyticsService.trackCheckoutFormAbandon({
+              itemCount: items.length,
+              totalValue: total,
+              filledFields,
+              timeSpentSeconds: timeSpent,
+            });
+            setFormOpenTime(null);
+          }
+          setIsDialogOpen(open);
+        }}
+      >
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>Informações de envio</DialogTitle>

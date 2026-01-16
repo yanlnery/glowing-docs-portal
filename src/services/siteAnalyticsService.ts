@@ -8,6 +8,8 @@ export type EventType =
   | 'add_to_cart'
   | 'remove_from_cart'
   | 'view_cart'
+  | 'checkout_form_open'
+  | 'checkout_form_abandon'
   | 'checkout_start'
   | 'checkout_form_error'
   | 'checkout_success'
@@ -242,7 +244,30 @@ export const siteAnalyticsService = {
     });
   },
 
-  // Track checkout start
+  // Track checkout form open (when user clicks "Finalizar Compra" and opens the form)
+  async trackCheckoutFormOpen(cartData: { itemCount: number; totalValue: number }): Promise<void> {
+    await this.trackEvent({
+      event_type: 'checkout_form_open',
+      event_category: 'checkout',
+      metadata: cartData,
+    });
+  },
+
+  // Track checkout form abandon (when user closes the form without completing)
+  async trackCheckoutFormAbandon(data: { 
+    itemCount: number; 
+    totalValue: number; 
+    filledFields: string[];
+    timeSpentSeconds?: number;
+  }): Promise<void> {
+    await this.trackEvent({
+      event_type: 'checkout_form_abandon',
+      event_category: 'checkout',
+      metadata: data,
+    });
+  },
+
+  // Track checkout start (when user submits the form)
   async trackCheckoutStart(cartData: { itemCount: number; totalValue: number }): Promise<void> {
     await this.trackEvent({
       event_type: 'checkout_start',
