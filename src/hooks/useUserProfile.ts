@@ -11,25 +11,29 @@ export const useUserProfile = (user: User | null, onProfileLoadAttempted: () => 
   const [profileError, setProfileError] = useState<PostgrestError | null>(null);
 
   const fetchProfile = useCallback(async (userId: string) => {
+    console.log('[useUserProfile] Iniciando fetch do perfil para userId:', userId);
     setIsProfileLoading(true);
     setProfileError(null);
     try {
       const { data, error } = await fetchProfileService(userId);
       if (error) {
+        console.error('[useUserProfile] Erro retornado do fetchProfileService:', error);
         setProfileError(error);
         setProfile(null);
       } else {
+        console.log('[useUserProfile] Perfil carregado com sucesso:', data);
         setProfile(data as Profile);
       }
       return { data, error };
     } catch (e) {
       const catchedError = e as PostgrestError;
+      console.error('[useUserProfile] Exceção ao carregar perfil:', catchedError);
       setProfileError(catchedError);
       setProfile(null);
       return { data: null, error: catchedError };
     } finally {
       setIsProfileLoading(false);
-      onProfileLoadAttempted(); // Notifica que a tentativa de carregamento do perfil foi concluída
+      onProfileLoadAttempted();
     }
   }, [onProfileLoadAttempted]);
 

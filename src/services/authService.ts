@@ -97,7 +97,14 @@ export const signupService = async (payload: { email: string, password: string, 
 };
 
 export const logoutService = async (): Promise<{ error: AuthError | null }> => {
-  return supabase.auth.signOut();
+  console.log('[AuthService] Executando logout...');
+  const result = await supabase.auth.signOut();
+  if (result.error) {
+    console.error('[AuthService] Erro no logout:', result.error);
+  } else {
+    console.log('[AuthService] Logout realizado com sucesso');
+  }
+  return result;
 };
 
 // Enhanced password reset with rate limiting
