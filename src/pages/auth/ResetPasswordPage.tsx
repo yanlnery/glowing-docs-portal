@@ -17,6 +17,21 @@ const ResetPasswordPage: React.FC = () => {
   const [hasSession, setHasSession] = useState(false); // This state can be used to conditionally render the form
 
   useEffect(() => {
+    // Guard: only allow access when coming from a recovery link
+    const expectedType = (() => {
+      try {
+        return sessionStorage.getItem('supabase_auth_link_type');
+      } catch {
+        return null;
+      }
+    })();
+
+    if (expectedType !== 'recovery') {
+      console.warn('[ResetPasswordPage] Acesso sem contexto de recovery; redirecionando para /login');
+      navigate('/login', { replace: true });
+      return;
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY") {
         setHasSession(true); 
@@ -28,17 +43,27 @@ const ResetPasswordPage: React.FC = () => {
     });
     
     // Check current session on mount to see if already in recovery mode
-    supabase.auth.getSession().then(({ data }) => {
-        // A password recovery "session" doesn't give full access, it's specific for `updateUser`
-        // We can assume if there is a session and the current URL indicates password recovery,
-        // it's likely a recovery context. Or rely on PASSWORD_RECOVERY event.
-        // For now, the PASSWORD_RECOVERY event is the most reliable indicator.
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (error) {
+        console.error('[ResetPasswordPage] getSession error:', error);
+        navigate('/login', { replace: true });
+        return;
+      }
+
+      if (!data.session) {
+        console.warn('[ResetPasswordPage] Sem sessão válida para recovery; redirecionando para /login');
+        navigate('/login', { replace: true });
+        return;
+      }
+
+      // If user arrived with an already-established session (token flow), PASSWORD_RECOVERY may not fire.
+      setHasSession(true);
     });
 
     return () => {
       subscription?.unsubscribe();
     };
-  }, []);
+  }, [navigate]);
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -59,6 +84,11 @@ const ResetPasswordPage: React.FC = () => {
       toast({ title: 'Senha Redefinida!', description: 'Sua senha foi alterada com sucesso. Faça login com sua nova senha.' });
       // It's good practice to also sign the user out after password update to ensure clean session
       await supabase.auth.signOut(); 
+      try {
+        sessionStorage.removeItem('supabase_auth_link_type');
+      } catch {
+        // ignore
+      }
       navigate('/login');
     }
   };
@@ -79,7 +109,12 @@ const ResetPasswordPage: React.FC = () => {
           <CardDescription>Crie uma nova senha para sua conta.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {!hasSession ? (
+            <div className="text-sm text-muted-foreground">
+              Validando link de recuperação…
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="password">Nova Senha</Label>
               <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
@@ -91,7 +126,8 @@ const ResetPasswordPage: React.FC = () => {
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? 'Salvando...' : 'Redefinir Senha'}
             </Button>
-          </form>
+            </form>
+          )}
         </CardContent>
       </Card>
     </div>
