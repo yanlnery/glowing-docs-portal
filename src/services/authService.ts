@@ -64,39 +64,9 @@ export const loginService = async (email: string, password: string): Promise<{ d
   return { data: data ? { user: data.user, session: data.session } : null, error };
 };
 
-// Helper function to send confirmation email via Resend
-const sendConfirmationEmail = async (email: string, name: string, confirmationUrl: string): Promise<void> => {
-  try {
-    const response = await supabase.functions.invoke('send-confirmation-email', {
-      body: { email, name, confirmationUrl }
-    });
-    
-    if (response.error) {
-      console.error('Error sending confirmation email:', response.error);
-    } else {
-      console.log('Confirmation email sent successfully via Resend');
-    }
-  } catch (error) {
-    console.error('Failed to send confirmation email:', error);
-  }
-};
-
-// Helper function to send password reset email via Resend
-const sendPasswordResetEmail = async (email: string, resetUrl: string, name?: string): Promise<void> => {
-  try {
-    const response = await supabase.functions.invoke('send-password-reset', {
-      body: { email, resetUrl, name }
-    });
-    
-    if (response.error) {
-      console.error('Error sending password reset email:', response.error);
-    } else {
-      console.log('Password reset email sent successfully via Resend');
-    }
-  } catch (error) {
-    console.error('Failed to send password reset email:', error);
-  }
-};
+// NOTE: Email sending is handled natively by Supabase Auth via SMTP configuration.
+// No edge functions are needed - Supabase sends emails directly using the SMTP settings
+// configured in the Supabase Dashboard (Authentication > Email Templates).
 
 // signupService deve usar AuthResponse['data'] que contém user e session
 export const signupService = async (payload: { email: string, password: string, options?: { data: any } }): Promise<{ data: AuthResponse['data'] | null, error: AuthError | null }> => {
