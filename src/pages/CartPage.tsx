@@ -365,6 +365,7 @@ const CartPage = () => {
         order_id: orderResult.id,
         product_id: item.product.id,
         product_name: item.product.name,
+        product_code: item.product.meta?.productId || null,
         species_name: item.product.speciesName || 'Não especificado',
         product_image_url: item.product.images?.[0]?.url || null,
         quantity: item.quantity,
