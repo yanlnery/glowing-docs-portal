@@ -258,7 +258,7 @@ export default function OrdersAdmin() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="max-w-[200px]">
+                        <div className="max-w-[250px]">
                           {order.order_items && order.order_items.length > 0 ? (
                             <div className="space-y-1">
                               {order.order_items.slice(0, 2).map((item, idx) => (
@@ -272,9 +272,9 @@ export default function OrdersAdmin() {
                                   )}
                                   <div className="min-w-0">
                                     <p className="text-sm font-medium truncate">{item.product_name}</p>
-                                    {item.species_name && (
-                                      <p className="text-xs text-muted-foreground truncate">{item.species_name}</p>
-                                    )}
+                                    <p className="text-xs text-muted-foreground font-mono truncate">
+                                      ID: {item.product_id ? item.product_id.substring(0, 8) : 'N/A'}
+                                    </p>
                                   </div>
                                 </div>
                               ))}
