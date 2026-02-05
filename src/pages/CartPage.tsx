@@ -25,9 +25,11 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
 import { orderService } from '@/services/orderService';
+import { orderEventsService } from '@/services/orderEventsService';
 import { cartAnalyticsService } from '@/services/cartAnalyticsService';
 import { siteAnalyticsService } from '@/services/siteAnalyticsService';
 import { CheckoutAbandonmentDialog } from '@/components/cart/CheckoutAbandonmentDialog';
+import { supabase } from '@/integrations/supabase/client';
 
 // Define proper interfaces for our form data and errors
 interface CheckoutFormData {
@@ -379,12 +381,21 @@ const CartPage = () => {
 
       console.log("✅ Order items added successfully");
 
-      // Prepare WhatsApp message with formatted address
+      // Create 'created' event
+      await orderEventsService.createEvent({
+        order_id: orderResult.id,
+        event_type: 'created',
+        event_data: { item_count: items.length, total: total },
+      });
+
+      // Prepare WhatsApp message with formatted address and order_number
       const fullAddress = `${formData.street}, ${formData.number}${formData.complement ? ` - ${formData.complement}` : ''}, ${formData.neighborhood}, ${formData.city} - ${formData.state}, CEP: ${formData.cep}`;
+      
+      const orderNumber = orderResult.order_number || `#${orderResult.id.substring(0, 8)}`;
       
       const message = 
         `Olá! Acabei de finalizar um pedido no site Pet Serpentes.\n\n` +
-        `Pedido: #${orderResult.id.substring(0, 8)}\n` +
+        `Pedido: ${orderNumber}\n` +
         `Nome do comprador: ${formData.fullName}\n` +
         `CPF: ${formData.cpf}\n` +
         `Endereço: ${fullAddress}\n\n` +
@@ -427,6 +438,18 @@ const CartPage = () => {
       });
 
       console.log("✅ Checkout completed successfully, redirecting to WhatsApp...");
+      
+      // Record whatsapp_clicked_at and create event
+      await supabase
+        .from('orders')
+        .update({ whatsapp_clicked_at: new Date().toISOString() })
+        .eq('id', orderResult.id);
+      
+      await orderEventsService.createEvent({
+        order_id: orderResult.id,
+        event_type: 'whatsapp_redirect',
+        event_data: { whatsapp_url: whatsappUrl.substring(0, 100) },
+      });
       
       // Track WhatsApp redirect
       siteAnalyticsService.trackWhatsAppRedirect({
