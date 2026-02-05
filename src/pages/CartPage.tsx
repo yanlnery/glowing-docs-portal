@@ -114,7 +114,8 @@ const CartPage = () => {
       items: items.map(item => ({
         id: item.product.id,
         name: item.product.name,
-        price: item.product.price
+        price: item.product.price,
+        productCode: item.product.meta?.productId
       }))
     });
 

@@ -106,10 +106,14 @@ const ShoppingCartAnalytics = () => {
   const totalAddToCart = filteredData.filter(entry => entry.action === 'add_to_cart').length;
   const totalProducts = filteredData.reduce((sum, entry) => sum + (entry.item_count || 0), 0);
   
-  // Get product names from items array
-  const getProductName = (entry: CartAnalyticsEntry) => {
+  // Get product names from items array with product code
+  const getProductDisplay = (entry: CartAnalyticsEntry) => {
     if (entry.items && Array.isArray(entry.items) && entry.items.length > 0) {
-      return entry.items.map((item: any) => item.name || 'Produto').join(', ');
+      return entry.items.map((item: any) => {
+        const productCode = item.productCode || item.product_code;
+        const name = item.name || 'Produto';
+        return productCode ? `#${productCode} ${name}` : name;
+      }).join(', ');
     }
     return '-';
   };
@@ -387,7 +391,7 @@ const ShoppingCartAnalytics = () => {
                               entry.action === 'view_cart' ? 'Visualização do Carrinho' :
                               entry.action
                             }</TableCell>
-                            <TableCell>{getProductName(entry)}</TableCell>
+                            <TableCell>{getProductDisplay(entry)}</TableCell>
                             <TableCell>{entry.item_count || '-'}</TableCell>
                             <TableCell>{entry.total_value ? formatPrice(entry.total_value) : '-'}</TableCell>
                             <TableCell>

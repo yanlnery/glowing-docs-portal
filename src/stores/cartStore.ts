@@ -35,11 +35,12 @@ export const useCartStore = create<CartStore>()(
             return state;
           }
           
-          // Track add to cart event
+          // Track add to cart event with product code
           siteAnalyticsService.trackAddToCart({
             id: product.id,
             name: product.name,
             price: product.price,
+            productCode: product.meta?.productId,
           });
           
           console.log(`✅ Adicionando produto ${product.name} ao carrinho`);
@@ -54,11 +55,12 @@ export const useCartStore = create<CartStore>()(
         const item = state.items.find(i => i.product.id === productId);
         
         if (item) {
-          // Track remove from cart event
+          // Track remove from cart event with product code
           siteAnalyticsService.trackRemoveFromCart({
             id: item.product.id,
             name: item.product.name,
             price: item.product.price,
+            productCode: item.product.meta?.productId,
           });
         }
         
