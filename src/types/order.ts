@@ -34,6 +34,7 @@ export interface OrderItem {
   id: string;
   order_id: string;
   product_id?: string;
+  product_code?: string;
   product_name: string;
   species_name?: string;
   product_image_url?: string;

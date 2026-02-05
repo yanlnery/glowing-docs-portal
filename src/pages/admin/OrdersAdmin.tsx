@@ -271,9 +271,14 @@ export default function OrdersAdmin() {
                                     />
                                   )}
                                   <div className="min-w-0">
-                                    <p className="text-sm font-medium truncate">{item.product_name}</p>
-                                    <p className="text-xs text-muted-foreground font-mono truncate">
-                                      ID: {item.product_id ? item.product_id.substring(0, 8) : 'N/A'}
+                                    <p className="text-sm font-medium truncate">
+                                      {item.product_code && (
+                                        <span className="font-mono text-primary mr-1">#{item.product_code}</span>
+                                      )}
+                                      {item.product_name}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground truncate">
+                                      {item.species_name || 'Espécie não especificada'}
                                     </p>
                                   </div>
                                 </div>
