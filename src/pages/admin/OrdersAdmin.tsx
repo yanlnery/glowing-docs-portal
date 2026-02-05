@@ -222,6 +222,7 @@ export default function OrdersAdmin() {
                     <TableHead>Data</TableHead>
                     <TableHead>Nº Pedido</TableHead>
                     <TableHead>Cliente</TableHead>
+                    <TableHead>Produtos</TableHead>
                     <TableHead className="hidden md:table-cell">Total</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Ações</TableHead>
@@ -254,6 +255,38 @@ export default function OrdersAdmin() {
                           <div className="text-xs text-muted-foreground hidden sm:block">
                             {order.customer_cpf || ''}
                           </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="max-w-[200px]">
+                          {order.order_items && order.order_items.length > 0 ? (
+                            <div className="space-y-1">
+                              {order.order_items.slice(0, 2).map((item, idx) => (
+                                <div key={idx} className="flex items-center gap-2">
+                                  {item.product_image_url && (
+                                    <img 
+                                      src={item.product_image_url} 
+                                      alt={item.product_name}
+                                      className="h-8 w-8 rounded object-cover flex-shrink-0"
+                                    />
+                                  )}
+                                  <div className="min-w-0">
+                                    <p className="text-sm font-medium truncate">{item.product_name}</p>
+                                    {item.species_name && (
+                                      <p className="text-xs text-muted-foreground truncate">{item.species_name}</p>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                              {order.order_items.length > 2 && (
+                                <p className="text-xs text-muted-foreground">
+                                  +{order.order_items.length - 2} item(s)
+                                </p>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-sm text-muted-foreground">-</span>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
