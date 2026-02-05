@@ -51,6 +51,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   const navigation: NavItem[] = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: Home },
+    { name: 'Pedidos', href: '/admin/pedidos', icon: ShoppingCart },
     { name: 'Produtos', href: '/admin/products', icon: Package },
     { name: 'Mensagens', href: '/admin/contact-submissions', icon: MessageSquare },
     { name: 'Gestão de Espécies', href: '/admin/species', icon: ClipboardList, requiredRole: 'admin' },

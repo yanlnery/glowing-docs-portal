@@ -1,6 +1,9 @@
+export type OrderStatus = 'pending' | 'contacted' | 'confirmed' | 'cancelled' | 'shipped' | 'delivered' | 'processing';
+
 export interface Order {
   id: string;
   user_id: string;
+  order_number?: string;
   customer_name?: string;
   customer_cpf?: string;
   customer_phone?: string;
@@ -17,7 +20,11 @@ export interface Order {
   notes?: string;
   tracking_code?: string;
   total_amount: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: OrderStatus;
+  whatsapp_clicked_at?: string;
+  confirmed_at?: string;
+  confirmed_by?: string;
+  admin_notes?: string;
   created_at: string;
   updated_at: string;
   order_items?: OrderItem[];

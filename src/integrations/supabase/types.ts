@@ -329,6 +329,41 @@ export type Database = {
         }
         Relationships: []
       }
+      order_events: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          event_data: Json | null
+          event_type: string
+          id: string
+          order_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          order_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           created_at: string
@@ -378,12 +413,16 @@ export type Database = {
       }
       orders: {
         Row: {
+          admin_notes: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
           created_at: string
           customer_cpf: string | null
           customer_name: string | null
           customer_phone: string | null
           id: string
           notes: string | null
+          order_number: string | null
           payment_method: string | null
           shipping_address: Json | null
           status: string
@@ -391,14 +430,19 @@ export type Database = {
           tracking_code: string | null
           updated_at: string
           user_id: string
+          whatsapp_clicked_at: string | null
         }
         Insert: {
+          admin_notes?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
           created_at?: string
           customer_cpf?: string | null
           customer_name?: string | null
           customer_phone?: string | null
           id?: string
           notes?: string | null
+          order_number?: string | null
           payment_method?: string | null
           shipping_address?: Json | null
           status?: string
@@ -406,14 +450,19 @@ export type Database = {
           tracking_code?: string | null
           updated_at?: string
           user_id: string
+          whatsapp_clicked_at?: string | null
         }
         Update: {
+          admin_notes?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
           created_at?: string
           customer_cpf?: string | null
           customer_name?: string | null
           customer_phone?: string | null
           id?: string
           notes?: string | null
+          order_number?: string | null
           payment_method?: string | null
           shipping_address?: Json | null
           status?: string
@@ -421,6 +470,7 @@ export type Database = {
           tracking_code?: string | null
           updated_at?: string
           user_id?: string
+          whatsapp_clicked_at?: string | null
         }
         Relationships: []
       }
