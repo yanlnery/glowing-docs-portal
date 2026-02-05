@@ -363,6 +363,7 @@ const ProductList = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-12"></TableHead>
+                    <TableHead>ID</TableHead>
                     <TableHead>Nome</TableHead>
                     <TableHead className="hidden md:table-cell">Espécie</TableHead>
                     <TableHead className="hidden lg:table-cell">Preço</TableHead>
@@ -382,6 +383,11 @@ const ProductList = () => {
                           {product.isNew && !product.featured && (
                             <Clock className="h-5 w-5 text-blue-500" />
                           )}
+                        </TableCell>
+                        <TableCell>
+                          <span className="font-mono text-sm text-primary font-medium">
+                            {product.meta?.productId ? `#${product.meta.productId}` : '-'}
+                          </span>
                         </TableCell>
                         <TableCell className="font-medium">{product.name}</TableCell>
                         <TableCell className="hidden md:table-cell">

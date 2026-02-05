@@ -203,35 +203,38 @@ export const siteAnalyticsService = {
   },
 
   // Track product view
-  async trackProductView(product: { id: string; name: string; price: number }): Promise<void> {
+  async trackProductView(product: { id: string; name: string; price: number; productCode?: string }): Promise<void> {
     await this.trackEvent({
       event_type: 'product_view',
       event_category: 'product',
       product_id: product.id,
-      product_name: product.name,
+      product_name: product.productCode ? `#${product.productCode} ${product.name}` : product.name,
       product_price: product.price,
+      metadata: { product_code: product.productCode },
     });
   },
 
   // Track add to cart
-  async trackAddToCart(product: { id: string; name: string; price: number }): Promise<void> {
+  async trackAddToCart(product: { id: string; name: string; price: number; productCode?: string }): Promise<void> {
     await this.trackEvent({
       event_type: 'add_to_cart',
       event_category: 'cart',
       product_id: product.id,
-      product_name: product.name,
+      product_name: product.productCode ? `#${product.productCode} ${product.name}` : product.name,
       product_price: product.price,
+      metadata: { product_code: product.productCode },
     });
   },
 
   // Track remove from cart
-  async trackRemoveFromCart(product: { id: string; name: string; price: number }): Promise<void> {
+  async trackRemoveFromCart(product: { id: string; name: string; price: number; productCode?: string }): Promise<void> {
     await this.trackEvent({
       event_type: 'remove_from_cart',
       event_category: 'cart',
       product_id: product.id,
-      product_name: product.name,
+      product_name: product.productCode ? `#${product.productCode} ${product.name}` : product.name,
       product_price: product.price,
+      metadata: { product_code: product.productCode },
     });
   },
 

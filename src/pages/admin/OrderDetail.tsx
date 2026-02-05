@@ -305,7 +305,12 @@ export default function OrderDetail() {
                           />
                         )}
                         <div>
-                          <p className="font-medium">{item.product_name}</p>
+                          <p className="font-medium">
+                            {(item as any).product_code && (
+                              <span className="font-mono text-primary mr-2">#{(item as any).product_code}</span>
+                            )}
+                            {item.product_name}
+                          </p>
                           {item.species_name && (
                             <p className="text-sm text-muted-foreground">{item.species_name}</p>
                           )}
