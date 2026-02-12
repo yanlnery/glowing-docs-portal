@@ -31,7 +31,7 @@ export const settingsService = {
         key, 
         value: typeof value === 'string' ? value : JSON.stringify(value),
         updated_at: new Date().toISOString() 
-      })
+      }, { onConflict: 'key' })
       .select('*')
       .single();
     
