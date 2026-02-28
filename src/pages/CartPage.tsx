@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useCartStore } from '@/stores/cartStore';
+import { useCartStore, CartItem } from '@/stores/cartStore';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,7 +12,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Trash2, ShoppingCart, ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
+import { Trash2, ShoppingCart, ArrowLeft, AlertCircle, Loader2, CreditCard, QrCode } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { 
   Dialog, 
   DialogContent, 
@@ -84,6 +85,7 @@ const CartPage = () => {
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'pix' | 'cartao'>('pix');
   const [isFetchingCep, setIsFetchingCep] = useState(false);
   const cepDebounceRef = useRef<NodeJS.Timeout | null>(null);
   
@@ -127,7 +129,19 @@ const CartPage = () => {
   }, []);
   
   // Calculate total
-  const total = items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+  const total = items.reduce((sum, item) => {
+    if (paymentMethod === 'pix' && item.product.pixPrice) {
+      return sum + item.product.pixPrice * item.quantity;
+    }
+    return sum + item.product.price * item.quantity;
+  }, 0);
+
+  const getItemPrice = (item: CartItem) => {
+    if (paymentMethod === 'pix' && item.product.pixPrice) {
+      return item.product.pixPrice;
+    }
+    return item.product.price;
+  };
   
   // Format price
   const formatPrice = (price: number) => {
@@ -339,7 +353,7 @@ const CartPage = () => {
           state: formData.state.trim(),
           zipcode: formData.cep.replace(/\D/g, '')
         },
-        payment_method: 'whatsapp',
+        payment_method: paymentMethod === 'pix' ? 'pix' : 'cartao',
         total_amount: total,
         status: 'pending' as const // Order starts as pending until confirmed via WhatsApp
       };
@@ -395,13 +409,16 @@ const CartPage = () => {
       
       const orderNumber = orderResult.order_number || `#${orderResult.id.substring(0, 8)}`;
       
+      const paymentLabel = paymentMethod === 'pix' ? 'PIX' : 'Cartão (até 10x sem juros)';
+      
       const message = 
         `Olá! Acabei de finalizar um pedido no site Pet Serpentes.\n\n` +
         `Pedido: ${orderNumber}\n` +
         `Nome do comprador: ${formData.fullName}\n` +
         `CPF: ${formData.cpf}\n` +
-        `Endereço: ${fullAddress}\n\n` +
-        `Animal(is) solicitado(s):\n${items.map(item => `- ${item.product.name} (${item.product.speciesName || "Não especificado"}) - ${formatPrice(item.product.price)}`).join('\n')}\n\n` +
+        `Endereço: ${fullAddress}\n` +
+        `Forma de pagamento: ${paymentLabel}\n\n` +
+        `Animal(is) solicitado(s):\n${items.map(item => `- ${item.product.name} (${item.product.speciesName || "Não especificado"}) - ${formatPrice(getItemPrice(item))}`).join('\n')}\n\n` +
         `Total: ${formatPrice(total)}\n\n` +
         `Gostaria de confirmar o pedido e combinar os detalhes do envio.`;
 
@@ -574,7 +591,12 @@ const CartPage = () => {
                           
                           <div className="flex justify-end mt-2">
                             <div className="text-sm sm:text-base font-semibold">
-                              {formatPrice(item.product.price)}
+                              {formatPrice(getItemPrice(item))}
+                              {paymentMethod === 'pix' && item.product.pixPrice && item.product.pixPrice < item.product.price && (
+                                <span className="text-xs text-muted-foreground line-through ml-2">
+                                  {formatPrice(item.product.price)}
+                                </span>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -603,18 +625,67 @@ const CartPage = () => {
                 <CardTitle>Resumo do Pedido</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {items.map((item) => (
-                  <div key={item.product.id} className="flex justify-between text-sm">
-                    <span>{item.product.name}</span>
-                    <span>{formatPrice(item.product.price)}</span>
-                  </div>
-                ))}
+                {/* Payment method selector */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-semibold">Forma de pagamento</Label>
+                  <RadioGroup
+                    value={paymentMethod}
+                    onValueChange={(v) => setPaymentMethod(v as 'pix' | 'cartao')}
+                    className="grid grid-cols-2 gap-3"
+                  >
+                    <label
+                      className={`flex items-center gap-2 border rounded-lg p-3 cursor-pointer transition-colors ${
+                        paymentMethod === 'pix'
+                          ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                          : 'border-border hover:border-muted-foreground/40'
+                      }`}
+                    >
+                      <RadioGroupItem value="pix" id="pix" />
+                      <div className="flex items-center gap-1.5">
+                        <QrCode className="h-4 w-4 text-green-600 dark:text-green-400" />
+                        <span className="text-sm font-medium">PIX</span>
+                      </div>
+                    </label>
+                    <label
+                      className={`flex items-center gap-2 border rounded-lg p-3 cursor-pointer transition-colors ${
+                        paymentMethod === 'cartao'
+                          ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                          : 'border-border hover:border-muted-foreground/40'
+                      }`}
+                    >
+                      <RadioGroupItem value="cartao" id="cartao" />
+                      <div className="flex items-center gap-1.5">
+                        <CreditCard className="h-4 w-4" />
+                        <span className="text-sm font-medium">Cartão</span>
+                      </div>
+                    </label>
+                  </RadioGroup>
+                  {paymentMethod === 'cartao' && (
+                    <p className="text-xs text-muted-foreground">Até 10x sem juros</p>
+                  )}
+                </div>
+
+                <div className="border-t pt-3 space-y-2">
+                  {items.map((item) => (
+                    <div key={item.product.id} className="flex justify-between text-sm">
+                      <span className="truncate mr-2">{item.product.name}</span>
+                      <span className="flex-shrink-0">{formatPrice(getItemPrice(item))}</span>
+                    </div>
+                  ))}
+                </div>
                 
-                <div className="border-t pt-4 mt-4">
+                <div className="border-t pt-4 mt-2">
                   <div className="flex justify-between font-bold text-lg">
                     <span>Total</span>
-                    <span>{formatPrice(total)}</span>
+                    <span className={paymentMethod === 'pix' ? 'text-green-600 dark:text-green-400' : ''}>
+                      {formatPrice(total)}
+                    </span>
                   </div>
+                  {paymentMethod === 'cartao' && (
+                    <p className="text-xs text-muted-foreground text-right mt-1">
+                      ou 10x de {formatPrice(total / 10)} sem juros
+                    </p>
+                  )}
                 </div>
                 
                 <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-md flex gap-2 text-sm">
