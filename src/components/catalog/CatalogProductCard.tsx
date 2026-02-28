@@ -104,7 +104,9 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
       
       <CardHeader className="p-2 sm:p-3 pb-1 sm:pb-2">
         <CardTitle className="text-sm sm:text-base text-balance line-clamp-2">
-          {product.name}
+          <Link to={`/produtos/${product.id}`} className="hover:underline">
+            {product.name}
+          </Link>
           {product.meta?.productId && (
             <span className="text-muted-foreground font-normal text-xs ml-1">{product.meta.productId}</span>
           )}
