@@ -81,7 +81,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             className="w-full h-full"
             imgClassName="object-contain object-center"
-            style={{}}
+            style={{ objectFit: 'contain', objectPosition: 'center' }}
             disablePlaceholderBlur
             debugId={`catalog-${product.id}`}
             onDebug={setImageDebug}
