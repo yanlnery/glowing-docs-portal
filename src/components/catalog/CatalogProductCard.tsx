@@ -86,7 +86,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
             priority={index < 8}
             quality={90}
             className="w-full h-full"
-            imgClassName="transition-transform duration-300 ease-out group-hover:scale-105"
+            imgClassName="transition-opacity duration-300 ease-out group-hover:opacity-95 group-hover:brightness-95"
             style={{ objectFit: 'cover' }}
             forcedWidth={forcedCatalogWidth}
             disableSrcSet
