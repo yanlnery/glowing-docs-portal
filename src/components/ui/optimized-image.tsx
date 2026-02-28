@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { getSrcSet, getTransformedUrl, getXDescriptorSrcSet, CATALOG_SIZES } from '@/utils/supabaseImageUrl';
 
@@ -50,7 +50,8 @@ export function OptimizedImage({
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [isInView, setIsInView] = useState(priority);
-  const imgRef = useRef<HTMLImageElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const imgElRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     if (priority) {
@@ -68,15 +69,15 @@ export function OptimizedImage({
       { threshold: 0.01, rootMargin: '200px' }
     );
 
-    if (imgRef.current) {
-      observer.observe(imgRef.current);
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
     }
 
     return () => observer.disconnect();
   }, [priority]);
 
-  const handleLoad = () => {
-    const el = imgRef.current;
+  const handleLoad = useCallback(() => {
+    const el = imgElRef.current;
     if (el) {
       const currentSrc = el.currentSrc || el.src;
       const widthMatch = currentSrc.match(/[?&]width=(\d+)/);
@@ -96,11 +97,18 @@ export function OptimizedImage({
     setIsLoaded(true);
     setHasError(false);
     onLoad?.();
-  };
+  }, [debugId, onDebug, onLoad]);
+
+  // Handle cached images: check img.complete on mount / src change
+  useEffect(() => {
+    const el = imgElRef.current;
+    if (el && el.complete && el.naturalWidth > 0) {
+      handleLoad();
+    }
+  }, [src, handleLoad]);
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     const target = e.currentTarget;
-    // If transformed URL fails, fallback to original src (no query params)
     const originalSrc = src?.split('?')[0] || src;
     if (target.src !== originalSrc && src) {
       target.srcset = '';
@@ -125,31 +133,31 @@ export function OptimizedImage({
 
   const defaultSrc = isValidSrc ? transformedSrc : src;
 
-  // When using x-descriptors or forced src-only mode, sizes is not needed
   const effectiveSrcSet = disableSrcSet ? undefined : (srcSet || undefined);
   const effectiveSizes = disableSrcSet || useXDescriptors ? undefined : sizes;
 
   return (
-    <div className={cn('relative overflow-hidden w-full h-full', className)} ref={imgRef}>
+    <div className={cn('relative overflow-hidden w-full h-full', className)} ref={containerRef}>
+      {/* Placeholder: covers image until loaded, then removed */}
       {!isLoaded && shouldLoad && !hasError && isValidSrc && (
         <div
-          className="absolute inset-0 bg-muted w-full h-full"
+          className="absolute inset-0 bg-muted w-full h-full z-10"
           style={disablePlaceholderBlur ? style : { ...style, backdropFilter: 'blur(8px)' }}
         />
       )}
 
       {shouldLoad && isValidSrc && !hasError && (
         <img
+          ref={imgElRef}
           src={defaultSrc}
           srcSet={effectiveSrcSet}
           sizes={effectiveSizes}
           alt={alt}
-          className={cn('w-full h-full', imgClassName, isLoaded ? 'opacity-100' : 'opacity-0')}
+          className={cn('w-full h-full', imgClassName)}
           style={{
             objectFit: 'cover',
             width: '100%',
             height: '100%',
-            transition: 'opacity 0.2s ease-out',
             imageRendering: 'auto',
             ...style,
           }}
