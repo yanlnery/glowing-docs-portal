@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight } from 'lucide-react';
-
+import { getSrcSet, getTransformedUrl } from '@/utils/supabaseImageUrl';
 
 interface ProductImageZoomProps {
   images: { id?: string; url: string; alt?: string }[];
@@ -8,6 +8,8 @@ interface ProductImageZoomProps {
   selectedIndex: number;
   onIndexChange: (index: number) => void;
 }
+
+const MAIN_SIZES = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px';
 
 export function ProductImageZoom({ 
   images, 
@@ -43,7 +45,6 @@ export function ProductImageZoom({
       setIsZoomed(true);
       setZoomScale(2);
       
-      // Center zoom on click position
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
@@ -59,7 +60,6 @@ export function ProductImageZoom({
     }
   }, [isZoomed]);
 
-  // Mouse drag handlers
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (!isZoomed) return;
     e.preventDefault();
@@ -80,7 +80,6 @@ export function ProductImageZoom({
     setIsDragging(false);
   }, []);
 
-  // Touch handlers for pinch-zoom
   const getDistance = (touches: React.TouchList) => {
     if (touches.length < 2) return 0;
     const dx = touches[0].clientX - touches[1].clientX;
@@ -90,11 +89,9 @@ export function ProductImageZoom({
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (e.touches.length === 2) {
-      // Pinch start
       e.preventDefault();
       setInitialDistance(getDistance(e.touches));
     } else if (e.touches.length === 1 && isZoomed) {
-      // Pan start
       setIsDragging(true);
       setDragStart({
         x: e.touches[0].clientX - position.x,
@@ -105,7 +102,6 @@ export function ProductImageZoom({
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     if (e.touches.length === 2 && initialDistance !== null) {
-      // Pinch zoom
       e.preventDefault();
       const currentDistance = getDistance(e.touches);
       const scale = currentDistance / initialDistance;
@@ -122,7 +118,6 @@ export function ProductImageZoom({
       
       setInitialDistance(currentDistance);
     } else if (e.touches.length === 1 && isDragging && isZoomed) {
-      // Pan
       e.preventDefault();
       setPosition({
         x: e.touches[0].clientX - dragStart.x,
@@ -136,7 +131,6 @@ export function ProductImageZoom({
     setIsDragging(false);
   }, []);
 
-  // Double-tap to zoom
   const lastTapRef = useRef<number>(0);
   const handleDoubleTap = useCallback((e: React.TouchEvent) => {
     const now = Date.now();
@@ -180,6 +174,20 @@ export function ProductImageZoom({
     onIndexChange(newIndex);
   };
 
+  // Generate srcSet and optimized src for main image
+  const mainSrcSet = selectedImage ? getSrcSet(selectedImage, 90) : '';
+  const mainSrc = selectedImage && mainSrcSet
+    ? getTransformedUrl(selectedImage, { width: 1600, quality: 90, format: 'webp' })
+    : selectedImage;
+
+  const handleMainError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const target = e.currentTarget;
+    if (selectedImage && target.src !== selectedImage) {
+      target.srcset = '';
+      target.src = selectedImage;
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Main Image Container */}
@@ -204,7 +212,9 @@ export function ProductImageZoom({
           <>
             <img 
               ref={imageRef}
-              src={selectedImage} 
+              src={mainSrc}
+              srcSet={mainSrcSet || undefined}
+              sizes={mainSrcSet ? MAIN_SIZES : undefined}
               alt={productName} 
               className="w-full h-full object-contain pointer-events-none"
               style={{ 
@@ -214,6 +224,7 @@ export function ProductImageZoom({
               }}
               loading="eager"
               draggable={false}
+              onError={handleMainError}
             />
             
             {/* Zoom Indicator Overlay */}
@@ -225,7 +236,7 @@ export function ProductImageZoom({
               </div>
             )}
 
-            {/* Navigation Arrows (when multiple images and not zoomed) */}
+            {/* Navigation Arrows */}
             {images.length > 1 && !isZoomed && (
               <>
                 <button
@@ -279,22 +290,30 @@ export function ProductImageZoom({
       {/* Thumbnail Gallery */}
       {images.length > 1 && (
         <div className="grid grid-cols-4 gap-2">
-          {images.map((image, index) => (
-            <div 
-              key={image.id || index} 
-              className={`aspect-square bg-muted rounded-md overflow-hidden cursor-pointer border-2 transition-all duration-200 hover:scale-105 ${
-                selectedIndex === index ? 'border-serpente-500 ring-2 ring-serpente-500/20' : 'border-transparent hover:border-serpente-300'
-              }`}
-              onClick={() => onIndexChange(index)}
-            >
-              <img 
-                src={image.url}
-                alt={image.alt || `${productName} - imagem ${index + 1}`} 
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </div>
-          ))}
+          {images.map((image, index) => {
+            const thumbSrc = getTransformedUrl(image.url, { width: 480, quality: 80, format: 'webp' });
+            return (
+              <div 
+                key={image.id || index} 
+                className={`aspect-square bg-muted rounded-md overflow-hidden cursor-pointer border-2 transition-all duration-200 hover:scale-105 ${
+                  selectedIndex === index ? 'border-serpente-500 ring-2 ring-serpente-500/20' : 'border-transparent hover:border-serpente-300'
+                }`}
+                onClick={() => onIndexChange(index)}
+              >
+                <img 
+                  src={thumbSrc}
+                  alt={image.alt || `${productName} - imagem ${index + 1}`} 
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  onError={(e) => {
+                    if (e.currentTarget.src !== image.url) {
+                      e.currentTarget.src = image.url;
+                    }
+                  }}
+                />
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
