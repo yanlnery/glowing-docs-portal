@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight } from 'lucide-react';
-import { getTransformedUrl, getSrcSet } from '@/utils/supabaseImageUrl';
+
 
 interface ProductImageZoomProps {
   images: { id?: string; url: string; alt?: string }[];
@@ -204,9 +204,7 @@ export function ProductImageZoom({
           <>
             <img 
               ref={imageRef}
-              src={getTransformedUrl(selectedImage, { width: 1600, quality: 90, format: 'webp' })} 
-              srcSet={getSrcSet(selectedImage, 90) || undefined}
-              sizes="(max-width: 768px) 100vw, 50vw"
+              src={selectedImage} 
               alt={productName} 
               className="w-full h-full object-contain pointer-events-none"
               style={{ 
@@ -290,7 +288,7 @@ export function ProductImageZoom({
               onClick={() => onIndexChange(index)}
             >
               <img 
-                src={getTransformedUrl(image.url, { width: 480, quality: 90, format: 'webp' })}
+                src={image.url}
                 alt={image.alt || `${productName} - imagem ${index + 1}`} 
                 className="w-full h-full object-cover"
                 loading="lazy"
