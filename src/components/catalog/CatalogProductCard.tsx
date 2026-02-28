@@ -79,14 +79,14 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
       }}
     >
       <Link to={`/produtos/${product.id}`} className="block relative cursor-pointer group">
-        <div className="aspect-square md:aspect-[4/3] overflow-hidden rounded-t-lg bg-muted">
+        <div className="aspect-square md:aspect-[4/3] overflow-hidden rounded-t-lg bg-muted transition-transform duration-300 ease-out group-hover:scale-105">
           <OptimizedImage
             src={imageUrl || '/placeholder.svg'}
             alt={product.name}
             priority={index < 8}
             quality={90}
             className="w-full h-full"
-            imgClassName="transition-opacity duration-300 ease-out group-hover:opacity-95 group-hover:brightness-95"
+            imgClassName=""
             style={{ objectFit: 'cover' }}
             forcedWidth={forcedCatalogWidth}
             disableSrcSet
