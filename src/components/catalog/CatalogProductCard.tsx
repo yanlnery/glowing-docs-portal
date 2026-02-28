@@ -24,22 +24,12 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
   const isInCart = isProductInCart(product.id);
   const isUnavailable = product.status === 'indisponivel' || product.status === 'vendido';
   const imageUrl = getProductImageUrl(product);
-  const [isDesktop, setIsDesktop] = React.useState(() => typeof window !== 'undefined' && window.innerWidth >= 1024);
   const [imageDebug, setImageDebug] = React.useState<{
     renderedWidth: number;
     naturalWidth: number;
     currentSrc: string;
     currentWidthParam: string | null;
   } | null>(null);
-
-  React.useEffect(() => {
-    const onResize = () => setIsDesktop(window.innerWidth >= 1024);
-    onResize();
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
-
-  const catalogBaseWidth = isDesktop ? 300 : 280;
 
   const handleAddToCart = (product: Product) => {
     if (isProductInCart(product.id)) {
@@ -86,8 +76,9 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
             priority={index < 8}
             quality={90}
             transformFormat="origin"
-            useXDescriptors
-            baseWidth={catalogBaseWidth}
+            forcedWidth={600}
+            disableSrcSet
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             className="w-full h-full"
             imgClassName=""
             style={{ objectFit: 'cover' }}
