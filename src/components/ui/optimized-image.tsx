@@ -44,10 +44,7 @@ export function OptimizedImage({
           observer.disconnect();
         }
       },
-      {
-        threshold: 0.01,
-        rootMargin: '200px',
-      }
+      { threshold: 0.01, rootMargin: '200px' }
     );
 
     if (imgRef.current) {
@@ -64,11 +61,12 @@ export function OptimizedImage({
   };
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    // If transformed URL fails (e.g. ORB blocking, Pro not active), fallback to original
     const target = e.currentTarget;
-    if (target.src !== src && src) {
+    // If transformed URL fails, fallback to original src (no query params)
+    const originalSrc = src?.split('?')[0] || src;
+    if (target.src !== originalSrc && src) {
       target.srcset = '';
-      target.src = src;
+      target.src = originalSrc;
       return;
     }
     setHasError(true);
@@ -79,58 +77,46 @@ export function OptimizedImage({
   const isValidSrc = src && src.trim() !== '' && src !== '/placeholder.svg';
   const shouldLoad = isInView || priority;
 
-  // Generate srcset for Supabase images
   const srcSet = isValidSrc ? getSrcSet(src, quality) : '';
-  // Default src uses 1200w for good desktop quality
   const defaultSrc = isValidSrc && srcSet
     ? getTransformedUrl(src, { width: 1200, quality, format: 'webp' })
     : src;
 
   return (
     <div className={cn('relative overflow-hidden w-full h-full', className)} ref={imgRef}>
-      {/* Blur placeholder */}
       {!isLoaded && shouldLoad && !hasError && isValidSrc && (
-        <div 
-          className="absolute inset-0 bg-muted w-full h-full" 
-          style={{
-            ...style,
-            backdropFilter: 'blur(8px)',
-          }}
+        <div
+          className="absolute inset-0 bg-muted w-full h-full"
+          style={{ ...style, backdropFilter: 'blur(8px)' }}
         />
       )}
-      
-      {/* Main image with srcset */}
+
       {shouldLoad && isValidSrc && !hasError && (
         <img
           src={defaultSrc}
           srcSet={srcSet || undefined}
           sizes={srcSet ? sizes : undefined}
           alt={alt}
-          className={cn(
-            'w-full h-full',
-            isLoaded ? 'opacity-100' : 'opacity-0'
-          )}
+          className={cn('w-full h-full', isLoaded ? 'opacity-100' : 'opacity-0')}
           style={{
             objectFit: 'cover',
             width: '100%',
             height: '100%',
             transition: 'opacity 0.2s ease-out',
             imageRendering: 'auto',
-            ...style
+            ...style,
           }}
           loading={priority ? 'eager' : 'lazy'}
           decoding={priority ? 'sync' : 'async'}
-          // @ts-ignore - fetchPriority is valid HTML but React 18 warns
-          fetchpriority={priority ? 'high' : 'auto'}
+          fetchPriority={priority ? 'high' : 'auto'}
           onLoad={handleLoad}
           onError={handleError}
           {...props}
         />
       )}
-      
-      {/* Fallback for error or invalid image */}
+
       {(hasError || !isValidSrc) && (
-        <div 
+        <div
           className="absolute inset-0 flex flex-col items-center justify-center bg-muted w-full h-full"
           style={style}
         >

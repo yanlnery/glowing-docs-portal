@@ -1,14 +1,12 @@
 
 /**
  * Generates transformed Supabase Storage URLs for responsive images.
- * Uses Supabase's built-in image transformation API:
- * /storage/v1/render/image/public/bucket/path?width=X&quality=Y&format=webp
+ * Uses query parameters on /object/public/ URLs (Supabase Pro feature).
  * 
  * Falls back to original URL if not a Supabase storage URL.
  */
 
 const SUPABASE_PROJECT_ID = 'xlhcneenthhhsjqqdmbm';
-const SUPABASE_STORAGE_BASE = `https://${SUPABASE_PROJECT_ID}.supabase.co/storage/v1`;
 
 // Standard breakpoints for srcset
 export const IMAGE_WIDTHS = [480, 768, 1200, 1600] as const;
@@ -27,27 +25,16 @@ function isSupabaseStorageUrl(url: string): boolean {
 }
 
 /**
- * Convert a Supabase Storage object URL to a render (transform) URL
- * /storage/v1/object/public/bucket/path -> /storage/v1/render/image/public/bucket/path
- */
-function toRenderUrl(url: string): string {
-  return url.replace(
-    '/storage/v1/object/public/',
-    '/storage/v1/render/image/public/'
-  );
-}
-
-/**
- * Get a transformed image URL with specific width and quality
+ * Get a transformed image URL with specific width and quality.
+ * Appends query params directly to the /object/public/ URL.
  */
 export function getTransformedUrl(src: string, options: TransformOptions): string {
   if (!src || !isSupabaseStorageUrl(src)) {
-    return src; // Not a Supabase URL, return as-is
+    return src;
   }
 
-  // Strip any existing query params from the URL
+  // Strip any existing query params
   const baseUrl = src.split('?')[0];
-  const renderUrl = toRenderUrl(baseUrl);
 
   const params = new URLSearchParams();
   params.set('width', String(options.width));
@@ -56,7 +43,7 @@ export function getTransformedUrl(src: string, options: TransformOptions): strin
     params.set('format', options.format);
   }
 
-  return `${renderUrl}?${params.toString()}`;
+  return `${baseUrl}?${params.toString()}`;
 }
 
 /**
@@ -64,7 +51,7 @@ export function getTransformedUrl(src: string, options: TransformOptions): strin
  */
 export function getSrcSet(src: string, quality = 90): string {
   if (!src || !isSupabaseStorageUrl(src)) {
-    return ''; // Can't generate srcSet for non-Supabase URLs
+    return '';
   }
 
   return IMAGE_WIDTHS.map(w =>
