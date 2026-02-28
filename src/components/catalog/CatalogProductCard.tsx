@@ -39,7 +39,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  const catalogBaseWidth = isDesktop ? 520 : 400;
+  const catalogBaseWidth = isDesktop ? 300 : 280;
 
   const handleAddToCart = (product: Product) => {
     if (isProductInCart(product.id)) {
@@ -84,7 +84,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
             src={imageUrl || '/placeholder.svg'}
             alt={product.name}
             priority={index < 8}
-            quality={100}
+            quality={90}
             transformFormat="origin"
             useXDescriptors
             baseWidth={catalogBaseWidth}
