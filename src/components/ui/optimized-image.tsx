@@ -15,6 +15,7 @@ interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
   baseWidth?: number;
   forcedWidth?: number;
   disableSrcSet?: boolean;
+  disableTransform?: boolean;
   disablePlaceholderBlur?: boolean;
   transformFormat?: 'webp' | 'avif' | 'origin';
   debugId?: string;
@@ -40,6 +41,7 @@ export function OptimizedImage({
   baseWidth = 480,
   forcedWidth,
   disableSrcSet = false,
+  disableTransform = false,
   disablePlaceholderBlur = false,
   transformFormat = 'webp',
   debugId,
@@ -125,11 +127,13 @@ export function OptimizedImage({
   const isValidSrc = src && src.trim() !== '' && src !== '/placeholder.svg';
   const shouldLoad = isInView || priority;
 
-  const srcSet = isValidSrc
+  const shouldTransform = !disableTransform;
+
+  const srcSet = isValidSrc && shouldTransform
     ? (useXDescriptors ? getXDescriptorSrcSet(src, baseWidth, quality, transformFormat) : getSrcSet(src, quality, transformFormat))
     : '';
 
-  const transformedSrc = isValidSrc
+  const transformedSrc = isValidSrc && shouldTransform
     ? getTransformedUrl(src, { width: forcedWidth ?? (useXDescriptors ? baseWidth : 1200), quality, format: transformFormat })
     : src;
 
