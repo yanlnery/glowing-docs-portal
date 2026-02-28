@@ -36,6 +36,11 @@ export function getTransformedUrl(src: string, options: TransformOptions): strin
   // Strip any existing query params
   const baseUrl = src.split('?')[0];
 
+  // Supabase image transformations are guaranteed on /render/image/public/
+  const transformBaseUrl = baseUrl.includes('/storage/v1/object/public/')
+    ? baseUrl.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')
+    : baseUrl;
+
   const params = new URLSearchParams();
   params.set('width', String(options.width));
   params.set('quality', String(options.quality ?? 90));
@@ -43,7 +48,7 @@ export function getTransformedUrl(src: string, options: TransformOptions): strin
     params.set('format', options.format);
   }
 
-  return `${baseUrl}?${params.toString()}`;
+  return `${transformBaseUrl}?${params.toString()}`;
 }
 
 /**
