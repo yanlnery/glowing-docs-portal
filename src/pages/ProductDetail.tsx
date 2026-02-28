@@ -282,9 +282,11 @@ const ProductDetail = () => {
                 <h2 className="font-semibold">Documentos Inclusos</h2>
               </div>
               <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                <li>Nota Fiscal.</li>
+                <li>Nota Fiscal (Inclui numeração do Microchip do Animal).</li>
                 <li>Certificado de Origem (Emitido via Sisfauna - Sistema Nacional de Gestão de Fauna Silvestre).</li>
                 <li>Licença de Transporte (Emitido via Sisfauna).</li>
+                <li>GTA - Guia de Transporte Animal (Interestadual).</li>
+                <li>Atestado Sanitário (Interestadual).</li>
               </ul>
             </div>
             
