@@ -7,7 +7,7 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Product } from "@/types/product";
 import { getProductImageUrl } from "@/utils/productImageUtils";
-import { CATALOG_SIZES } from "@/utils/supabaseImageUrl";
+import { getXDescriptorSrcSet, getTransformedUrl } from "@/utils/supabaseImageUrl";
 import { useCartStore } from "@/stores/cartStore";
 import { useToast } from "@/hooks/use-toast";
 import { Star, AlertCircle, ShoppingCart, Check } from "lucide-react";
@@ -69,10 +69,11 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
             src={imageUrl || '/placeholder.svg'}
             alt={product.name}
             priority={index < 8}
-            sizes={CATALOG_SIZES}
             quality={90}
             className="w-full h-full"
             style={{ objectFit: 'cover' }}
+            useXDescriptors
+            baseWidth={480}
           />
         </div>
         

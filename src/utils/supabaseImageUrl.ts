@@ -65,6 +65,26 @@ export function getSrcSet(src: string, quality = 90): string {
 export const CATALOG_SIZES = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 420px';
 
 /**
+ * Generate a srcSet using x-descriptors (1x/2x/3x) based on the base width of the element.
+ * This ensures retina displays always pull a higher-resolution image.
+ */
+export function getXDescriptorSrcSet(src: string, baseWidth: number, quality = 90): string {
+  if (!src || !isSupabaseStorageUrl(src)) {
+    return '';
+  }
+
+  const descriptors = [
+    { multiplier: 1, width: baseWidth },
+    { multiplier: 2, width: baseWidth * 2 },
+    { multiplier: 3, width: baseWidth * 3 },
+  ];
+
+  return descriptors.map(d =>
+    `${getTransformedUrl(src, { width: d.width, quality, format: 'webp' })} ${d.multiplier}x`
+  ).join(', ');
+}
+
+/**
  * Sizes for featured/hero product images
  */
 export const FEATURED_SIZES = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw';
