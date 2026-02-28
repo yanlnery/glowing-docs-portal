@@ -1,6 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { getSrcSet, getTransformedUrl, CATALOG_SIZES } from '@/utils/supabaseImageUrl';
 
 interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
@@ -17,8 +18,8 @@ export function OptimizedImage({
   src,
   alt,
   priority = false,
-  quality = 80,
-  sizes = '100vw',
+  quality = 85,
+  sizes = CATALOG_SIZES,
   className,
   onLoad,
   onError,
@@ -63,6 +64,13 @@ export function OptimizedImage({
   };
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    // If transformed URL fails, try original
+    const target = e.currentTarget;
+    if (target.src !== src && src) {
+      target.srcset = '';
+      target.src = src;
+      return;
+    }
     setHasError(true);
     setIsLoaded(false);
     onError?.(e);
@@ -71,9 +79,16 @@ export function OptimizedImage({
   const isValidSrc = src && src.trim() !== '' && src !== '/placeholder.svg';
   const shouldLoad = isInView || priority;
 
+  // Generate srcset for Supabase images
+  const srcSet = isValidSrc ? getSrcSet(src, quality) : '';
+  // Default src uses 1200w for good desktop quality
+  const defaultSrc = isValidSrc && srcSet
+    ? getTransformedUrl(src, { width: 1200, quality, format: 'webp' })
+    : src;
+
   return (
     <div className={cn('relative overflow-hidden w-full h-full', className)} ref={imgRef}>
-      {/* Blur placeholder - lighter weight than animate-pulse */}
+      {/* Blur placeholder */}
       {!isLoaded && shouldLoad && !hasError && isValidSrc && (
         <div 
           className="absolute inset-0 bg-muted w-full h-full" 
@@ -84,10 +99,12 @@ export function OptimizedImage({
         />
       )}
       
-      {/* Main image */}
+      {/* Main image with srcset */}
       {shouldLoad && isValidSrc && !hasError && (
         <img
-          src={src}
+          src={defaultSrc}
+          srcSet={srcSet || undefined}
+          sizes={srcSet ? sizes : undefined}
           alt={alt}
           className={cn(
             'w-full h-full',
@@ -106,7 +123,6 @@ export function OptimizedImage({
           fetchPriority={priority ? 'high' : 'auto'}
           onLoad={handleLoad}
           onError={handleError}
-          sizes={sizes}
           {...props}
         />
       )}
