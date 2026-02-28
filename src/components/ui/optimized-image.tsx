@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { getSrcSet, getTransformedUrl, CATALOG_SIZES } from '@/utils/supabaseImageUrl';
+import { getSrcSet, getTransformedUrl, getXDescriptorSrcSet, CATALOG_SIZES } from '@/utils/supabaseImageUrl';
 
 interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
@@ -10,6 +10,8 @@ interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
   quality?: number;
   sizes?: string;
   className?: string;
+  useXDescriptors?: boolean;
+  baseWidth?: number;
   onLoad?: () => void;
   onError?: (e: React.SyntheticEvent<HTMLImageElement, Event>) => void;
 }
@@ -21,6 +23,8 @@ export function OptimizedImage({
   quality = 90,
   sizes = CATALOG_SIZES,
   className,
+  useXDescriptors = false,
+  baseWidth = 480,
   onLoad,
   onError,
   style,
@@ -77,10 +81,15 @@ export function OptimizedImage({
   const isValidSrc = src && src.trim() !== '' && src !== '/placeholder.svg';
   const shouldLoad = isInView || priority;
 
-  const srcSet = isValidSrc ? getSrcSet(src, quality) : '';
+  const srcSet = isValidSrc
+    ? (useXDescriptors ? getXDescriptorSrcSet(src, baseWidth, quality) : getSrcSet(src, quality))
+    : '';
   const defaultSrc = isValidSrc && srcSet
-    ? getTransformedUrl(src, { width: 1200, quality, format: 'webp' })
+    ? getTransformedUrl(src, { width: useXDescriptors ? baseWidth : 1200, quality, format: 'webp' })
     : src;
+
+  // When using x-descriptors, sizes is not needed
+  const effectiveSizes = useXDescriptors ? undefined : sizes;
 
   return (
     <div className={cn('relative overflow-hidden w-full h-full', className)} ref={imgRef}>
@@ -95,7 +104,7 @@ export function OptimizedImage({
         <img
           src={defaultSrc}
           srcSet={srcSet || undefined}
-          sizes={srcSet ? sizes : undefined}
+          sizes={effectiveSizes}
           alt={alt}
           className={cn('w-full h-full', isLoaded ? 'opacity-100' : 'opacity-0')}
           style={{
