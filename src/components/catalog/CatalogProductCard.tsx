@@ -69,14 +69,14 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
       }}
     >
       <Link to={`/produtos/${product.id}`} className="block relative cursor-pointer group">
-        <div className="aspect-square md:aspect-[4/3] overflow-hidden rounded-t-lg bg-muted transition-transform duration-300 ease-out group-hover:scale-105">
+        <div className="aspect-square md:aspect-[4/3] overflow-hidden rounded-t-lg bg-muted">
           <OptimizedImage
             src={imageUrl || '/placeholder.svg'}
             alt={product.name}
             priority={index < 8}
             quality={90}
             transformFormat="origin"
-            forcedWidth={600}
+            forcedWidth={640}
             disableSrcSet
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             className="w-full h-full"
