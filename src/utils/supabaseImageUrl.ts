@@ -9,7 +9,7 @@
 const SUPABASE_PROJECT_ID = 'xlhcneenthhhsjqqdmbm';
 
 // Standard breakpoints for srcset
-export const IMAGE_WIDTHS = [960, 1280, 1920] as const;
+export const IMAGE_WIDTHS = [480, 768, 1200, 1600] as const;
 
 export interface TransformOptions {
   width: number;
@@ -36,11 +36,6 @@ export function getTransformedUrl(src: string, options: TransformOptions): strin
   // Strip any existing query params
   const baseUrl = src.split('?')[0];
 
-  // Supabase image transformations are guaranteed on /render/image/public/
-  const transformBaseUrl = baseUrl.includes('/storage/v1/object/public/')
-    ? baseUrl.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')
-    : baseUrl;
-
   const params = new URLSearchParams();
   params.set('width', String(options.width));
   params.set('quality', String(options.quality ?? 90));
@@ -48,7 +43,7 @@ export function getTransformedUrl(src: string, options: TransformOptions): strin
     params.set('format', options.format);
   }
 
-  return `${transformBaseUrl}?${params.toString()}`;
+  return `${baseUrl}?${params.toString()}`;
 }
 
 /**

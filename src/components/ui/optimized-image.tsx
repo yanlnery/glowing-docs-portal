@@ -157,6 +157,7 @@ export function OptimizedImage({
           alt={alt}
           className={cn('w-full h-full', imgClassName)}
           style={{
+            objectFit: 'cover',
             width: '100%',
             height: '100%',
             imageRendering: 'auto',
