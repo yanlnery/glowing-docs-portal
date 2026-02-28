@@ -31,6 +31,12 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
     currentWidthParam: string | null;
   } | null>(null);
 
+  const rawCatalogImageUrl = React.useMemo(() => {
+    if (!imageUrl) return '/placeholder.svg';
+    const [baseUrl] = imageUrl.split('?');
+    return baseUrl.replace('/storage/v1/render/image/public/', '/storage/v1/object/public/');
+  }, [imageUrl]);
+
   const handleAddToCart = (product: Product) => {
     if (isProductInCart(product.id)) {
       toast({
@@ -71,13 +77,10 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
       <Link to={`/produtos/${product.id}`} className="block relative cursor-pointer group">
         <div className="aspect-square md:aspect-[4/3] overflow-hidden rounded-t-lg bg-muted transition-transform duration-300 ease-out group-hover:scale-105">
           <OptimizedImage
-            src={imageUrl || '/placeholder.svg'}
+            src={rawCatalogImageUrl}
             alt={product.name}
             priority={index < 8}
-            quality={90}
-            transformFormat="webp"
-            forcedWidth={1600}
-            disableSrcSet
+            disableTransform
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             className="w-full h-full"
             imgClassName=""
