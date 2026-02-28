@@ -18,7 +18,7 @@ export function OptimizedImage({
   src,
   alt,
   priority = false,
-  quality = 85,
+  quality = 90,
   sizes = CATALOG_SIZES,
   className,
   onLoad,
@@ -64,13 +64,6 @@ export function OptimizedImage({
   };
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    // If transformed URL fails, try original
-    const target = e.currentTarget;
-    if (target.src !== src && src) {
-      target.srcset = '';
-      target.src = src;
-      return;
-    }
     setHasError(true);
     setIsLoaded(false);
     onError?.(e);

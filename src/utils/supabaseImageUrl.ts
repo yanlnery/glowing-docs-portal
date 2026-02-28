@@ -51,7 +51,7 @@ export function getTransformedUrl(src: string, options: TransformOptions): strin
 
   const params = new URLSearchParams();
   params.set('width', String(options.width));
-  params.set('quality', String(options.quality ?? 85));
+  params.set('quality', String(options.quality ?? 90));
   if (options.format && options.format !== 'origin') {
     params.set('format', options.format);
   }
@@ -62,7 +62,7 @@ export function getTransformedUrl(src: string, options: TransformOptions): strin
 /**
  * Generate a srcSet string for responsive images
  */
-export function getSrcSet(src: string, quality = 85): string {
+export function getSrcSet(src: string, quality = 90): string {
   if (!src || !isSupabaseStorageUrl(src)) {
     return ''; // Can't generate srcSet for non-Supabase URLs
   }
