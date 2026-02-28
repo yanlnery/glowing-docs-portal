@@ -75,8 +75,8 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
             alt={product.name}
             priority={index < 8}
             quality={90}
-            transformFormat="origin"
-            forcedWidth={600}
+            transformFormat="webp"
+            forcedWidth={1600}
             disableSrcSet
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             className="w-full h-full"
