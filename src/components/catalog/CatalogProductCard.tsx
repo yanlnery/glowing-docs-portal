@@ -7,7 +7,6 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Product } from "@/types/product";
 import { getProductImageUrl } from "@/utils/productImageUtils";
-import { getXDescriptorSrcSet, getTransformedUrl } from "@/utils/supabaseImageUrl";
 import { useCartStore } from "@/stores/cartStore";
 import { useToast } from "@/hooks/use-toast";
 import { Star, AlertCircle, ShoppingCart, Check } from "lucide-react";
@@ -25,6 +24,22 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
   const isInCart = isProductInCart(product.id);
   const isUnavailable = product.status === 'indisponivel' || product.status === 'vendido';
   const imageUrl = getProductImageUrl(product);
+  const [isDesktop, setIsDesktop] = React.useState(() => typeof window !== 'undefined' && window.innerWidth >= 1024);
+  const [imageDebug, setImageDebug] = React.useState<{
+    renderedWidth: number;
+    naturalWidth: number;
+    currentSrc: string;
+    currentWidthParam: string | null;
+  } | null>(null);
+
+  React.useEffect(() => {
+    const onResize = () => setIsDesktop(window.innerWidth >= 1024);
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  const forcedCatalogWidth = isDesktop ? 1200 : 768;
 
   const handleAddToCart = (product: Product) => {
     if (isProductInCart(product.id)) {
@@ -63,7 +78,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
         overflow: "visible"
       }}
     >
-      <Link to={`/produtos/${product.id}`} className="block relative cursor-pointer">
+      <Link to={`/produtos/${product.id}`} className="block relative cursor-pointer group">
         <div className="aspect-square md:aspect-[4/3] overflow-hidden rounded-t-lg bg-muted">
           <OptimizedImage
             src={imageUrl || '/placeholder.svg'}
@@ -71,9 +86,13 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
             priority={index < 8}
             quality={90}
             className="w-full h-full"
+            imgClassName="transition-transform duration-300 ease-out group-hover:scale-105"
             style={{ objectFit: 'cover' }}
-            useXDescriptors
-            baseWidth={480}
+            forcedWidth={forcedCatalogWidth}
+            disableSrcSet
+            disablePlaceholderBlur
+            debugId={`catalog-${product.id}`}
+            onDebug={setImageDebug}
           />
         </div>
         
@@ -115,6 +134,11 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
       
       <CardContent className="p-2 sm:p-3 pt-0 pb-1 sm:pb-2 flex-1">
         <p className="text-xs sm:text-sm text-muted-foreground italic mb-2 line-clamp-1 opacity-70">{product.speciesName}</p>
+        {import.meta.env.DEV && imageDebug && (
+          <p className="text-[10px] text-muted-foreground mb-2 break-all">
+            rendered:{imageDebug.renderedWidth}px • natural:{imageDebug.naturalWidth}px • width={imageDebug.currentWidthParam ?? 'n/a'}
+          </p>
+        )}
         
         <div className="space-y-1">
           {product.originalPrice && (

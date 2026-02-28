@@ -47,7 +47,7 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
         overflow: "visible"
       }}
     >
-      <Link to={`/produtos/${product.id}`} className="block relative overflow-hidden aspect-square cursor-pointer bg-muted">
+      <Link to={`/produtos/${product.id}`} className="block relative overflow-hidden aspect-square cursor-pointer bg-muted group">
         <OptimizedImage
           src={imageUrl || "/placeholder.svg"}
           alt={product.name}
@@ -55,6 +55,7 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
           sizes={FEATURED_SIZES}
           quality={90}
           className="w-full h-full"
+          imgClassName="transition-transform duration-300 ease-out group-hover:scale-105"
           style={{ objectFit: 'cover' }}
         />
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 sm:p-4">
@@ -67,7 +68,9 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
       </Link>
       <div className="p-3 sm:p-4">
         <h3 className="font-bold text-sm sm:text-base md:text-lg mb-1 line-clamp-1">
-          {product.name}
+          <Link to={`/produtos/${product.id}`} className="hover:underline">
+            {product.name}
+          </Link>
           {product.meta?.productId && (
             <span className="text-muted-foreground font-normal text-xs ml-1">{product.meta.productId}</span>
           )}
