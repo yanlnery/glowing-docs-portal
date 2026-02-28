@@ -48,16 +48,18 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
       }}
     >
       <Link to={`/produtos/${product.id}`} className="block relative overflow-hidden aspect-square cursor-pointer bg-muted group">
-        <OptimizedImage
-          src={imageUrl || "/placeholder.svg"}
-          alt={product.name}
-          priority={index < 4}
-          sizes={FEATURED_SIZES}
-          quality={90}
-          className="w-full h-full"
-          imgClassName="transition-transform duration-300 ease-out group-hover:scale-105"
-          style={{ objectFit: 'cover' }}
-        />
+        <div className="w-full h-full transition-transform duration-300 ease-out group-hover:scale-105">
+          <OptimizedImage
+            src={imageUrl || "/placeholder.svg"}
+            alt={product.name}
+            priority={index < 4}
+            sizes={FEATURED_SIZES}
+            quality={90}
+            className="w-full h-full"
+            imgClassName=""
+            style={{ objectFit: 'cover' }}
+          />
+        </div>
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 sm:p-4">
           {product.status === 'disponivel' ? (
             <span className="inline-block bg-serpente-600 text-white text-xs px-2 py-1 rounded">Disponível</span>
