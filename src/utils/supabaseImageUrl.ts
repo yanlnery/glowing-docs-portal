@@ -9,7 +9,7 @@
 const SUPABASE_PROJECT_ID = 'xlhcneenthhhsjqqdmbm';
 
 // Standard breakpoints for srcset
-export const IMAGE_WIDTHS = [640, 960, 1280] as const;
+export const IMAGE_WIDTHS = [960, 1280, 1920] as const;
 
 export interface TransformOptions {
   width: number;
