@@ -47,15 +47,16 @@ export function getTransformedUrl(src: string, options: TransformOptions): strin
 }
 
 /**
- * Generate a srcSet string for responsive images
+ * Generate a srcSet string for responsive images.
+ * `format` defaults to 'webp'; pass 'origin' to skip re-encoding.
  */
-export function getSrcSet(src: string, quality = 90): string {
+export function getSrcSet(src: string, quality = 90, format: TransformOptions['format'] = 'webp'): string {
   if (!src || !isSupabaseStorageUrl(src)) {
     return '';
   }
 
   return IMAGE_WIDTHS.map(w =>
-    `${getTransformedUrl(src, { width: w, quality, format: 'webp' })} ${w}w`
+    `${getTransformedUrl(src, { width: w, quality, format })} ${w}w`
   ).join(', ');
 }
 
@@ -68,7 +69,7 @@ export const CATALOG_SIZES = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw
  * Generate a srcSet using x-descriptors (1x/2x/3x) based on the base width of the element.
  * This ensures retina displays always pull a higher-resolution image.
  */
-export function getXDescriptorSrcSet(src: string, baseWidth: number, quality = 90): string {
+export function getXDescriptorSrcSet(src: string, baseWidth: number, quality = 90, format: TransformOptions['format'] = 'webp'): string {
   if (!src || !isSupabaseStorageUrl(src)) {
     return '';
   }
@@ -80,7 +81,7 @@ export function getXDescriptorSrcSet(src: string, baseWidth: number, quality = 9
   ];
 
   return descriptors.map(d =>
-    `${getTransformedUrl(src, { width: d.width, quality, format: 'webp' })} ${d.multiplier}x`
+    `${getTransformedUrl(src, { width: d.width, quality, format })} ${d.multiplier}x`
   ).join(', ');
 }
 
