@@ -10,8 +10,19 @@ interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
   quality?: number;
   sizes?: string;
   className?: string;
+  imgClassName?: string;
   useXDescriptors?: boolean;
   baseWidth?: number;
+  forcedWidth?: number;
+  disableSrcSet?: boolean;
+  disablePlaceholderBlur?: boolean;
+  debugId?: string;
+  onDebug?: (info: {
+    renderedWidth: number;
+    naturalWidth: number;
+    currentSrc: string;
+    currentWidthParam: string | null;
+  }) => void;
   onLoad?: () => void;
   onError?: (e: React.SyntheticEvent<HTMLImageElement, Event>) => void;
 }
@@ -23,8 +34,14 @@ export function OptimizedImage({
   quality = 90,
   sizes = CATALOG_SIZES,
   className,
+  imgClassName,
   useXDescriptors = false,
   baseWidth = 480,
+  forcedWidth,
+  disableSrcSet = false,
+  disablePlaceholderBlur = false,
+  debugId,
+  onDebug,
   onLoad,
   onError,
   style,
@@ -59,6 +76,23 @@ export function OptimizedImage({
   }, [priority]);
 
   const handleLoad = () => {
+    const el = imgRef.current;
+    if (el) {
+      const currentSrc = el.currentSrc || el.src;
+      const widthMatch = currentSrc.match(/[?&]width=(\d+)/);
+      const info = {
+        renderedWidth: Math.round(el.getBoundingClientRect().width),
+        naturalWidth: el.naturalWidth,
+        currentSrc,
+        currentWidthParam: widthMatch?.[1] ?? null,
+      };
+
+      if (import.meta.env.DEV && debugId) {
+        console.info(`[OptimizedImage:${debugId}]`, info);
+      }
+      onDebug?.(info);
+    }
+
     setIsLoaded(true);
     setHasError(false);
     onLoad?.();
@@ -84,29 +118,33 @@ export function OptimizedImage({
   const srcSet = isValidSrc
     ? (useXDescriptors ? getXDescriptorSrcSet(src, baseWidth, quality) : getSrcSet(src, quality))
     : '';
-  const defaultSrc = isValidSrc && srcSet
-    ? getTransformedUrl(src, { width: useXDescriptors ? baseWidth : 1200, quality, format: 'webp' })
+
+  const transformedSrc = isValidSrc
+    ? getTransformedUrl(src, { width: forcedWidth ?? (useXDescriptors ? baseWidth : 1200), quality, format: 'webp' })
     : src;
 
-  // When using x-descriptors, sizes is not needed
-  const effectiveSizes = useXDescriptors ? undefined : sizes;
+  const defaultSrc = isValidSrc ? transformedSrc : src;
+
+  // When using x-descriptors or forced src-only mode, sizes is not needed
+  const effectiveSrcSet = disableSrcSet ? undefined : (srcSet || undefined);
+  const effectiveSizes = disableSrcSet || useXDescriptors ? undefined : sizes;
 
   return (
     <div className={cn('relative overflow-hidden w-full h-full', className)} ref={imgRef}>
       {!isLoaded && shouldLoad && !hasError && isValidSrc && (
         <div
           className="absolute inset-0 bg-muted w-full h-full"
-          style={{ ...style, backdropFilter: 'blur(8px)' }}
+          style={disablePlaceholderBlur ? style : { ...style, backdropFilter: 'blur(8px)' }}
         />
       )}
 
       {shouldLoad && isValidSrc && !hasError && (
         <img
           src={defaultSrc}
-          srcSet={srcSet || undefined}
+          srcSet={effectiveSrcSet}
           sizes={effectiveSizes}
           alt={alt}
-          className={cn('w-full h-full', isLoaded ? 'opacity-100' : 'opacity-0')}
+          className={cn('w-full h-full', imgClassName, isLoaded ? 'opacity-100' : 'opacity-0')}
           style={{
             objectFit: 'cover',
             width: '100%',
