@@ -1,59 +1,42 @@
 
 
-## Correcao: Imagens do Catalogo com Qualidade Baixa
+## Fix: All Images Blank Across Site
 
-### Diagnostico
+### Root Cause
 
-As URLs `/render/image/` estao sendo **bloqueadas pelo navegador** (`net::ERR_BLOCKED_BY_ORB` - Opaque Response Blocking) porque esse endpoint retorna headers CORS diferentes do `/object/public/`. O fallback atual reverte para a imagem original sem nenhuma otimizacao, resultando em imagens de baixa qualidade (o navegador carrega o JPEG original e o redimensiona via CSS).
+In `OptimizedImage`, the `<img>` starts with `opacity-0` and transitions to `opacity-100` only after `onLoad` fires (`isLoaded` state). When images are cached by the browser, `onLoad` can fire synchronously before React attaches the event handler, so `isLoaded` never becomes `true` and images stay invisible.
 
-A pagina do produto funciona porque o `ProductImageZoom` ja foi revertido para usar URLs originais diretamente.
+There is no ref on the `<img>` element to check `img.complete` as a fallback.
 
-### Solucao
+### Fix
 
-Usar **query parameters diretamente na URL `/object/public/`** para transformacoes de imagem, em vez do endpoint `/render/image/`. O Supabase Pro suporta isso nativamente:
+**File: `src/components/ui/optimized-image.tsx`**
+
+1. Remove the `opacity-0` / `opacity-100` toggling from the `<img>` className entirely. Images should always be visible once rendered.
+2. Keep a simple fade-in using CSS only: use `opacity: 1` always on the img, and let the placeholder div disappear via React state (remove placeholder when loaded).
+3. Add a ref directly on the `<img>` element and check `img.complete` on mount to handle cached images.
+4. Move `imgRef` from the wrapper div to use two refs: one for IntersectionObserver (wrapper) and one for the img element.
+
+The simplified approach:
+- The `<img>` will always have full opacity (no `opacity-0` default)
+- The loading placeholder (gray bg) covers it until loaded, then is removed
+- `onLoad` and a `useEffect` checking `img.complete` both set `isLoaded = true`
+
+**File: `src/components/home/FeaturedProductCard.tsx`**
+
+- Remove `group-hover:scale-105` from `imgClassName` (causes blur, same issue fixed in catalog)
+- Move hover zoom to the wrapper div instead (same pattern as CatalogProductCard)
+
+### Technical Details
 
 ```text
-ANTES (bloqueado por ORB):
-/storage/v1/render/image/public/product_images/xxx.jpg?width=1200&quality=90&format=webp
+Current flow (broken):
+  img renders -> opacity-0 -> onLoad fires (maybe missed) -> stays invisible
 
-DEPOIS (funciona cross-origin):
-/storage/v1/object/public/product_images/xxx.jpg?width=1200&quality=90&format=webp
+Fixed flow:
+  img renders -> always visible -> placeholder covers until loaded -> placeholder removed on load
 ```
 
-### Arquivo 1: `src/utils/supabaseImageUrl.ts`
-
-Alterar a funcao `getTransformedUrl` para **adicionar query params diretamente a URL `/object/public/`** em vez de substituir o path para `/render/image/`:
-
-- Remover a funcao `toRenderUrl` completamente
-- Em `getTransformedUrl`: apenas remover query params existentes e adicionar `?width=X&quality=Y&format=webp` a URL original
-- Manter breakpoints: 480w, 768w, 1200w, 1600w
-- Manter qualidade padrao: 90
-
-### Arquivo 2: `src/components/ui/optimized-image.tsx`
-
-Simplificar o `handleError`:
-- Como as URLs agora sao do mesmo dominio `/object/public/`, nao devem falhar por ORB
-- Manter um fallback basico: se a URL com query params falhar, tentar a URL original (sem params)
-- Isso garante que imagens nunca desaparecam
-
-### Arquivo 3: `src/components/product/ProductImageZoom.tsx`
-
-Reintegrar `srcSet` e `sizes` na imagem principal e thumbnails, usando as novas URLs corrigidas:
-- Imagem principal: srcSet com 480w, 768w, 1200w, 1600w; src padrao 1600w
-- Thumbnails: usar `getTransformedUrl` com width=480 para retina
-
-### Resultado Esperado
-
-- Todas as imagens do catalogo serao servidas em WebP otimizado com resolucao adequada
-- Desktop 1440px: browser selecionara candidato 1200w ou 1600w (conforme DPR)
-- Nenhum erro ORB, nenhum fallback degradante
-- Imagens nitidas tanto no catalogo quanto na pagina do produto
-
-### Detalhes Tecnicos
-
-| Arquivo | Mudanca |
-|---------|---------|
-| `src/utils/supabaseImageUrl.ts` | Trocar `/render/image/` por query params em `/object/public/` |
-| `src/components/ui/optimized-image.tsx` | Simplificar fallback de erro |
-| `src/components/product/ProductImageZoom.tsx` | Reintegrar srcSet com URLs corrigidas |
-
+Changes summary:
+- `optimized-image.tsx`: separate refs for container/img, remove opacity toggle, check img.complete
+- `FeaturedProductCard.tsx`: move scale from img to wrapper div
