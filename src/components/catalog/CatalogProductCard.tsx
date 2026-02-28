@@ -69,7 +69,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
       }}
     >
       <Link to={`/produtos/${product.id}`} className="block relative cursor-pointer group">
-        <div className="relative w-full aspect-square overflow-hidden rounded-t-lg bg-gray-100 dark:bg-gray-800">
+        <div className="w-full overflow-hidden rounded-t-lg">
           <OptimizedImage
             src={imageUrl || '/placeholder.svg'}
             alt={product.name}
@@ -78,8 +78,8 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
             transformFormat="origin"
             forcedWidth={960}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
-            className="w-full h-full"
-            imgClassName="w-full h-full object-cover object-center"
+            className="w-full"
+            imgClassName="w-full h-auto block"
             disablePlaceholderBlur
             debugId={`catalog-${product.id}`}
             onDebug={setImageDebug}
