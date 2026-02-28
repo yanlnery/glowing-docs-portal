@@ -81,7 +81,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
             alt={product.name}
             priority={index < 8}
             disableTransform
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            disableSrcSet
             className="w-full h-full"
             imgClassName=""
             style={{ objectFit: 'cover' }}
