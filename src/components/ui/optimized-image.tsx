@@ -64,6 +64,13 @@ export function OptimizedImage({
   };
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    // If transformed URL fails (e.g. ORB blocking, Pro not active), fallback to original
+    const target = e.currentTarget;
+    if (target.src !== src && src) {
+      target.srcset = '';
+      target.src = src;
+      return;
+    }
     setHasError(true);
     setIsLoaded(false);
     onError?.(e);
@@ -113,7 +120,8 @@ export function OptimizedImage({
           }}
           loading={priority ? 'eager' : 'lazy'}
           decoding={priority ? 'sync' : 'async'}
-          fetchPriority={priority ? 'high' : 'auto'}
+          // @ts-ignore - fetchPriority is valid HTML but React 18 warns
+          fetchpriority={priority ? 'high' : 'auto'}
           onLoad={handleLoad}
           onError={handleError}
           {...props}
