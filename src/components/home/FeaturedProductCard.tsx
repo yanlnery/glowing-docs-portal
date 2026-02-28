@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { Product } from "@/types/product";
 import { getProductImageUrl } from "@/utils/productImageUtils";
-import { FEATURED_SIZES } from "@/utils/supabaseImageUrl";
 import { useCartStore } from "@/stores/cartStore";
 import { ShoppingCart, Check } from "lucide-react";
 import { toast } from "sonner";
@@ -53,8 +52,10 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
             src={imageUrl || "/placeholder.svg"}
             alt={product.name}
             priority={index < 4}
-            sizes={FEATURED_SIZES}
-            quality={90}
+            quality={100}
+            transformFormat="origin"
+            useXDescriptors
+            baseWidth={480}
             className="w-full h-full"
             imgClassName=""
             style={{ objectFit: 'cover' }}
