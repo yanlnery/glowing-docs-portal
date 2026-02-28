@@ -1,81 +1,59 @@
 
 
-## Plano: Imagens Premium (Pro) + Hierarquia de Precos
+## Correcao: Imagens do Catalogo com Qualidade Baixa
 
-### A) IMAGENS - QUALIDADE MAXIMA
+### Diagnostico
 
-#### A1. Utilitario `supabaseImageUrl.ts` - Qualidade 90, sem fallback
+As URLs `/render/image/` estao sendo **bloqueadas pelo navegador** (`net::ERR_BLOCKED_BY_ORB` - Opaque Response Blocking) porque esse endpoint retorna headers CORS diferentes do `/object/public/`. O fallback atual reverte para a imagem original sem nenhuma otimizacao, resultando em imagens de baixa qualidade (o navegador carrega o JPEG original e o redimensiona via CSS).
 
-- Alterar qualidade padrao de 85 para **90**
-- Manter breakpoints: 480w, 768w, 1200w, 1600w
-- Formato WebP mantido (suporte universal; AVIF ainda limitado no Supabase)
+A pagina do produto funciona porque o `ProductImageZoom` ja foi revertido para usar URLs originais diretamente.
 
-#### A2. `OptimizedImage` - Remover fallback degradante
+### Solucao
 
-Atualmente, no `handleError`, se a URL transformada falha, o componente tenta a URL original (sem transformacao). Com o Pro ativo, isso nao e mais necessario e pode servir imagem em resolucao errada.
-
-- Remover o fallback que troca `srcset` e `src` para a URL original no `handleError`
-- Se a imagem falhar, ir direto para o estado de erro (placeholder "Sem imagem")
-- Alterar qualidade padrao do componente de 85 para 90
-
-#### A3. Catalogo (`CatalogProductCard.tsx`)
-
-- Alterar `quality={85}` para `quality={90}`
-- `sizes` e `CATALOG_SIZES` ja estao corretos para o grid de 4 colunas
-
-#### A4. Produtos em Destaque (`FeaturedProductCard.tsx`)
-
-- Alterar `quality={85}` para `quality={90}`
-
-#### A5. Pagina do Produto - Imagem Principal (`ProductImageZoom.tsx`)
-
-Atualmente usa `<img src={selectedImage}>` direta, **sem** srcset/transformacao. Correcoes:
-
-- Importar `getTransformedUrl` e `getSrcSet`
-- Imagem principal: servir com `srcSet` (480w, 768w, 1200w, 1600w) e src padrao de **1600w** com qualidade 90
-- `sizes="(max-width: 768px) 100vw, 50vw"` (ocupa 50% no desktop, 100% no mobile)
-
-#### A6. Pagina do Produto - Thumbnails (`ProductImageZoom.tsx`)
-
-Atualmente usa `<img src={image.url}>` direta. Correcoes:
-
-- Servir thumbnails com `getTransformedUrl` a **480w** (thumbnails exibidas ~80-120px, 480px = ~4x, suficiente para retina)
-- Qualidade 90, formato WebP
-
----
-
-### B) HIERARQUIA DE PRECO - Pagina do Produto
-
-Problema atual em `ProductDetail.tsx` (linhas 175-193):
-- Destaque principal (texto 3xl, cor serpente): preco cheio/parcelado
-- Preco PIX: aparece abaixo, menor, como informacao secundaria
-
-Correcao na secao de precos:
+Usar **query parameters diretamente na URL `/object/public/`** para transformacoes de imagem, em vez do endpoint `/render/image/`. O Supabase Pro suporta isso nativamente:
 
 ```text
-De R$ X.XXX,XX          (riscado, texto pequeno, muted)
-R$ X.XXX,XX no PIX      (texto 3xl, bold, verde = DESTAQUE MAXIMO)
-  XX% OFF               (badge verde ao lado)
-ou R$ X.XXX,XX em 10x   (texto sm, muted = secundario)
+ANTES (bloqueado por ORB):
+/storage/v1/render/image/public/product_images/xxx.jpg?width=1200&quality=90&format=webp
+
+DEPOIS (funciona cross-origin):
+/storage/v1/object/public/product_images/xxx.jpg?width=1200&quality=90&format=webp
 ```
 
-Implementacao:
+### Arquivo 1: `src/utils/supabaseImageUrl.ts`
 
-1. **Preco original** (se existir): `text-sm line-through text-muted-foreground` - "De R$ X.XXX,XX"
-2. **Preco PIX** (se existir): `text-3xl font-bold text-green-600` - "R$ X.XXX,XX no PIX" + badge com desconto calculado dinamicamente: `Math.round((1 - pixPrice/originalPrice) * 100)` ou `Math.round((1 - pixPrice/price) * 100)` se nao houver originalPrice
-3. **Parcelado**: `text-sm text-muted-foreground` - "ou R$ X.XXX,XX em ate 10x sem juros"
-4. Se nao houver `pixPrice`, o preco cheio continua como destaque principal
+Alterar a funcao `getTransformedUrl` para **adicionar query params diretamente a URL `/object/public/`** em vez de substituir o path para `/render/image/`:
 
----
+- Remover a funcao `toRenderUrl` completamente
+- Em `getTransformedUrl`: apenas remover query params existentes e adicionar `?width=X&quality=Y&format=webp` a URL original
+- Manter breakpoints: 480w, 768w, 1200w, 1600w
+- Manter qualidade padrao: 90
 
-### Arquivos Modificados
+### Arquivo 2: `src/components/ui/optimized-image.tsx`
+
+Simplificar o `handleError`:
+- Como as URLs agora sao do mesmo dominio `/object/public/`, nao devem falhar por ORB
+- Manter um fallback basico: se a URL com query params falhar, tentar a URL original (sem params)
+- Isso garante que imagens nunca desaparecam
+
+### Arquivo 3: `src/components/product/ProductImageZoom.tsx`
+
+Reintegrar `srcSet` e `sizes` na imagem principal e thumbnails, usando as novas URLs corrigidas:
+- Imagem principal: srcSet com 480w, 768w, 1200w, 1600w; src padrao 1600w
+- Thumbnails: usar `getTransformedUrl` com width=480 para retina
+
+### Resultado Esperado
+
+- Todas as imagens do catalogo serao servidas em WebP otimizado com resolucao adequada
+- Desktop 1440px: browser selecionara candidato 1200w ou 1600w (conforme DPR)
+- Nenhum erro ORB, nenhum fallback degradante
+- Imagens nitidas tanto no catalogo quanto na pagina do produto
+
+### Detalhes Tecnicos
 
 | Arquivo | Mudanca |
 |---------|---------|
-| `src/utils/supabaseImageUrl.ts` | Qualidade padrao 85 -> 90 |
-| `src/components/ui/optimized-image.tsx` | Qualidade 90, remover fallback degradante |
-| `src/components/catalog/CatalogProductCard.tsx` | quality 90 |
-| `src/components/home/FeaturedProductCard.tsx` | quality 90 |
-| `src/components/product/ProductImageZoom.tsx` | Adicionar srcSet na imagem principal (1600w), thumbnails otimizadas (480w) |
-| `src/pages/ProductDetail.tsx` | Inverter hierarquia de precos: PIX = destaque, parcelado = secundario |
+| `src/utils/supabaseImageUrl.ts` | Trocar `/render/image/` por query params em `/object/public/` |
+| `src/components/ui/optimized-image.tsx` | Simplificar fallback de erro |
+| `src/components/product/ProductImageZoom.tsx` | Reintegrar srcSet com URLs corrigidas |
 
