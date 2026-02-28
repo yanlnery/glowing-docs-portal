@@ -70,7 +70,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
             alt={product.name}
             priority={index < 8}
             sizes={CATALOG_SIZES}
-            quality={85}
+            quality={90}
             className="w-full h-full"
             style={{ objectFit: 'cover' }}
           />

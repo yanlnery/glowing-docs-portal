@@ -53,7 +53,7 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
           alt={product.name}
           priority={index < 4}
           sizes={FEATURED_SIZES}
-          quality={85}
+          quality={90}
           className="w-full h-full"
           style={{ objectFit: 'cover' }}
         />

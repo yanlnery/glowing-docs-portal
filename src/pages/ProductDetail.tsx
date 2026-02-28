@@ -173,23 +173,41 @@ const ProductDetail = () => {
             </div>
             
             <div className="space-y-2">
-              {product.originalPrice && (
+              {product.originalPrice && product.originalPrice > (product.pixPrice || product.price) && (
                 <div className="text-sm text-muted-foreground line-through">
                   De {formatPrice(product.originalPrice)}
                 </div>
               )}
               
-              <div className="text-3xl font-bold text-serpente-600 dark:text-serpente-400">
-                {formatPrice(product.price)}
-              </div>
-              <p className="text-sm text-muted-foreground dark:text-gray-300">
-                em até 10x sem juros
-              </p>
-              
-              {product.pixPrice && (
-                <div className="text-xl font-semibold text-green-600 dark:text-green-400">
-                  {formatPrice(product.pixPrice)} no PIX (10% OFF)
-                </div>
+              {product.pixPrice ? (
+                <>
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <span className="text-3xl font-bold text-green-600 dark:text-green-400">
+                      {formatPrice(product.pixPrice)} no PIX
+                    </span>
+                    {(() => {
+                      const base = product.originalPrice || product.price;
+                      const discount = Math.round((1 - product.pixPrice / base) * 100);
+                      return discount > 0 ? (
+                        <Badge className="bg-green-600 hover:bg-green-600 text-white text-xs">
+                          {discount}% OFF
+                        </Badge>
+                      ) : null;
+                    })()}
+                  </div>
+                  <p className="text-sm text-muted-foreground dark:text-gray-300">
+                    ou {formatPrice(product.price)} em até 10x sem juros
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="text-3xl font-bold text-serpente-600 dark:text-serpente-400">
+                    {formatPrice(product.price)}
+                  </div>
+                  <p className="text-sm text-muted-foreground dark:text-gray-300">
+                    em até 10x sem juros
+                  </p>
+                </>
               )}
             </div>
             
