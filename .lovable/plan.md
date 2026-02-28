@@ -1,43 +1,81 @@
 
 
-## Problema
+## Plano: Imagens Premium (Pro) + Hierarquia de Precos
 
-A coluna "Produtos" na lista de pedidos mostra "-" porque o campo `product_code` nos itens de pedido esta vazio para todos os pedidos anteriores (apenas o PS-000032 tem esse dado). Os produtos possuem o ID customizado (ex: SM4487, F1-1, II02) armazenado em `products.meta->productId`, mas esse valor nao foi salvo nos pedidos historicos.
+### A) IMAGENS - QUALIDADE MAXIMA
 
-## Solucao
+#### A1. Utilitario `supabaseImageUrl.ts` - Qualidade 90, sem fallback
 
-### 1. Migracao SQL - Preencher pedidos historicos
+- Alterar qualidade padrao de 85 para **90**
+- Manter breakpoints: 480w, 768w, 1200w, 1600w
+- Formato WebP mantido (suporte universal; AVIF ainda limitado no Supabase)
 
-Criar uma migracao que atualiza todos os `order_items` que tem `product_code` nulo, buscando o `productId` do campo `meta` do produto correspondente:
+#### A2. `OptimizedImage` - Remover fallback degradante
 
-```sql
-UPDATE order_items oi
-SET product_code = (p.meta->>'productId')
-FROM products p
-WHERE oi.product_id = p.id
-  AND oi.product_code IS NULL
-  AND p.meta->>'productId' IS NOT NULL;
-```
+Atualmente, no `handleError`, se a URL transformada falha, o componente tenta a URL original (sem transformacao). Com o Pro ativo, isso nao e mais necessario e pode servir imagem em resolucao errada.
 
-### 2. UI - Exibir product_code na coluna Produtos (OrdersAdmin.tsx)
+- Remover o fallback que troca `srcset` e `src` para a URL original no `handleError`
+- Se a imagem falhar, ir direto para o estado de erro (placeholder "Sem imagem")
+- Alterar qualidade padrao do componente de 85 para 90
 
-Ajustar a coluna para sempre mostrar o `product_code` de forma destacada. Se nao houver `product_code`, exibir o `product_name` como fallback. Formato: `#SM4487 - Teiu`.
+#### A3. Catalogo (`CatalogProductCard.tsx`)
 
-### 3. UI - Exibir product_code no detalhe do pedido (OrderDetail.tsx)
+- Alterar `quality={85}` para `quality={90}`
+- `sizes` e `CATALOG_SIZES` ja estao corretos para o grid de 4 colunas
 
-Ja foi feito parcialmente, mas garantir que o `product_code` aparece de forma consistente nos itens do pedido.
+#### A4. Produtos em Destaque (`FeaturedProductCard.tsx`)
+
+- Alterar `quality={85}` para `quality={90}`
+
+#### A5. Pagina do Produto - Imagem Principal (`ProductImageZoom.tsx`)
+
+Atualmente usa `<img src={selectedImage}>` direta, **sem** srcset/transformacao. Correcoes:
+
+- Importar `getTransformedUrl` e `getSrcSet`
+- Imagem principal: servir com `srcSet` (480w, 768w, 1200w, 1600w) e src padrao de **1600w** com qualidade 90
+- `sizes="(max-width: 768px) 100vw, 50vw"` (ocupa 50% no desktop, 100% no mobile)
+
+#### A6. Pagina do Produto - Thumbnails (`ProductImageZoom.tsx`)
+
+Atualmente usa `<img src={image.url}>` direta. Correcoes:
+
+- Servir thumbnails com `getTransformedUrl` a **480w** (thumbnails exibidas ~80-120px, 480px = ~4x, suficiente para retina)
+- Qualidade 90, formato WebP
 
 ---
 
-## Detalhes Tecnicos
+### B) HIERARQUIA DE PRECO - Pagina do Produto
 
-**Arquivos modificados:**
-- Nova migracao SQL para backfill dos product_codes
-- `src/integrations/supabase/types.ts` (se necessario apos migracao)
-- `src/pages/admin/OrdersAdmin.tsx` - Garantir exibicao correta do product_code na coluna Produtos
+Problema atual em `ProductDetail.tsx` (linhas 175-193):
+- Destaque principal (texto 3xl, cor serpente): preco cheio/parcelado
+- Preco PIX: aparece abaixo, menor, como informacao secundaria
 
-**Dados verificados:**
-- 30 dos 31 pedidos tem `product_code` nulo
-- Todos os produtos possuem `meta.productId` preenchido (SM4487, F1-1, II02, etc.)
-- O `product_id` (UUID) nos order_items faz o link correto com a tabela products
+Correcao na secao de precos:
+
+```text
+De R$ X.XXX,XX          (riscado, texto pequeno, muted)
+R$ X.XXX,XX no PIX      (texto 3xl, bold, verde = DESTAQUE MAXIMO)
+  XX% OFF               (badge verde ao lado)
+ou R$ X.XXX,XX em 10x   (texto sm, muted = secundario)
+```
+
+Implementacao:
+
+1. **Preco original** (se existir): `text-sm line-through text-muted-foreground` - "De R$ X.XXX,XX"
+2. **Preco PIX** (se existir): `text-3xl font-bold text-green-600` - "R$ X.XXX,XX no PIX" + badge com desconto calculado dinamicamente: `Math.round((1 - pixPrice/originalPrice) * 100)` ou `Math.round((1 - pixPrice/price) * 100)` se nao houver originalPrice
+3. **Parcelado**: `text-sm text-muted-foreground` - "ou R$ X.XXX,XX em ate 10x sem juros"
+4. Se nao houver `pixPrice`, o preco cheio continua como destaque principal
+
+---
+
+### Arquivos Modificados
+
+| Arquivo | Mudanca |
+|---------|---------|
+| `src/utils/supabaseImageUrl.ts` | Qualidade padrao 85 -> 90 |
+| `src/components/ui/optimized-image.tsx` | Qualidade 90, remover fallback degradante |
+| `src/components/catalog/CatalogProductCard.tsx` | quality 90 |
+| `src/components/home/FeaturedProductCard.tsx` | quality 90 |
+| `src/components/product/ProductImageZoom.tsx` | Adicionar srcSet na imagem principal (1600w), thumbnails otimizadas (480w) |
+| `src/pages/ProductDetail.tsx` | Inverter hierarquia de precos: PIX = destaque, parcelado = secundario |
 
