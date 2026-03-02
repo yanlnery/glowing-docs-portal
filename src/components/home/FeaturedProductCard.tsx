@@ -42,21 +42,21 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
   return (
     <div 
       key={product.id} 
-      className="docs-card-gradient border rounded-lg overflow-hidden w-full"
+      className="docs-card-gradient border rounded-lg overflow-hidden w-full flex flex-col h-full"
       style={{
-        minHeight: "280px",
+        minHeight: "300px",
         height: "auto",
         overflow: "visible"
       }}
     >
-      <Link to={`/produtos/${product.id}`} className="block relative overflow-hidden aspect-[4/3] cursor-pointer bg-muted group">
-        <div className="w-full h-full transition-transform duration-300 ease-out group-hover:scale-105">
+      <Link to={`/produtos/${product.id}`} className="block relative cursor-pointer group">
+        <div className="aspect-[4/3] overflow-hidden rounded-t-lg bg-muted transition-transform duration-300 ease-out group-hover:scale-105">
           <img
             src={imageUrl}
             alt={product.name}
             loading={index < 4 ? 'eager' : 'lazy'}
             decoding={index < 4 ? 'sync' : 'async'}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-center"
           />
         </div>
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 sm:p-4">
