@@ -1,6 +1,16 @@
 
 import { Product } from "@/types/product";
 import { supabase } from "@/integrations/supabase/client";
+import { normalizeStorageUrl } from "@/utils/productImageUtils";
+
+// Normalize all image URLs in the images array at the data layer
+const normalizeProductImages = (images: any[]): any[] => {
+  if (!Array.isArray(images)) return [];
+  return images.map((img: any) => ({
+    ...img,
+    url: img.url ? normalizeStorageUrl(img.url) : img.url,
+  }));
+};
 
 // Transform Supabase row to Product type
 const transformSupabaseProduct = (row: any): Product => {
@@ -22,7 +32,7 @@ const transformSupabaseProduct = (row: any): Product => {
     visible: row.visible || false,
     order: row.order_position || 0,
     paymentLink: row.payment_link || '',
-    images: Array.isArray(row.images) ? row.images : [],
+    images: normalizeProductImages(row.images),
     details: Array.isArray(row.details) ? row.details : [],
     createdAt: row.created_at,
     updatedAt: row.updated_at,
