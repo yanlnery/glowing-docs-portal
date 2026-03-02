@@ -3,7 +3,6 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { OptimizedImage } from "@/components/ui/optimized-image";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Product } from "@/types/product";
 import { getProductImageUrl } from "@/utils/productImageUtils";
@@ -24,18 +23,8 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
   const isInCart = isProductInCart(product.id);
   const isUnavailable = product.status === 'indisponivel' || product.status === 'vendido';
   const imageUrl = getProductImageUrl(product);
-  const [imageDebug, setImageDebug] = React.useState<{
-    renderedWidth: number;
-    naturalWidth: number;
-    currentSrc: string;
-    currentWidthParam: string | null;
-  } | null>(null);
-
-  const rawCatalogImageUrl = React.useMemo(() => {
-    if (!imageUrl) return '/placeholder.svg';
-    const [baseUrl] = imageUrl.split('?');
-    return baseUrl.replace('/storage/v1/render/image/public/', '/storage/v1/object/public/');
-  }, [imageUrl]);
+  // URL is already normalized at the data layer (normalizeStorageUrl in productQueries)
+  const catalogImageUrl = imageUrl || '/placeholder.svg';
 
   const handleAddToCart = (product: Product) => {
     if (isProductInCart(product.id)) {
@@ -76,18 +65,13 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
     >
       <Link to={`/produtos/${product.id}`} className="block relative cursor-pointer group">
         <div className="aspect-square md:aspect-[4/3] overflow-hidden rounded-t-lg bg-muted transition-transform duration-300 ease-out group-hover:scale-105">
-          <OptimizedImage
-            src={rawCatalogImageUrl}
+          <img
+            src={catalogImageUrl}
             alt={product.name}
-            priority={index < 8}
-            disableTransform
-            disableSrcSet
+            loading={index < 8 ? 'eager' : 'lazy'}
+            decoding={index < 8 ? 'sync' : 'async'}
             className="w-full h-full"
-            imgClassName=""
             style={{ objectFit: 'cover' }}
-            disablePlaceholderBlur
-            debugId={`catalog-${product.id}`}
-            onDebug={setImageDebug}
           />
         </div>
         
@@ -129,11 +113,6 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
       
       <CardContent className="p-2 sm:p-3 pt-0 pb-1 sm:pb-2 flex-1">
         <p className="text-xs sm:text-sm text-muted-foreground italic mb-2 line-clamp-1 opacity-70">{product.speciesName}</p>
-        {import.meta.env.DEV && imageDebug && (
-          <p className="text-[10px] text-muted-foreground mb-2 break-all">
-            rendered:{imageDebug.renderedWidth}px • natural:{imageDebug.naturalWidth}px • width={imageDebug.currentWidthParam ?? 'n/a'}
-          </p>
-        )}
         
         <div className="space-y-1">
           {product.originalPrice && (
