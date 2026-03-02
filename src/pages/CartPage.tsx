@@ -668,7 +668,7 @@ const CartPage = () => {
                 <div className="border-t pt-3 space-y-2">
                   {items.map((item) => (
                     <div key={item.product.id} className="flex justify-between text-sm">
-                      <span className="truncate mr-2">{item.product.name}</span>
+                      <span className="truncate mr-2">{item.product.meta?.productId ? `#${item.product.meta.productId} - ` : ''}{item.product.name}</span>
                       <span className="flex-shrink-0">{formatPrice(getItemPrice(item))}</span>
                     </div>
                   ))}
