@@ -100,11 +100,11 @@ export default function FeaturedProductsGrid({ products }: FeaturedProductsGridP
 
       {/* Carousel para todas as telas - 2 produtos no mobile, 3 no desktop */}
       <div className="overflow-hidden mx-0 sm:mx-12" ref={emblaRef}>
-        <div className="flex">
+        <div className="flex items-start">
           {displayedProducts.map((product, index) => (
             <div 
               key={product.id} 
-              className="flex-none w-[48%] sm:w-[45%] lg:w-[30%] xl:w-[30%] pr-3 sm:pr-6 lg:pr-8"
+              className="flex-none h-auto w-[48%] sm:w-[45%] lg:w-[30%] xl:w-[30%] pr-3 sm:pr-6 lg:pr-8"
             >
               <FeaturedProductCard 
                 product={product} 

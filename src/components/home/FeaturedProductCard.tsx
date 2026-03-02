@@ -21,7 +21,7 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
   
   const rawImageUrl = getProductImageUrl(product);
   const imageUrl = rawImageUrl
-    ? `${rawImageUrl.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')}${rawImageUrl.includes('?') ? '&' : '?'}width=960&quality=95`
+    ? `${rawImageUrl.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')}${rawImageUrl.includes('?') ? '&' : '?'}width=960&height=720&quality=95`
     : '/placeholder.svg';
   
   const handleAddToCart = () => {
@@ -42,7 +42,7 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
   return (
     <div 
       key={product.id} 
-      className="docs-card-gradient border rounded-lg overflow-hidden w-full flex flex-col h-full"
+      className="docs-card-gradient border rounded-lg overflow-hidden w-full flex flex-col"
     >
       <Link to={`/produtos/${product.id}`} className="block relative cursor-pointer group">
         <div className="aspect-[4/3] overflow-hidden rounded-t-lg bg-muted transition-transform duration-300 ease-out group-hover:scale-105">
