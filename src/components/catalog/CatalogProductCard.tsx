@@ -24,7 +24,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
   const isUnavailable = product.status === 'indisponivel' || product.status === 'vendido';
   const imageUrl = getProductImageUrl(product);
   const catalogImageUrl = imageUrl
-    ? `${imageUrl.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')}${imageUrl.includes('?') ? '&' : '?'}width=960&quality=95`
+    ? `${imageUrl.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')}${imageUrl.includes('?') ? '&' : '?'}width=960&height=720&quality=95`
     : '/placeholder.svg';
 
   const handleAddToCart = (product: Product) => {
@@ -65,14 +65,13 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
       }}
     >
       <Link to={`/produtos/${product.id}`} className="block relative cursor-pointer group">
-        <div className="aspect-square md:aspect-[4/3] overflow-hidden rounded-t-lg bg-muted transition-transform duration-300 ease-out group-hover:scale-105">
+        <div className="aspect-[4/3] overflow-hidden rounded-t-lg bg-muted transition-transform duration-300 ease-out group-hover:scale-105">
           <img
             src={catalogImageUrl}
             alt={product.name}
             loading={index < 8 ? 'eager' : 'lazy'}
             decoding={index < 8 ? 'sync' : 'async'}
-            className="w-full h-full"
-            style={{ objectFit: 'cover' }}
+            className="w-full h-full object-cover object-center"
           />
         </div>
         
