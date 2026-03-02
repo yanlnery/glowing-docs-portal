@@ -45,13 +45,13 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
       className="docs-card-gradient border rounded-lg overflow-hidden w-full flex flex-col"
     >
       <Link to={`/produtos/${product.id}`} className="block relative cursor-pointer group">
-        <div className="aspect-[4/3] overflow-hidden rounded-t-lg bg-muted transition-transform duration-300 ease-out group-hover:scale-105">
+        <div className="aspect-[4/3] overflow-hidden rounded-t-lg bg-muted">
           <img
             src={imageUrl}
             alt={product.name}
             loading={index < 8 ? 'eager' : 'lazy'}
             decoding={index < 8 ? 'sync' : 'async'}
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-cover object-center transition-transform duration-300 ease-out group-hover:scale-105"
           />
         </div>
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 sm:p-4">
