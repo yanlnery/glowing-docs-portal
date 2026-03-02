@@ -23,8 +23,10 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
   const isInCart = isProductInCart(product.id);
   const isUnavailable = product.status === 'indisponivel' || product.status === 'vendido';
   const imageUrl = getProductImageUrl(product);
-  // URL is already normalized at the data layer (normalizeStorageUrl in productQueries)
-  const catalogImageUrl = imageUrl || '/placeholder.svg';
+  // Normalized at data layer; add Supabase transform for optimal catalog size
+  const catalogImageUrl = imageUrl
+    ? `${imageUrl}?width=640&quality=90&format=webp`
+    : '/placeholder.svg';
 
   const handleAddToCart = (product: Product) => {
     if (isProductInCart(product.id)) {
