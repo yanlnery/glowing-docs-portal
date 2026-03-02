@@ -418,7 +418,7 @@ const CartPage = () => {
         `CPF: ${formData.cpf}\n` +
         `Endereço: ${fullAddress}\n` +
         `Forma de pagamento: ${paymentLabel}\n\n` +
-        `Animal(is) solicitado(s):\n${items.map(item => `- ${item.product.name} (${item.product.speciesName || "Não especificado"}) - ${formatPrice(getItemPrice(item))}`).join('\n')}\n\n` +
+        `Animal(is) solicitado(s):\n${items.map(item => `- ${item.product.meta?.productId ? `#${item.product.meta.productId} - ` : ''}${item.product.name} (${item.product.speciesName || "Não especificado"}) - ${formatPrice(getItemPrice(item))}`).join('\n')}\n\n` +
         `Total: ${formatPrice(total)}\n\n` +
         `Gostaria de confirmar o pedido e combinar os detalhes do envio.`;
 
