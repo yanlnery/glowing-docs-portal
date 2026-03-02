@@ -19,7 +19,10 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
   const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
   
-  const imageUrl = getProductImageUrl(product);
+  const rawImageUrl = getProductImageUrl(product);
+  const imageUrl = rawImageUrl
+    ? `${rawImageUrl.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')}${rawImageUrl.includes('?') ? '&' : '?'}width=960&quality=95`
+    : '/placeholder.svg';
   
   const handleAddToCart = () => {
     if (product.status === 'disponivel') {
@@ -48,17 +51,12 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
     >
       <Link to={`/produtos/${product.id}`} className="block relative overflow-hidden aspect-square cursor-pointer bg-muted group">
         <div className="w-full h-full transition-transform duration-300 ease-out group-hover:scale-105">
-          <OptimizedImage
-            src={imageUrl || "/placeholder.svg"}
+          <img
+            src={imageUrl}
             alt={product.name}
-            priority={index < 4}
-            quality={100}
-            transformFormat="origin"
-            useXDescriptors
-            baseWidth={480}
-            className="w-full h-full"
-            imgClassName=""
-            style={{ objectFit: 'cover' }}
+            loading={index < 4 ? 'eager' : 'lazy'}
+            decoding={index < 4 ? 'sync' : 'async'}
+            className="w-full h-full object-cover"
           />
         </div>
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 sm:p-4">
