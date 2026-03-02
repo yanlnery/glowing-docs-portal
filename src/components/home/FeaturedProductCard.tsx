@@ -49,7 +49,7 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
         overflow: "visible"
       }}
     >
-      <Link to={`/produtos/${product.id}`} className="block relative overflow-hidden aspect-square cursor-pointer bg-muted group">
+      <Link to={`/produtos/${product.id}`} className="block relative overflow-hidden aspect-[4/3] cursor-pointer bg-muted group">
         <div className="w-full h-full transition-transform duration-300 ease-out group-hover:scale-105">
           <img
             src={imageUrl}
