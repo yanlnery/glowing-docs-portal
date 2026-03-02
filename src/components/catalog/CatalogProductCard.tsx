@@ -9,7 +9,6 @@ import { getProductImageUrl } from "@/utils/productImageUtils";
 import { useCartStore } from "@/stores/cartStore";
 import { useToast } from "@/hooks/use-toast";
 import { Star, AlertCircle, ShoppingCart, Check } from "lucide-react";
-import { getTransformedUrl } from "@/utils/supabaseImageUrl";
 
 interface CatalogProductCardProps {
   product: Product;
@@ -24,9 +23,8 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
   const isInCart = isProductInCart(product.id);
   const isUnavailable = product.status === 'indisponivel' || product.status === 'vendido';
   const imageUrl = getProductImageUrl(product);
-  // Use same transform strategy as SpeciesGallery/PDP: query params on /object/public/
   const catalogImageUrl = imageUrl
-    ? getTransformedUrl(imageUrl, { width: 960, quality: 95, format: 'webp' })
+    ? `${imageUrl.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')}${imageUrl.includes('?') ? '&' : '?'}width=960&quality=95`
     : '/placeholder.svg';
 
   const handleAddToCart = (product: Product) => {
