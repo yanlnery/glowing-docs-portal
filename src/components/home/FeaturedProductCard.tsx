@@ -54,13 +54,11 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
             className="w-full h-full object-cover object-center transition-transform duration-300 ease-out group-hover:scale-105"
           />
         </div>
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 sm:p-4">
-          {product.status === 'disponivel' ? (
-            <span className="inline-block bg-serpente-600 text-white text-xs px-2 py-1 rounded">Disponível</span>
-          ) : (
+        {product.status !== 'disponivel' && (
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 sm:p-4">
             <span className="inline-block bg-red-600 text-white text-xs px-2 py-1 rounded">Indisponível</span>
-          )}
-        </div>
+          </div>
+        )}
       </Link>
       <div className="p-3 sm:p-4">
         <h3 className="font-bold text-sm sm:text-base md:text-lg mb-1 line-clamp-1">
