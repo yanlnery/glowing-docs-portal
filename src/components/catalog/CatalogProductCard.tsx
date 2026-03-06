@@ -76,16 +76,6 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
         </div>
         
         <div className="absolute top-2 left-2 flex flex-col gap-1.5">
-          {product.featured && (
-            <Badge variant="secondary" className="bg-yellow-100 hover:bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 text-xs px-1.5 py-0.5">
-              <Star className="h-3 w-3 mr-1 inline" /> Destaque
-            </Badge>
-          )}
-          {product.isNew && (
-            <Badge variant="secondary" className="bg-blue-100 hover:bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 text-xs px-1.5 py-0.5">
-              Novidade
-            </Badge>
-          )}
           {isUnavailable && (
             <Badge variant="secondary" className="bg-red-100 hover:bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 text-xs px-1.5 py-0.5">
               <AlertCircle className="h-3 w-3 mr-1 inline" /> 
