@@ -17,7 +17,8 @@ import {
   Image,
   MessageSquare,
   Images,
-  TrendingUp
+  TrendingUp,
+  Ticket
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -53,6 +54,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { name: 'Dashboard', href: '/admin/dashboard', icon: Home },
     { name: 'Pedidos', href: '/admin/pedidos', icon: ShoppingCart },
     { name: 'Produtos', href: '/admin/products', icon: Package },
+    { name: 'Cupons de Desconto', href: '/admin/coupons', icon: Ticket },
     { name: 'Mensagens', href: '/admin/contact-submissions', icon: MessageSquare },
     { name: 'Gestão de Espécies', href: '/admin/species', icon: ClipboardList, requiredRole: 'admin' },
     { name: 'Carrossel da Home', href: '/admin/carousel', icon: Image, requiredRole: 'admin' },

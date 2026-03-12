@@ -30,6 +30,8 @@ import { orderEventsService } from '@/services/orderEventsService';
 import { cartAnalyticsService } from '@/services/cartAnalyticsService';
 import { siteAnalyticsService } from '@/services/siteAnalyticsService';
 import { CheckoutAbandonmentDialog } from '@/components/cart/CheckoutAbandonmentDialog';
+import CouponInput from '@/components/cart/CouponInput';
+import { couponService, Coupon } from '@/services/couponService';
 import { supabase } from '@/integrations/supabase/client';
 
 // Define proper interfaces for our form data and errors
@@ -104,6 +106,8 @@ const CartPage = () => {
   const [formOpenTime, setFormOpenTime] = useState<number | null>(null);
   const [showAbandonDialog, setShowAbandonDialog] = useState(false);
   const [pendingClose, setPendingClose] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
+  const [couponDiscount, setCouponDiscount] = useState(0);
   
   useEffect(() => {
     // Record cart view for analytics
@@ -129,12 +133,21 @@ const CartPage = () => {
   }, []);
   
   // Calculate total
-  const total = items.reduce((sum, item) => {
+  const subtotal = items.reduce((sum, item) => {
     if (paymentMethod === 'pix' && item.product.pixPrice) {
       return sum + item.product.pixPrice * item.quantity;
     }
     return sum + item.product.price * item.quantity;
   }, 0);
+
+  // Recalculate coupon discount when subtotal or payment method changes
+  const effectiveDiscount = appliedCoupon
+    ? appliedCoupon.discount_type === 'percentage'
+      ? subtotal * (appliedCoupon.discount_value / 100)
+      : Math.min(appliedCoupon.discount_value, subtotal)
+    : 0;
+
+  const total = Math.max(subtotal - effectiveDiscount, 0);
 
   const getItemPrice = (item: CartItem) => {
     if (paymentMethod === 'pix' && item.product.pixPrice) {
@@ -411,6 +424,16 @@ const CartPage = () => {
       
       const paymentLabel = paymentMethod === 'pix' ? 'PIX' : 'Cartão (até 10x sem juros)';
       
+      let couponSection = '';
+      if (appliedCoupon) {
+        couponSection = 
+          `\n\nCupom aplicado: ${appliedCoupon.code}\n` +
+          `Subtotal original: ${formatPrice(subtotal)}\n` +
+          `Desconto: -${formatPrice(effectiveDiscount)}\n` +
+          `Total no PIX: ${formatPrice(total)}\n` +
+          `Total parcelado (10x): ${formatPrice(total / 10)}`;
+      }
+      
       const message = 
         `Olá! Acabei de finalizar um pedido no site Pet Serpentes.\n\n` +
         `Pedido: ${orderNumber}\n` +
@@ -419,8 +442,9 @@ const CartPage = () => {
         `Endereço: ${fullAddress}\n` +
         `Forma de pagamento: ${paymentLabel}\n\n` +
         `Animal(is) solicitado(s):\n${items.map(item => `- ${item.product.meta?.productId ? `#${item.product.meta.productId} - ` : ''}${item.product.name} (${item.product.speciesName || "Não especificado"}) - ${formatPrice(getItemPrice(item))}`).join('\n')}\n\n` +
-        `Total: ${formatPrice(total)}\n\n` +
-        `Gostaria de confirmar o pedido e combinar os detalhes do envio.`;
+        `Total: ${formatPrice(total)}` +
+        couponSection +
+        `\n\nGostaria de confirmar o pedido e combinar os detalhes do envio.`;
 
       const whatsappUrl = `https://wa.me/5521967802174?text=${encodeURIComponent(message)}`;
 
@@ -455,6 +479,11 @@ const CartPage = () => {
         description: "Abrindo o WhatsApp...",
         duration: 2000,
       });
+
+      // Increment coupon usage if applied
+      if (appliedCoupon) {
+        await couponService.incrementUsage(appliedCoupon.id);
+      }
 
       console.log("✅ Checkout completed successfully, redirecting to WhatsApp...");
       
@@ -673,8 +702,37 @@ const CartPage = () => {
                     </div>
                   ))}
                 </div>
+
+                {/* Coupon Input */}
+                <div className="border-t pt-3">
+                  <CouponInput
+                    cartTotal={subtotal}
+                    appliedCoupon={appliedCoupon}
+                    discountAmount={effectiveDiscount}
+                    onApply={(coupon, amount) => {
+                      setAppliedCoupon(coupon);
+                      setCouponDiscount(amount);
+                    }}
+                    onRemove={() => {
+                      setAppliedCoupon(null);
+                      setCouponDiscount(0);
+                    }}
+                  />
+                </div>
                 
                 <div className="border-t pt-4 mt-2">
+                  {appliedCoupon && (
+                    <div className="space-y-1 mb-3">
+                      <div className="flex justify-between text-sm">
+                        <span>Subtotal</span>
+                        <span className="line-through text-muted-foreground">{formatPrice(subtotal)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
+                        <span>Cupom {appliedCoupon.code}</span>
+                        <span>-{formatPrice(effectiveDiscount)}</span>
+                      </div>
+                    </div>
+                  )}
                   <div className="flex justify-between font-bold text-lg">
                     <span>Total</span>
                     <span className={paymentMethod === 'pix' ? 'text-green-600 dark:text-green-400' : ''}>

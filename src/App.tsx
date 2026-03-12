@@ -57,6 +57,7 @@ import DownloadAnalyticsAdmin from "./pages/admin/DownloadAnalyticsAdmin";
 import AnalyticsDashboard from "./pages/admin/AnalyticsDashboard";
 import OrdersAdmin from "./pages/admin/OrdersAdmin";
 import OrderDetail from "./pages/admin/OrderDetail";
+import CouponsAdmin from "./pages/admin/CouponsAdmin";
 import AdminProtectedRoute from "./components/admin/AdminProtectedRoute";
 
 // Function for conditional Academy route based on settings
@@ -114,6 +115,7 @@ const AdminRoutes = () => {
           <Route path="analytics-dashboard" element={<AnalyticsDashboard />} />
           <Route path="pedidos" element={<OrdersAdmin />} />
           <Route path="pedidos/:id" element={<OrderDetail />} />
+          <Route path="coupons" element={<CouponsAdmin />} />
         </Route>
       </Routes>
     </AdminAuthProvider>
