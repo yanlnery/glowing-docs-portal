@@ -206,6 +206,51 @@ export type Database = {
         }
         Relationships: []
       }
+      coupons: {
+        Row: {
+          code: string
+          created_at: string
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          max_uses: number | null
+          max_uses_per_customer: number | null
+          min_order_value: number | null
+          starts_at: string | null
+          times_used: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          discount_type: string
+          discount_value: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          max_uses_per_customer?: number | null
+          min_order_value?: number | null
+          starts_at?: string | null
+          times_used?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          max_uses_per_customer?: number | null
+          min_order_value?: number | null
+          starts_at?: string | null
+          times_used?: number
+        }
+        Relationships: []
+      }
       internship_waitlist: {
         Row: {
           availability: string
