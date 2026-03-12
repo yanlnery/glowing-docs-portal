@@ -79,7 +79,7 @@ export const couponService = {
       return { valid: false, error: 'Cupom inválido ou não encontrado.' };
     }
 
-    const coupon = data as Coupon;
+    const coupon = data as unknown as Coupon;
     const now = new Date();
 
     if (coupon.starts_at && new Date(coupon.starts_at) > now) {
