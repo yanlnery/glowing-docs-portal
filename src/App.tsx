@@ -115,6 +115,7 @@ const AdminRoutes = () => {
           <Route path="analytics-dashboard" element={<AnalyticsDashboard />} />
           <Route path="pedidos" element={<OrdersAdmin />} />
           <Route path="pedidos/:id" element={<OrderDetail />} />
+          <Route path="coupons" element={<CouponsAdmin />} />
         </Route>
       </Routes>
     </AdminAuthProvider>
