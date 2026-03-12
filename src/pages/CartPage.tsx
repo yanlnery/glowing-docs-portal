@@ -133,12 +133,21 @@ const CartPage = () => {
   }, []);
   
   // Calculate total
-  const total = items.reduce((sum, item) => {
+  const subtotal = items.reduce((sum, item) => {
     if (paymentMethod === 'pix' && item.product.pixPrice) {
       return sum + item.product.pixPrice * item.quantity;
     }
     return sum + item.product.price * item.quantity;
   }, 0);
+
+  // Recalculate coupon discount when subtotal or payment method changes
+  const effectiveDiscount = appliedCoupon
+    ? appliedCoupon.discount_type === 'percentage'
+      ? subtotal * (appliedCoupon.discount_value / 100)
+      : Math.min(appliedCoupon.discount_value, subtotal)
+    : 0;
+
+  const total = Math.max(subtotal - effectiveDiscount, 0);
 
   const getItemPrice = (item: CartItem) => {
     if (paymentMethod === 'pix' && item.product.pixPrice) {
