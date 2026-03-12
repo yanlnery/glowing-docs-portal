@@ -106,6 +106,8 @@ const CartPage = () => {
   const [formOpenTime, setFormOpenTime] = useState<number | null>(null);
   const [showAbandonDialog, setShowAbandonDialog] = useState(false);
   const [pendingClose, setPendingClose] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
+  const [couponDiscount, setCouponDiscount] = useState(0);
   
   useEffect(() => {
     // Record cart view for analytics
