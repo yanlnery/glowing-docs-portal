@@ -686,8 +686,37 @@ const CartPage = () => {
                     </div>
                   ))}
                 </div>
+
+                {/* Coupon Input */}
+                <div className="border-t pt-3">
+                  <CouponInput
+                    cartTotal={subtotal}
+                    appliedCoupon={appliedCoupon}
+                    discountAmount={effectiveDiscount}
+                    onApply={(coupon, amount) => {
+                      setAppliedCoupon(coupon);
+                      setCouponDiscount(amount);
+                    }}
+                    onRemove={() => {
+                      setAppliedCoupon(null);
+                      setCouponDiscount(0);
+                    }}
+                  />
+                </div>
                 
                 <div className="border-t pt-4 mt-2">
+                  {appliedCoupon && (
+                    <div className="space-y-1 mb-3">
+                      <div className="flex justify-between text-sm">
+                        <span>Subtotal</span>
+                        <span className="line-through text-muted-foreground">{formatPrice(subtotal)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
+                        <span>Cupom {appliedCoupon.code}</span>
+                        <span>-{formatPrice(effectiveDiscount)}</span>
+                      </div>
+                    </div>
+                  )}
                   <div className="flex justify-between font-bold text-lg">
                     <span>Total</span>
                     <span className={paymentMethod === 'pix' ? 'text-green-600 dark:text-green-400' : ''}>
