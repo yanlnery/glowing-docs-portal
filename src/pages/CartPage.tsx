@@ -30,6 +30,8 @@ import { orderEventsService } from '@/services/orderEventsService';
 import { cartAnalyticsService } from '@/services/cartAnalyticsService';
 import { siteAnalyticsService } from '@/services/siteAnalyticsService';
 import { CheckoutAbandonmentDialog } from '@/components/cart/CheckoutAbandonmentDialog';
+import CouponInput from '@/components/cart/CouponInput';
+import { couponService, Coupon } from '@/services/couponService';
 import { supabase } from '@/integrations/supabase/client';
 
 // Define proper interfaces for our form data and errors
