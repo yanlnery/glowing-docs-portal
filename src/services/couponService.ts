@@ -31,7 +31,7 @@ export const couponService = {
       .from('coupons' as any)
       .select('*')
       .order('created_at', { ascending: false });
-    return { data: data as Coupon[] | null, error };
+    return { data: data as unknown as Coupon[] | null, error };
   },
 
   async create(coupon: CouponInsert) {
@@ -40,7 +40,7 @@ export const couponService = {
       .insert({ ...coupon, code: coupon.code.toUpperCase() })
       .select()
       .single();
-    return { data: data as Coupon | null, error };
+    return { data: data as unknown as Coupon | null, error };
   },
 
   async update(id: string, updates: CouponUpdate) {
@@ -52,7 +52,7 @@ export const couponService = {
       .eq('id', id)
       .select()
       .single();
-    return { data: data as Coupon | null, error };
+    return { data: data as unknown as Coupon | null, error };
   },
 
   async delete(id: string) {
