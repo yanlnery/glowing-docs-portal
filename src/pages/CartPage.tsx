@@ -424,6 +424,16 @@ const CartPage = () => {
       
       const paymentLabel = paymentMethod === 'pix' ? 'PIX' : 'Cartão (até 10x sem juros)';
       
+      let couponSection = '';
+      if (appliedCoupon) {
+        couponSection = 
+          `\n\nCupom aplicado: ${appliedCoupon.code}\n` +
+          `Subtotal original: ${formatPrice(subtotal)}\n` +
+          `Desconto: -${formatPrice(effectiveDiscount)}\n` +
+          `Total no PIX: ${formatPrice(total)}\n` +
+          `Total parcelado (10x): ${formatPrice(total / 10)}`;
+      }
+      
       const message = 
         `Olá! Acabei de finalizar um pedido no site Pet Serpentes.\n\n` +
         `Pedido: ${orderNumber}\n` +
@@ -432,8 +442,9 @@ const CartPage = () => {
         `Endereço: ${fullAddress}\n` +
         `Forma de pagamento: ${paymentLabel}\n\n` +
         `Animal(is) solicitado(s):\n${items.map(item => `- ${item.product.meta?.productId ? `#${item.product.meta.productId} - ` : ''}${item.product.name} (${item.product.speciesName || "Não especificado"}) - ${formatPrice(getItemPrice(item))}`).join('\n')}\n\n` +
-        `Total: ${formatPrice(total)}\n\n` +
-        `Gostaria de confirmar o pedido e combinar os detalhes do envio.`;
+        `Total: ${formatPrice(total)}` +
+        couponSection +
+        `\n\nGostaria de confirmar o pedido e combinar os detalhes do envio.`;
 
       const whatsappUrl = `https://wa.me/5521967802174?text=${encodeURIComponent(message)}`;
 
