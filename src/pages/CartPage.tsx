@@ -728,7 +728,7 @@ const CartPage = () => {
                         <span className="line-through text-muted-foreground">{formatPrice(subtotal)}</span>
                       </div>
                       <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
-                        <span>Cupom {appliedCoupon.code}</span>
+                        <span>Cupom {appliedCoupon.code}{appliedCoupon.discount_type === 'percentage' ? ` (${appliedCoupon.discount_value}%)` : ''}</span>
                         <span>-{formatPrice(effectiveDiscount)}</span>
                       </div>
                     </div>
@@ -749,7 +749,9 @@ const CartPage = () => {
                 <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-md flex gap-2 text-sm">
                   <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
                   <p className="text-yellow-800 dark:text-yellow-300">
-                    ⚠️ O frete é sujeito à disponibilidade logística e valores variam por região. Finalize para consultar a disponibilidade.
+                    {appliedCoupon
+                      ? '🎉 Este cupom é exclusivo para retirada no evento MEX Festival, que irá ocorrer no dia 18/04/2026 em São Paulo.'
+                      : '⚠️ O frete é sujeito à disponibilidade logística e valores variam por região. Finalize para consultar a disponibilidade.'}
                   </p>
                 </div>
               </CardContent>

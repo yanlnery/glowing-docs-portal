@@ -60,7 +60,7 @@ const CouponInput: React.FC<CouponInputProps> = ({
           </Button>
         </div>
         <p className="text-sm text-green-600 dark:text-green-400">
-          Desconto: -{formatted}
+          Desconto{appliedCoupon.discount_type === 'percentage' ? ` (${appliedCoupon.discount_value}%)` : ''}: -{formatted}
         </p>
       </div>
     );
