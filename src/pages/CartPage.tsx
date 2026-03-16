@@ -728,7 +728,7 @@ const CartPage = () => {
                         <span className="line-through text-muted-foreground">{formatPrice(subtotal)}</span>
                       </div>
                       <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
-                        <span>Cupom {appliedCoupon.code}</span>
+                        <span>Cupom {appliedCoupon.code}{appliedCoupon.discount_type === 'percentage' ? ` (${appliedCoupon.discount_value}%)` : ''}</span>
                         <span>-{formatPrice(effectiveDiscount)}</span>
                       </div>
                     </div>
