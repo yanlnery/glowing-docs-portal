@@ -365,7 +365,7 @@ const CartPage = () => {
         user_id: user.id,
         customer_name: formData.fullName.trim(),
         customer_cpf: formData.cpf.trim(),
-        customer_phone: '',
+        customer_phone: formData.phone.trim(),
         shipping_address: {
           street: formData.street.trim(),
           number: formData.number.trim(),
