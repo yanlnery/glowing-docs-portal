@@ -291,6 +291,13 @@ const CartPage = () => {
     const errors: FormErrors = {};
     if (!formData.fullName.trim()) errors.fullName = "Nome completo é obrigatório";
     
+    const cleanPhone = formData.phone.replace(/\D/g, '');
+    if (!cleanPhone) {
+      errors.phone = "Celular é obrigatório";
+    } else if (cleanPhone.length < 10) {
+      errors.phone = "Celular inválido";
+    }
+    
     const cleanCPF = formData.cpf.replace(/\D/g, '');
     if (!cleanCPF) {
       errors.cpf = "CPF é obrigatório";
