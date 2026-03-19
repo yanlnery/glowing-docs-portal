@@ -436,11 +436,13 @@ const CartPage = () => {
       let couponSection = '';
       if (appliedCoupon) {
         couponSection = 
-          `\n\nCupom aplicado: ${appliedCoupon.code}\n` +
-          `Subtotal original: ${formatPrice(subtotal)}\n` +
-          `Desconto: -${formatPrice(effectiveDiscount)}\n` +
-          `Total no PIX: ${formatPrice(total)}\n` +
-          `Total parcelado (10x): ${formatPrice(total / 10)}`;
+          `\n\n🎟️ Cupom aplicado: ${appliedCoupon.code}` +
+          (appliedCoupon.discount_type === 'percentage' ? ` (${appliedCoupon.discount_value}%)` : '') +
+          `\nSubtotal original: ${formatPrice(subtotal)}` +
+          `\nDesconto: -${formatPrice(effectiveDiscount)}` +
+          `\nTotal no PIX: ${formatPrice(total)}` +
+          `\nTotal parcelado (10x): ${formatPrice(total / 10)}` +
+          `\n\n📍 Retirada exclusiva no evento MEX Festival — 18/04/2026, São Paulo.`;
       }
       
       const message = 
@@ -448,6 +450,7 @@ const CartPage = () => {
         `Pedido: ${orderNumber}\n` +
         `Nome do comprador: ${formData.fullName}\n` +
         `CPF: ${formData.cpf}\n` +
+        `Celular: ${formData.phone}\n` +
         `Endereço: ${fullAddress}\n` +
         `Forma de pagamento: ${paymentLabel}\n\n` +
         `Animal(is) solicitado(s):\n${items.map(item => `- ${item.product.meta?.productId ? `#${item.product.meta.productId} - ` : ''}${item.product.name} (${item.product.speciesName || "Não especificado"}) - ${formatPrice(getItemPrice(item))}`).join('\n')}\n\n` +
