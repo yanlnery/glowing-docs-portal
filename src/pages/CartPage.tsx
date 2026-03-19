@@ -95,6 +95,7 @@ const CartPage = () => {
   const [formData, setFormData] = useState<CheckoutFormData>({
     fullName: '',
     cpf: '',
+    phone: '',
     cep: '',
     street: '',
     number: '',
