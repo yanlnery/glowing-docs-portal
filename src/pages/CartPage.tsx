@@ -523,6 +523,7 @@ const CartPage = () => {
       setFormData({
         fullName: '',
         cpf: '',
+        phone: '',
         cep: '',
         street: '',
         number: '',
