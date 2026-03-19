@@ -38,6 +38,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface CheckoutFormData {
   fullName: string;
   cpf: string;
+  phone: string;
   cep: string;
   street: string;
   number: string;
@@ -94,6 +95,7 @@ const CartPage = () => {
   const [formData, setFormData] = useState<CheckoutFormData>({
     fullName: '',
     cpf: '',
+    phone: '',
     cep: '',
     street: '',
     number: '',
@@ -289,6 +291,13 @@ const CartPage = () => {
     const errors: FormErrors = {};
     if (!formData.fullName.trim()) errors.fullName = "Nome completo é obrigatório";
     
+    const cleanPhone = formData.phone.replace(/\D/g, '');
+    if (!cleanPhone) {
+      errors.phone = "Celular é obrigatório";
+    } else if (cleanPhone.length < 10) {
+      errors.phone = "Celular inválido";
+    }
+    
     const cleanCPF = formData.cpf.replace(/\D/g, '');
     if (!cleanCPF) {
       errors.cpf = "CPF é obrigatório";
@@ -356,7 +365,7 @@ const CartPage = () => {
         user_id: user.id,
         customer_name: formData.fullName.trim(),
         customer_cpf: formData.cpf.trim(),
-        customer_phone: '',
+        customer_phone: formData.phone.trim(),
         shipping_address: {
           street: formData.street.trim(),
           number: formData.number.trim(),
@@ -427,11 +436,13 @@ const CartPage = () => {
       let couponSection = '';
       if (appliedCoupon) {
         couponSection = 
-          `\n\nCupom aplicado: ${appliedCoupon.code}\n` +
-          `Subtotal original: ${formatPrice(subtotal)}\n` +
-          `Desconto: -${formatPrice(effectiveDiscount)}\n` +
-          `Total no PIX: ${formatPrice(total)}\n` +
-          `Total parcelado (10x): ${formatPrice(total / 10)}`;
+          `\n\n🎟️ Cupom aplicado: ${appliedCoupon.code}` +
+          (appliedCoupon.discount_type === 'percentage' ? ` (${appliedCoupon.discount_value}%)` : '') +
+          `\nSubtotal original: ${formatPrice(subtotal)}` +
+          `\nDesconto: -${formatPrice(effectiveDiscount)}` +
+          `\nTotal no PIX: ${formatPrice(total)}` +
+          `\nTotal parcelado (10x): ${formatPrice(total / 10)}` +
+          `\n\n📍 Retirada exclusiva no evento MEX Festival — 18/04/2026, São Paulo.`;
       }
       
       const message = 
@@ -439,6 +450,7 @@ const CartPage = () => {
         `Pedido: ${orderNumber}\n` +
         `Nome do comprador: ${formData.fullName}\n` +
         `CPF: ${formData.cpf}\n` +
+        `Celular: ${formData.phone}\n` +
         `Endereço: ${fullAddress}\n` +
         `Forma de pagamento: ${paymentLabel}\n\n` +
         `Animal(is) solicitado(s):\n${items.map(item => `- ${item.product.meta?.productId ? `#${item.product.meta.productId} - ` : ''}${item.product.name} (${item.product.speciesName || "Não especificado"}) - ${formatPrice(getItemPrice(item))}`).join('\n')}\n\n` +
@@ -511,6 +523,7 @@ const CartPage = () => {
       setFormData({
         fullName: '',
         cpf: '',
+        phone: '',
         cep: '',
         street: '',
         number: '',
@@ -885,6 +898,23 @@ const CartPage = () => {
               />
               {formErrors.cpf && (
                 <p className="text-destructive text-xs">{formErrors.cpf}</p>
+              )}
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="phone">Celular / WhatsApp</Label>
+              <Input
+                id="phone"
+                name="phone"
+                placeholder="(00) 00000-0000"
+                type="tel"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className={formErrors.phone ? "border-destructive focus-visible:ring-destructive" : ""}
+                disabled={isProcessing}
+              />
+              {formErrors.phone && (
+                <p className="text-destructive text-xs">{formErrors.phone}</p>
               )}
             </div>
 
