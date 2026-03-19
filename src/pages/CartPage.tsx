@@ -456,7 +456,9 @@ const CartPage = () => {
         `Animal(is) solicitado(s):\n${items.map(item => `- ${item.product.meta?.productId ? `#${item.product.meta.productId} - ` : ''}${item.product.name} (${item.product.speciesName || "Não especificado"}) - ${formatPrice(getItemPrice(item))}`).join('\n')}\n\n` +
         `Total: ${formatPrice(total)}` +
         couponSection +
-        `\n\nGostaria de confirmar o pedido e combinar os detalhes do envio.`;
+        (appliedCoupon
+          ? `\n\nGostaria de confirmar o pedido.`
+          : `\n\nGostaria de confirmar o pedido e combinar os detalhes do envio.`);
 
       const whatsappUrl = `https://wa.me/5521967802174?text=${encodeURIComponent(message)}`;
 
