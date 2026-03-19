@@ -435,13 +435,31 @@ const CartPage = () => {
       
       let couponSection = '';
       if (appliedCoupon) {
+        // Calculate PIX subtotal (with pix prices)
+        const pixSubtotal = items.reduce((sum, item) => {
+          return sum + (item.product.pixPrice || item.product.price) * item.quantity;
+        }, 0);
+        const pixDiscount = appliedCoupon.discount_type === 'percentage'
+          ? pixSubtotal * (appliedCoupon.discount_value / 100)
+          : Math.min(appliedCoupon.discount_value, pixSubtotal);
+        const pixTotal = Math.max(pixSubtotal - pixDiscount, 0);
+
+        // Calculate card subtotal (with regular prices)
+        const cardSubtotal = items.reduce((sum, item) => {
+          return sum + item.product.price * item.quantity;
+        }, 0);
+        const cardDiscount = appliedCoupon.discount_type === 'percentage'
+          ? cardSubtotal * (appliedCoupon.discount_value / 100)
+          : Math.min(appliedCoupon.discount_value, cardSubtotal);
+        const cardTotal = Math.max(cardSubtotal - cardDiscount, 0);
+
         couponSection = 
           `\n\n🎟️ Cupom aplicado: ${appliedCoupon.code}` +
           (appliedCoupon.discount_type === 'percentage' ? ` (${appliedCoupon.discount_value}%)` : '') +
-          `\nSubtotal original: ${formatPrice(subtotal)}` +
-          `\nDesconto: -${formatPrice(effectiveDiscount)}` +
-          `\nTotal no PIX: ${formatPrice(total)}` +
-          `\nTotal parcelado (10x): ${formatPrice(total / 10)}` +
+          `\nSubtotal original: ${formatPrice(cardSubtotal)}` +
+          `\nDesconto: -${formatPrice(cardDiscount)}` +
+          `\nTotal no PIX: ${formatPrice(pixTotal)}` +
+          `\nTotal parcelado (10x): ${formatPrice(cardTotal / 10)}` +
           `\n\n📍 Retirada exclusiva no evento MEX Festival — 18/04/2026, São Paulo.`;
       }
       
