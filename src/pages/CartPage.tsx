@@ -38,6 +38,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface CheckoutFormData {
   fullName: string;
   cpf: string;
+  phone: string;
   cep: string;
   street: string;
   number: string;
