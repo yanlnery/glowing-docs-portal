@@ -902,6 +902,23 @@ const CartPage = () => {
             </div>
 
             <div className="grid gap-2">
+              <Label htmlFor="phone">Celular / WhatsApp</Label>
+              <Input
+                id="phone"
+                name="phone"
+                placeholder="(00) 00000-0000"
+                type="tel"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className={formErrors.phone ? "border-destructive focus-visible:ring-destructive" : ""}
+                disabled={isProcessing}
+              />
+              {formErrors.phone && (
+                <p className="text-destructive text-xs">{formErrors.phone}</p>
+              )}
+            </div>
+
+            <div className="grid gap-2">
               <Label htmlFor="cep">CEP</Label>
               <div className="relative">
                 <Input
