@@ -1,8 +1,7 @@
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Menu, X, Book, Home, FileText, Users, Phone, MonitorPlay } from "lucide-react";
+import { Book, Home, FileText, Users, Phone, MonitorPlay } from "lucide-react";
 import { SnakeIcon, LizardIcon } from '@/components/icons/CustomIcons';
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/hooks/useSettings";
@@ -10,7 +9,7 @@ import type { MenuItem } from './header/menuItem.type';
 
 import Logo from './header/Logo';
 import HeaderActions from './header/HeaderActions';
-import MobileNavigation from './header/MobileNavigation';
+import { MobileMenu } from "@/components/MobileMenu";
 
 // Mobile menu icons (PNG images)
 import menuHomeIcon from '@/assets/icons/menu-home.png';
@@ -53,15 +52,9 @@ const staticBaseMenuItems: StaticMenuItem[] = [
 ];
 
 export default function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const { settings } = useSettings(); 
   const isAcademyVisible = settings.isAcademyVisible;
-
-
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [location.pathname]);
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -116,31 +109,9 @@ export default function Header() {
         
         <div className="flex items-center gap-1 md:gap-2">
           <HeaderActions />
-          
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsMenuOpen(prev => !prev);
-            }}
-            aria-expanded={isMenuOpen}
-            aria-controls="mobile-menu"
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            <span className="sr-only">{isMenuOpen ? "Fechar menu" : "Abrir menu"}</span>
-          </Button>
+          <MobileMenu />
         </div>
       </div>
-      
-      {isMenuOpen && (
-        <MobileNavigation 
-          menuItems={menuItems} 
-          isActive={isActive} 
-          setIsMenuOpen={setIsMenuOpen} 
-        />
-      )}
     </header>
   );
 }
