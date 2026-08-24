@@ -1,6 +1,7 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
+import { AnimatePresence } from 'motion/react';
 import { Button } from "@/components/ui/button";
 import { Menu, X, Book, Home, FileText, Users, Phone, MonitorPlay } from "lucide-react";
 import { SnakeIcon, LizardIcon } from '@/components/icons/CustomIcons';
@@ -134,13 +135,15 @@ export default function Header() {
         </div>
       </div>
       
-      {isMenuOpen && (
-        <MobileNavigation 
-          menuItems={menuItems} 
-          isActive={isActive} 
-          setIsMenuOpen={setIsMenuOpen} 
-        />
-      )}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <MobileNavigation 
+            menuItems={menuItems} 
+            isActive={isActive} 
+            setIsMenuOpen={setIsMenuOpen} 
+          />
+        )}
+      </AnimatePresence>
     </header>
   );
 }

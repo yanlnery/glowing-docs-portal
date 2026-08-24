@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'motion/react';
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, User, LogOut, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -73,9 +74,13 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
   };
 
   const menuContent = (
-    <div 
-      className="fixed inset-0 z-[9999] bg-background text-foreground md:hidden animate-fade-in"
+    <motion.div 
+      className="fixed inset-0 z-[9999] bg-background text-foreground md:hidden"
       style={{ isolation: 'isolate' }}
+      initial={{ clipPath: "circle(0% at calc(100% - 40px) 32px)" }}
+      animate={{ clipPath: "circle(150% at calc(100% - 40px) 32px)" }}
+      exit={{ clipPath: "circle(0% at calc(100% - 40px) 32px)" }}
+      transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
     >
       {/* Header fixo dentro do menu - sempre visível independente do scroll */}
       <div className="h-16 border-b border-border bg-background flex items-center justify-between px-4 sm:px-6">
@@ -172,9 +177,29 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
         </div>
 
         {/* Navigation menu - design limpo */}
-        <ul className="flex flex-col space-y-1">
+        <motion.ul 
+          className="flex flex-col space-y-1"
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+          variants={{
+            hidden: {},
+            visible: {
+              transition: {
+                staggerChildren: 0.06,
+                delayChildren: 0.2,
+              }
+            }
+          }}
+        >
           {menuItems.map((item) => (
-            <li key={item.title}>
+            <motion.li 
+              key={item.title}
+              variants={{
+                hidden: { opacity: 0, x: -16 },
+                visible: { opacity: 1, x: 0, transition: { duration: 0.3, ease: "easeOut" } }
+              }}
+            >
                 <Link
                   to={item.path}
                   className={cn(
@@ -201,9 +226,9 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
                   )}
                   <span className="leading-none">{item.title}</span>
                 </Link>
-            </li>
+            </motion.li>
           ))}
-        </ul>
+        </motion.ul>
 
         {/* Footer com branding */}
         <div className="mt-auto pt-8 pb-4 text-center">
@@ -212,7 +237,7 @@ export default function MobileNavigation({ menuItems, isActive, setIsMenuOpen }:
           </p>
         </div>
       </nav>
-    </div>
+    </motion.div>
   );
 
   // Render via portal to escape any stacking context issues
