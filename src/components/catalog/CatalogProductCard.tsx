@@ -77,7 +77,11 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
       }}
     >
       <Link to={`/produtos/${product.id}`} className="block relative cursor-pointer group">
-        <div className="aspect-[4/3] overflow-hidden rounded-t-lg bg-muted transition-transform duration-300 ease-out group-hover:scale-105">
+        <div
+          ref={productImageRef}
+          className="aspect-[4/3] overflow-hidden rounded-t-lg bg-muted relative z-40"
+          style={{ willChange: "transform, opacity" }}
+        >
           <img
             src={catalogImageUrl}
             alt={product.name}
