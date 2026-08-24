@@ -598,6 +598,33 @@ const CartPage = () => {
         </div>
       ) : (
         <>
+          <AnimatePresence>
+            {items.length > 0 && showNotification && (
+              <motion.div
+                key="cart-notice"
+                initial={{ opacity: 0, y: -12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ type: "spring", stiffness: 300, damping: 24 }}
+                className="mb-6 rounded-lg border border-primary/20 bg-primary/5 p-4"
+              >
+                <p className="text-sm font-semibold text-foreground">Quase lá! 🐍</p>
+                <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
+                  Para finalizar, confirme seus dados. Precisamos deles para emitir a documentação do animal.
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                  Ao clicar em <span className="font-medium text-foreground">Finalizar pedido</span>, você será direcionado ao nosso WhatsApp para confirmar o frete e realizar o pagamento. Simples assim.
+                </p>
+                <button
+                  onClick={() => setShowNotification(false)}
+                  className="mt-3 inline-flex items-center rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity"
+                >
+                  Entendi
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <div className="space-y-4">
@@ -682,33 +709,6 @@ const CartPage = () => {
               </Button>
             </div>
           </div>
-
-          <AnimatePresence>
-            {items.length > 0 && showNotification && (
-              <motion.div
-                key="cart-notice"
-                initial={{ opacity: 0, y: -12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ type: "spring", stiffness: 300, damping: 24 }}
-                className="mt-6 rounded-lg border border-primary/20 bg-primary/5 p-4"
-              >
-                <p className="text-sm font-semibold text-foreground">Quase lá! 🐍</p>
-                <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
-                  Para finalizar, confirme seus dados. Precisamos deles para emitir a documentação do animal.
-                </p>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  Ao clicar em <span className="font-medium text-foreground">Finalizar pedido</span>, você será direcionado ao nosso WhatsApp para confirmar o frete e realizar o pagamento. Simples assim.
-                </p>
-                <button
-                  onClick={() => setShowNotification(false)}
-                  className="mt-3 inline-flex items-center rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity"
-                >
-                  Entendi
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
           
           <div>
             <Card>
