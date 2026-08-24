@@ -1,11 +1,12 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 import { Product } from "@/types/product";
 import { getProductImageUrl } from "@/utils/productImageUtils";
 import { useCartStore } from "@/stores/cartStore";
+import { useAddToCartAnimation, cartIconRef, cartRingRef } from "@/hooks/useAddToCartAnimation";
 import { ShoppingCart, Check } from "lucide-react";
 import { toast } from "sonner";
 
