@@ -53,9 +53,10 @@ export function MobileMenu() {
   const isAcademyVisible = settings.isAcademyVisible;
 
   useEffect(() => {
-    if (containerRef.current) {
-      setHeight(containerRef.current.offsetHeight);
-    }
+    setHeight(window.innerHeight);
+    const handleResize = () => setHeight(window.innerHeight);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
