@@ -112,7 +112,7 @@ export function MobileMenu() {
         custom={height}
         variants={sidebarVariants}
         className={cn(
-          "fixed inset-y-0 right-0 w-full max-w-sm bg-background shadow-2xl z-[60]",
+          "fixed top-0 right-0 h-screen w-full max-w-sm bg-background shadow-2xl z-[60]",
           "flex flex-col justify-center px-8"
         )}
       >
