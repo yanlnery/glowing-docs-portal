@@ -19,6 +19,8 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
   const addToCart = useCartStore((state) => state.addToCart);
   const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
+  const productImageRef = useRef<HTMLDivElement>(null);
+  const { triggerFlyAnimation } = useAddToCartAnimation();
   
   const rawImageUrl = getProductImageUrl(product);
   const imageUrl = rawImageUrl
@@ -26,17 +28,23 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
     : '/placeholder.svg';
   
   const handleAddToCart = () => {
-    if (product.status === 'disponivel') {
-      setIsAdding(true);
+    if (product.status !== 'disponivel') return;
+
+    setIsAdding(true);
+    const complete = () => {
       addToCart(product, 1);
       toast.success(`${product.name} adicionado ao carrinho!`, {
         duration: 2000,
       });
-      
-      // Redirecionar para o carrinho
       setTimeout(() => {
         navigate('/carrinho');
       }, 400);
+    };
+
+    if (productImageRef.current && cartIconRef.current && cartRingRef.current) {
+      triggerFlyAnimation(productImageRef.current, cartIconRef.current, cartRingRef.current, complete);
+    } else {
+      complete();
     }
   };
   
