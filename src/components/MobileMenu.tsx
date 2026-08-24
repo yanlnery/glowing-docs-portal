@@ -13,7 +13,7 @@ const navItems = [
   { label: "Manuais de Criação", href: "/manuais" },
   { label: "Quem Somos", href: "/sobre" },
   { label: "Contato", href: "/contato" },
-] as const;
+];
 
 const sidebarVariants: Variants = {
   open: (height = 1000) => ({
