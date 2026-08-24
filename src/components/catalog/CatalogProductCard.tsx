@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,7 @@ import { Product } from "@/types/product";
 import { getProductImageUrl } from "@/utils/productImageUtils";
 import { useCartStore } from "@/stores/cartStore";
 import { useToast } from "@/hooks/use-toast";
+import { useAddToCartAnimation, cartIconRef, cartRingRef } from "@/hooks/useAddToCartAnimation";
 import { Star, AlertCircle, ShoppingCart, Check } from "lucide-react";
 
 interface CatalogProductCardProps {
