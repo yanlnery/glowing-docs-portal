@@ -51,10 +51,14 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
   return (
     <div 
       key={product.id} 
-      className="docs-card-gradient border rounded-lg overflow-hidden w-full flex flex-col"
+      className="docs-card-gradient border rounded-lg w-full flex flex-col"
     >
       <Link to={`/produtos/${product.id}`} className="block relative cursor-pointer group">
-        <div className="aspect-[4/3] overflow-hidden rounded-t-lg bg-muted">
+        <div
+          ref={productImageRef}
+          className="aspect-[4/3] overflow-hidden rounded-t-lg bg-muted relative z-40"
+          style={{ willChange: "transform, opacity" }}
+        >
           <img
             src={imageUrl}
             alt={product.name}
