@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useCartStore } from '@/stores/cartStore';
@@ -11,6 +11,8 @@ import { Product } from '@/types/product';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ProductImageZoom } from '@/components/product/ProductImageZoom';
 import { siteAnalyticsService } from '@/services/siteAnalyticsService';
+import { useAddToCartAnimation } from '@/hooks/useAddToCartAnimation';
+import { cartIconRef, cartRingRef } from '@/components/header/HeaderActions';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,6 +22,8 @@ const ProductDetail = () => {
   const [showSpeciesDetails, setShowSpeciesDetails] = useState(false);
   const { addToCart } = useCartStore();
   const navigate = useNavigate();
+  const productImageRef = useRef<HTMLDivElement>(null);
+  const { triggerFlyAnimation } = useAddToCartAnimation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -93,28 +97,41 @@ const ProductDetail = () => {
     }
   };
   
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!product) return;
-    try {
-      addToCart(product);
-      
-      toast({
-        title: "Produto adicionado ao carrinho",
-        description: `${product.name} foi adicionado ao seu carrinho.`,
-        duration: 2000,
-      });
 
-      // Automatically redirect to cart after 2 seconds
-      setTimeout(() => {
-        navigate('/carrinho');
-      }, 2000);
-    } catch (error) {
-      console.error("Error adding product to cart:", error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível adicionar o produto ao carrinho.",
-        variant: "destructive",
-      });
+    const addProduct = () => {
+      try {
+        addToCart(product);
+
+        toast({
+          title: "Produto adicionado ao carrinho",
+          description: `${product.name} foi adicionado ao seu carrinho.`,
+          duration: 2000,
+        });
+
+        setTimeout(() => {
+          navigate('/carrinho');
+        }, 2000);
+      } catch (error) {
+        console.error("Error adding product to cart:", error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível adicionar o produto ao carrinho.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    if (productImageRef.current && cartIconRef.current && cartRingRef.current) {
+      triggerFlyAnimation(
+        productImageRef.current,
+        cartIconRef.current,
+        cartRingRef.current,
+        addProduct
+      );
+    } else {
+      addProduct();
     }
   };
   
@@ -179,10 +196,12 @@ const ProductDetail = () => {
           {/* Product Images with In-place Zoom */}
           {product.images && product.images.length > 0 && (
             <ProductImageZoom
+              ref={productImageRef}
               images={product.images}
               productName={product.name}
               selectedIndex={selectedImageIndex}
               onIndexChange={setSelectedImageIndex}
+              style={{ willChange: "transform, opacity" }}
             />
           )}
           

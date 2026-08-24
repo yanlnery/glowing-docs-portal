@@ -110,7 +110,15 @@ const CartPage = () => {
   const [pendingClose, setPendingClose] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [couponDiscount, setCouponDiscount] = useState(0);
-  const [showNotification, setShowNotification] = useState(true);
+  const [showNotice, setShowNotice] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return !sessionStorage.getItem("cart-notice-seen");
+  });
+
+  const handleDismissNotice = () => {
+    sessionStorage.setItem("cart-notice-seen", "true");
+    setShowNotice(false);
+  };
   
   useEffect(() => {
     // Record cart view for analytics
@@ -597,34 +605,7 @@ const CartPage = () => {
           </Button>
         </div>
       ) : (
-        <>
-          <AnimatePresence>
-            {items.length > 0 && showNotification && (
-              <motion.div
-                key="cart-notice"
-                initial={{ opacity: 0, y: -12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ type: "spring", stiffness: 300, damping: 24 }}
-                className="mb-6 rounded-lg border border-primary/20 bg-primary/5 p-4"
-              >
-                <p className="text-sm font-semibold text-foreground">Quase lá! 🐍</p>
-                <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
-                  Para finalizar, confirme seus dados. Precisamos deles para emitir a documentação do animal.
-                </p>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  Ao clicar em <span className="font-medium text-foreground">Finalizar pedido</span>, você será direcionado ao nosso WhatsApp para confirmar o frete e realizar o pagamento. Simples assim.
-                </p>
-                <button
-                  onClick={() => setShowNotification(false)}
-                  className="mt-3 inline-flex items-center rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity"
-                >
-                  Entendi
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
+        <div className="relative">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <div className="space-y-4">
@@ -841,7 +822,34 @@ const CartPage = () => {
             </Card>
           </div>
         </div>
-      </>
+
+        {showNotice && items.length > 0 && (
+          <div className="absolute inset-0 z-20 flex items-start justify-center bg-background/80 backdrop-blur-sm p-4 pt-8">
+            <motion.div
+              key="cart-notice"
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ type: "spring", stiffness: 300, damping: 24 }}
+              className="w-full max-w-md rounded-lg border border-primary/20 bg-primary/5 p-4 shadow-lg"
+            >
+              <p className="text-sm font-semibold text-foreground">Quase lá! 🐍</p>
+              <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
+                Para finalizar, confirme seus dados. Precisamos deles para emitir a documentação do animal.
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                Ao clicar em <span className="font-medium text-foreground">Finalizar pedido</span>, você será direcionado ao nosso WhatsApp para confirmar o frete e realizar o pagamento. Simples assim.
+              </p>
+              <button
+                onClick={handleDismissNotice}
+                className="mt-3 inline-flex items-center rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity"
+              >
+                Entendi
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </div>
       )}
 
       {/* Abandonment Confirmation Dialog */}
