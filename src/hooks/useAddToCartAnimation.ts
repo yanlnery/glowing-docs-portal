@@ -46,8 +46,8 @@ export function useAddToCartAnimation() {
               opacity: { inherit: true, times: [0, 0.95, 1] },
             } as any
           ),
-          animate(probeX, dx, { duration, ease: ease as unknown as number[] }),
-          animate(probeY, dy, { duration, ease: ease as unknown as number[] }),
+          (animate as any)(probeX, dx, { duration, ease }),
+          (animate as any)(probeY, dy, { duration, ease }),
         ]);
 
         animate(
