@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, type Variants } from "motion/react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -13,20 +13,20 @@ const navItems = [
   { label: "Manuais de Criação", href: "/manuais" },
   { label: "Quem Somos", href: "/sobre" },
   { label: "Contato", href: "/contato" },
-];
+] as const;
 
-const sidebarVariants = {
+const sidebarVariants: Variants = {
   open: (height = 1000) => ({
     clipPath: `circle(${height * 2 + 200}px at calc(100% - 44px) 32px)`,
-    transition: { type: "spring", stiffness: 20, restDelta: 2 },
+    transition: { type: "spring" as const, stiffness: 20, restDelta: 2 },
   }),
   closed: {
     clipPath: "circle(24px at calc(100% - 44px) 32px)",
-    transition: { delay: 0.2, type: "spring", stiffness: 400, damping: 40 },
+    transition: { delay: 0.2, type: "spring" as const, stiffness: 400, damping: 40 },
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   open: {
     y: 0,
     opacity: 1,
@@ -39,7 +39,7 @@ const itemVariants = {
   },
 };
 
-const listVariants = {
+const listVariants: Variants = {
   open: { transition: { staggerChildren: 0.07, delayChildren: 0.2 } },
   closed: { transition: { staggerChildren: 0.05, staggerDirection: -1 } },
 };
