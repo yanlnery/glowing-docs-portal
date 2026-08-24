@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import WaitlistForm from '@/components/WaitlistForm';
@@ -102,6 +103,17 @@ const Academy = () => {
 
   return (
     <div className="container py-12 px-4 sm:px-6">
+      <Helmet>
+        <title>Pet Serpentes Academy | Curso de criação de répteis</title>
+        <meta
+          name="description"
+          content="A Pet Serpentes Academy reúne aulas, comunidade e acompanhamento para quem quer criar serpentes e lagartos com segurança e dentro da lei. Veja os módulos e como participar."
+        />
+        <link rel="canonical" href="https://petserpentes.com.br/academy" />
+        <meta property="og:title" content="Pet Serpentes Academy | Curso de criação de répteis" />
+        <meta property="og:description" content="Aulas, comunidade e acompanhamento para criar serpentes e lagartos com segurança e dentro da lei." />
+        <meta property="og:url" content="https://petserpentes.com.br/academy" />
+      </Helmet>
       {/* Subscriber Banner */}
       {hasAcademyAccess && (
         <AcademySubscriberBanner 
