@@ -110,6 +110,7 @@ const CartPage = () => {
   const [pendingClose, setPendingClose] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [couponDiscount, setCouponDiscount] = useState(0);
+  const [showNotification, setShowNotification] = useState(true);
   
   useEffect(() => {
     // Record cart view for analytics
