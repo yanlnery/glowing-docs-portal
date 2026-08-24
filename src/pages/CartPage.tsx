@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { useCartStore, CartItem } from '@/stores/cartStore';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
