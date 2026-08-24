@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, forwardRef } from 'react';
 import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getSrcSet, getTransformedUrl } from '@/utils/supabaseImageUrl';
 
@@ -7,16 +7,18 @@ interface ProductImageZoomProps {
   productName: string;
   selectedIndex: number;
   onIndexChange: (index: number) => void;
+  style?: React.CSSProperties;
 }
 
 const MAIN_SIZES = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px';
 
-export function ProductImageZoom({ 
-  images, 
-  productName, 
-  selectedIndex, 
-  onIndexChange 
-}: ProductImageZoomProps) {
+export const ProductImageZoom = forwardRef<HTMLDivElement, ProductImageZoomProps>(function ProductImageZoom({
+  images,
+  productName,
+  selectedIndex,
+  onIndexChange,
+  style
+}, forwardedRef) {
   const [isZoomed, setIsZoomed] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -25,6 +27,14 @@ export function ProductImageZoom({
   const [zoomScale, setZoomScale] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    if (typeof forwardedRef === 'function') {
+      forwardedRef(containerRef.current);
+    } else if (forwardedRef) {
+      (forwardedRef as React.MutableRefObject<HTMLDivElement | null>).current = containerRef.current;
+    }
+  }, [forwardedRef]);
 
   const selectedImage = images[selectedIndex]?.url;
 
@@ -191,11 +201,12 @@ export function ProductImageZoom({
   return (
     <div className="space-y-4">
       {/* Main Image Container */}
-      <div 
+      <div
         ref={containerRef}
         className={`aspect-square bg-muted rounded-lg overflow-hidden relative group select-none ${
           isZoomed ? (isDragging ? 'cursor-grabbing' : 'cursor-pointer') : 'cursor-zoom-in'
         }`}
+        style={style}
         onClick={toggleZoom}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -318,4 +329,4 @@ export function ProductImageZoom({
       )}
     </div>
   );
-}
+});
