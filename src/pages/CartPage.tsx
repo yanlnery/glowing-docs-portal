@@ -840,6 +840,7 @@ const CartPage = () => {
             </Card>
           </div>
         </div>
+      </>
       )}
 
       {/* Abandonment Confirmation Dialog */}
