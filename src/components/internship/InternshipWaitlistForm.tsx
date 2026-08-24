@@ -324,7 +324,7 @@ export function InternshipWaitlistForm({ isOpen, onClose }: InternshipWaitlistFo
                 </Button>
                 <Button type="submit" disabled={isSubmitting || isCoolingDown} className="flex-1">
                   {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                  Enviar Inscrição
+                  {isCoolingDown ? `Aguarde ${remaining}s...` : 'Enviar Inscrição'}
                 </Button>
               </div>
             </form>

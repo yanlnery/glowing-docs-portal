@@ -13,10 +13,12 @@ import {
   Send
 } from "lucide-react";
 import { contactService } from "@/services/contactService";
+import { useSubmitCooldown } from "@/hooks/useSubmitCooldown";
 
 export default function ContactPage() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const { remaining, isCoolingDown, startCooldown } = useSubmitCooldown('contact_form');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -35,7 +37,16 @@ export default function ContactPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    if (isCoolingDown) {
+      toast({
+        title: "Aguarde um momento",
+        description: `Você poderá enviar uma nova mensagem em ${remaining}s.`,
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (!formData.name || !formData.email || !formData.message) {
       toast({
         title: "Campos obrigatórios",
@@ -60,6 +71,8 @@ export default function ContactPage() {
       if (error) {
         throw new Error(error.message);
       }
+
+      startCooldown();
 
       toast({
         title: "Mensagem enviada!",
@@ -241,9 +254,9 @@ export default function ContactPage() {
                     />
                   </div>
 
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button type="submit" className="w-full" disabled={isLoading || isCoolingDown}>
                     <Send className="h-4 w-4 mr-2" />
-                    {isLoading ? 'Enviando...' : 'Enviar Mensagem'}
+                    {isCoolingDown ? `Aguarde ${remaining}s...` : isLoading ? 'Enviando...' : 'Enviar Mensagem'}
                   </Button>
                 </form>
               </CardContent>
