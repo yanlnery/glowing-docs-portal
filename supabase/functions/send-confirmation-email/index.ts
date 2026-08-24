@@ -3,11 +3,16 @@ import { Resend } from "npm:resend@2.0.0";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import {
+  authUserExists,
+  corsHeaders,
+  getClientIp,
+  isValidEmail,
+  markSent,
+  rateLimit,
+  recentlySent,
+  tooManyRequests,
+} from "../_shared/security.ts";
 
 // HTML escape function to prevent XSS
 function escapeHtml(text: string): string {
@@ -32,6 +37,37 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const { name, email, confirmationUrl }: ConfirmationEmailRequest = await req.json();
+
+    // Validação de entrada
+    if (!isValidEmail(email) || typeof confirmationUrl !== "string" || !confirmationUrl.startsWith("https://")) {
+      return new Response(JSON.stringify({ error: "Dados inválidos." }), {
+        status: 400,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    // Rate limiting: máx. 3 chamadas por e-mail e por IP em 10 minutos
+    const ip = getClientIp(req);
+    const byEmail = rateLimit(`confirm:email:${email.toLowerCase()}`, 3, 10 * 60_000);
+    const byIp = rateLimit(`confirm:ip:${ip}`, 3, 10 * 60_000);
+    if (!byEmail.allowed || !byIp.allowed) {
+      return tooManyRequests(Math.max(byEmail.retryAfter, byIp.retryAfter));
+    }
+
+    // Não reenviar o mesmo e-mail em menos de 5 minutos
+    const recent = recentlySent("confirmation", email);
+    if (recent.blocked) {
+      return tooManyRequests(recent.retryAfter);
+    }
+
+    // O usuário precisa existir no Auth para receber confirmação
+    if (!(await authUserExists(email))) {
+      // Resposta genérica para não permitir enumeração de contas
+      return new Response(JSON.stringify({ ok: true }), {
+        status: 200,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
     
     // Sanitize user input to prevent XSS
     const safeName = escapeHtml(name || 'Criador');
@@ -102,7 +138,8 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Confirmation email sent successfully:", emailResponse);
+    markSent("confirmation", email);
+    console.log("Confirmation email sent successfully");
 
     return new Response(JSON.stringify(emailResponse), {
       status: 200,
