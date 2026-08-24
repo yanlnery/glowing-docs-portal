@@ -17,11 +17,11 @@ const navItems = [
 
 const sidebarVariants: Variants = {
   open: (height = 1000) => ({
-    clipPath: `circle(${height * 2 + 200}px at calc(100% - 44px) 32px)`,
+    clipPath: `circle(${height * 2 + 200}px at 92% 5%)`,
     transition: { type: "spring" as const, stiffness: 20, restDelta: 2 },
   }),
   closed: {
-    clipPath: "circle(24px at calc(100% - 44px) 32px)",
+    clipPath: "circle(24px at 92% 5%)",
     transition: { delay: 0.2, type: "spring" as const, stiffness: 400, damping: 40 },
   },
 };
