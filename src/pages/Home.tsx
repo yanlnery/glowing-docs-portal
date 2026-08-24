@@ -10,7 +10,7 @@ export default function Home() {
   return (
     <>
       <Helmet>
-        <title>PET SERPENTES & COMPANHIA</title>
+        <title>Pet Serpentes | Criadouro legalizado de répteis nativos</title>
         <meta 
           name="description" 
           content="O Pet Serpentes & Companhia é um criadouro comercial legalizado localizado no Rio de Janeiro, certificado pelo IBAMA e INEA-RJ. Trabalhamos exclusivamente com répteis silvestres nativos." 
