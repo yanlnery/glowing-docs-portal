@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { Helmet } from "react-helmet-async";
 import { Manual } from "@/types/manual";
 import ManualsSearch from "@/components/manuals/ManualsSearch";
 import ManualsGrid from "@/components/manuals/ManualsGrid";
@@ -72,6 +73,18 @@ export default function Manuals() {
   }
 
   return (
+    <>
+      <Helmet>
+        <title>Manuais e Guias de Répteis em PDF | Pet Serpentes</title>
+        <meta
+          name="description"
+          content="Baixe gratuitamente manuais em PDF sobre manejo, alimentação, terrário e saúde de serpentes, lagartos e quelônios, elaborados pelo criadouro Pet Serpentes & Companhia."
+        />
+        <link rel="canonical" href="https://petserpentes.com.br/manuais" />
+        <meta property="og:title" content="Manuais e Guias de Répteis em PDF | Pet Serpentes" />
+        <meta property="og:description" content="Manuais gratuitos em PDF sobre manejo, alimentação, terrário e saúde de répteis." />
+        <meta property="og:url" content="https://petserpentes.com.br/manuais" />
+      </Helmet>
     <div className="container px-4 md:px-6 py-8 sm:py-12">
       <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">
         <div className="docs-section-title">
@@ -107,5 +120,6 @@ export default function Manuals() {
         />
       )}
     </div>
+    </>
   );
 }

@@ -137,7 +137,7 @@ export default function HeroCarouselUI({
                     {processedImageUrl && processedImageUrl !== "/placeholder.svg" ? (
                       <img
                         src={processedImageUrl}
-                        alt={item.alt_text || "Imagem do carrossel"}
+                        alt={item.alt_text || item.title || "Répteis criados no criadouro legalizado Pet Serpentes & Companhia"}
                         loading={index === 0 ? "eager" : "lazy"}
                         decoding={index === 0 ? "sync" : "async"}
                         fetchPriority={index === 0 ? "high" : "auto"}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useCartStore } from '@/stores/cartStore';
 import { Button } from '@/components/ui/button';
@@ -117,8 +118,54 @@ const ProductDetail = () => {
     }
   };
   
+  const canonicalUrl = `https://petserpentes.com.br/produtos/${product.id}`;
+  const primaryImage = product.images?.[0]?.url;
+  const metaTitle = `${product.name} | ${product.speciesName} à venda | Pet Serpentes`;
+  const metaDescription = (
+    product.description?.replace(/\s+/g, ' ').trim() ||
+    `${product.name} (${product.speciesName}) disponível no Pet Serpentes & Companhia, criadouro legalizado pelo IBAMA no Rio de Janeiro.`
+  ).slice(0, 155);
+
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: metaDescription,
+    ...(primaryImage ? { image: [primaryImage] } : {}),
+    ...(product.meta?.productId ? { sku: product.meta.productId } : {}),
+    category: product.category,
+    additionalProperty: [
+      { '@type': 'PropertyValue', name: 'Espécie', value: product.speciesName },
+    ],
+    brand: { '@type': 'Brand', name: 'Pet Serpentes & Companhia' },
+    offers: {
+      '@type': 'Offer',
+      url: canonicalUrl,
+      priceCurrency: 'BRL',
+      price: (product.pixPrice ?? product.price).toFixed(2),
+      availability: product.available
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      seller: { '@type': 'Organization', name: 'Pet Serpentes & Companhia' },
+    },
+  };
+
   return (
     <div className="container px-4 py-12 sm:px-6">
+      <Helmet>
+        <title>{metaTitle}</title>
+        <meta name="description" content={metaDescription} />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:type" content="product" />
+        <meta property="og:title" content={metaTitle} />
+        <meta property="og:description" content={metaDescription} />
+        <meta property="og:url" content={canonicalUrl} />
+        {primaryImage && <meta property="og:image" content={primaryImage} />}
+        <meta name="twitter:title" content={metaTitle} />
+        <meta name="twitter:description" content={metaDescription} />
+        {primaryImage && <meta name="twitter:image" content={primaryImage} />}
+        <script type="application/ld+json">{JSON.stringify(productJsonLd)}</script>
+      </Helmet>
       <div className="mb-4">
         <div className="flex items-center text-muted-foreground text-sm mb-8">
           <Link to="/" className="hover:underline">Home</Link>

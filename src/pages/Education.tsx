@@ -1,5 +1,6 @@
 
 import React from "react";
+import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, File, Play, BookOpen } from "lucide-react";
@@ -8,6 +9,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export default function Education() {
   return (
     <div>
+      <Helmet>
+        <title>Educação e Cuidados com Répteis | Pet Serpentes</title>
+        <meta
+          name="description"
+          content="Guias, vídeos e artigos sobre manejo, alimentação, terrários e saúde de serpentes, lagartos e quelônios, produzidos pelo criadouro legalizado Pet Serpentes & Companhia."
+        />
+        <link rel="canonical" href="https://petserpentes.com.br/educacao" />
+        <meta property="og:title" content="Educação e Cuidados com Répteis | Pet Serpentes" />
+        <meta property="og:description" content="Guias, vídeos e artigos sobre manejo, alimentação, terrários e saúde de répteis." />
+        <meta property="og:url" content="https://petserpentes.com.br/educacao" />
+      </Helmet>
       {/* Hero Section */}
       <section className="relative bg-serpente-900 text-white">
         <div className="absolute inset-0 opacity-30" style={{ 
@@ -57,8 +69,10 @@ export default function Education() {
                     </p>
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-muted-foreground">15 páginas</span>
-                      <Button size="sm" variant="outline" className="gap-1">
-                        <File className="h-4 w-4" /> Baixar PDF
+                      <Button size="sm" variant="outline" className="gap-1" asChild>
+                        <Link to="/manuais">
+                          <File className="h-4 w-4" /> Baixar PDF
+                        </Link>
                       </Button>
                     </div>
                   </div>
@@ -83,8 +97,10 @@ export default function Education() {
                     </p>
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-muted-foreground">22 páginas</span>
-                      <Button size="sm" variant="outline" className="gap-1">
-                        <File className="h-4 w-4" /> Baixar PDF
+                      <Button size="sm" variant="outline" className="gap-1" asChild>
+                        <Link to="/manuais">
+                          <File className="h-4 w-4" /> Baixar PDF
+                        </Link>
                       </Button>
                     </div>
                   </div>
@@ -109,8 +125,10 @@ export default function Education() {
                     </p>
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-muted-foreground">18 páginas</span>
-                      <Button size="sm" variant="outline" className="gap-1">
-                        <File className="h-4 w-4" /> Baixar PDF
+                      <Button size="sm" variant="outline" className="gap-1" asChild>
+                        <Link to="/manuais">
+                          <File className="h-4 w-4" /> Baixar PDF
+                        </Link>
                       </Button>
                     </div>
                   </div>
