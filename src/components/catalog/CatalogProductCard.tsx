@@ -87,7 +87,7 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
             alt={product.name}
             loading={index < 8 ? 'eager' : 'lazy'}
             decoding={index < 8 ? 'sync' : 'async'}
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-cover object-center transition-transform duration-300 ease-out group-hover:scale-105"
           />
         </div>
         
