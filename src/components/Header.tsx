@@ -1,8 +1,7 @@
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useMemo } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Menu, X, Book, Home, FileText, Users, Phone, MonitorPlay } from "lucide-react";
+import { Book, Home, FileText, Users, Phone, MonitorPlay } from "lucide-react";
 import { SnakeIcon, LizardIcon } from '@/components/icons/CustomIcons';
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/hooks/useSettings";
@@ -10,7 +9,7 @@ import type { MenuItem } from './header/menuItem.type';
 
 import Logo from './header/Logo';
 import HeaderActions from './header/HeaderActions';
-import MobileNavigation from './header/MobileNavigation';
+import { MobileMenu } from "@/components/MobileMenu";
 
 // Mobile menu icons (PNG images)
 import menuHomeIcon from '@/assets/icons/menu-home.png';
