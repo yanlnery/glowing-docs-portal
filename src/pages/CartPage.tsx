@@ -110,6 +110,7 @@ const CartPage = () => {
   const [pendingClose, setPendingClose] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [couponDiscount, setCouponDiscount] = useState(0);
+  const [showNotification, setShowNotification] = useState(true);
   
   useEffect(() => {
     // Record cart view for analytics
@@ -598,7 +599,7 @@ const CartPage = () => {
       ) : (
         <>
           <AnimatePresence>
-            {items.length > 0 && (
+            {items.length > 0 && showNotification && (
               <motion.div
                 key="cart-notice"
                 initial={{ opacity: 0, y: -12 }}
@@ -615,10 +616,10 @@ const CartPage = () => {
                   Ao clicar em <span className="font-medium text-foreground">Finalizar pedido</span>, você será direcionado ao nosso WhatsApp para confirmar o frete e realizar o pagamento. Simples assim.
                 </p>
                 <button
-                  onClick={() => navigate('/area-cliente')}
-                  className="mt-3 text-xs font-medium text-primary underline underline-offset-2 hover:opacity-70 transition-opacity"
+                  onClick={() => setShowNotification(false)}
+                  className="mt-3 inline-flex items-center rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity"
                 >
-                  Verificar meus dados →
+                  Entendi
                 </button>
               </motion.div>
             )}
