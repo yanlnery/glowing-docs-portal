@@ -1,11 +1,12 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 import { Product } from "@/types/product";
 import { getProductImageUrl } from "@/utils/productImageUtils";
 import { useCartStore } from "@/stores/cartStore";
+import { useAddToCartAnimation, cartIconRef, cartRingRef } from "@/hooks/useAddToCartAnimation";
 import { ShoppingCart, Check } from "lucide-react";
 import { toast } from "sonner";
 
@@ -18,6 +19,8 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
   const addToCart = useCartStore((state) => state.addToCart);
   const [isAdding, setIsAdding] = useState(false);
   const navigate = useNavigate();
+  const productImageRef = useRef<HTMLDivElement>(null);
+  const { triggerFlyAnimation } = useAddToCartAnimation();
   
   const rawImageUrl = getProductImageUrl(product);
   const imageUrl = rawImageUrl
@@ -25,27 +28,37 @@ export default function FeaturedProductCard({ product, index }: FeaturedProductC
     : '/placeholder.svg';
   
   const handleAddToCart = () => {
-    if (product.status === 'disponivel') {
-      setIsAdding(true);
+    if (product.status !== 'disponivel') return;
+
+    setIsAdding(true);
+    const complete = () => {
       addToCart(product, 1);
       toast.success(`${product.name} adicionado ao carrinho!`, {
         duration: 2000,
       });
-      
-      // Redirecionar para o carrinho
       setTimeout(() => {
         navigate('/carrinho');
       }, 400);
+    };
+
+    if (productImageRef.current && cartIconRef.current && cartRingRef.current) {
+      triggerFlyAnimation(productImageRef.current, cartIconRef.current, cartRingRef.current, complete);
+    } else {
+      complete();
     }
   };
   
   return (
     <div 
       key={product.id} 
-      className="docs-card-gradient border rounded-lg overflow-hidden w-full flex flex-col"
+      className="docs-card-gradient border rounded-lg w-full flex flex-col"
     >
       <Link to={`/produtos/${product.id}`} className="block relative cursor-pointer group">
-        <div className="aspect-[4/3] overflow-hidden rounded-t-lg bg-muted">
+        <div
+          ref={productImageRef}
+          className="aspect-[4/3] overflow-hidden rounded-t-lg bg-muted relative z-40"
+          style={{ willChange: "transform, opacity" }}
+        >
           <img
             src={imageUrl}
             alt={product.name}

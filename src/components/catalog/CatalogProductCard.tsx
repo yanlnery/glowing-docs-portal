@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,7 @@ import { Product } from "@/types/product";
 import { getProductImageUrl } from "@/utils/productImageUtils";
 import { useCartStore } from "@/stores/cartStore";
 import { useToast } from "@/hooks/use-toast";
+import { useAddToCartAnimation, cartIconRef, cartRingRef } from "@/hooks/useAddToCartAnimation";
 import { Star, AlertCircle, ShoppingCart, Check } from "lucide-react";
 
 interface CatalogProductCardProps {
@@ -27,6 +28,9 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
     ? `${imageUrl.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')}${imageUrl.includes('?') ? '&' : '?'}width=960&height=720&quality=95`
     : '/placeholder.svg';
 
+  const productImageRef = useRef<HTMLDivElement>(null);
+  const { triggerFlyAnimation } = useAddToCartAnimation();
+
   const handleAddToCart = (product: Product) => {
     if (isProductInCart(product.id)) {
       toast({
@@ -38,13 +42,21 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
       return;
     }
 
-    addToCart(product);
-    toast({
-      title: "Produto adicionado",
-      description: `${product.name} foi adicionado ao carrinho`,
-      variant: "default",
-    });
-    navigate('/carrinho');
+    const complete = () => {
+      addToCart(product);
+      toast({
+        title: "Produto adicionado",
+        description: `${product.name} foi adicionado ao carrinho`,
+        variant: "default",
+      });
+      navigate('/carrinho');
+    };
+
+    if (productImageRef.current && cartIconRef.current && cartRingRef.current) {
+      triggerFlyAnimation(productImageRef.current, cartIconRef.current, cartRingRef.current, complete);
+    } else {
+      complete();
+    }
   };
 
   const formatPrice = (price: number) => {
@@ -65,13 +77,17 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
       }}
     >
       <Link to={`/produtos/${product.id}`} className="block relative cursor-pointer group">
-        <div className="aspect-[4/3] overflow-hidden rounded-t-lg bg-muted transition-transform duration-300 ease-out group-hover:scale-105">
+        <div
+          ref={productImageRef}
+          className="aspect-[4/3] overflow-hidden rounded-t-lg bg-muted relative z-40"
+          style={{ willChange: "transform, opacity" }}
+        >
           <img
             src={catalogImageUrl}
             alt={product.name}
             loading={index < 8 ? 'eager' : 'lazy'}
             decoding={index < 8 ? 'sync' : 'async'}
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-cover object-center transition-transform duration-300 ease-out group-hover:scale-105"
           />
         </div>
         

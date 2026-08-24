@@ -7,6 +7,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { useCartStore } from "@/stores/cartStore";
 import { useToast } from "@/components/ui/use-toast";
+import { cartIconRef, cartRingRef } from "@/hooks/useAddToCartAnimation";
 
 export default function HeaderActions() {
   const { isAuthenticated, logout } = useAuth();
@@ -47,17 +48,28 @@ export default function HeaderActions() {
           </Link>
         </Button>
       )}
-      <Button variant="ghost" size="icon" asChild className="relative">
-        <Link to="/carrinho">
-          <ShoppingCart size={20} />
-          {cartQuantity > 0 && (
-            <Badge className="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center text-xs">
-              {cartQuantity}
-            </Badge>
-          )}
-          <span className="sr-only">Carrinho</span>
-        </Link>
-      </Button>
+      <div
+        ref={(el) => { cartIconRef.current = el; }}
+        className="relative flex items-center justify-center w-11 h-11"
+        style={{ willChange: "transform, opacity" }}
+      >
+        <div
+          ref={(el) => { cartRingRef.current = el; }}
+          className="absolute inset-0 border border-current opacity-0 pointer-events-none rounded-full"
+          style={{ willChange: "transform, opacity" }}
+        />
+        <Button variant="ghost" size="icon" asChild className="relative">
+          <Link to="/carrinho">
+            <ShoppingCart size={20} />
+            {cartQuantity > 0 && (
+              <Badge className="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center text-xs">
+                {cartQuantity}
+              </Badge>
+            )}
+            <span className="sr-only">Carrinho</span>
+          </Link>
+        </Button>
+      </div>
       <ThemeToggle />
     </div>
   );
