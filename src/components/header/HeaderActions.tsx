@@ -7,6 +7,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { useCartStore } from "@/stores/cartStore";
 import { useToast } from "@/components/ui/use-toast";
+import { cartIconRef, cartRingRef } from "@/hooks/useAddToCartAnimation";
 
 export default function HeaderActions() {
   const { isAuthenticated, logout } = useAuth();
