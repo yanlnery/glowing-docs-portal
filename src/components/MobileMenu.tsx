@@ -106,7 +106,7 @@ export function MobileMenu() {
   return (
     <div ref={containerRef} className="md:hidden">
       <motion.nav
-        initial={false}
+        initial="closed"
         animate={isOpen ? "open" : "closed"}
         custom={height}
         variants={sidebarVariants}
