@@ -28,6 +28,9 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
     ? `${imageUrl.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')}${imageUrl.includes('?') ? '&' : '?'}width=960&height=720&quality=95`
     : '/placeholder.svg';
 
+  const productImageRef = useRef<HTMLDivElement>(null);
+  const { triggerFlyAnimation } = useAddToCartAnimation();
+
   const handleAddToCart = (product: Product) => {
     if (isProductInCart(product.id)) {
       toast({
@@ -39,13 +42,21 @@ export default function CatalogProductCard({ product, index }: CatalogProductCar
       return;
     }
 
-    addToCart(product);
-    toast({
-      title: "Produto adicionado",
-      description: `${product.name} foi adicionado ao carrinho`,
-      variant: "default",
-    });
-    navigate('/carrinho');
+    const complete = () => {
+      addToCart(product);
+      toast({
+        title: "Produto adicionado",
+        description: `${product.name} foi adicionado ao carrinho`,
+        variant: "default",
+      });
+      navigate('/carrinho');
+    };
+
+    if (productImageRef.current && cartIconRef.current && cartRingRef.current) {
+      triggerFlyAnimation(productImageRef.current, cartIconRef.current, cartRingRef.current, complete);
+    } else {
+      complete();
+    }
   };
 
   const formatPrice = (price: number) => {
