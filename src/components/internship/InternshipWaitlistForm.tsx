@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useSubmitCooldown } from '@/hooks/useSubmitCooldown';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
@@ -55,6 +56,7 @@ interface InternshipWaitlistFormProps {
 export function InternshipWaitlistForm({ isOpen, onClose }: InternshipWaitlistFormProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const { remaining, isCoolingDown, startCooldown } = useSubmitCooldown('internship_waitlist');
   const [isSuccess, setIsSuccess] = React.useState(false);
 
   const form = useForm<FormData>({
@@ -80,6 +82,7 @@ export function InternshipWaitlistForm({ isOpen, onClose }: InternshipWaitlistFo
   };
 
   const onSubmit = async (data: FormData) => {
+    if (isCoolingDown) return;
     setIsSubmitting(true);
 
     try {
@@ -105,6 +108,7 @@ export function InternshipWaitlistForm({ isOpen, onClose }: InternshipWaitlistFo
         return;
       }
 
+      startCooldown();
       setIsSuccess(true);
       toast({
         title: 'Inscrição realizada!',
@@ -318,7 +322,7 @@ export function InternshipWaitlistForm({ isOpen, onClose }: InternshipWaitlistFo
                 <Button type="button" variant="outline" onClick={handleClose} className="flex-1">
                   Cancelar
                 </Button>
-                <Button type="submit" disabled={isSubmitting} className="flex-1">
+                <Button type="submit" disabled={isSubmitting || isCoolingDown} className="flex-1">
                   {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                   Enviar Inscrição
                 </Button>

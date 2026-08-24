@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { useSubmitCooldown } from "@/hooks/useSubmitCooldown";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -41,7 +42,11 @@ export default function WaitlistForm({ onSubmit, onCancel }: WaitlistFormProps) 
     },
   });
 
+  const { remaining, isCoolingDown, startCooldown } = useSubmitCooldown("academy_waitlist");
+
   function handleSubmit(values: z.infer<typeof formSchema>) {
+    if (isCoolingDown) return;
+    startCooldown();
     onSubmit(values);
   }
 
@@ -134,7 +139,9 @@ export default function WaitlistForm({ onSubmit, onCancel }: WaitlistFormProps) 
               <Button type="button" variant="outline" onClick={onCancel}>
                 Cancelar
               </Button>
-              <Button type="submit">Cadastrar</Button>
+              <Button type="submit" disabled={isCoolingDown}>
+                {isCoolingDown ? `Aguarde ${remaining}s...` : "Cadastrar"}
+              </Button>
             </div>
           </form>
         </Form>
