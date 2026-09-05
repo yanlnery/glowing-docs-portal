@@ -176,7 +176,7 @@ export default function SpeciesPage() {
         },
       ],
     };
-  }, [selectedSpecies]);
+  }, [selectedSpecies, routeSlug, searchParams]);
 
   if (loading) {
     return (
