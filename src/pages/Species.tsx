@@ -76,7 +76,7 @@ export default function SpeciesPage() {
   useEffect(() => {
     if (speciesList.length === 0) return;
 
-    const selectedSlug = searchParams.get('selected');
+    const selectedSlug = routeSlug || searchParams.get('selected');
     let nextSpecies: Species | null = null;
 
     // 1) Prioridade máxima: slug explícito na URL (mesmo que não passe no filtro ativo)
@@ -102,11 +102,15 @@ export default function SpeciesPage() {
     if (nextSpecies?.id !== selectedSpeciesRef.current?.id) {
       setSelectedSpecies(nextSpecies);
     }
-  }, [searchParams, speciesList, filteredSpecies]);
+  }, [routeSlug, searchParams, speciesList, filteredSpecies]);
 
   const handleSelectSpecies = (species: Species) => {
     setSelectedSpecies(species);
-    setSearchParams({ selected: species.slug }, { replace: true });
+    if (routeSlug) {
+      navigate(`/especies-criadas/${species.slug}`, { replace: true });
+    } else {
+      setSearchParams({ selected: species.slug }, { replace: true });
+    }
   };
 
   const baseUrl = 'https://petserpentes.com.br';
