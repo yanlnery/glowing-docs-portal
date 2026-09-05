@@ -14,6 +14,89 @@ import { siteAnalyticsService } from '@/services/siteAnalyticsService';
 import { useAddToCartAnimation } from '@/hooks/useAddToCartAnimation';
 import { cartIconRef, cartRingRef } from '@/components/header/HeaderActions';
 
+interface ProductSeoProps {
+  productId?: string;
+  product: Product | null;
+  loading: boolean;
+}
+
+const ProductSeo = ({ productId, product, loading }: ProductSeoProps) => {
+  const canonicalUrl = productId
+    ? `https://petserpentes.com.br/produtos/${productId}`
+    : 'https://petserpentes.com.br/catalogo';
+  const primaryImage = product?.images?.[0]?.url;
+  const metaTitle = product
+    ? `${product.name} | ${product.speciesName} à venda | Pet Serpentes`
+    : loading
+      ? 'Carregando produto | Pet Serpentes'
+      : 'Produto não encontrado | Pet Serpentes';
+  const metaDescription = product
+    ? (
+        product.description?.replace(/\s+/g, ' ').trim() ||
+        `${product.name} (${product.speciesName}) disponível no Pet Serpentes & Companhia, criadouro legalizado pelo IBAMA no Rio de Janeiro.`
+      ).slice(0, 155)
+    : loading
+      ? 'Consulte informações, fotos, disponibilidade e documentação deste animal no Pet Serpentes.'
+      : 'O produto procurado não está disponível no catálogo do Pet Serpentes.';
+
+  const productJsonLd = product ? {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: metaDescription,
+    ...(primaryImage ? { image: [primaryImage] } : {}),
+    ...(product.meta?.productId ? { sku: product.meta.productId } : {}),
+    category: product.category,
+    additionalProperty: [
+      { '@type': 'PropertyValue', name: 'Espécie', value: product.speciesName },
+    ],
+    brand: { '@type': 'Brand', name: 'Pet Serpentes & Companhia' },
+    offers: {
+      '@type': 'Offer',
+      url: canonicalUrl,
+      priceCurrency: 'BRL',
+      price: (product.pixPrice ?? product.price).toFixed(2),
+      availability: product.available
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      seller: { '@type': 'Organization', name: 'Pet Serpentes & Companhia' },
+    },
+  } : null;
+
+  const breadcrumbJsonLd = product ? {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://petserpentes.com.br/' },
+      { '@type': 'ListItem', position: 2, name: 'Catálogo', item: 'https://petserpentes.com.br/catalogo' },
+      { '@type': 'ListItem', position: 3, name: product.name, item: canonicalUrl },
+    ],
+  } : null;
+
+  useEffect(() => {
+    document.title = metaTitle;
+  }, [metaTitle]);
+
+  return (
+    <Helmet>
+      <title>{metaTitle}</title>
+      <meta name="description" content={metaDescription} />
+      {!loading && !product && <meta name="robots" content="noindex, follow" />}
+      <link rel="canonical" href={canonicalUrl} />
+      <meta property="og:type" content={product ? 'product' : 'website'} />
+      <meta property="og:title" content={metaTitle} />
+      <meta property="og:description" content={metaDescription} />
+      <meta property="og:url" content={canonicalUrl} />
+      {primaryImage && <meta property="og:image" content={primaryImage} />}
+      <meta name="twitter:title" content={metaTitle} />
+      <meta name="twitter:description" content={metaDescription} />
+      {primaryImage && <meta name="twitter:image" content={primaryImage} />}
+      {productJsonLd && <script type="application/ld+json">{JSON.stringify(productJsonLd)}</script>}
+      {breadcrumbJsonLd && <script type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</script>}
+    </Helmet>
+  );
+};
+
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
@@ -57,25 +140,31 @@ const ProductDetail = () => {
   
   if (loading) {
     return (
-      <div className="container px-4 py-12 sm:px-6 flex justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-serpente-600"></div>
-      </div>
+      <>
+        <ProductSeo productId={id} product={product} loading />
+        <div className="container px-4 py-12 sm:px-6 flex justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-serpente-600"></div>
+        </div>
+      </>
     );
   }
   
   if (!product) {
     return (
-      <div className="container px-4 py-12 sm:px-6 flex flex-col items-center">
-        <h1 className="text-2xl font-bold mb-4">Produto não encontrado</h1>
-        <p className="text-muted-foreground mb-6">
-          O produto que você está procurando não existe ou foi removido.
-        </p>
-        <Button asChild>
-          <Link to="/catalogo">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao Catálogo
-          </Link>
-        </Button>
-      </div>
+      <>
+        <ProductSeo productId={id} product={product} loading={false} />
+        <div className="container px-4 py-12 sm:px-6 flex flex-col items-center">
+          <h1 className="text-2xl font-bold mb-4">Produto não encontrado</h1>
+          <p className="text-muted-foreground mb-6">
+            O produto que você está procurando não existe ou foi removido.
+          </p>
+          <Button asChild>
+            <Link to="/catalogo">
+              <ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao Catálogo
+            </Link>
+          </Button>
+        </div>
+      </>
     );
   }
   
@@ -135,65 +224,9 @@ const ProductDetail = () => {
     }
   };
   
-  const canonicalUrl = `https://petserpentes.com.br/produtos/${product.id}`;
-  const primaryImage = product.images?.[0]?.url;
-  const metaTitle = `${product.name} | ${product.speciesName} à venda | Pet Serpentes`;
-  const metaDescription = (
-    product.description?.replace(/\s+/g, ' ').trim() ||
-    `${product.name} (${product.speciesName}) disponível no Pet Serpentes & Companhia, criadouro legalizado pelo IBAMA no Rio de Janeiro.`
-  ).slice(0, 155);
-
-  const productJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: product.name,
-    description: metaDescription,
-    ...(primaryImage ? { image: [primaryImage] } : {}),
-    ...(product.meta?.productId ? { sku: product.meta.productId } : {}),
-    category: product.category,
-    additionalProperty: [
-      { '@type': 'PropertyValue', name: 'Espécie', value: product.speciesName },
-    ],
-    brand: { '@type': 'Brand', name: 'Pet Serpentes & Companhia' },
-    offers: {
-      '@type': 'Offer',
-      url: canonicalUrl,
-      priceCurrency: 'BRL',
-      price: (product.pixPrice ?? product.price).toFixed(2),
-      availability: product.available
-        ? 'https://schema.org/InStock'
-        : 'https://schema.org/OutOfStock',
-      seller: { '@type': 'Organization', name: 'Pet Serpentes & Companhia' },
-    },
-  };
-
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://petserpentes.com.br/' },
-      { '@type': 'ListItem', position: 2, name: 'Catálogo', item: 'https://petserpentes.com.br/catalogo' },
-      { '@type': 'ListItem', position: 3, name: product.name, item: canonicalUrl },
-    ],
-  };
-
   return (
     <div className="container px-4 py-12 sm:px-6">
-      <Helmet>
-        <title>{metaTitle}</title>
-        <meta name="description" content={metaDescription} />
-        <link rel="canonical" href={canonicalUrl} />
-        <meta property="og:type" content="product" />
-        <meta property="og:title" content={metaTitle} />
-        <meta property="og:description" content={metaDescription} />
-        <meta property="og:url" content={canonicalUrl} />
-        {primaryImage && <meta property="og:image" content={primaryImage} />}
-        <meta name="twitter:title" content={metaTitle} />
-        <meta name="twitter:description" content={metaDescription} />
-        {primaryImage && <meta name="twitter:image" content={primaryImage} />}
-        <script type="application/ld+json">{JSON.stringify(productJsonLd)}</script>
-        <script type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</script>
-      </Helmet>
+      <ProductSeo productId={id} product={product} loading={false} />
       <div className="mb-4">
         <div className="flex items-center text-muted-foreground text-sm mb-8">
           <Link to="/" className="hover:underline">Home</Link>
