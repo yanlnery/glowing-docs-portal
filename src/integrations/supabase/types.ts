@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.1"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -86,6 +86,246 @@ export type Database = {
           updated_at?: string
           user_id?: string
           zipcode?: string
+        }
+        Relationships: []
+      }
+      backup_pr0_20260905_order_items: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          order_id: string | null
+          price: number | null
+          product_code: string | null
+          product_id: string | null
+          product_image_url: string | null
+          product_name: string | null
+          quantity: number | null
+          species_name: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          order_id?: string | null
+          price?: number | null
+          product_code?: string | null
+          product_id?: string | null
+          product_image_url?: string | null
+          product_name?: string | null
+          quantity?: number | null
+          species_name?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          order_id?: string | null
+          price?: number | null
+          product_code?: string | null
+          product_id?: string | null
+          product_image_url?: string | null
+          product_name?: string | null
+          quantity?: number | null
+          species_name?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      backup_pr0_20260905_orders: {
+        Row: {
+          admin_notes: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string | null
+          customer_cpf: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          id: string | null
+          notes: string | null
+          order_number: string | null
+          payment_method: string | null
+          shipping_address: Json | null
+          status: string | null
+          total_amount: number | null
+          tracking_code: string | null
+          updated_at: string | null
+          user_id: string | null
+          whatsapp_clicked_at: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string | null
+          customer_cpf?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          id?: string | null
+          notes?: string | null
+          order_number?: string | null
+          payment_method?: string | null
+          shipping_address?: Json | null
+          status?: string | null
+          total_amount?: number | null
+          tracking_code?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          whatsapp_clicked_at?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string | null
+          customer_cpf?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          id?: string | null
+          notes?: string | null
+          order_number?: string | null
+          payment_method?: string | null
+          shipping_address?: Json | null
+          status?: string | null
+          total_amount?: number | null
+          tracking_code?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          whatsapp_clicked_at?: string | null
+        }
+        Relationships: []
+      }
+      backup_pr0_20260905_products: {
+        Row: {
+          available: boolean | null
+          category: string | null
+          created_at: string | null
+          description: string | null
+          details: Json | null
+          featured: boolean | null
+          id: string | null
+          images: Json | null
+          is_new: boolean | null
+          meta: Json | null
+          name: string | null
+          order_position: number | null
+          original_price: number | null
+          payment_link: string | null
+          pix_price: number | null
+          price: number | null
+          slug: string | null
+          species_id: string | null
+          species_name: string | null
+          status: string | null
+          stock: number | null
+          subcategory: string | null
+          updated_at: string | null
+          visible: boolean | null
+        }
+        Insert: {
+          available?: boolean | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          details?: Json | null
+          featured?: boolean | null
+          id?: string | null
+          images?: Json | null
+          is_new?: boolean | null
+          meta?: Json | null
+          name?: string | null
+          order_position?: number | null
+          original_price?: number | null
+          payment_link?: string | null
+          pix_price?: number | null
+          price?: number | null
+          slug?: string | null
+          species_id?: string | null
+          species_name?: string | null
+          status?: string | null
+          stock?: number | null
+          subcategory?: string | null
+          updated_at?: string | null
+          visible?: boolean | null
+        }
+        Update: {
+          available?: boolean | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          details?: Json | null
+          featured?: boolean | null
+          id?: string | null
+          images?: Json | null
+          is_new?: boolean | null
+          meta?: Json | null
+          name?: string | null
+          order_position?: number | null
+          original_price?: number | null
+          payment_link?: string | null
+          pix_price?: number | null
+          price?: number | null
+          slug?: string | null
+          species_id?: string | null
+          species_name?: string | null
+          status?: string | null
+          stock?: number | null
+          subcategory?: string | null
+          updated_at?: string | null
+          visible?: boolean | null
+        }
+        Relationships: []
+      }
+      backup_pr0_20260905_species: {
+        Row: {
+          characteristics: Json | null
+          commonname: string | null
+          created_at: string | null
+          curiosities: Json | null
+          description: string | null
+          focus_desktop: string | null
+          focus_mobile: string | null
+          gallery: Json | null
+          id: string | null
+          image: string | null
+          name: string | null
+          order: number | null
+          slug: string | null
+          type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          characteristics?: Json | null
+          commonname?: string | null
+          created_at?: string | null
+          curiosities?: Json | null
+          description?: string | null
+          focus_desktop?: string | null
+          focus_mobile?: string | null
+          gallery?: Json | null
+          id?: string | null
+          image?: string | null
+          name?: string | null
+          order?: number | null
+          slug?: string | null
+          type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          characteristics?: Json | null
+          commonname?: string | null
+          created_at?: string | null
+          curiosities?: Json | null
+          description?: string | null
+          focus_desktop?: string | null
+          focus_mobile?: string | null
+          gallery?: Json | null
+          id?: string | null
+          image?: string | null
+          name?: string | null
+          order?: number | null
+          slug?: string | null
+          type?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -928,12 +1168,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -957,11 +1197,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -982,11 +1222,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1007,11 +1247,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1024,11 +1264,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
