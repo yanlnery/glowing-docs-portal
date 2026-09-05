@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { SEO } from '@/components/SEO';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
@@ -56,23 +56,9 @@ export default function SpeciesPage() {
     fetchSpecies();
   }, []); // Só roda uma vez
 
-  // Pré-seleção baseada na URL ou auto-seleção da primeira espécie
-  useEffect(() => {
-    const selectedSlug = searchParams.get('selected');
-    
-    if (speciesList.length > 0) {
-      if (selectedSlug) {
-        // Se há um slug na URL, seleciona essa espécie
-        const species = speciesList.find(s => s.slug === selectedSlug);
-        if (species) {
-          setSelectedSpecies(species);
-        }
-      } else if (!selectedSpecies) {
-        // Se não há slug na URL e nenhuma espécie selecionada, seleciona a primeira
-        setSelectedSpecies(speciesList[0]);
-      }
-    }
-  }, [searchParams, speciesList]);
+  // Referência para acessar o valor atual de selectedSpecies sem adicioná-lo às dependências
+  const selectedSpeciesRef = useRef<Species | null>(selectedSpecies);
+  selectedSpeciesRef.current = selectedSpecies;
 
   const filteredSpecies = useMemo(() => {
     return speciesList.filter((species) => {
@@ -85,20 +71,37 @@ export default function SpeciesPage() {
     });
   }, [speciesList, activeFilter, searchQuery]);
 
-  // Quando o filtro ou busca mudar, seleciona a primeira espécie da lista filtrada
+  // Seleção unificada: prioridade URL > seleção atual válida > primeira da lista filtrada
   useEffect(() => {
-    if (filteredSpecies.length > 0) {
-      // Verifica se a espécie atualmente selecionada está na lista filtrada
-      const currentIsInFiltered = selectedSpecies && filteredSpecies.some(s => s.id === selectedSpecies.id);
-      
-      // Se não estiver, seleciona a primeira da lista
-      if (!currentIsInFiltered) {
-        setSelectedSpecies(filteredSpecies[0]);
+    if (speciesList.length === 0) return;
+
+    const selectedSlug = searchParams.get('selected');
+    let nextSpecies: Species | null = null;
+
+    // 1) Prioridade máxima: slug explícito na URL (mesmo que não passe no filtro ativo)
+    if (selectedSlug) {
+      const urlSpecies = speciesList.find(s => s.slug === selectedSlug);
+      if (urlSpecies) {
+        nextSpecies = urlSpecies;
       }
-    } else {
-      setSelectedSpecies(null);
     }
-  }, [filteredSpecies]);
+
+    // 2) Mantém a seleção atual se ela ainda estiver na lista filtrada
+    if (!nextSpecies) {
+      const current = selectedSpeciesRef.current;
+      const currentIsInFiltered = current && filteredSpecies.some(s => s.id === current.id);
+      if (currentIsInFiltered) {
+        nextSpecies = current;
+      } else if (filteredSpecies.length > 0) {
+        nextSpecies = filteredSpecies[0];
+      }
+    }
+
+    // Só atualiza se for diferente do estado atual
+    if (nextSpecies?.id !== selectedSpeciesRef.current?.id) {
+      setSelectedSpecies(nextSpecies);
+    }
+  }, [searchParams, speciesList, filteredSpecies]);
 
   const handleSelectSpecies = (species: Species) => {
     setSelectedSpecies(species);
