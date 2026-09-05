@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { SEO } from '@/components/SEO';
+import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useSearchParams, useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Species } from '@/types/species';
@@ -12,6 +11,61 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Search } from 'lucide-react';
 
 type SpeciesTypeFilter = Species['type'] | 'todos';
+
+interface SpeciesSeoProps {
+  title: string;
+  description: string;
+  canonical: string;
+  breadcrumbJsonLd: Record<string, unknown> | null;
+}
+
+const SpeciesSeo = ({ title, description, canonical, breadcrumbJsonLd }: SpeciesSeoProps) => {
+  useLayoutEffect(() => {
+    const canonicalUrl = `https://petserpentes.com.br${canonical}`;
+    const upsertMeta = (attribute: 'name' | 'property', key: string, content: string) => {
+      let element = document.head.querySelector<HTMLMetaElement>(`meta[${attribute}="${key}"]`);
+      if (!element) {
+        element = document.createElement('meta');
+        element.setAttribute(attribute, key);
+        document.head.appendChild(element);
+      }
+      element.content = content;
+    };
+
+    document.title = title;
+    upsertMeta('name', 'description', description);
+    upsertMeta('name', 'robots', 'index, follow');
+    upsertMeta('property', 'og:type', 'website');
+    upsertMeta('property', 'og:title', title);
+    upsertMeta('property', 'og:description', description);
+    upsertMeta('property', 'og:url', canonicalUrl);
+    upsertMeta('name', 'twitter:title', title);
+    upsertMeta('name', 'twitter:description', description);
+
+    let canonicalElement = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!canonicalElement) {
+      canonicalElement = document.createElement('link');
+      canonicalElement.rel = 'canonical';
+      document.head.appendChild(canonicalElement);
+    }
+    canonicalElement.href = canonicalUrl;
+
+    document.head.querySelectorAll('script[data-species-seo]').forEach((script) => script.remove());
+    if (breadcrumbJsonLd) {
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.dataset.speciesSeo = 'breadcrumb';
+      script.textContent = JSON.stringify(breadcrumbJsonLd);
+      document.head.appendChild(script);
+    }
+
+    return () => {
+      document.head.querySelectorAll('script[data-species-seo]').forEach((script) => script.remove());
+    };
+  }, [breadcrumbJsonLd, canonical, description, title]);
+
+  return null;
+};
 
 export default function SpeciesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -142,12 +196,6 @@ export default function SpeciesPage() {
     };
   }, [selectedSpecies, routeSlug, searchParams]);
 
-  // Mantém o título sincronizado também durante o carregamento da rota canônica,
-  // quando o retorno antecipado abaixo ainda impede a montagem do componente SEO.
-  useEffect(() => {
-    document.title = pageTitle;
-  }, [pageTitle]);
-
   const breadcrumbJsonLd = useMemo(() => {
     const slugInUrl = routeSlug || searchParams.get('selected');
     if (!selectedSpecies || slugInUrl !== selectedSpecies.slug) return null;
@@ -180,36 +228,34 @@ export default function SpeciesPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-12 min-h-[60vh] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-t-2 border-b-2 border-serpente-600 mx-auto mb-4"></div>
-          <p className="text-lg text-muted-foreground">Carregando espécies...</p>
+      <>
+        <SpeciesSeo title={pageTitle} description={pageDescription} canonical={canonicalUrl} breadcrumbJsonLd={breadcrumbJsonLd} />
+        <div className="container mx-auto px-4 py-12 min-h-[60vh] flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-t-2 border-b-2 border-serpente-600 mx-auto mb-4"></div>
+            <p className="text-lg text-muted-foreground">Carregando espécies...</p>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="text-center">
-          <p className="text-lg text-destructive">Erro ao carregar espécies: {error}</p>
+      <>
+        <SpeciesSeo title={pageTitle} description={pageDescription} canonical={canonicalUrl} breadcrumbJsonLd={breadcrumbJsonLd} />
+        <div className="container mx-auto px-4 py-12">
+          <div className="text-center">
+            <p className="text-lg text-destructive">Erro ao carregar espécies: {error}</p>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
     <>
-      <SEO
-        title={pageTitle}
-        description={pageDescription}
-        canonical={canonicalUrl}
-      >
-        {breadcrumbJsonLd && (
-          <script type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</script>
-        )}
-      </SEO>
+      <SpeciesSeo title={pageTitle} description={pageDescription} canonical={canonicalUrl} breadcrumbJsonLd={breadcrumbJsonLd} />
       <div className="container px-4 md:px-6 py-8 sm:py-12 min-h-[60vh]">
         {/* Header centralizado com barra verde */}
         <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">
