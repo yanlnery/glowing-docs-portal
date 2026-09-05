@@ -138,6 +138,12 @@ export default function SpeciesPage() {
     };
   }, [selectedSpecies]);
 
+  // Mantém o título sincronizado também durante o carregamento da rota canônica,
+  // quando o retorno antecipado abaixo ainda impede a montagem do componente SEO.
+  useEffect(() => {
+    document.title = pageTitle;
+  }, [pageTitle]);
+
   const breadcrumbJsonLd = useMemo(() => {
     if (!selectedSpecies) return null;
     const speciesUrl = `${baseUrl}/especies-criadas/${selectedSpecies.slug}`;
