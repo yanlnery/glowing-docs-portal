@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { SEO } from '@/components/SEO';
+import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Species } from '@/types/species';
@@ -104,6 +105,60 @@ export default function SpeciesPage() {
     setSearchParams({ selected: species.slug }, { replace: true });
   };
 
+  const baseUrl = 'https://petserpentes.com.br';
+
+  const { pageTitle, pageDescription, canonicalUrl } = useMemo(() => {
+    if (selectedSpecies) {
+      const title = `${selectedSpecies.commonname} (${selectedSpecies.name}) | Pet Serpentes`;
+      const rawDescription = selectedSpecies.description?.replace(/\s+/g, ' ').trim() || '';
+      const scientificContext = `Espécie ${selectedSpecies.name}`;
+      const maxLen = 160 - scientificContext.length - 4;
+      let description = rawDescription;
+      if (description.length > maxLen) {
+        const truncated = description.slice(0, maxLen);
+        const lastSpace = truncated.lastIndexOf(' ');
+        description = lastSpace > 0 ? truncated.slice(0, lastSpace) + '...' : truncated + '...';
+      }
+      description = `${scientificContext}: ${description}`;
+      const canonical = `/especies-criadas/${selectedSpecies.slug}`;
+      return { pageTitle: title, pageDescription: description, canonicalUrl: canonical };
+    }
+    return {
+      pageTitle: 'Espécies Criadas | Pet Serpentes',
+      pageDescription: 'Conheça as espécies de répteis nativos brasileiros criadas pelo Pet Serpentes, criadouro legalizado pelo IBAMA e INEA-RJ.',
+      canonicalUrl: '/especies',
+    };
+  }, [selectedSpecies]);
+
+  const breadcrumbJsonLd = useMemo(() => {
+    if (!selectedSpecies) return null;
+    const speciesUrl = `${baseUrl}/especies-criadas/${selectedSpecies.slug}`;
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Home',
+          item: `${baseUrl}/`,
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'Espécies Criadas',
+          item: `${baseUrl}/especies`,
+        },
+        {
+          '@type': 'ListItem',
+          position: 3,
+          name: selectedSpecies.commonname,
+          item: speciesUrl,
+        },
+      ],
+    };
+  }, [selectedSpecies]);
+
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-12 min-h-[60vh] flex items-center justify-center">
@@ -128,10 +183,15 @@ export default function SpeciesPage() {
   return (
     <>
       <SEO
-        title="Espécies Criadas | Pet Serpentes"
-        description="Conheça as espécies de répteis nativos brasileiros criadas pelo Pet Serpentes, criadouro legalizado pelo IBAMA e INEA-RJ."
-        canonical="/especies"
+        title={pageTitle}
+        description={pageDescription}
+        canonical={canonicalUrl}
       />
+      {breadcrumbJsonLd && (
+        <Helmet>
+          <script type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</script>
+        </Helmet>
+      )}
       <div className="container px-4 md:px-6 py-8 sm:py-12 min-h-[60vh]">
         {/* Header centralizado com barra verde */}
         <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">
