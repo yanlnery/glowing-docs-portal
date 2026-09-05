@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Helmet } from 'react-helmet-async';
+import { SEO } from '@/components/SEO';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Species } from '@/types/species';
@@ -104,30 +104,6 @@ export default function SpeciesPage() {
     setSearchParams({ selected: species.slug }, { replace: true });
   };
 
-  const speciesMeta = useMemo(() => {
-    const selectedSlug = searchParams.get('selected');
-    if (selectedSpecies && selectedSlug === selectedSpecies.slug) {
-      const description = (
-        selectedSpecies.description?.replace(/\s+/g, ' ').trim() ||
-        `Conheça a ${selectedSpecies.commonname} (${selectedSpecies.name}), criada no Pet Serpentes & Companhia, criadouro legalizado pelo IBAMA no Rio de Janeiro.`
-      ).slice(0, 155);
-      return {
-        title: `${selectedSpecies.commonname} (${selectedSpecies.name}) | Pet Serpentes`,
-        description,
-        url: `https://petserpentes.com.br/especies?selected=${selectedSpecies.slug}`,
-        image: selectedSpecies.image || undefined,
-      };
-    }
-    return {
-      title: 'Espécies Criadas | Pet Serpentes & Companhia',
-      description:
-        'Conheça as espécies de répteis criadas no Pet Serpentes & Companhia. Serpentes, lagartos e quelônios com informações detalhadas sobre cada espécie.',
-      url: 'https://petserpentes.com.br/especies',
-      image: undefined as string | undefined,
-    };
-  }, [selectedSpecies, searchParams]);
-
-
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-12 min-h-[60vh] flex items-center justify-center">
@@ -151,18 +127,11 @@ export default function SpeciesPage() {
 
   return (
     <>
-      <Helmet>
-        <title>{speciesMeta.title}</title>
-        <meta name="description" content={speciesMeta.description} />
-        <link rel="canonical" href={speciesMeta.url} />
-        <meta property="og:title" content={speciesMeta.title} />
-        <meta property="og:description" content={speciesMeta.description} />
-        <meta property="og:url" content={speciesMeta.url} />
-        {speciesMeta.image && <meta property="og:image" content={speciesMeta.image} />}
-        <meta name="twitter:title" content={speciesMeta.title} />
-        <meta name="twitter:description" content={speciesMeta.description} />
-        {speciesMeta.image && <meta name="twitter:image" content={speciesMeta.image} />}
-      </Helmet>
+      <SEO
+        title="Especies Criadas | Pet Serpentes"
+        description="Conheca as especies de repteis nativos brasileiros criadas pelo Pet Serpentes, criadouro legalizado pelo IBAMA e INEA-RJ."
+        canonical="/especies"
+      />
       <div className="container px-4 md:px-6 py-8 sm:py-12 min-h-[60vh]">
         {/* Header centralizado com barra verde */}
         <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Helmet } from "react-helmet-async";
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -68,13 +68,11 @@ export default function Contact() {
 
   return (
     <>
-      <Helmet>
-        <title>Contato | Pet Serpentes & Companhia</title>
-        <meta 
-          name="description" 
-          content="Entre em contato com o Pet Serpentes & Companhia. Tire dúvidas sobre répteis, consulte disponibilidade de animais ou agende uma visita ao criadouro no Rio de Janeiro." 
-        />
-      </Helmet>
+      <SEO
+        title="Contato | Pet Serpentes"
+        description="Entre em contato com o Pet Serpentes. Tire duvidas sobre repteis, consulte disponibilidade de animais ou agende uma visita ao criadouro legalizado pelo IBAMA e INEA-RJ."
+        canonical="/contato"
+      />
       <div className="container px-4 py-12 sm:px-6">
         <div className="flex flex-col items-center mb-12 text-center">
           <div className="docs-section-title">
