@@ -116,7 +116,11 @@ export default function SpeciesPage() {
   const baseUrl = 'https://petserpentes.com.br';
 
   const { pageTitle, pageDescription, canonicalUrl } = useMemo(() => {
-    if (selectedSpecies) {
+    // SEO por espécie só quando a URL aponta explicitamente para ela;
+    // na listagem pura (/especies) mantemos título/canonical da listagem.
+    const slugInUrl = routeSlug || searchParams.get('selected');
+    const seoSpecies = selectedSpecies && slugInUrl === selectedSpecies.slug ? selectedSpecies : null;
+    if (seoSpecies) {
       const title = `${selectedSpecies.commonname} (${selectedSpecies.name}) | Pet Serpentes`;
       const rawDescription = selectedSpecies.description?.replace(/\s+/g, ' ').trim() || '';
       const scientificContext = `Espécie ${selectedSpecies.name}`;
