@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { SEO } from '@/components/SEO';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Species } from '@/types/species';
 import { Input } from '@/components/ui/input';
@@ -15,6 +15,8 @@ type SpeciesTypeFilter = Species['type'] | 'todos';
 
 export default function SpeciesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { slug: routeSlug } = useParams<{ slug?: string }>();
+  const navigate = useNavigate();
   const isMobile = useIsMobile();
   
   const [activeFilter, setActiveFilter] = useState<SpeciesTypeFilter>('todos');

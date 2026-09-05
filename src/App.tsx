@@ -137,7 +137,7 @@ function App() {
                 <Route path="catalogo" element={<Catalog />} />
                 <Route path="produtos/:id" element={<ProductDetail />} />
                 <Route path="especies" element={<Species />} />
-                <Route path="especies-criadas/:slug" element={<SpeciesDetailRedirect />} />
+                <Route path="especies-criadas/:slug" element={<Species />} />
                 <Route path="manuais" element={<Manuals />} />
                 <Route path="sobre" element={<About />} />
                 <Route path="educacao" element={<Education />} />
