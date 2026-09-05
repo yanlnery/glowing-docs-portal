@@ -121,9 +121,9 @@ export default function SpeciesPage() {
     const slugInUrl = routeSlug || searchParams.get('selected');
     const seoSpecies = selectedSpecies && slugInUrl === selectedSpecies.slug ? selectedSpecies : null;
     if (seoSpecies) {
-      const title = `${selectedSpecies.commonname} (${selectedSpecies.name}) | Pet Serpentes`;
-      const rawDescription = selectedSpecies.description?.replace(/\s+/g, ' ').trim() || '';
-      const scientificContext = `Espécie ${selectedSpecies.name}`;
+      const title = `${seoSpecies.commonname} (${seoSpecies.name}) | Pet Serpentes`;
+      const rawDescription = seoSpecies.description?.replace(/\s+/g, ' ').trim() || '';
+      const scientificContext = `Espécie ${seoSpecies.name}`;
       const maxLen = 160 - scientificContext.length - 4;
       let description = rawDescription;
       if (description.length > maxLen) {
