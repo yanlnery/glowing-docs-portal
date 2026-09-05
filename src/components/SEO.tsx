@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { Helmet } from "react-helmet-async";
 
 interface SEOProps {
@@ -6,11 +7,12 @@ interface SEOProps {
   canonical: string;
   ogImage?: string;
   noindex?: boolean;
+  children?: ReactNode;
 }
 
 const BASE_URL = "https://petserpentes.com.br";
 
-export function SEO({ title, description, canonical, ogImage, noindex = false }: SEOProps) {
+export function SEO({ title, description, canonical, ogImage, noindex = false, children }: SEOProps) {
   const canonicalUrl = `${BASE_URL}${canonical}`;
   const robotsContent = noindex ? "noindex, follow" : "index, follow";
 
@@ -25,6 +27,7 @@ export function SEO({ title, description, canonical, ogImage, noindex = false }:
       <meta property="og:url" content={canonicalUrl} />
       <meta property="og:type" content="website" />
       {ogImage && <meta property="og:image" content={ogImage} />}
+      {children}
     </Helmet>
   );
 }

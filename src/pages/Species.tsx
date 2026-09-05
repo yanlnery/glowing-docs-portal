@@ -189,12 +189,11 @@ export default function SpeciesPage() {
         title={pageTitle}
         description={pageDescription}
         canonical={canonicalUrl}
-      />
-      {breadcrumbJsonLd && (
-        <Helmet>
+      >
+        {breadcrumbJsonLd && (
           <script type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</script>
-        </Helmet>
-      )}
+        )}
+      </SEO>
       <div className="container px-4 md:px-6 py-8 sm:py-12 min-h-[60vh]">
         {/* Header centralizado com barra verde */}
         <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">
