@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Helmet } from 'react-helmet-async';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useCartStore } from '@/stores/cartStore';
 import { Button } from '@/components/ui/button';
@@ -73,28 +72,62 @@ const ProductSeo = ({ productId, product, loading }: ProductSeoProps) => {
     ],
   } : null;
 
-  useEffect(() => {
-    document.title = metaTitle;
-  }, [metaTitle]);
+  useLayoutEffect(() => {
+    const upsertMeta = (attribute: 'name' | 'property', key: string, content: string) => {
+      let element = document.head.querySelector<HTMLMetaElement>(`meta[${attribute}="${key}"]`);
+      if (!element) {
+        element = document.createElement('meta');
+        element.setAttribute(attribute, key);
+        document.head.appendChild(element);
+      }
+      element.content = content;
+    };
 
-  return (
-    <Helmet>
-      <title>{metaTitle}</title>
-      <meta name="description" content={metaDescription} />
-      {!loading && !product && <meta name="robots" content="noindex, follow" />}
-      <link rel="canonical" href={canonicalUrl} />
-      <meta property="og:type" content={product ? 'product' : 'website'} />
-      <meta property="og:title" content={metaTitle} />
-      <meta property="og:description" content={metaDescription} />
-      <meta property="og:url" content={canonicalUrl} />
-      {primaryImage && <meta property="og:image" content={primaryImage} />}
-      <meta name="twitter:title" content={metaTitle} />
-      <meta name="twitter:description" content={metaDescription} />
-      {primaryImage && <meta name="twitter:image" content={primaryImage} />}
-      {productJsonLd && <script type="application/ld+json">{JSON.stringify(productJsonLd)}</script>}
-      {breadcrumbJsonLd && <script type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</script>}
-    </Helmet>
-  );
+    document.title = metaTitle;
+    upsertMeta('name', 'description', metaDescription);
+    upsertMeta('name', 'robots', !loading && !product ? 'noindex, follow' : 'index, follow');
+    upsertMeta('property', 'og:type', product ? 'product' : 'website');
+    upsertMeta('property', 'og:title', metaTitle);
+    upsertMeta('property', 'og:description', metaDescription);
+    upsertMeta('property', 'og:url', canonicalUrl);
+    upsertMeta('name', 'twitter:title', metaTitle);
+    upsertMeta('name', 'twitter:description', metaDescription);
+
+    let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.rel = 'canonical';
+      document.head.appendChild(canonical);
+    }
+    canonical.href = canonicalUrl;
+
+    const syncOptionalMeta = (attribute: 'name' | 'property', key: string, content?: string) => {
+      const selector = `meta[${attribute}="${key}"]`;
+      if (content) {
+        upsertMeta(attribute, key, content);
+      } else {
+        document.head.querySelector(selector)?.remove();
+      }
+    };
+    syncOptionalMeta('property', 'og:image', primaryImage);
+    syncOptionalMeta('name', 'twitter:image', primaryImage);
+
+    document.head.querySelectorAll('script[data-product-seo]').forEach((script) => script.remove());
+    [productJsonLd, breadcrumbJsonLd].forEach((schema, index) => {
+      if (!schema) return;
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.dataset.productSeo = index === 0 ? 'product' : 'breadcrumb';
+      script.textContent = JSON.stringify(schema);
+      document.head.appendChild(script);
+    });
+
+    return () => {
+      document.head.querySelectorAll('script[data-product-seo]').forEach((script) => script.remove());
+    };
+  }, [breadcrumbJsonLd, canonicalUrl, loading, metaDescription, metaTitle, primaryImage, product, productJsonLd]);
+
+  return null;
 };
 
 const ProductDetail = () => {
