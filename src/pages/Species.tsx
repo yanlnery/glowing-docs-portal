@@ -116,10 +116,14 @@ export default function SpeciesPage() {
   const baseUrl = 'https://petserpentes.com.br';
 
   const { pageTitle, pageDescription, canonicalUrl } = useMemo(() => {
-    if (selectedSpecies) {
-      const title = `${selectedSpecies.commonname} (${selectedSpecies.name}) | Pet Serpentes`;
-      const rawDescription = selectedSpecies.description?.replace(/\s+/g, ' ').trim() || '';
-      const scientificContext = `Espécie ${selectedSpecies.name}`;
+    // SEO por espécie só quando a URL aponta explicitamente para ela;
+    // na listagem pura (/especies) mantemos título/canonical da listagem.
+    const slugInUrl = routeSlug || searchParams.get('selected');
+    const seoSpecies = selectedSpecies && slugInUrl === selectedSpecies.slug ? selectedSpecies : null;
+    if (seoSpecies) {
+      const title = `${seoSpecies.commonname} (${seoSpecies.name}) | Pet Serpentes`;
+      const rawDescription = seoSpecies.description?.replace(/\s+/g, ' ').trim() || '';
+      const scientificContext = `Espécie ${seoSpecies.name}`;
       const maxLen = 160 - scientificContext.length - 4;
       let description = rawDescription;
       if (description.length > maxLen) {
@@ -128,7 +132,7 @@ export default function SpeciesPage() {
         description = lastSpace > 0 ? truncated.slice(0, lastSpace) + '...' : truncated + '...';
       }
       description = `${scientificContext}: ${description}`;
-      const canonical = `/especies-criadas/${selectedSpecies.slug}`;
+      const canonical = `/especies-criadas/${seoSpecies.slug}`;
       return { pageTitle: title, pageDescription: description, canonicalUrl: canonical };
     }
     return {
@@ -136,7 +140,7 @@ export default function SpeciesPage() {
       pageDescription: 'Conheça as espécies de répteis nativos brasileiros criadas pelo Pet Serpentes, criadouro legalizado pelo IBAMA e INEA-RJ.',
       canonicalUrl: '/especies',
     };
-  }, [selectedSpecies]);
+  }, [selectedSpecies, routeSlug, searchParams]);
 
   // Mantém o título sincronizado também durante o carregamento da rota canônica,
   // quando o retorno antecipado abaixo ainda impede a montagem do componente SEO.
@@ -145,7 +149,8 @@ export default function SpeciesPage() {
   }, [pageTitle]);
 
   const breadcrumbJsonLd = useMemo(() => {
-    if (!selectedSpecies) return null;
+    const slugInUrl = routeSlug || searchParams.get('selected');
+    if (!selectedSpecies || slugInUrl !== selectedSpecies.slug) return null;
     const speciesUrl = `${baseUrl}/especies-criadas/${selectedSpecies.slug}`;
     return {
       '@context': 'https://schema.org',
@@ -171,7 +176,7 @@ export default function SpeciesPage() {
         },
       ],
     };
-  }, [selectedSpecies]);
+  }, [selectedSpecies, routeSlug, searchParams]);
 
   if (loading) {
     return (
