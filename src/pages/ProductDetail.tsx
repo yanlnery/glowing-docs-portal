@@ -225,9 +225,10 @@ const ProductDetail = () => {
   };
   
   return (
-    <div className="container px-4 py-12 sm:px-6">
+    <>
       <ProductSeo productId={id} product={product} loading={false} />
-      <div className="mb-4">
+      <div className="container px-4 py-12 sm:px-6">
+        <div className="mb-4">
         <div className="flex items-center text-muted-foreground text-sm mb-8">
           <Link to="/" className="hover:underline">Home</Link>
           <span className="mx-2">/</span>
@@ -431,9 +432,9 @@ const ProductDetail = () => {
             </div>
           </div>
         </div>
+        </div>
       </div>
-
-    </div>
+    </>
   );
 };
 
