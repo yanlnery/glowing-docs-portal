@@ -149,7 +149,8 @@ export default function SpeciesPage() {
   }, [pageTitle]);
 
   const breadcrumbJsonLd = useMemo(() => {
-    if (!selectedSpecies) return null;
+    const slugInUrl = routeSlug || searchParams.get('selected');
+    if (!selectedSpecies || slugInUrl !== selectedSpecies.slug) return null;
     const speciesUrl = `${baseUrl}/especies-criadas/${selectedSpecies.slug}`;
     return {
       '@context': 'https://schema.org',
