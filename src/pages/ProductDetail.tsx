@@ -167,6 +167,16 @@ const ProductDetail = () => {
     },
   };
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://petserpentes.com.br/' },
+      { '@type': 'ListItem', position: 2, name: 'Catálogo', item: 'https://petserpentes.com.br/catalogo' },
+      { '@type': 'ListItem', position: 3, name: product.name, item: canonicalUrl },
+    ],
+  };
+
   return (
     <div className="container px-4 py-12 sm:px-6">
       <Helmet>
@@ -182,6 +192,7 @@ const ProductDetail = () => {
         <meta name="twitter:description" content={metaDescription} />
         {primaryImage && <meta name="twitter:image" content={primaryImage} />}
         <script type="application/ld+json">{JSON.stringify(productJsonLd)}</script>
+        <script type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</script>
       </Helmet>
       <div className="mb-4">
         <div className="flex items-center text-muted-foreground text-sm mb-8">
