@@ -70,7 +70,7 @@ export default function Contact() {
     <>
       <SEO
         title="Contato | Pet Serpentes"
-        description="Entre em contato com o Pet Serpentes. Tire duvidas sobre repteis, consulte disponibilidade de animais ou agende uma visita ao criadouro legalizado pelo IBAMA e INEA-RJ."
+        description="Entre em contato com o Pet Serpentes. Tire dúvidas sobre répteis, consulte disponibilidade de animais ou agende uma visita ao criadouro legalizado pelo IBAMA e INEA-RJ."
         canonical="/contato"
       />
       <div className="container px-4 py-12 sm:px-6">
