@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Helmet } from "react-helmet-async";
+import { SEO } from "@/components/SEO";
 import { Manual } from "@/types/manual";
 import ManualsSearch from "@/components/manuals/ManualsSearch";
 import ManualsGrid from "@/components/manuals/ManualsGrid";

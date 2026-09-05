@@ -1,5 +1,5 @@
 import React from "react";
-import { Helmet } from "react-helmet-async";
+import { SEO } from "@/components/SEO";
 import HeroCarousel from "@/components/HeroCarousel";
 import FeaturedProductsSection from "@/components/home/FeaturedProductsSection";
 import AboutSection from "@/components/home/AboutSection";
@@ -9,13 +9,11 @@ import CtaSection from "@/components/home/CtaSection";
 export default function Home() {
   return (
     <>
-      <Helmet>
-        <title>Pet Serpentes | Criadouro legalizado de répteis nativos</title>
-        <meta 
-          name="description" 
-          content="O Pet Serpentes & Companhia é um criadouro comercial legalizado localizado no Rio de Janeiro, certificado pelo IBAMA e INEA-RJ. Trabalhamos exclusivamente com répteis silvestres nativos." 
-        />
-      </Helmet>
+      <SEO
+        title="Pet Serpentes | Criadouro legalizado de répteis nativos - IBAMA e INEA-RJ"
+        description="O Pet Serpentes & Companhia é um criadouro comercial legalizado localizado no Rio de Janeiro, certificado pelo IBAMA e INEA-RJ. Trabalhamos exclusivamente com répteis silvestres nativos."
+        canonical="/"
+      />
       <div className="flex flex-col w-full">
         {/* Hero Carousel Section */}
         <section className="relative mb-0 pb-0">
