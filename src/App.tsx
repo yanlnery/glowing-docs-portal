@@ -10,7 +10,6 @@ import Catalog from "./pages/Catalog";
 import About from "./pages/About";
 import Species from "./pages/Species";
 import SpeciesDetail from "./pages/SpeciesDetail";
-import SpeciesDetailRedirect from "./pages/SpeciesDetailRedirect";
 import ProductDetail from "./pages/ProductDetail";
 import Manuals from "./pages/Manuals";
 import Education from "./pages/Education";
