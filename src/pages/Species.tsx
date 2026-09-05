@@ -132,7 +132,7 @@ export default function SpeciesPage() {
         description = lastSpace > 0 ? truncated.slice(0, lastSpace) + '...' : truncated + '...';
       }
       description = `${scientificContext}: ${description}`;
-      const canonical = `/especies-criadas/${selectedSpecies.slug}`;
+      const canonical = `/especies-criadas/${seoSpecies.slug}`;
       return { pageTitle: title, pageDescription: description, canonicalUrl: canonical };
     }
     return {
@@ -140,7 +140,7 @@ export default function SpeciesPage() {
       pageDescription: 'Conheça as espécies de répteis nativos brasileiros criadas pelo Pet Serpentes, criadouro legalizado pelo IBAMA e INEA-RJ.',
       canonicalUrl: '/especies',
     };
-  }, [selectedSpecies]);
+  }, [selectedSpecies, routeSlug, searchParams]);
 
   // Mantém o título sincronizado também durante o carregamento da rota canônica,
   // quando o retorno antecipado abaixo ainda impede a montagem do componente SEO.
