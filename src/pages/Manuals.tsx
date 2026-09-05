@@ -75,8 +75,8 @@ export default function Manuals() {
   return (
     <>
       <SEO
-        title="Manuais de Criacao | Pet Serpentes"
-        description="Manuais tecnicos de manejo e criacao de repteis nativos brasileiros."
+        title="Manuais de Criação | Pet Serpentes"
+        description="Manuais técnicos de manejo e criação de répteis nativos brasileiros."
         canonical="/manuais"
       />
     <div className="container px-4 md:px-6 py-8 sm:py-12">

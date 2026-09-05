@@ -128,8 +128,8 @@ export default function SpeciesPage() {
   return (
     <>
       <SEO
-        title="Especies Criadas | Pet Serpentes"
-        description="Conheca as especies de repteis nativos brasileiros criadas pelo Pet Serpentes, criadouro legalizado pelo IBAMA e INEA-RJ."
+        title="Espécies Criadas | Pet Serpentes"
+        description="Conheça as espécies de répteis nativos brasileiros criadas pelo Pet Serpentes, criadouro legalizado pelo IBAMA e INEA-RJ."
         canonical="/especies"
       />
       <div className="container px-4 md:px-6 py-8 sm:py-12 min-h-[60vh]">
