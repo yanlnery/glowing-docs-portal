@@ -704,6 +704,8 @@ export type Database = {
           admin_notes: string | null
           confirmed_at: string | null
           confirmed_by: string | null
+          coupon_code: string | null
+          coupon_discount: number
           created_at: string
           customer_cpf: string | null
           customer_name: string | null
@@ -714,6 +716,7 @@ export type Database = {
           payment_method: string | null
           shipping_address: Json | null
           status: string
+          subtotal_amount: number | null
           total_amount: number
           tracking_code: string | null
           updated_at: string
@@ -724,6 +727,8 @@ export type Database = {
           admin_notes?: string | null
           confirmed_at?: string | null
           confirmed_by?: string | null
+          coupon_code?: string | null
+          coupon_discount?: number
           created_at?: string
           customer_cpf?: string | null
           customer_name?: string | null
@@ -734,6 +739,7 @@ export type Database = {
           payment_method?: string | null
           shipping_address?: Json | null
           status?: string
+          subtotal_amount?: number | null
           total_amount?: number
           tracking_code?: string | null
           updated_at?: string
@@ -744,6 +750,8 @@ export type Database = {
           admin_notes?: string | null
           confirmed_at?: string | null
           confirmed_by?: string | null
+          coupon_code?: string | null
+          coupon_discount?: number
           created_at?: string
           customer_cpf?: string | null
           customer_name?: string | null
@@ -754,6 +762,7 @@ export type Database = {
           payment_method?: string | null
           shipping_address?: Json | null
           status?: string
+          subtotal_amount?: number | null
           total_amount?: number
           tracking_code?: string | null
           updated_at?: string
