@@ -134,7 +134,9 @@ function App() {
               <Route element={<WebsiteLayout />}>
                 <Route path="/" element={<Home />} />
                 <Route path="catalogo" element={<Catalog />} />
+                <Route path="animais/:slug" element={<ProductDetail />} />
                 <Route path="produtos/:id" element={<ProductDetail />} />
+
                 <Route path="especies" element={<Species />} />
                 <Route path="especies-criadas/:slug" element={<Species />} />
                 <Route path="manuais" element={<Manuals />} />

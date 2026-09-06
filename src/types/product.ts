@@ -29,9 +29,13 @@ export interface ProductDetail {
 export interface Product {
   id: string;
   name: string;
+  slug?: string;
+  newSlug?: string;
+  legacySlug?: string;
   speciesName: string;
   speciesId?: string;
   description: string;
+
   price: number;
   originalPrice?: number;
   pixPrice?: number;

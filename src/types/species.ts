@@ -11,6 +11,9 @@ export interface Species {
   order: number; // "order" INTEGER
   type: 'serpente' | 'lagarto' | 'quelonio' | 'outro'; // Mapeamento do enum species_type_enum
   slug: string; // slug TEXT UNIQUE
+  legacy_slug?: string | null; // slug antigo preservado (PR3)
+  new_slug?: string | null; // slug semântico novo (PR3)
+
   created_at?: string; // TIMESTAMPTZ
   updated_at?: string; // TIMESTAMPTZ
   focus_desktop?: string; // Focal point for main image on desktop
