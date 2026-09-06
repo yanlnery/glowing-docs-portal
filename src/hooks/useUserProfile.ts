@@ -70,7 +70,7 @@ export const useUserProfile = (user: User | null, onProfileLoadAttempted: () => 
 
   const refreshProfile = useCallback(async () => {
     if (!user) {
-      setProfileError({ name: "UserError", message: "Usuário não autenticado para atualizar perfil.", details:"", hint:"", code:"401" });
+      setProfileError({ name: "UserError", message: "Usuário não autenticado para atualizar perfil.", details: "", hint: "", code: "401", toJSON: () => ({}) } as unknown as PostgrestError);
       return;
     }
     await fetchProfile(user.id);

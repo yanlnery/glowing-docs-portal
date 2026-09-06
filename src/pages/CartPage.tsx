@@ -90,7 +90,7 @@ const CartPage = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'cartao'>('pix');
   const [isFetchingCep, setIsFetchingCep] = useState(false);
-  const cepDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const cepDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   const [formData, setFormData] = useState<CheckoutFormData>({
     fullName: '',
