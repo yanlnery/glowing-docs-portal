@@ -782,13 +782,16 @@ export type Database = {
           id: string
           images: Json
           is_new: boolean
+          legacy_slug: string | null
           meta: Json | null
           name: string
+          new_slug: string | null
           order_position: number | null
           original_price: number | null
           payment_link: string | null
           pix_price: number | null
           price: number
+          product_code: string | null
           slug: string | null
           species_id: string | null
           species_name: string
@@ -808,13 +811,16 @@ export type Database = {
           id?: string
           images?: Json
           is_new?: boolean
+          legacy_slug?: string | null
           meta?: Json | null
           name: string
+          new_slug?: string | null
           order_position?: number | null
           original_price?: number | null
           payment_link?: string | null
           pix_price?: number | null
           price?: number
+          product_code?: string | null
           slug?: string | null
           species_id?: string | null
           species_name: string
@@ -834,13 +840,16 @@ export type Database = {
           id?: string
           images?: Json
           is_new?: boolean
+          legacy_slug?: string | null
           meta?: Json | null
           name?: string
+          new_slug?: string | null
           order_position?: number | null
           original_price?: number | null
           payment_link?: string | null
           pix_price?: number | null
           price?: number
+          product_code?: string | null
           slug?: string | null
           species_id?: string | null
           species_name?: string
@@ -959,7 +968,9 @@ export type Database = {
           gallery: Json | null
           id: string
           image: string | null
+          legacy_slug: string | null
           name: string
+          new_slug: string | null
           order: number | null
           slug: string
           type: string | null
@@ -976,7 +987,9 @@ export type Database = {
           gallery?: Json | null
           id?: string
           image?: string | null
+          legacy_slug?: string | null
           name: string
+          new_slug?: string | null
           order?: number | null
           slug: string
           type?: string | null
@@ -993,7 +1006,9 @@ export type Database = {
           gallery?: Json | null
           id?: string
           image?: string | null
+          legacy_slug?: string | null
           name?: string
+          new_slug?: string | null
           order?: number | null
           slug?: string
           type?: string | null
@@ -1159,6 +1174,7 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      ps_slugify: { Args: { input: string }; Returns: string }
       validate_coupon: {
         Args: { p_code: string; p_order_total?: number }
         Returns: {

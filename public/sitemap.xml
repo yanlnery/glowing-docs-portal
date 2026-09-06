@@ -56,27 +56,12 @@
     <priority>0.2</priority>
   </url>
   <url>
-    <loc>https://petserpentes.com.br/produtos/2064f45c-e8f3-4a6c-b6aa-879d2c8f31d9</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://petserpentes.com.br/produtos/c4ae2b3b-f174-4fb0-979a-c63697b39aed</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://petserpentes.com.br/produtos/e2e6c1b5-8151-4e7f-9981-3970b6363e9b</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://petserpentes.com.br/produtos/0c2654a5-9d3b-48d5-a0e7-f127259ec555</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://petserpentes.com.br/produtos/6b566737-b933-41e6-a0e6-0039befc0b04</loc>
+    <loc>https://petserpentes.com.br/produtos/2064f45c-e8f3-4a6c-b6aa-879d2c8f31d9</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -86,17 +71,32 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://petserpentes.com.br/produtos/e2e6c1b5-8151-4e7f-9981-3970b6363e9b</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://petserpentes.com.br/produtos/6b566737-b933-41e6-a0e6-0039befc0b04</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://petserpentes.com.br/produtos/0c2654a5-9d3b-48d5-a0e7-f127259ec555</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://petserpentes.com.br/especies?selected=epicrates-assisi</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://petserpentes.com.br/especies?selected=epicrates-crassus</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://petserpentes.com.br/especies?selected=epicrates-cenchria</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://petserpentes.com.br/especies?selected=epicrates-assisi</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -121,17 +121,22 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://petserpentes.com.br/especies?selected=diploglossus-lessonae</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://petserpentes.com.br/especies?selected=epicrates-maurus</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://petserpentes.com.br/especies?selected=erythrolamprus-miliaris</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://petserpentes.com.br/especies?selected=thecadactylus-rapicauda</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://petserpentes.com.br/especies?selected=diploglossus-lessonae</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -157,11 +162,6 @@
   </url>
   <url>
     <loc>https://petserpentes.com.br/especies?selected=salvator-merianae</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://petserpentes.com.br/especies?selected=epicrates-maurus</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
