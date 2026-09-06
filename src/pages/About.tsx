@@ -120,13 +120,13 @@ const About = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Quem Somos | Pet Serpentes & Companhia</title>
-        <meta 
-          name="description" 
-          content="Conheça a história do Pet Serpentes & Companhia, criadouro comercial legalizado no Rio de Janeiro. Nossa missão, valores e trajetória na criação responsável de répteis nativos." 
-        />
-      </Helmet>
+      <SEO
+        title={ABOUT_TITLE}
+        description={ABOUT_DESCRIPTION}
+        canonical="/sobre"
+        jsonLd={aboutJsonLd}
+        jsonLdKey="about"
+      />
       
       <div className="bg-background text-foreground">
         {/* Hero Section */}
