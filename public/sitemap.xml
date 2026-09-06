@@ -71,17 +71,17 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://petserpentes.com.br/produtos/2df834f1-fa20-4405-a387-95f4083edaa8</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://petserpentes.com.br/produtos/0c2654a5-9d3b-48d5-a0e7-f127259ec555</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://petserpentes.com.br/produtos/6b566737-b933-41e6-a0e6-0039befc0b04</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://petserpentes.com.br/produtos/2df834f1-fa20-4405-a387-95f4083edaa8</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
