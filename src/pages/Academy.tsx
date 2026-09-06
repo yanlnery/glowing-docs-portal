@@ -98,8 +98,13 @@ const Academy = () => {
   const openWaitlistDialog = () => setIsWaitlistDialogOpen(true);
 
   // Determine which action to use based on settings
-  const handleAction = isAcademyOpenForSubscription ? handleSubscribe : openWaitlistDialog;
-  const actionLoading = isAcademyOpenForSubscription ? isLoading : false;
+  // Assinatura via Stripe desativada: fluxo de cobranca indisponivel no momento.
+  // Enquanto SUBSCRIPTIONS_ENABLED for false, o site so oferece a lista de espera.
+  const SUBSCRIPTIONS_ENABLED = false;
+  const subscriptionOpen = SUBSCRIPTIONS_ENABLED && isAcademyOpenForSubscription;
+
+  const handleAction = subscriptionOpen ? handleSubscribe : openWaitlistDialog;
+  const actionLoading = subscriptionOpen ? isLoading : false;
 
   return (
     <div className="container py-12 px-4 sm:px-6">
@@ -118,7 +123,7 @@ const Academy = () => {
       {hasAcademyAccess && (
         <AcademySubscriberBanner 
           subscriptionEnd={subscriptionEnd}
-          onManageSubscription={handleManageSubscription}
+          onManageSubscription={SUBSCRIPTIONS_ENABLED ? handleManageSubscription : undefined}
         />
       )}
 
@@ -126,35 +131,35 @@ const Academy = () => {
         onAction={handleAction} 
         isLoading={actionLoading}
         hasAccess={hasAcademyAccess}
-        isOpenForSubscription={isAcademyOpenForSubscription}
+        isOpenForSubscription={subscriptionOpen}
       />
       <AcademyFeatures />
       <AcademyCommunityMotto 
         onAction={handleAction}
         isLoading={actionLoading}
         hasAccess={hasAcademyAccess}
-        isOpenForSubscription={isAcademyOpenForSubscription}
+        isOpenForSubscription={subscriptionOpen}
       />
       <AcademyCoursePreview />
       <AcademyBenefitsCard 
         onAction={handleAction}
         isLoading={actionLoading}
         hasAccess={hasAcademyAccess}
-        isOpenForSubscription={isAcademyOpenForSubscription}
+        isOpenForSubscription={subscriptionOpen}
       />
       <AcademyPricing 
         onAction={handleAction}
         isLoading={actionLoading}
         hasAccess={hasAcademyAccess}
-        onManageSubscription={handleManageSubscription}
-        isOpenForSubscription={isAcademyOpenForSubscription}
+        onManageSubscription={SUBSCRIPTIONS_ENABLED ? handleManageSubscription : undefined}
+        isOpenForSubscription={subscriptionOpen}
       />
       <AcademyGuarantee />
       {!hasAcademyAccess && (
         <AcademyCTA 
           onAction={handleAction}
           isLoading={actionLoading}
-          isOpenForSubscription={isAcademyOpenForSubscription}
+          isOpenForSubscription={subscriptionOpen}
         />
       )}
 

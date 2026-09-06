@@ -77,6 +77,7 @@ const AcademyPricing: React.FC<AcademyPricingProps> = ({
           </CardContent>
           <CardFooter className="pt-4">
             {hasAccess ? (
+              onManageSubscription ? (
               <Button 
                 className="w-full py-6 text-lg font-semibold" 
                 variant="outline"
@@ -85,6 +86,7 @@ const AcademyPricing: React.FC<AcademyPricingProps> = ({
                 <Settings className="mr-2 h-5 w-5" />
                 Gerenciar Assinatura
               </Button>
+              ) : null
             ) : (
               <Button 
                 className="w-full btn-premium py-6 text-lg font-semibold" 

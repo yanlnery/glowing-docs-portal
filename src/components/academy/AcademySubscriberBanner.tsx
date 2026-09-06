@@ -4,7 +4,7 @@ import { Crown, Settings } from 'lucide-react';
 
 interface AcademySubscriberBannerProps {
   subscriptionEnd: string | null;
-  onManageSubscription: () => void;
+  onManageSubscription?: () => void;
 }
 
 const AcademySubscriberBanner: React.FC<AcademySubscriberBannerProps> = ({
@@ -27,14 +27,16 @@ const AcademySubscriberBanner: React.FC<AcademySubscriberBannerProps> = ({
           </p>
         </div>
       </div>
-      <Button 
-        variant="outline" 
-        className="bg-white/10 border-white/30 hover:bg-white/20 text-white"
-        onClick={onManageSubscription}
-      >
-        <Settings className="h-4 w-4 mr-2" />
-        Gerenciar Assinatura
-      </Button>
+      {onManageSubscription && (
+        <Button 
+          variant="outline" 
+          className="bg-white/10 border-white/30 hover:bg-white/20 text-white"
+          onClick={onManageSubscription}
+        >
+          <Settings className="h-4 w-4 mr-2" />
+          Gerenciar Assinatura
+        </Button>
+      )}
     </div>
   );
 };
