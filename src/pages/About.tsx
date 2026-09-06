@@ -54,7 +54,7 @@ const About = () => {
   const oQueFazemosText = {
     title: "O Que Fazemos",
     paragraphs: [
-      "Localizado no Rio de Janeiro e certificado pelo IBAMA e INEA-RJ, o criadouro trabalha com criação responsável de répteis nativos. Oferecemos animais saudáveis, nascidos sob cuidados humanos, com toda documentação necessária.",
+      "Localizado no Rio de Janeiro e certificado pelo IBAMA, o criadouro trabalha com criação responsável de répteis nativos. Oferecemos animais saudáveis, nascidos sob cuidados humanos, com toda documentação necessária.",
       "Além da comercialização, fazemos um trabalho educativo. Orientamos compradores sobre as reais necessidades de cada espécie, ajudamos pesquisadores com informações sobre reprodução e manejo, e recebemos estudantes interessados em aprender sobre herpetocultura."
     ]
   };

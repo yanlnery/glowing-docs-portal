@@ -40,7 +40,7 @@ const Catalog = () => {
     <>
       <SEO
         title="Catálogo de Répteis | Pet Serpentes & Companhia"
-        description="Confira nosso catálogo de répteis silvestres nativos disponíveis. Serpentes, lagartos e quelônios com procedência legal, certificados pelo IBAMA e INEA-RJ."
+        description="Confira nosso catálogo de répteis silvestres nativos disponíveis. Serpentes, lagartos e quelônios com procedência legal, certificados pelo IBAMA."
         canonical="/catalogo"
       />
       <div className="container mx-auto px-4 py-6 sm:py-8 md:py-12 sm:px-6">

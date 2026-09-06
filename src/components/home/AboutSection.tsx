@@ -15,7 +15,7 @@ const features = [
   {
     icon: iconCertificado,
     title: "Criadouro Certificado",
-    description: "Registro oficial IBAMA e INEA"
+    description: "Registro oficial IBAMA"
   },
   {
     icon: iconExpertise,
@@ -71,7 +71,7 @@ export default function AboutSection() {
             
             {/* Primeiro parágrafo */}
             <p className="mt-6 text-lg leading-relaxed text-foreground/90">
-              O <strong>Pet Serpentes & Companhia</strong> é um criadouro comercial legalizado localizado no Rio de Janeiro, certificado pelo IBAMA e INEA-RJ. Trabalhamos exclusivamente com répteis nativos, focando no bem-estar dos animais e na criação responsável.
+              O <strong>Pet Serpentes & Companhia</strong> é um criadouro comercial legalizado localizado no Rio de Janeiro, certificado pelo IBAMA. Trabalhamos exclusivamente com répteis nativos, focando no bem-estar dos animais e na criação responsável.
             </p>
             
             {/* Mobile: Imagem após primeiro parágrafo */}

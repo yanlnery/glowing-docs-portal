@@ -21,7 +21,7 @@ export default function Footer() {
               <span className="font-semibold text-xl text-white">PET SERPENTES</span>
             </Link>
             <p className="text-sm text-white/70 mb-4">
-              Criadouro especializado em répteis e aves, devidamente registrado no IBAMA e INEA.
+              Criadouro especializado em répteis e aves, devidamente registrado no IBAMA.
             </p>
             <div className="flex space-x-3">
               <a href="https://www.instagram.com/petserpentes/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" aria-label="Instagram">
