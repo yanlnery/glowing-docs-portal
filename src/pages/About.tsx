@@ -1,9 +1,45 @@
 import React from 'react';
-import { Helmet } from 'react-helmet-async';
+import { SEO } from '@/components/SEO';
 import { Leaf, BookOpen, Award, Heart, Shield, Target } from 'lucide-react';
 import { ImageWithLoader } from '@/components/ui/image-with-loader';
 import { OptimizedImage } from '@/components/ui/optimized-image';
 import { AboutImageCarousel } from '@/components/about/AboutImageCarousel';
+
+const ABOUT_TITLE = 'Quem Somos | Pet Serpentes & Companhia';
+const ABOUT_DESCRIPTION =
+  'Conheça a história do Pet Serpentes & Companhia, criadouro comercial legalizado no Rio de Janeiro. Nossa missão, valores e trajetória na criação responsável de répteis nativos.';
+
+const aboutJsonLd: Record<string, unknown>[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    name: ABOUT_TITLE,
+    description: ABOUT_DESCRIPTION,
+    url: 'https://petserpentes.com.br/sobre',
+    about: { '@id': 'https://petserpentes.com.br/#organization' },
+    author: { '@id': 'https://petserpentes.com.br/#yan-nery' },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    '@id': 'https://petserpentes.com.br/#yan-nery',
+    name: 'Yan Nery',
+    jobTitle: 'Gestor técnico do criadouro',
+    description:
+      'Responsável pela gestão técnica do Pet Serpentes & Companhia, criadouro comercial legalizado de répteis nativos brasileiros.',
+    image: 'https://petserpentes.com.br/lovable-uploads/13113c77-f713-4585-9041-1766e67545b8.png',
+    worksFor: { '@id': 'https://petserpentes.com.br/#organization' },
+    url: 'https://petserpentes.com.br/sobre',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://petserpentes.com.br/' },
+      { '@type': 'ListItem', position: 2, name: 'Quem Somos', item: 'https://petserpentes.com.br/sobre' },
+    ],
+  },
+];
 
 const About = () => {
   const sobreCriadouroText = {
