@@ -1150,6 +1150,15 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      validate_coupon: {
+        Args: { p_code: string; p_order_total?: number }
+        Returns: {
+          discount_type: string
+          discount_value: number
+          message: string
+          valid: boolean
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

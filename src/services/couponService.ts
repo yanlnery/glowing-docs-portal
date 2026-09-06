@@ -68,43 +68,49 @@ export const couponService = {
   },
 
   async validate(code: string, cartTotal: number): Promise<CouponValidationResult> {
-    const { data, error } = await supabase
-      .from('coupons' as any)
-      .select('*')
-      .eq('code', code.toUpperCase())
-      .eq('is_active', true)
-      .single();
+    const { data, error } = await supabase.rpc('validate_coupon' as any, {
+      p_code: code.trim().toUpperCase(),
+      p_order_total: cartTotal,
+    });
 
-    if (error || !data) {
-      return { valid: false, error: 'Cupom inválido ou não encontrado.' };
+    if (error) {
+      console.error('Erro ao validar cupom:', error);
+      return { valid: false, error: 'Não foi possível validar o cupom. Tente novamente.' };
     }
 
-    const coupon = data as unknown as Coupon;
-    const now = new Date();
+    const row = (Array.isArray(data) ? data[0] : data) as
+      | { valid: boolean; message: string; discount_type: string | null; discount_value: number | null }
+      | undefined;
 
-    if (coupon.starts_at && new Date(coupon.starts_at) > now) {
-      return { valid: false, error: 'Este cupom ainda não está ativo.' };
+    if (!row || !row.valid) {
+      return { valid: false, error: row?.message || 'Cupom inválido ou não encontrado.' };
     }
 
-    if (coupon.expires_at && new Date(coupon.expires_at) < now) {
-      return { valid: false, error: 'Este cupom expirou.' };
-    }
+    const discountType = (row.discount_type === 'percentage' ? 'percentage' : 'fixed') as Coupon['discount_type'];
+    const discountValue = Number(row.discount_value ?? 0);
 
-    if (coupon.max_uses !== null && coupon.times_used >= coupon.max_uses) {
-      return { valid: false, error: 'Este cupom atingiu o limite de uso.' };
-    }
+    const discountAmount = discountType === 'percentage'
+      ? cartTotal * (discountValue / 100)
+      : Math.min(discountValue, cartTotal);
 
-    if (coupon.min_order_value !== null && cartTotal < coupon.min_order_value) {
-      const formatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(coupon.min_order_value);
-      return { valid: false, error: `Valor mínimo do pedido: ${formatted}.` };
-    }
-
-    const discountAmount = coupon.discount_type === 'percentage'
-      ? cartTotal * (coupon.discount_value / 100)
-      : Math.min(coupon.discount_value, cartTotal);
+    const coupon: Coupon = {
+      id: '',
+      code: code.trim().toUpperCase(),
+      discount_type: discountType,
+      discount_value: discountValue,
+      min_order_value: null,
+      max_uses: null,
+      times_used: 0,
+      max_uses_per_customer: null,
+      starts_at: null,
+      expires_at: null,
+      is_active: true,
+      created_at: '',
+    };
 
     return { valid: true, coupon, discountAmount };
   },
+
 
   async incrementUsage(id: string) {
     // Use RPC or raw update to increment
