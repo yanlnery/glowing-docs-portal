@@ -119,6 +119,23 @@ const CartPage = () => {
     sessionStorage.setItem("cart-notice-seen", "true");
     setShowNotice(false);
   };
+
+  // Dados pessoais (CPF, telefone, endereço) não podem ficar guardados para sempre:
+  // expiram em 24h e são apagados assim que o pedido é concluído.
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("pendingOrder");
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      const createdAt = Number(parsed?.createdAt) || 0;
+      if (!createdAt || Date.now() - createdAt > 24 * 60 * 60 * 1000) {
+        localStorage.removeItem("pendingOrder");
+      }
+    } catch {
+      localStorage.removeItem("pendingOrder");
+    }
+  }, []);
+
   
   useEffect(() => {
     // Record cart view for analytics
