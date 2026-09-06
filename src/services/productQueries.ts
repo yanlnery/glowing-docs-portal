@@ -17,8 +17,12 @@ const transformSupabaseProduct = (row: any): Product => {
   return {
     id: row.id,
     name: row.name,
+    slug: row.slug || undefined,
+    newSlug: row.new_slug || undefined,
+    legacySlug: row.legacy_slug || undefined,
     speciesName: row.species_name,
     speciesId: row.species_id,
+
     description: row.description || '',
     price: parseFloat(row.price) || 0,
     originalPrice: row.original_price ? parseFloat(row.original_price) : undefined,
@@ -69,32 +73,31 @@ const isUUID = (str: string): boolean => {
   return uuidRegex.test(str);
 };
 
-// Get product by ID or Slug
+// Get product by UUID, new_slug, legacy_slug or slug
 export const getProductById = async (idOrSlug: string): Promise<Product | null> => {
   try {
     console.log(`🔄 Fetching product ${idOrSlug} from Supabase...`);
-    
-    // Determine if we're searching by UUID or slug
-    const isIdSearch = isUUID(idOrSlug);
-    const column = isIdSearch ? 'id' : 'slug';
-    
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq(column, idOrSlug)
-      .maybeSingle();
+
+    const baseQuery = supabase.from('products').select('*');
+    const query = isUUID(idOrSlug)
+      ? baseQuery.eq('id', idOrSlug)
+      : baseQuery.or(
+          `new_slug.eq.${idOrSlug},legacy_slug.eq.${idOrSlug},slug.eq.${idOrSlug}`
+        );
+
+    const { data, error } = await query.limit(1);
 
     if (error) {
       console.error(`❌ Error fetching product ${idOrSlug}:`, error);
       return null;
     }
 
-    if (!data) {
+    if (!data || data.length === 0) {
       console.log(`📭 Product ${idOrSlug} not found`);
       return null;
     }
 
-    const product = transformSupabaseProduct(data);
+    const product = transformSupabaseProduct(data[0]);
     console.log(`✅ Product ${idOrSlug} fetched from Supabase`);
     return product;
   } catch (error) {
@@ -102,6 +105,7 @@ export const getProductById = async (idOrSlug: string): Promise<Product | null> 
     return null;
   }
 };
+
 
 // Get available products (visible and sorted)
 export const getAvailableProducts = async (): Promise<Product[]> => {

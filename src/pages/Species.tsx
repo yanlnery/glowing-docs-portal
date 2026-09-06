@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
-import { useSearchParams, useParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useParams, useNavigate, Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Species } from '@/types/species';
 import { Input } from '@/components/ui/input';
@@ -135,11 +135,14 @@ export default function SpeciesPage() {
 
     // 1) Prioridade máxima: slug explícito na URL (mesmo que não passe no filtro ativo)
     if (selectedSlug) {
-      const urlSpecies = speciesList.find(s => s.slug === selectedSlug);
+      const urlSpecies = speciesList.find(
+        s => s.new_slug === selectedSlug || s.slug === selectedSlug || s.legacy_slug === selectedSlug
+      );
       if (urlSpecies) {
         nextSpecies = urlSpecies;
       }
     }
+
 
     // 2) Mantém a seleção atual se ela ainda estiver na lista filtrada
     if (!nextSpecies) {
@@ -158,22 +161,43 @@ export default function SpeciesPage() {
     }
   }, [routeSlug, searchParams, speciesList, filteredSpecies]);
 
+  // Slug canônico (novo) de uma espécie
+  const speciesSlug = (species: Species) => species.new_slug || species.slug;
+
+  // Redirect client-side: /especies-criadas/{legacy_slug} -> /especies-criadas/{new_slug}
+  const legacyRedirect = useMemo(() => {
+    if (!routeSlug || speciesList.length === 0) return null;
+    if (speciesList.some(s => s.new_slug === routeSlug)) return null;
+    const match = speciesList.find(s => s.slug === routeSlug || s.legacy_slug === routeSlug);
+    if (match?.new_slug && match.new_slug !== routeSlug) {
+      return `/especies-criadas/${match.new_slug}`;
+    }
+    return null;
+  }, [routeSlug, speciesList]);
+
   const handleSelectSpecies = (species: Species) => {
     setSelectedSpecies(species);
     if (routeSlug) {
-      navigate(`/especies-criadas/${species.slug}`, { replace: true });
+      navigate(`/especies-criadas/${speciesSlug(species)}`, { replace: true });
     } else {
-      setSearchParams({ selected: species.slug }, { replace: true });
+      setSearchParams({ selected: speciesSlug(species) }, { replace: true });
     }
   };
 
   const baseUrl = 'https://petserpentes.com.br';
 
+
   const { pageTitle, pageDescription, canonicalUrl } = useMemo(() => {
     // SEO por espécie só quando a URL aponta explicitamente para ela;
     // na listagem pura (/especies) mantemos título/canonical da listagem.
     const slugInUrl = routeSlug || searchParams.get('selected');
-    const seoSpecies = selectedSpecies && slugInUrl === selectedSpecies.slug ? selectedSpecies : null;
+    const urlMatchesSelected = !!selectedSpecies && !!slugInUrl && [
+      selectedSpecies.new_slug,
+      selectedSpecies.slug,
+      selectedSpecies.legacy_slug,
+    ].includes(slugInUrl);
+    const seoSpecies = urlMatchesSelected ? selectedSpecies : null;
+
     if (seoSpecies) {
       const title = `${seoSpecies.commonname} (${seoSpecies.name}) | Pet Serpentes`;
       const rawDescription = seoSpecies.description?.replace(/\s+/g, ' ').trim() || '';
@@ -186,7 +210,7 @@ export default function SpeciesPage() {
         description = lastSpace > 0 ? truncated.slice(0, lastSpace) + '...' : truncated + '...';
       }
       description = `${scientificContext}: ${description}`;
-      const canonical = `/especies-criadas/${seoSpecies.slug}`;
+      const canonical = `/especies-criadas/${seoSpecies.new_slug || seoSpecies.slug}`;
       return { pageTitle: title, pageDescription: description, canonicalUrl: canonical };
     }
     return {
@@ -198,8 +222,10 @@ export default function SpeciesPage() {
 
   const breadcrumbJsonLd = useMemo(() => {
     const slugInUrl = routeSlug || searchParams.get('selected');
-    if (!selectedSpecies || slugInUrl !== selectedSpecies.slug) return null;
-    const speciesUrl = `${baseUrl}/especies-criadas/${selectedSpecies.slug}`;
+    if (!selectedSpecies || !slugInUrl) return null;
+    if (![selectedSpecies.new_slug, selectedSpecies.slug, selectedSpecies.legacy_slug].includes(slugInUrl)) return null;
+    const speciesUrl = `${baseUrl}/especies-criadas/${selectedSpecies.new_slug || selectedSpecies.slug}`;
+
     return {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
@@ -226,7 +252,12 @@ export default function SpeciesPage() {
     };
   }, [selectedSpecies, routeSlug, searchParams]);
 
+  if (legacyRedirect) {
+    return <Navigate to={legacyRedirect} replace />;
+  }
+
   if (loading) {
+
     return (
       <>
         <SpeciesSeo title={pageTitle} description={pageDescription} canonical={canonicalUrl} breadcrumbJsonLd={breadcrumbJsonLd} />

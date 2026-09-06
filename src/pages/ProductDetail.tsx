@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { useCartStore } from '@/stores/cartStore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, ShoppingCart, ArrowLeft, CheckCircle, AlertCircle, ChevronDown, ChevronUp, Package, FileText } from 'lucide-react';
+import { Star, ShoppingCart, ArrowLeft, CheckCircle, AlertCircle, ChevronDown, ChevronUp, Package, FileText, MessageCircle } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { productService } from '@/services/productService';
 import { Product } from '@/types/product';
@@ -13,16 +13,24 @@ import { siteAnalyticsService } from '@/services/siteAnalyticsService';
 import { useAddToCartAnimation } from '@/hooks/useAddToCartAnimation';
 import { cartIconRef, cartRingRef } from '@/components/header/HeaderActions';
 
+// Caminho canônico de um produto: sempre a URL nova (/animais/{new_slug})
+export const getProductPath = (product: Pick<Product, 'id' | 'newSlug'>) =>
+  product.newSlug ? `/animais/${product.newSlug}` : `/produtos/${product.id}`;
+
 interface ProductSeoProps {
-  productId?: string;
+  routeKey?: string;
   product: Product | null;
   loading: boolean;
 }
 
-const ProductSeo = ({ productId, product, loading }: ProductSeoProps) => {
-  const canonicalUrl = productId
-    ? `https://petserpentes.com.br/produtos/${productId}`
-    : 'https://petserpentes.com.br/catalogo';
+const ProductSeo = ({ routeKey, product, loading }: ProductSeoProps) => {
+  const canonicalUrl = product
+    ? `https://petserpentes.com.br${getProductPath(product)}`
+    : routeKey
+      ? `https://petserpentes.com.br/animais/${routeKey}`
+      : 'https://petserpentes.com.br/catalogo';
+
+  const isSold = product?.status === 'vendido';
   const primaryImage = product?.images?.[0]?.url;
   const metaTitle = product
     ? `${product.name} | ${product.speciesName} à venda | Pet Serpentes`
@@ -37,6 +45,7 @@ const ProductSeo = ({ productId, product, loading }: ProductSeoProps) => {
     : loading
       ? 'Consulte informações, fotos, disponibilidade e documentação deste animal no Pet Serpentes.'
       : 'O produto procurado não está disponível no catálogo do Pet Serpentes.';
+
 
   const productJsonLd = product ? {
     '@context': 'https://schema.org',
@@ -55,9 +64,12 @@ const ProductSeo = ({ productId, product, loading }: ProductSeoProps) => {
       url: canonicalUrl,
       priceCurrency: 'BRL',
       price: (product.pixPrice ?? product.price).toFixed(2),
-      availability: product.available
-        ? 'https://schema.org/InStock'
-        : 'https://schema.org/OutOfStock',
+      availability: isSold
+        ? 'https://schema.org/SoldOut'
+        : product.available
+          ? 'https://schema.org/InStock'
+          : 'https://schema.org/OutOfStock',
+
       seller: { '@type': 'Organization', name: 'Pet Serpentes & Companhia' },
     },
   } : null;
@@ -85,7 +97,7 @@ const ProductSeo = ({ productId, product, loading }: ProductSeoProps) => {
 
     document.title = metaTitle;
     upsertMeta('name', 'description', metaDescription);
-    upsertMeta('name', 'robots', !loading && !product ? 'noindex, follow' : 'index, follow');
+    upsertMeta('name', 'robots', (!loading && !product) || isSold ? 'noindex, follow' : 'index, follow');
     upsertMeta('property', 'og:type', product ? 'product' : 'website');
     upsertMeta('property', 'og:title', metaTitle);
     upsertMeta('property', 'og:description', metaDescription);
@@ -131,7 +143,10 @@ const ProductSeo = ({ productId, product, loading }: ProductSeoProps) => {
 };
 
 const ProductDetail = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id, slug } = useParams<{ id?: string; slug?: string }>();
+  const location = useLocation();
+  const routeKey = slug || id;
+  const isLegacyRoute = location.pathname.startsWith('/produtos/');
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -144,11 +159,11 @@ const ProductDetail = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     
-    if (id) {
+    if (routeKey) {
       const loadProduct = async () => {
         try {
           setLoading(true);
-          const foundProduct = await productService.getProductById(id);
+          const foundProduct = await productService.getProductById(routeKey);
           setProduct(foundProduct);
           setSelectedImageIndex(0);
           
@@ -169,24 +184,30 @@ const ProductDetail = () => {
       
       loadProduct();
     }
-  }, [id]);
+  }, [routeKey]);
   
   if (loading) {
     return (
       <>
-        <ProductSeo productId={id} product={product} loading />
+        <ProductSeo routeKey={routeKey} product={product} loading />
         <div className="container px-4 py-12 sm:px-6 flex justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-serpente-600"></div>
         </div>
       </>
     );
   }
+
+  // Rota antiga (/produtos/...) redireciona para a URL semântica nova
+  if (product?.newSlug && isLegacyRoute) {
+    return <Navigate to={`/animais/${product.newSlug}${location.search}`} replace />;
+  }
   
   if (!product) {
     return (
       <>
-        <ProductSeo productId={id} product={product} loading={false} />
+        <ProductSeo routeKey={routeKey} product={product} loading={false} />
         <div className="container px-4 py-12 sm:px-6 flex flex-col items-center">
+
           <h1 className="text-2xl font-bold mb-4">Produto não encontrado</h1>
           <p className="text-muted-foreground mb-6">
             O produto que você está procurando não existe ou foi removido.
@@ -259,7 +280,7 @@ const ProductDetail = () => {
   
   return (
     <>
-      <ProductSeo productId={id} product={product} loading={false} />
+      <ProductSeo routeKey={routeKey} product={product} loading={false} />
       <div className="container px-4 py-12 sm:px-6">
         <div className="mb-4">
         <div className="flex items-center text-muted-foreground text-sm mb-8">
@@ -297,9 +318,14 @@ const ProductDetail = () => {
                   Novidade
                 </Badge>
               )}
-              <Badge variant={product.available ? "default" : "outline"} className="text-sm">
-                {product.available ? "Disponível" : "Indisponível"}
-              </Badge>
+              {product.status === 'vendido' ? (
+                <Badge variant="destructive" className="text-sm">Vendido</Badge>
+              ) : (
+                <Badge variant={product.available ? "default" : "outline"} className="text-sm">
+                  {product.available ? "Disponível" : "Indisponível"}
+                </Badge>
+              )}
+
             </div>
             
             <div>
@@ -434,17 +460,45 @@ const ProductDetail = () => {
               </ul>
             </div>
             
-            {/* Add to Cart */}
+            {/* Add to Cart / Animal vendido */}
             <div className="pt-6 border-t">
-              <div className="flex gap-4 mb-4">
-                <Button 
-                  className="w-full h-10"
-                  onClick={handleAddToCart}
-                  disabled={!product.available}
-                >
-                  <ShoppingCart className="mr-2 h-4 w-4" /> Adicionar ao Carrinho
-                </Button>
-              </div>
+              {product.status === 'vendido' ? (
+                <div className="mb-4 space-y-3">
+                  <div className="bg-muted/50 p-4 rounded-md">
+                    <p className="font-semibold mb-1">Este animal já foi vendido.</p>
+                    <p className="text-sm text-muted-foreground">
+                      Entre na lista de espera ou fale com a gente no WhatsApp para saber dos próximos nascimentos de {product.speciesName}.
+                    </p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button asChild className="w-full h-10">
+                      <Link to="/lista-de-espera">Entrar na lista de espera</Link>
+                    </Button>
+                    <Button asChild variant="outline" className="w-full h-10">
+                      <a
+                        href={`https://wa.me/5521967802174?text=${encodeURIComponent(
+                          `Olá! Vi o animal ${product.name}${product.meta?.productId ? ` (#${product.meta.productId})` : ''} no site, mas está vendido. Gostaria de saber sobre disponibilidade de ${product.speciesName}.`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <MessageCircle className="mr-2 h-4 w-4" /> Falar no WhatsApp
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex gap-4 mb-4">
+                  <Button 
+                    className="w-full h-10"
+                    onClick={handleAddToCart}
+                    disabled={!product.available}
+                  >
+                    <ShoppingCart className="mr-2 h-4 w-4" /> Adicionar ao Carrinho
+                  </Button>
+                </div>
+              )}
+
               
               <div className="space-y-3">
                 <div className="bg-muted/50 p-3 rounded-md text-sm flex items-start gap-2">
