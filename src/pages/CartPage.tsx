@@ -579,8 +579,12 @@ const CartPage = () => {
         state: ''
       });
 
+      // Pedido concluído: apaga os dados pessoais guardados no navegador
+      localStorage.removeItem("pendingOrder");
+
       // Immediate redirect - mobile-safe (no setTimeout, no window.open)
       window.location.assign(whatsappUrl);
+
       
     } catch (error) {
       console.error("❌ Checkout process failed:", error);
