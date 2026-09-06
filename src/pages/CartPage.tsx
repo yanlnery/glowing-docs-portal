@@ -539,9 +539,10 @@ const CartPage = () => {
       });
 
       // Increment coupon usage if applied
-      if (appliedCoupon) {
+      if (appliedCoupon?.id) {
         await couponService.incrementUsage(appliedCoupon.id);
       }
+
 
       console.log("✅ Checkout completed successfully, redirecting to WhatsApp...");
       
