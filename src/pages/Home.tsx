@@ -10,8 +10,8 @@ export default function Home() {
   return (
     <>
       <SEO
-        title="Pet Serpentes | Criadouro legalizado de répteis nativos - IBAMA e INEA-RJ"
-        description="O Pet Serpentes & Companhia é um criadouro comercial legalizado localizado no Rio de Janeiro, certificado pelo IBAMA e INEA-RJ. Trabalhamos exclusivamente com répteis silvestres nativos."
+        title="Pet Serpentes | Criadouro legalizado de répteis nativos - IBAMA"
+        description="O Pet Serpentes & Companhia é um criadouro comercial legalizado localizado no Rio de Janeiro, certificado pelo IBAMA. Trabalhamos exclusivamente com répteis silvestres nativos."
         canonical="/"
       />
       <div className="flex flex-col w-full">

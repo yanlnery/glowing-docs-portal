@@ -191,7 +191,7 @@ export default function SpeciesPage() {
     }
     return {
       pageTitle: 'Espécies Criadas | Pet Serpentes',
-      pageDescription: 'Conheça as espécies de répteis nativos brasileiros criadas pelo Pet Serpentes, criadouro legalizado pelo IBAMA e INEA-RJ.',
+      pageDescription: 'Conheça as espécies de répteis nativos brasileiros criadas pelo Pet Serpentes, criadouro legalizado pelo IBAMA.',
       canonicalUrl: '/especies',
     };
   }, [selectedSpecies, routeSlug, searchParams]);

@@ -37,7 +37,7 @@ const localBusiness = {
   "@id": `${BASE_URL}/#localbusiness`,
   name: "Pet Serpentes & Companhia",
   description:
-    "Criadouro comercial legalizado de répteis nativos brasileiros, certificado pelo IBAMA (CTF nº 6654937) e licenciado pelo INEA-RJ.",
+    "Criadouro comercial legalizado de répteis nativos brasileiros, certificado pelo IBAMA (CTF nº 6654937)."
   url: `${BASE_URL}/`,
   image: `${BASE_URL}/lovable-uploads/7cf1001e-0989-475f-aaf5-fb56c4fb22a4.png`,
   telephone: "+55 21 96780-2174",
