@@ -403,6 +403,8 @@ const CartPage = () => {
         },
         payment_method: paymentMethod === 'pix' ? 'pix' : 'cartao',
         total_amount: total,
+        subtotal_amount: subtotal,
+        coupon_code: appliedCoupon?.code ?? null,
         status: 'pending' as const // Order starts as pending until confirmed via WhatsApp
       };
 
@@ -537,11 +539,6 @@ const CartPage = () => {
         description: "Abrindo o WhatsApp...",
         duration: 2000,
       });
-
-      // Increment coupon usage if applied
-      if (appliedCoupon?.id) {
-        await couponService.incrementUsage(appliedCoupon.id);
-      }
 
 
       console.log("✅ Checkout completed successfully, redirecting to WhatsApp...");
