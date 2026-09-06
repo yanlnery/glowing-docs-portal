@@ -39,7 +39,15 @@ const handler = async (req: Request): Promise<Response> => {
     const { name, email, confirmationUrl }: ConfirmationEmailRequest = await req.json();
 
     // Validação de entrada
-    if (!isValidEmail(email) || typeof confirmationUrl !== "string" || !confirmationUrl.startsWith("https://")) {
+    const isAllowedUrl = (url: unknown): url is string =>
+      typeof url === "string" &&
+      (url.startsWith("https://petserpentes.com.br/") ||
+        url.startsWith("https://www.petserpentes.com.br/") ||
+        url.startsWith("https://petserpentes.com/") ||
+        url.startsWith("https://www.petserpentes.com/") ||
+        /^https:\/\/[a-z0-9-]+(\.[a-z0-9-]+)*\.lovable\.app\//i.test(url));
+
+    if (!isValidEmail(email) || !isAllowedUrl(confirmationUrl)) {
       return new Response(JSON.stringify({ error: "Dados inválidos." }), {
         status: 400,
         headers: { "Content-Type": "application/json", ...corsHeaders },
