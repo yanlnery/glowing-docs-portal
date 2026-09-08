@@ -47,22 +47,28 @@ async function fetchRows<T>(path: string): Promise<T[]> {
 }
 
 async function buildEntries(): Promise<SitemapEntry[]> {
-  const products = await fetchRows<{ id: string }>(
-    "products?select=id&visible=eq.true&limit=1000",
+  const products = await fetchRows<{ slug: string | null; new_slug: string | null }>(
+    "products?select=slug,new_slug&visible=eq.true&limit=1000",
   )
-  const species = await fetchRows<{ slug: string }>("species?select=slug&limit=1000")
+  const species = await fetchRows<{ slug: string | null; new_slug: string | null }>(
+    "species?select=slug,new_slug&limit=1000",
+  )
 
   return [
     ...staticEntries,
-    ...products.map((product) => ({
-      path: `/produtos/${product.id}`,
-      changefreq: "weekly" as const,
-      priority: "0.8",
-    })),
+    ...products
+      .map((product) => product.new_slug || product.slug)
+      .filter((slug): slug is string => Boolean(slug))
+      .map((slug) => ({
+        path: `/animais/${slug}`,
+        changefreq: "weekly" as const,
+        priority: "0.8",
+      })),
     ...species
-      .filter((row) => Boolean(row.slug))
-      .map((row) => ({
-        path: `/especies?selected=${row.slug}`,
+      .map((row) => row.new_slug || row.slug)
+      .filter((slug): slug is string => Boolean(slug))
+      .map((slug) => ({
+        path: `/especies-criadas/${slug}`,
         changefreq: "monthly" as const,
         priority: "0.6",
       })),
