@@ -1,4 +1,5 @@
 import { useLayoutEffect, useMemo } from "react";
+import { DEFAULT_OG_IMAGE, restoreSeoDefaults } from "@/lib/seoDefaults";
 
 interface SEOProps {
   title: string;
@@ -62,13 +63,8 @@ export function SEO({
     }
     canonicalTag.href = canonicalUrl;
 
-    if (ogImage) {
-      upsertMeta("property", "og:image", ogImage);
-      upsertMeta("name", "twitter:image", ogImage);
-    } else {
-      document.head.querySelector('meta[property="og:image"]')?.remove();
-      document.head.querySelector('meta[name="twitter:image"]')?.remove();
-    }
+    upsertMeta("property", "og:image", ogImage || DEFAULT_OG_IMAGE);
+    upsertMeta("name", "twitter:image", ogImage || DEFAULT_OG_IMAGE);
 
     const selector = `script[data-page-seo="${jsonLdKey}"]`;
     document.head.querySelectorAll(selector).forEach((script) => script.remove());
@@ -82,6 +78,7 @@ export function SEO({
 
     return () => {
       document.head.querySelectorAll(selector).forEach((script) => script.remove());
+      restoreSeoDefaults();
     };
   }, [title, description, canonicalUrl, ogImage, noindex, serializedJsonLd, jsonLdKey]);
 
