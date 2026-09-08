@@ -9,6 +9,7 @@ import { SpeciesDetailPanel } from '@/components/species/SpeciesDetailPanel';
 import { SpeciesMobileView } from '@/components/species/SpeciesMobileView';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Search } from 'lucide-react';
+import { restoreSeoDefaults } from '@/lib/seoDefaults';
 
 type SpeciesTypeFilter = Species['type'] | 'todos';
 
@@ -61,6 +62,7 @@ const SpeciesSeo = ({ title, description, canonical, breadcrumbJsonLd }: Species
 
     return () => {
       document.head.querySelectorAll('script[data-species-seo]').forEach((script) => script.remove());
+      restoreSeoDefaults();
     };
   }, [breadcrumbJsonLd, canonical, description, title]);
 

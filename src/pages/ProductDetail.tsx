@@ -12,6 +12,7 @@ import { ProductImageZoom } from '@/components/product/ProductImageZoom';
 import { siteAnalyticsService } from '@/services/siteAnalyticsService';
 import { useAddToCartAnimation } from '@/hooks/useAddToCartAnimation';
 import { cartIconRef, cartRingRef } from '@/components/header/HeaderActions';
+import { DEFAULT_OG_IMAGE, restoreSeoDefaults } from '@/lib/seoDefaults';
 
 // Caminho canônico de um produto: sempre a URL nova (/animais/{new_slug})
 export const getProductPath = (product: Pick<Product, 'id' | 'newSlug'>) =>
@@ -113,16 +114,8 @@ const ProductSeo = ({ routeKey, product, loading }: ProductSeoProps) => {
     }
     canonical.href = canonicalUrl;
 
-    const syncOptionalMeta = (attribute: 'name' | 'property', key: string, content?: string) => {
-      const selector = `meta[${attribute}="${key}"]`;
-      if (content) {
-        upsertMeta(attribute, key, content);
-      } else {
-        document.head.querySelector(selector)?.remove();
-      }
-    };
-    syncOptionalMeta('property', 'og:image', primaryImage);
-    syncOptionalMeta('name', 'twitter:image', primaryImage);
+    upsertMeta('property', 'og:image', primaryImage || DEFAULT_OG_IMAGE);
+    upsertMeta('name', 'twitter:image', primaryImage || DEFAULT_OG_IMAGE);
 
     document.head.querySelectorAll('script[data-product-seo]').forEach((script) => script.remove());
     [productJsonLd, breadcrumbJsonLd].forEach((schema, index) => {
@@ -136,6 +129,7 @@ const ProductSeo = ({ routeKey, product, loading }: ProductSeoProps) => {
 
     return () => {
       document.head.querySelectorAll('script[data-product-seo]').forEach((script) => script.remove());
+      restoreSeoDefaults();
     };
   }, [breadcrumbJsonLd, canonicalUrl, loading, metaDescription, metaTitle, primaryImage, product, productJsonLd]);
 
