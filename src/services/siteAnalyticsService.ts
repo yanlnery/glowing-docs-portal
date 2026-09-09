@@ -13,7 +13,10 @@ export type EventType =
   | 'checkout_start'
   | 'checkout_form_error'
   | 'checkout_success'
-  | 'whatsapp_redirect';
+  | 'whatsapp_redirect'
+  | 'whatsapp_direct_click'
+  | 'checkout_v2_open'
+  | 'checkout_v2_submit';
 
 export type EventCategory = 'session' | 'navigation' | 'product' | 'cart' | 'checkout' | 'conversion';
 

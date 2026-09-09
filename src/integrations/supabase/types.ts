@@ -1183,6 +1183,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_guest_lead_order: {
+        Args: {
+          p_consent: boolean
+          p_customer_name: string
+          p_customer_phone: string
+          p_product_id: string
+        }
+        Returns: {
+          order_id: string
+          order_number: string
+        }[]
+      }
       get_business_whatsapp: { Args: never; Returns: string }
       has_role: {
         Args: {

@@ -2,6 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Link } from 'react-router-dom';
 import { Species } from '@/types/species';
 import { speciesWaitlistService } from '@/services/speciesWaitlistService';
 import { useToast } from '@/hooks/use-toast';
@@ -22,6 +23,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -36,6 +38,9 @@ const formSchema = z.object({
   email: z.string().trim().email('Email inválido').max(255, 'Email muito longo'),
   phone: z.string().trim().min(10, 'Telefone inválido').max(20, 'Telefone muito longo'),
   contact_preference: z.enum(['email', 'whatsapp', 'both']),
+  consent: z.literal(true, {
+    errorMap: () => ({ message: 'É preciso aceitar a política de privacidade' }),
+  }),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -58,6 +63,7 @@ export function SpeciesWaitlistForm({ species, isOpen, onClose }: SpeciesWaitlis
       email: '',
       phone: '',
       contact_preference: 'whatsapp',
+      consent: false as unknown as true,
     },
   });
 
@@ -77,6 +83,8 @@ export function SpeciesWaitlistForm({ species, isOpen, onClose }: SpeciesWaitlis
         email: data.email,
         phone: data.phone,
         contact_preference: data.contact_preference,
+        consent: true,
+        consent_at: new Date().toISOString(),
       });
 
       if (error) {
@@ -186,6 +194,36 @@ export function SpeciesWaitlistForm({ species, isOpen, onClose }: SpeciesWaitlis
                         <SelectItem value="both">Ambos</SelectItem>
                       </SelectContent>
                     </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="consent"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-start gap-2">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value === true}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormLabel className="!mt-0 text-sm font-normal leading-snug">
+                        Li e aceito a{' '}
+                        <Link
+                          to="/politica-de-privacidade"
+                          className="text-serpente-600 hover:underline"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          política de privacidade
+                        </Link>
+                        .
+                      </FormLabel>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
