@@ -24,6 +24,10 @@ export const useCheckoutV2Enabled = () => {
 
   useEffect(() => {
     let cancelled = false;
+    if (readLocalOverride() === true) {
+      setEnabled(true);
+      return;
+    }
     settingsService
       .getSettings(['checkout_v2_enabled'])
       .then(({ data }) => {
