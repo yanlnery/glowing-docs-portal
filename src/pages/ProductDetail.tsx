@@ -577,14 +577,23 @@ const ProductDetail = () => {
                   </div>
                 </div>
               ) : (
-                <div className="flex gap-4 mb-4">
-                  <Button 
+                <div className="flex flex-col gap-3 mb-4">
+                  <Button
                     className="w-full h-10"
                     onClick={handleAddToCart}
                     disabled={!product.available}
                   >
                     <ShoppingCart className="mr-2 h-4 w-4" /> Adicionar ao Carrinho
                   </Button>
+                  {checkoutV2Enabled && (
+                    <Button
+                      variant="outline"
+                      className="w-full h-10"
+                      onClick={handleGuestWhatsAppClick}
+                    >
+                      <MessageCircle className="mr-2 h-4 w-4" /> Falar sobre este animal no WhatsApp
+                    </Button>
+                  )}
                 </div>
               )}
 
