@@ -13,6 +13,18 @@ import { siteAnalyticsService } from '@/services/siteAnalyticsService';
 import { useAddToCartAnimation } from '@/hooks/useAddToCartAnimation';
 import { cartIconRef, cartRingRef } from '@/components/header/HeaderActions';
 import { DEFAULT_OG_IMAGE, restoreSeoDefaults } from '@/lib/seoDefaults';
+import { useCheckoutV2Enabled } from '@/hooks/useCheckoutV2';
+import { guestOrderService } from '@/services/guestOrderService';
+import { GuestWhatsAppDialog, GuestWhatsAppFormData } from '@/components/product/GuestWhatsAppDialog';
+
+const getAnimalEmoji = (category?: string): string => {
+  switch (category) {
+    case 'lagarto': return '🦎';
+    case 'quelonio': return '🐢';
+    case 'serpente':
+    default: return '🐍';
+  }
+};
 
 // Caminho canônico de um produto: sempre a URL nova (/animais/{new_slug})
 export const getProductPath = (product: Pick<Product, 'id' | 'newSlug'>) =>
@@ -149,6 +161,89 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const productImageRef = useRef<HTMLDivElement>(null);
   const { triggerFlyAnimation } = useAddToCartAnimation();
+  const checkoutV2Enabled = useCheckoutV2Enabled();
+  const [guestDialogOpen, setGuestDialogOpen] = useState(false);
+  const [guestSubmitting, setGuestSubmitting] = useState(false);
+
+  const handleGuestWhatsAppClick = () => {
+    if (!product) return;
+    siteAnalyticsService.trackEvent({
+      event_type: 'whatsapp_direct_click',
+      event_category: 'conversion',
+      product_id: product.id,
+      product_name: product.name,
+      product_price: product.price,
+      metadata: { product_code: product.meta?.productId },
+    });
+    siteAnalyticsService.trackEvent({
+      event_type: 'checkout_v2_open',
+      event_category: 'checkout',
+      product_id: product.id,
+      product_name: product.name,
+      product_price: product.price,
+    });
+    setGuestDialogOpen(true);
+  };
+
+  const handleGuestWhatsAppSubmit = async (data: GuestWhatsAppFormData) => {
+    if (!product) return;
+    setGuestSubmitting(true);
+    try {
+      const { orderNumber, error } = await guestOrderService.createGuestLeadOrder({
+        productId: product.id,
+        customerName: data.name,
+        customerPhone: data.phone,
+      });
+
+      if (error) {
+        toast({
+          title: 'Não foi possível registrar seu interesse',
+          description: error.message?.includes('disponivel')
+            ? 'Este animal não está mais disponível.'
+            : 'Tente novamente em instantes.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      siteAnalyticsService.trackEvent({
+        event_type: 'checkout_v2_submit',
+        event_category: 'checkout',
+        product_id: product.id,
+        product_name: product.name,
+        product_price: product.price,
+        metadata: { order_number: orderNumber },
+      });
+
+      const whatsappNumber = await guestOrderService.getWhatsAppNumber();
+      const emoji = getAnimalEmoji(product.category);
+      const code = product.meta?.productId ?? '';
+      const sexLabel = getSexLabel(product.meta?.sex) ?? 'Indefinido';
+      const price = product.price.toFixed(2).replace('.', ',');
+      const pixPrice = (product.pixPrice ?? product.price).toFixed(2).replace('.', ',');
+      const productPath = getProductPath(product);
+      const message = [
+        'Olá! Tenho interesse neste animal:',
+        `${emoji} ${product.name} (${product.speciesName})`,
+        `Código: ${code} · ${sexLabel}`,
+        `Valor: R$ ${price} (R$ ${pixPrice} no PIX)`,
+        `Pedido: ${orderNumber}`,
+        `petserpentes.com.br${productPath}`,
+      ].join('\n');
+
+      setGuestDialogOpen(false);
+      window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+    } catch (err) {
+      console.error('Guest checkout error:', err);
+      toast({
+        title: 'Erro inesperado',
+        description: 'Tente novamente em instantes.',
+        variant: 'destructive',
+      });
+    } finally {
+      setGuestSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
