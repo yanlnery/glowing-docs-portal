@@ -619,6 +619,15 @@ const ProductDetail = () => {
         </div>
         </div>
       </div>
+      {checkoutV2Enabled && product.status !== 'vendido' && (
+        <GuestWhatsAppDialog
+          isOpen={guestDialogOpen}
+          onClose={() => setGuestDialogOpen(false)}
+          onSubmit={handleGuestWhatsAppSubmit}
+          isSubmitting={guestSubmitting}
+          productName={product.name}
+        />
+      )}
     </>
   );
 };
