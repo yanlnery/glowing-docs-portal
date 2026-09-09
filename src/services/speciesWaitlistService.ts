@@ -10,6 +10,8 @@ export const speciesWaitlistService = {
     phone: string;
     cpf?: string;
     contact_preference: string;
+    consent?: boolean;
+    consent_at?: string;
   }): Promise<{ data: SpeciesWaitlistEntry | null; error: any }> {
     // Check if email already exists for this species
     const { data: existing } = await supabase
