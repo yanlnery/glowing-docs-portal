@@ -704,6 +704,8 @@ export type Database = {
           admin_notes: string | null
           confirmed_at: string | null
           confirmed_by: string | null
+          consent: boolean
+          consent_at: string | null
           coupon_code: string | null
           coupon_discount: number
           created_at: string
@@ -711,22 +713,26 @@ export type Database = {
           customer_name: string | null
           customer_phone: string | null
           id: string
+          lead_stage: string | null
           notes: string | null
           order_number: string | null
           payment_method: string | null
           shipping_address: Json | null
+          source: string | null
           status: string
           subtotal_amount: number | null
           total_amount: number
           tracking_code: string | null
           updated_at: string
-          user_id: string
+          user_id: string | null
           whatsapp_clicked_at: string | null
         }
         Insert: {
           admin_notes?: string | null
           confirmed_at?: string | null
           confirmed_by?: string | null
+          consent?: boolean
+          consent_at?: string | null
           coupon_code?: string | null
           coupon_discount?: number
           created_at?: string
@@ -734,22 +740,26 @@ export type Database = {
           customer_name?: string | null
           customer_phone?: string | null
           id?: string
+          lead_stage?: string | null
           notes?: string | null
           order_number?: string | null
           payment_method?: string | null
           shipping_address?: Json | null
+          source?: string | null
           status?: string
           subtotal_amount?: number | null
           total_amount?: number
           tracking_code?: string | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
           whatsapp_clicked_at?: string | null
         }
         Update: {
           admin_notes?: string | null
           confirmed_at?: string | null
           confirmed_by?: string | null
+          consent?: boolean
+          consent_at?: string | null
           coupon_code?: string | null
           coupon_discount?: number
           created_at?: string
@@ -757,16 +767,18 @@ export type Database = {
           customer_name?: string | null
           customer_phone?: string | null
           id?: string
+          lead_stage?: string | null
           notes?: string | null
           order_number?: string | null
           payment_method?: string | null
           shipping_address?: Json | null
+          source?: string | null
           status?: string
           subtotal_amount?: number | null
           total_amount?: number
           tracking_code?: string | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
           whatsapp_clicked_at?: string | null
         }
         Relationships: []
@@ -1018,6 +1030,8 @@ export type Database = {
       }
       species_waitlist: {
         Row: {
+          consent: boolean
+          consent_at: string | null
           contact_preference: string | null
           cpf: string | null
           created_at: string | null
@@ -1034,6 +1048,8 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          consent?: boolean
+          consent_at?: string | null
           contact_preference?: string | null
           cpf?: string | null
           created_at?: string | null
@@ -1050,6 +1066,8 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          consent?: boolean
+          consent_at?: string | null
           contact_preference?: string | null
           cpf?: string | null
           created_at?: string | null
