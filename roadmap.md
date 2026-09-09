@@ -1,0 +1,1 @@
+- PR4 checkout enxuto atras da flag checkout_v2_enabled: checar available=true na RPC create_guest_lead_order (pedido do usuario), reenviar migracao, implementar frontend (botao WhatsApp direto + modal nome/whatsapp/consent, eventos novos, consent na lista de espera), testar sem publicar
