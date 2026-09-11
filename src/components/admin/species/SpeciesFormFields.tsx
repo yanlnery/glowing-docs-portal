@@ -3,6 +3,8 @@ import React from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Plus, Trash2 } from 'lucide-react';
 import { Species } from '@/types/species';
 import { ArrayFieldManager } from './ArrayFieldManager';
 import { ImageUpload } from './ImageUpload';
@@ -29,6 +31,10 @@ interface SpeciesFormFieldsProps {
   galleryFiles: File[];
   onGalleryAdd: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onGalleryRemove: (index: number) => void;
+
+  onFaqChange: (index: number, field: 'question' | 'answer', value: string) => void;
+  onAddFaq: () => void;
+  onRemoveFaq: (index: number) => void;
 }
 
 export function SpeciesFormFields({
