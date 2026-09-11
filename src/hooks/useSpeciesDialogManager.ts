@@ -45,6 +45,8 @@ export function useSpeciesDialogManager({
       type: 'serpente',
       slug: '',
       order: maxOrder + 1,
+      video_url: '',
+      faq: [],
     });
     setIsNewSpecies(true);
     setImagePreview(null);
@@ -55,7 +57,11 @@ export function useSpeciesDialogManager({
   }, [maxOrder]);
 
   const openEditSpeciesDialog = useCallback((speciesData: Species) => {
-    setCurrentSpecies(speciesData);
+    setCurrentSpecies({
+      ...speciesData,
+      video_url: speciesData.video_url ?? '',
+      faq: Array.isArray(speciesData.faq) ? speciesData.faq : [],
+    });
     setIsNewSpecies(false);
     setImagePreview(speciesData.image);
     setImageFile(null);
