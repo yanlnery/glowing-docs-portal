@@ -48,25 +48,14 @@ interface FormErrors {
 
 const CartPage = () => {
   const { items, removeFromCart, clearCart } = useCartStore();
-  const { user } = useAuth();
-  const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'cartao'>('pix');
-  const [isFetchingCep, setIsFetchingCep] = useState(false);
-  const cepDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  
+  const [consent, setConsent] = useState(false);
+
   const [formData, setFormData] = useState<CheckoutFormData>({
     fullName: '',
-    cpf: '',
-    phone: '',
-    cep: '',
-    street: '',
-    number: '',
-    complement: '',
-    neighborhood: '',
-    city: '',
-    state: ''
+    phone: ''
   });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [formOpenTime, setFormOpenTime] = useState<number | null>(null);
@@ -157,156 +146,31 @@ const CartPage = () => {
   }).format(price);
   };
 
-  // Mask functions for CPF and CEP
-  const formatCPF = (value: string): string => {
-    const digits = value.replace(/\D/g, '').slice(0, 11);
-    return digits
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-  };
-
-  const formatCEP = (value: string): string => {
-    const digits = value.replace(/\D/g, '').slice(0, 8);
-    return digits.replace(/(\d{5})(\d)/, '$1-$2');
-  };
-
-  // Fetch address from ViaCEP
-  const fetchAddressFromCEP = useCallback(async (cep: string) => {
-    const cleanCEP = cep.replace(/\D/g, '');
-    if (cleanCEP.length !== 8) return;
-    
-    setIsFetchingCep(true);
-    setFormErrors(prev => ({ ...prev, cep: '' }));
-    
-    try {
-      const response = await fetch(`https://viacep.com.br/ws/${cleanCEP}/json/`);
-      const data = await response.json();
-      
-      if (data.erro) {
-        setFormErrors(prev => ({ ...prev, cep: 'CEP não encontrado' }));
-        // Clear auto-filled fields on error
-        setFormData(prev => ({
-          ...prev,
-          street: '',
-          neighborhood: '',
-          city: '',
-          state: ''
-        }));
-      } else {
-        setFormData(prev => ({
-          ...prev,
-          street: data.logradouro || '',
-          neighborhood: data.bairro || '',
-          city: data.localidade || '',
-          state: data.uf || ''
-        }));
-        // Clear any previous CEP error
-        setFormErrors(prev => ({ ...prev, cep: '' }));
-      }
-    } catch (error) {
-      console.error('Error fetching CEP:', error);
-      setFormErrors(prev => ({ ...prev, cep: 'Não foi possível buscar o CEP' }));
-    } finally {
-      setIsFetchingCep(false);
-    }
-  }, []);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
-    let formattedValue = value;
-    if (name === 'cpf') {
-      formattedValue = formatCPF(value);
-    } else if (name === 'cep') {
-      formattedValue = formatCEP(value);
-      
-      // Clear auto-filled address fields when CEP changes
-      const cleanCEP = value.replace(/\D/g, '');
-      if (cleanCEP.length < 8) {
-        setFormData(prev => ({
-          ...prev,
-          cep: formattedValue,
-          street: '',
-          neighborhood: '',
-          city: '',
-          state: ''
-        }));
-        setFormErrors(prev => ({ ...prev, cep: '' }));
-      }
-      
-      // Debounced CEP lookup
-      if (cepDebounceRef.current) {
-        clearTimeout(cepDebounceRef.current);
-      }
-      
-      if (cleanCEP.length === 8) {
-        cepDebounceRef.current = setTimeout(() => {
-          fetchAddressFromCEP(cleanCEP);
-        }, 300);
-      }
-    }
-    
-    if (name !== 'cep') {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: formattedValue
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        cep: formattedValue
-      }));
-    }
-    
-    // Clear error for this field when user starts typing
-    if (formErrors[name] && name !== 'cep') {
-      setFormErrors((prev) => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
+    const formattedValue = name === 'phone' ? formatPhoneMask(value) : value;
 
-  const handleCpfBlur = () => {
-    const cleanCPF = formData.cpf.replace(/\D/g, '');
-    if (cleanCPF.length > 0 && !validateCPF(cleanCPF)) {
-      setFormErrors(prev => ({ ...prev, cpf: 'CPF inválido' }));
-    } else {
-      setFormErrors(prev => ({ ...prev, cpf: '' }));
+    setFormData((prev) => ({ ...prev, [name]: formattedValue }));
+
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
   const validateForm = () => {
     const errors: FormErrors = {};
     if (!formData.fullName.trim()) errors.fullName = "Nome completo é obrigatório";
-    
+
     const cleanPhone = formData.phone.replace(/\D/g, '');
     if (!cleanPhone) {
-      errors.phone = "Celular é obrigatório";
+      errors.phone = "WhatsApp é obrigatório";
     } else if (cleanPhone.length < 10) {
-      errors.phone = "Celular inválido";
+      errors.phone = "WhatsApp inválido";
     }
-    
-    const cleanCPF = formData.cpf.replace(/\D/g, '');
-    if (!cleanCPF) {
-      errors.cpf = "CPF é obrigatório";
-    } else if (!validateCPF(cleanCPF)) {
-      errors.cpf = "CPF inválido";
+
+    if (!consent) {
+      errors.consent = "É preciso aceitar a política de privacidade";
     }
-    
-    const cleanCEP = formData.cep.replace(/\D/g, '');
-    if (!cleanCEP) {
-      errors.cep = "CEP é obrigatório";
-    } else if (cleanCEP.length !== 8) {
-      errors.cep = "CEP deve ter 8 dígitos";
-    }
-    
-    if (!formData.street.trim()) errors.street = "Rua é obrigatória";
-    if (!formData.number.trim()) errors.number = "Número é obrigatório";
-    if (!formData.neighborhood.trim()) errors.neighborhood = "Bairro é obrigatório";
-    if (!formData.city.trim()) errors.city = "Cidade é obrigatória";
-    if (!formData.state.trim()) errors.state = "Estado é obrigatório";
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
