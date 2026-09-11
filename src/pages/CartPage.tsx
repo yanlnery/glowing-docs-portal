@@ -1,9 +1,8 @@
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCartStore, CartItem } from '@/stores/cartStore';
-import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -12,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Trash2, ShoppingCart, ArrowLeft, AlertCircle, Loader2, CreditCard, QrCode } from 'lucide-react';
+import { Trash2, ShoppingCart, ArrowLeft, AlertCircle, CreditCard, QrCode } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { 
   Dialog, 
@@ -24,63 +23,28 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from '@/hooks/use-toast';
-import { orderService } from '@/services/orderService';
 import { orderEventsService } from '@/services/orderEventsService';
 import { cartAnalyticsService } from '@/services/cartAnalyticsService';
 import { siteAnalyticsService } from '@/services/siteAnalyticsService';
 import { CheckoutAbandonmentDialog } from '@/components/cart/CheckoutAbandonmentDialog';
 import CouponInput from '@/components/cart/CouponInput';
-import { couponService, Coupon } from '@/services/couponService';
+import { Coupon } from '@/services/couponService';
 import { supabase } from '@/integrations/supabase/client';
+import { guestOrderService } from '@/services/guestOrderService';
+import { formatPhoneMask } from '@/components/product/GuestWhatsAppDialog';
 
-// Define proper interfaces for our form data and errors
+// Checkout enxuto: apenas nome e WhatsApp. Sem CPF e sem endereço — esses
+// detalhes passam a ser tratados na conversa do WhatsApp.
 interface CheckoutFormData {
   fullName: string;
-  cpf: string;
   phone: string;
-  cep: string;
-  street: string;
-  number: string;
-  complement: string;
-  neighborhood: string;
-  city: string;
-  state: string;
 }
 
 interface FormErrors {
   [key: string]: string;
 }
-
-// CPF validation with verification digits
-const validateCPF = (cpf: string): boolean => {
-  const cleanCPF = cpf.replace(/\D/g, '');
-  
-  if (cleanCPF.length !== 11) return false;
-  
-  // Reject CPFs with all same digits
-  if (/^(\d)\1{10}$/.test(cleanCPF)) return false;
-  
-  // Validate first verification digit
-  let sum = 0;
-  for (let i = 0; i < 9; i++) {
-    sum += parseInt(cleanCPF[i]) * (10 - i);
-  }
-  let remainder = (sum * 10) % 11;
-  if (remainder === 10 || remainder === 11) remainder = 0;
-  if (remainder !== parseInt(cleanCPF[9])) return false;
-  
-  // Validate second verification digit
-  sum = 0;
-  for (let i = 0; i < 10; i++) {
-    sum += parseInt(cleanCPF[i]) * (11 - i);
-  }
-  remainder = (sum * 10) % 11;
-  if (remainder === 10 || remainder === 11) remainder = 0;
-  if (remainder !== parseInt(cleanCPF[10])) return false;
-  
-  return true;
-};
 
 const CartPage = () => {
   const { items, removeFromCart, clearCart } = useCartStore();
