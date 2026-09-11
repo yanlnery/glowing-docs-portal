@@ -1,0 +1,1 @@
+DELETE FROM public.species_waitlist WHERE name = 'Teste PR8 QA' AND phone = '(21) 90000-0001';
