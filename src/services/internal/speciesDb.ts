@@ -45,7 +45,7 @@ export const fetchSpeciesDataFromDb = async (
   }
   
   console.log("speciesDb.ts: Espécies buscadas com sucesso.");
-  const speciesData = data ? (data as SpeciesDbRecord[]).map(mapDbRecordToSpecies) : null;
+  const speciesData = data ? (data as unknown as SpeciesDbRecord[]).map(mapDbRecordToSpecies) : null;
   return { data: speciesData, error: null };
 };
 
@@ -64,7 +64,7 @@ export const createSpeciesInDb = async (
     return { data: null, error: new Error(error.message) };
   }
   
-  return { data: data ? mapDbRecordToSpecies(data as SpeciesDbRecord) : null, error: null };
+  return { data: data ? mapDbRecordToSpecies(data as unknown as SpeciesDbRecord) : null, error: null };
 };
 
 // Função para atualizar uma espécie no banco de dados
@@ -84,7 +84,7 @@ export const updateSpeciesInDb = async (
     return { data: null, error: new Error(error.message) };
   }
   
-  return { data: data ? mapDbRecordToSpecies(data as SpeciesDbRecord) : null, error: null };
+  return { data: data ? mapDbRecordToSpecies(data as unknown as SpeciesDbRecord) : null, error: null };
 };
 
 // Função para deletar um registro de espécie do banco de dados
