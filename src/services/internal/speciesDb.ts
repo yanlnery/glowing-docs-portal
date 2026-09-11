@@ -16,6 +16,8 @@ interface SpeciesDbRecord {
   order: number;
   type: 'serpente' | 'lagarto' | 'quelonio' | 'outro';
   slug: string;
+  video_url?: string | null;
+  faq?: { question: string; answer: string }[];
   created_at?: string;
   updated_at?: string;
 }
