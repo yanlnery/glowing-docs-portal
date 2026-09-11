@@ -53,6 +53,7 @@ function useRelatedManual(species: Species | null) {
         .from('manuals')
         .select('id, title, description')
         .eq('category', species.type)
+        .is('species_id', null)
         .limit(1);
 
       if (!cancelled && fallback && fallback.length > 0) {
