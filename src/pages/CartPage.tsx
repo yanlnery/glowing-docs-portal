@@ -526,10 +526,6 @@ const CartPage = () => {
                 <Button 
                   className="w-full" 
                   onClick={() => {
-                    if (!user) {
-                      navigate('/checkout-cadastro');
-                      return;
-                    }
                     // Track checkout form open
                     siteAnalyticsService.trackCheckoutFormOpen({
                       itemCount: items.length,
@@ -637,16 +633,16 @@ const CartPage = () => {
       >
         <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Informações de envio</DialogTitle>
+            <DialogTitle>Confirmar pedido</DialogTitle>
             <DialogDescription>
-              Preencha seus dados para finalizar a compra.
+              Só precisamos de nome e WhatsApp para confirmar seu pedido.
             </DialogDescription>
           </DialogHeader>
 
           <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-md flex gap-2 text-sm mb-4">
             <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
             <p className="text-yellow-800 dark:text-yellow-300">
-              ⚠️ Estas informações são obrigatórias para emissão legal da documentação e transporte do animal.
+              ⚠️ Os detalhes de documentação, frete e pagamento são combinados na conversa do WhatsApp.
             </p>
           </div>
 
@@ -667,29 +663,13 @@ const CartPage = () => {
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="cpf">CPF</Label>
-              <Input
-                id="cpf"
-                name="cpf"
-                placeholder="000.000.000-00"
-                value={formData.cpf}
-                onChange={handleInputChange}
-                onBlur={handleCpfBlur}
-                className={formErrors.cpf ? "border-destructive focus-visible:ring-destructive" : ""}
-                disabled={isProcessing}
-              />
-              {formErrors.cpf && (
-                <p className="text-destructive text-xs">{formErrors.cpf}</p>
-              )}
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="phone">Celular / WhatsApp</Label>
+              <Label htmlFor="phone">WhatsApp</Label>
               <Input
                 id="phone"
                 name="phone"
                 placeholder="(00) 00000-0000"
                 type="tel"
+                inputMode="numeric"
                 value={formData.phone}
                 onChange={handleInputChange}
                 className={formErrors.phone ? "border-destructive focus-visible:ring-destructive" : ""}
@@ -701,114 +681,32 @@ const CartPage = () => {
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="cep">CEP</Label>
-              <div className="relative">
-                <Input
-                  id="cep"
-                  name="cep"
-                  placeholder="00000-000"
-                  value={formData.cep}
-                  onChange={handleInputChange}
-                  className={formErrors.cep ? "border-destructive focus-visible:ring-destructive pr-8" : "pr-8"}
+              <div className="flex items-start gap-2">
+                <Checkbox
+                  id="consent"
+                  checked={consent}
+                  onCheckedChange={(checked) => {
+                    setConsent(checked === true);
+                    if (checked === true) setFormErrors(prev => ({ ...prev, consent: '' }));
+                  }}
                   disabled={isProcessing}
                 />
-                {isFetchingCep && (
-                  <Loader2 className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
-                )}
+                <Label htmlFor="consent" className="text-sm font-normal leading-snug">
+                  Li e aceito a{' '}
+                  <Link
+                    to="/politica-de-privacidade"
+                    className="text-serpente-600 hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    política de privacidade
+                  </Link>
+                  .
+                </Label>
               </div>
-              {formErrors.cep && (
-                <p className="text-destructive text-xs">{formErrors.cep}</p>
+              {formErrors.consent && (
+                <p className="text-destructive text-xs">{formErrors.consent}</p>
               )}
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="street">Rua / Logradouro</Label>
-              <Input
-                id="street"
-                name="street"
-                value={formData.street}
-                onChange={handleInputChange}
-                className={formErrors.street ? "border-destructive focus-visible:ring-destructive" : ""}
-                disabled={isProcessing}
-              />
-              {formErrors.street && (
-                <p className="text-destructive text-xs">{formErrors.street}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="number">Número</Label>
-                <Input
-                  id="number"
-                  name="number"
-                  value={formData.number}
-                  onChange={handleInputChange}
-                  className={formErrors.number ? "border-destructive focus-visible:ring-destructive" : ""}
-                  disabled={isProcessing}
-                />
-                {formErrors.number && (
-                  <p className="text-destructive text-xs">{formErrors.number}</p>
-                )}
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="complement">Complemento</Label>
-                <Input
-                  id="complement"
-                  name="complement"
-                  placeholder="Opcional"
-                  value={formData.complement}
-                  onChange={handleInputChange}
-                  disabled={isProcessing}
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="neighborhood">Bairro</Label>
-              <Input
-                id="neighborhood"
-                name="neighborhood"
-                value={formData.neighborhood}
-                onChange={handleInputChange}
-                className={formErrors.neighborhood ? "border-destructive focus-visible:ring-destructive" : ""}
-                disabled={isProcessing}
-              />
-              {formErrors.neighborhood && (
-                <p className="text-destructive text-xs">{formErrors.neighborhood}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div className="grid gap-2 col-span-2">
-                <Label htmlFor="city">Cidade</Label>
-                <Input
-                  id="city"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                  className={formErrors.city ? "border-destructive focus-visible:ring-destructive" : ""}
-                  disabled={isProcessing}
-                />
-                {formErrors.city && (
-                  <p className="text-destructive text-xs">{formErrors.city}</p>
-                )}
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="state">UF</Label>
-                <Input
-                  id="state"
-                  name="state"
-                  maxLength={2}
-                  value={formData.state}
-                  onChange={handleInputChange}
-                  className={formErrors.state ? "border-destructive focus-visible:ring-destructive" : ""}
-                  disabled={isProcessing}
-                />
-                {formErrors.state && (
-                  <p className="text-destructive text-xs">{formErrors.state}</p>
-                )}
-              </div>
             </div>
           </div>
 
