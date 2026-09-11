@@ -154,7 +154,72 @@ export function SpeciesFormFields({
         onAddItem={onAddCuriosity}
         onRemoveItem={onRemoveCuriosity}
       />
-      
+
+      <div className="space-y-1.5">
+        <Label htmlFor="video_url">Vídeo (YouTube)</Label>
+        <Input
+          id="video_url"
+          name="video_url"
+          type="url"
+          value={speciesData.video_url ?? ''}
+          onChange={onInputChange}
+          placeholder="https://www.youtube.com/watch?v=..."
+        />
+        <p className="text-xs text-muted-foreground">
+          Opcional. Cole a URL do vídeo do YouTube ou deixe em branco.
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <Label>Perguntas frequentes (FAQ)</Label>
+          <Button type="button" variant="outline" size="sm" onClick={onAddFaq}>
+            <Plus className="mr-2 h-4 w-4" /> Adicionar pergunta
+          </Button>
+        </div>
+
+        {(speciesData.faq || []).length === 0 ? (
+          <p className="text-sm text-muted-foreground">Nenhuma pergunta cadastrada.</p>
+        ) : (
+          <div className="space-y-4">
+            {(speciesData.faq || []).map((item, index) => (
+              <div key={index} className="space-y-2 rounded-md border border-border p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <Label htmlFor={`faq-question-${index}`} className="text-sm">
+                    Pergunta {index + 1}
+                  </Label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onRemoveFaq(index)}
+                    aria-label={`Remover pergunta ${index + 1}`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+                <Input
+                  id={`faq-question-${index}`}
+                  value={item.question}
+                  onChange={(e) => onFaqChange(index, 'question', e.target.value)}
+                  placeholder="Ex.: Essa espécie precisa de aquecimento?"
+                />
+                <Label htmlFor={`faq-answer-${index}`} className="text-sm">
+                  Resposta {index + 1}
+                </Label>
+                <Textarea
+                  id={`faq-answer-${index}`}
+                  rows={3}
+                  value={item.answer}
+                  onChange={(e) => onFaqChange(index, 'answer', e.target.value)}
+                  placeholder="Resposta completa para essa pergunta"
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       <div className="space-y-1.5">
         <Label htmlFor="order">Ordem de exibição</Label>
         <Input
