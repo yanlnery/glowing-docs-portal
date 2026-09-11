@@ -1183,6 +1183,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_guest_cart_order: {
+        Args: {
+          p_consent: boolean
+          p_coupon_code?: string
+          p_customer_name: string
+          p_customer_phone: string
+          p_items: Json
+        }
+        Returns: {
+          coupon_applied: boolean
+          coupon_discount: number
+          order_id: string
+          order_number: string
+          subtotal_amount: number
+          total_amount: number
+        }[]
+      }
       create_guest_lead_order: {
         Args: {
           p_consent: boolean
