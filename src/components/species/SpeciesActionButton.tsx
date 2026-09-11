@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Bell, ShoppingCart, ExternalLink } from 'lucide-react';
+import { Bell, ShoppingCart } from 'lucide-react';
 import { Species } from '@/types/species';
 import { SpeciesWaitlistForm } from './SpeciesWaitlistForm';
 import { supabase } from '@/integrations/supabase/client';
-import { speciesWaitlistService } from '@/services/speciesWaitlistService';
 
 interface SpeciesActionButtonProps {
   species: Species;
@@ -31,7 +30,6 @@ export function SpeciesActionButton({
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
   const [availableProducts, setAvailableProducts] = useState<AvailableProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [waitingCount, setWaitingCount] = useState(0);
 
   useEffect(() => {
     const fetchAvailableProducts = async () => {
@@ -57,16 +55,6 @@ export function SpeciesActionButton({
     };
 
     fetchAvailableProducts();
-  }, [species.id]);
-
-  useEffect(() => {
-    let cancelled = false;
-    speciesWaitlistService.getWaitingCount(species.id).then((count) => {
-      if (!cancelled) setWaitingCount(count);
-    });
-    return () => {
-      cancelled = true;
-    };
   }, [species.id]);
 
   const handleBuyClick = () => {
@@ -113,7 +101,7 @@ export function SpeciesActionButton({
         className={className}
       >
         <Bell className="w-4 h-4 mr-2" />
-        {waitingCount > 0 ? `Quero ser avisado (${waitingCount} aguardando)` : 'Quero ser avisado'}
+        Quero ser avisado
       </Button>
 
       <SpeciesWaitlistForm
@@ -124,3 +112,4 @@ export function SpeciesActionButton({
     </>
   );
 }
+
