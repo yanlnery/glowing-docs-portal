@@ -72,9 +72,7 @@ export function SpeciesWaitlistForm({ species, isOpen, onClose }: SpeciesWaitlis
         species_id: species.id,
         name: data.name,
         phone: data.phone,
-        contact_preference: 'whatsapp',
         consent: true,
-        consent_at: new Date().toISOString(),
       });
 
       if (error) {
