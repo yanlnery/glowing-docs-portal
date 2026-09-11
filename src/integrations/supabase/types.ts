@@ -1238,11 +1238,27 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      join_species_waitlist: {
+        Args: {
+          p_consent: boolean
+          p_name: string
+          p_phone: string
+          p_species_id: string
+        }
+        Returns: {
+          already_registered: boolean
+          queue_position: number
+        }[]
+      }
       link_anonymous_orders_by_phone: {
         Args: { p_phone: string }
         Returns: number
       }
       ps_slugify: { Args: { input: string }; Returns: string }
+      species_waitlist_count: {
+        Args: { p_species_id: string }
+        Returns: number
+      }
       validate_coupon: {
         Args: { p_code: string; p_order_total?: number }
         Returns: {
