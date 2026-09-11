@@ -34,6 +34,9 @@ interface SpeciesDialogProps {
   galleryFiles: File[];
   onGalleryAdd: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onGalleryRemove: (index: number) => void;
+  onFaqChange: (index: number, field: 'question' | 'answer', value: string) => void;
+  onAddFaq: () => void;
+  onRemoveFaq: (index: number) => void;
 }
 
 export function SpeciesDialog({

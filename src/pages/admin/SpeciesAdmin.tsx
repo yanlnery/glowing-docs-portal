@@ -122,6 +122,9 @@ export default function SpeciesAdmin() {
           galleryFiles={dialogManager.galleryFiles}
           onGalleryAdd={dialogManager.handleGalleryAdd}
           onGalleryRemove={dialogManager.handleGalleryRemove}
+          onFaqChange={dialogManager.faqHandler.handleChange}
+          onAddFaq={dialogManager.faqHandler.handleAdd}
+          onRemoveFaq={dialogManager.faqHandler.handleRemove}
           isLoading={speciesLoading}
         />
       )}

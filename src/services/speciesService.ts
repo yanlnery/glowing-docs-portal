@@ -107,6 +107,12 @@ export const saveSpeciesData = async (
     characteristics: speciesToSave.characteristics || [],
     curiosities: speciesToSave.curiosities || [],
     order: typeof speciesToSave.order === 'number' ? speciesToSave.order : 0,
+    video_url: speciesToSave.video_url && speciesToSave.video_url.trim() !== ''
+      ? speciesToSave.video_url.trim()
+      : null,
+    faq: (speciesToSave.faq || [])
+      .map(item => ({ question: (item.question || '').trim(), answer: (item.answer || '').trim() }))
+      .filter(item => item.question !== '' || item.answer !== ''),
   };
 
   let result;
