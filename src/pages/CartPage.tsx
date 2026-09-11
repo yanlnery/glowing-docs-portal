@@ -177,12 +177,6 @@ const CartPage = () => {
   };
 
   const handleCheckout = async () => {
-    // Check authentication first - redirect to checkout auth page
-    if (!user) {
-      navigate('/checkout-cadastro');
-      return;
-    }
-
     // Track checkout start
     siteAnalyticsService.trackCheckoutStart({
       itemCount: items.length,
@@ -190,240 +184,123 @@ const CartPage = () => {
     });
 
     if (!validateForm()) {
-      console.log("❌ Form validation failed");
-      
-      // Track form validation errors
       const errorTypes = Object.keys(formErrors);
-      if (errorTypes.length > 0) {
-        errorTypes.forEach(errorType => {
-          siteAnalyticsService.trackCheckoutFormError(errorType, formErrors[errorType]);
-        });
-      }
-      
+      errorTypes.forEach(errorType => {
+        siteAnalyticsService.trackCheckoutFormError(errorType, formErrors[errorType]);
+      });
       return;
     }
 
-    if (isProcessing) {
-      console.log("⚠️ Already processing checkout, ignoring duplicate request");
-      return;
-    }
+    if (isProcessing) return;
 
-    console.log("🔄 Starting checkout process...");
     setIsProcessing(true);
 
     try {
-      // Prepare order data with user_id
-      const formattedAddress = `${formData.street}, ${formData.number}${formData.complement ? ` - ${formData.complement}` : ''}, ${formData.neighborhood}, ${formData.city} - ${formData.state}, CEP: ${formData.cep}`;
-      
-      const orderData = {
-        user_id: user.id,
-        customer_name: formData.fullName.trim(),
-        customer_cpf: formData.cpf.trim(),
-        customer_phone: formData.phone.trim(),
-        shipping_address: {
-          street: formData.street.trim(),
-          number: formData.number.trim(),
-          complement: formData.complement.trim(),
-          neighborhood: formData.neighborhood.trim(),
-          city: formData.city.trim(),
-          state: formData.state.trim(),
-          zipcode: formData.cep.replace(/\D/g, '')
-        },
-        payment_method: paymentMethod === 'pix' ? 'pix' : 'cartao',
-        total_amount: total,
-        subtotal_amount: subtotal,
-        coupon_code: appliedCoupon?.code ?? null,
-        status: 'pending' as const // Order starts as pending until confirmed via WhatsApp
-      };
-
-      console.log("🔄 Creating order in database...", orderData);
-
-      // Create order in database
-      const { data: orderResult, error: orderError } = await orderService.createOrder(orderData);
-      
-      if (orderError) {
-        console.error("❌ Error creating order:", orderError);
-        throw new Error(`Erro ao criar pedido: ${orderError.message}`);
-      }
-
-      if (!orderResult?.id) {
-        console.error("❌ Order creation returned no ID");
-        throw new Error("Erro ao criar pedido: ID não retornado");
-      }
-
-      console.log("✅ Order created successfully:", orderResult.id);
-
-      // Add order items
-      const orderItems = items.map(item => ({
-        order_id: orderResult.id,
-        product_id: item.product.id,
-        product_name: item.product.name,
-        product_code: item.product.meta?.productId || null,
-        species_name: item.product.speciesName || 'Não especificado',
-        product_image_url: item.product.images?.[0]?.url || null,
-        quantity: item.quantity,
-        price: item.product.price
-      }));
-
-      console.log("🔄 Adding order items...", orderItems);
-      const { error: itemsError } = await orderService.addOrderItems(orderItems);
-      
-      if (itemsError) {
-        console.error("❌ Error adding order items:", itemsError);
-        throw new Error(`Erro ao adicionar itens do pedido: ${itemsError.message}`);
-      }
-
-      console.log("✅ Order items added successfully");
-
-      // Create 'created' event
-      await orderEventsService.createEvent({
-        order_id: orderResult.id,
-        event_type: 'created',
-        event_data: { item_count: items.length, total: total },
+      const result = await guestOrderService.createGuestCartOrder({
+        items: items.map(i => ({ productId: i.product.id, quantity: i.quantity })),
+        customerName: formData.fullName.trim(),
+        customerPhone: formData.phone.trim(),
+        couponCode: appliedCoupon?.code ?? null,
       });
 
-      // Prepare WhatsApp message with formatted address and order_number
-      const fullAddress = `${formData.street}, ${formData.number}${formData.complement ? ` - ${formData.complement}` : ''}, ${formData.neighborhood}, ${formData.city} - ${formData.state}, CEP: ${formData.cep}`;
-      
-      const orderNumber = orderResult.order_number || `#${orderResult.id.substring(0, 8)}`;
-      
-      const paymentLabel = paymentMethod === 'pix' ? 'PIX' : 'Cartão (até 10x sem juros)';
-      
-      let couponSection = '';
-      if (appliedCoupon) {
-        // Calculate PIX subtotal (with pix prices)
-        const pixSubtotal = items.reduce((sum, item) => {
-          return sum + (item.product.pixPrice || item.product.price) * item.quantity;
-        }, 0);
-        const pixDiscount = appliedCoupon.discount_type === 'percentage'
-          ? pixSubtotal * (appliedCoupon.discount_value / 100)
-          : Math.min(appliedCoupon.discount_value, pixSubtotal);
-        const pixTotal = Math.max(pixSubtotal - pixDiscount, 0);
-
-        // Calculate card subtotal (with regular prices)
-        const cardSubtotal = items.reduce((sum, item) => {
-          return sum + item.product.price * item.quantity;
-        }, 0);
-        const cardDiscount = appliedCoupon.discount_type === 'percentage'
-          ? cardSubtotal * (appliedCoupon.discount_value / 100)
-          : Math.min(appliedCoupon.discount_value, cardSubtotal);
-        const cardTotal = Math.max(cardSubtotal - cardDiscount, 0);
-
-        couponSection = 
-          `\n\n🎟️ Cupom aplicado: ${appliedCoupon.code}` +
-          (appliedCoupon.discount_type === 'percentage' ? ` (${appliedCoupon.discount_value}%)` : '') +
-          `\nSubtotal original: ${formatPrice(cardSubtotal)}` +
-          `\nDesconto: -${formatPrice(cardDiscount)}` +
-          `\nTotal no PIX: ${formatPrice(pixTotal)}` +
-          `\nTotal parcelado (10x): ${formatPrice(cardTotal / 10)}` +
-          `\n\n📍 Retirada exclusiva no evento MEX Festival — 18/04/2026, São Paulo.`;
+      if (result.error) {
+        const raw = String(result.error.message ?? '');
+        if (raw.toLowerCase().includes('disponive')) {
+          toast({
+            title: "Animal indisponível",
+            description: "Um ou mais animais do carrinho não estão mais disponíveis. Revise seu carrinho.",
+            variant: "destructive",
+            duration: 6000,
+          });
+          setIsDialogOpen(false);
+          return;
+        }
+        throw new Error(raw || 'Erro ao criar pedido');
       }
-      
-      const message = 
+
+      const orderId = result.orderId!;
+      const orderNumber = result.orderNumber || `#${orderId.substring(0, 8)}`;
+      // Valores finais vêm do servidor — nunca recalculados aqui.
+      const serverSubtotal = Number(result.subtotalAmount ?? 0);
+      const serverTotal = Number(result.totalAmount ?? 0);
+      const serverDiscount = Number(result.couponDiscount ?? 0);
+      const couponApplied = result.couponApplied === true;
+
+      await orderEventsService.createEvent({
+        order_id: orderId,
+        event_type: 'created',
+        event_data: { item_count: items.length, total: serverTotal },
+      });
+
+      const paymentLabel = paymentMethod === 'pix' ? 'PIX' : 'Cartão (até 10x sem juros)';
+
+      const couponSection = couponApplied
+        ? `\n\n🎟️ Cupom aplicado: ${appliedCoupon?.code}` +
+          `\nSubtotal: ${formatPrice(serverSubtotal)}` +
+          `\nDesconto: -${formatPrice(serverDiscount)}` +
+          `\n\n📍 Retirada exclusiva no evento MEX Festival — 18/04/2026, São Paulo.`
+        : '';
+
+      const message =
         `Olá! Acabei de finalizar um pedido no site Pet Serpentes.\n\n` +
         `Pedido: ${orderNumber}\n` +
-        `Nome do comprador: ${formData.fullName}\n` +
-        `CPF: ${formData.cpf}\n` +
-        `Celular: ${formData.phone}\n` +
-        `Endereço: ${fullAddress}\n` +
+        `Nome: ${formData.fullName}\n` +
+        `WhatsApp: ${formData.phone}\n` +
         `Forma de pagamento: ${paymentLabel}\n\n` +
-        `Animal(is) solicitado(s):\n${items.map(item => `- ${item.product.meta?.productId ? `#${item.product.meta.productId} - ` : ''}${item.product.name} (${item.product.speciesName || "Não especificado"}) - ${formatPrice(getItemPrice(item))}`).join('\n')}\n\n` +
-        `Total: ${formatPrice(total)}` +
+        `Animal(is) solicitado(s):\n${items.map(item => `- ${item.product.meta?.productId ? `#${item.product.meta.productId} - ` : ''}${item.product.name} (${item.product.speciesName || "Não especificado"})`).join('\n')}\n\n` +
+        `Total: ${formatPrice(serverTotal)}` +
         couponSection +
-        (appliedCoupon
+        (couponApplied
           ? `\n\nGostaria de confirmar o pedido.`
           : `\n\nGostaria de confirmar o pedido e combinar os detalhes do envio.`);
 
-      const whatsappUrl = `https://wa.me/5521967802174?text=${encodeURIComponent(message)}`;
+      const whatsappNumber = await guestOrderService.getWhatsAppNumber();
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
-      // Persist order data before redirect (for recovery if needed)
-      localStorage.setItem(
-        "pendingOrder",
-        JSON.stringify({
-          createdAt: Date.now(),
-          orderId: orderResult.id,
-          cartItems: items.map(item => ({
-            id: item.product.id,
-            name: item.product.name,
-            price: item.product.price
-          })),
-          formData,
-          message
-        })
-      );
-
-      // Track checkout success
       siteAnalyticsService.trackCheckoutSuccess({
-        orderId: orderResult.id,
-        totalValue: total,
+        orderId,
+        totalValue: serverTotal,
         itemCount: items.length,
       });
 
-      // Close dialog and show success message
       setIsDialogOpen(false);
-      
+
       toast({
         title: "Pedido criado com sucesso!",
         description: "Abrindo o WhatsApp...",
         duration: 2000,
       });
 
-
-      console.log("✅ Checkout completed successfully, redirecting to WhatsApp...");
-      
-      // Record whatsapp_clicked_at and create event
       await supabase
         .from('orders')
         .update({ whatsapp_clicked_at: new Date().toISOString() })
-        .eq('id', orderResult.id);
-      
+        .eq('id', orderId);
+
       await orderEventsService.createEvent({
-        order_id: orderResult.id,
+        order_id: orderId,
         event_type: 'whatsapp_redirect',
         event_data: { whatsapp_url: whatsappUrl.substring(0, 100) },
       });
-      
-      // Track WhatsApp redirect
+
       siteAnalyticsService.trackWhatsAppRedirect({
-        orderId: orderResult.id,
-        totalValue: total,
+        orderId,
+        totalValue: serverTotal,
       });
-      
-      // Clear cart and reset form before redirect
+
       clearCart();
       setFormOpenTime(null);
-      setFormData({
-        fullName: '',
-        cpf: '',
-        phone: '',
-        cep: '',
-        street: '',
-        number: '',
-        complement: '',
-        neighborhood: '',
-        city: '',
-        state: ''
-      });
+      setFormData({ fullName: '', phone: '' });
+      setConsent(false);
 
-      // Pedido concluído: apaga os dados pessoais guardados no navegador
       localStorage.removeItem("pendingOrder");
 
-      // Immediate redirect - mobile-safe (no setTimeout, no window.open)
       window.location.assign(whatsappUrl);
-
-      
     } catch (error) {
       console.error("❌ Checkout process failed:", error);
-      
-      let errorMessage = "Ocorreu um erro inesperado. Por favor, tente novamente.";
-      
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      
+
       toast({
         title: "Erro ao processar pedido",
-        description: errorMessage,
+        description: error instanceof Error ? error.message : "Ocorreu um erro inesperado. Por favor, tente novamente.",
         variant: "destructive",
         duration: 5000,
       });
