@@ -24,20 +24,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Loader2, CheckCircle } from 'lucide-react';
 
 const formSchema = z.object({
   name: z.string().trim().min(2, 'Nome deve ter pelo menos 2 caracteres').max(100, 'Nome muito longo'),
-  email: z.string().trim().email('Email inválido').max(255, 'Email muito longo'),
   phone: z.string().trim().min(10, 'Telefone inválido').max(20, 'Telefone muito longo'),
-  contact_preference: z.enum(['email', 'whatsapp', 'both']),
   consent: z.literal(true, {
     errorMap: () => ({ message: 'É preciso aceitar a política de privacidade' }),
   }),
@@ -55,14 +46,13 @@ export function SpeciesWaitlistForm({ species, isOpen, onClose }: SpeciesWaitlis
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
+  const [position, setPosition] = React.useState<number | null>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      email: '',
       phone: '',
-      contact_preference: 'whatsapp',
       consent: false as unknown as true,
     },
   });
@@ -70,6 +60,7 @@ export function SpeciesWaitlistForm({ species, isOpen, onClose }: SpeciesWaitlis
   const handleClose = () => {
     form.reset();
     setIsSuccess(false);
+    setPosition(null);
     onClose();
   };
 
@@ -77,14 +68,11 @@ export function SpeciesWaitlistForm({ species, isOpen, onClose }: SpeciesWaitlis
     setIsSubmitting(true);
 
     try {
-      const { error } = await speciesWaitlistService.addToWaitlist({
+      const { error, position: queuePosition } = await speciesWaitlistService.addToWaitlist({
         species_id: species.id,
         name: data.name,
-        email: data.email,
         phone: data.phone,
-        contact_preference: data.contact_preference,
         consent: true,
-        consent_at: new Date().toISOString(),
       });
 
       if (error) {
@@ -96,6 +84,7 @@ export function SpeciesWaitlistForm({ species, isOpen, onClose }: SpeciesWaitlis
         return;
       }
 
+      setPosition(queuePosition ?? null);
       setIsSuccess(true);
       toast({
         title: 'Cadastro realizado!',
@@ -126,8 +115,13 @@ export function SpeciesWaitlistForm({ species, isOpen, onClose }: SpeciesWaitlis
           <div className="text-center py-8">
             <CheckCircle className="w-16 h-16 mx-auto text-green-500 mb-4" />
             <h3 className="text-lg font-semibold mb-2">Cadastro realizado com sucesso!</h3>
+            {position !== null && (
+              <p className="text-base font-medium mb-2">
+                Você é o {position}º na fila de {species.commonname}.
+              </p>
+            )}
             <p className="text-muted-foreground mb-4">
-              Entraremos em contato assim que houver disponibilidade.
+              Entraremos em contato pelo WhatsApp assim que houver disponibilidade.
             </p>
             <Button onClick={handleClose}>Fechar</Button>
           </div>
@@ -150,50 +144,13 @@ export function SpeciesWaitlistForm({ species, isOpen, onClose }: SpeciesWaitlis
 
               <FormField
                 control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="seu@email.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Telefone / WhatsApp</FormLabel>
+                    <FormLabel>WhatsApp</FormLabel>
                     <FormControl>
                       <Input placeholder="(00) 00000-0000" {...field} />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="contact_preference"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Preferência de contato</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="whatsapp">WhatsApp</SelectItem>
-                        <SelectItem value="email">Email</SelectItem>
-                        <SelectItem value="both">Ambos</SelectItem>
-                      </SelectContent>
-                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

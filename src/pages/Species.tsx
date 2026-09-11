@@ -18,9 +18,10 @@ interface SpeciesSeoProps {
   description: string;
   canonical: string;
   breadcrumbJsonLd: Record<string, unknown> | null;
+  videoJsonLd?: Record<string, unknown> | null;
 }
 
-const SpeciesSeo = ({ title, description, canonical, breadcrumbJsonLd }: SpeciesSeoProps) => {
+const SpeciesSeo = ({ title, description, canonical, breadcrumbJsonLd, videoJsonLd }: SpeciesSeoProps) => {
   useLayoutEffect(() => {
     const canonicalUrl = `https://petserpentes.com.br${canonical}`;
     const upsertMeta = (attribute: 'name' | 'property', key: string, content: string) => {
@@ -52,19 +53,21 @@ const SpeciesSeo = ({ title, description, canonical, breadcrumbJsonLd }: Species
     canonicalElement.href = canonicalUrl;
 
     document.head.querySelectorAll('script[data-species-seo]').forEach((script) => script.remove());
-    if (breadcrumbJsonLd) {
+    const appendJsonLd = (key: string, payload: Record<string, unknown>) => {
       const script = document.createElement('script');
       script.type = 'application/ld+json';
-      script.dataset.speciesSeo = 'breadcrumb';
-      script.textContent = JSON.stringify(breadcrumbJsonLd);
+      script.dataset.speciesSeo = key;
+      script.textContent = JSON.stringify(payload);
       document.head.appendChild(script);
-    }
+    };
+    if (breadcrumbJsonLd) appendJsonLd('breadcrumb', breadcrumbJsonLd);
+    if (videoJsonLd) appendJsonLd('video', videoJsonLd);
 
     return () => {
       document.head.querySelectorAll('script[data-species-seo]').forEach((script) => script.remove());
       restoreSeoDefaults();
     };
-  }, [breadcrumbJsonLd, canonical, description, title]);
+  }, [breadcrumbJsonLd, videoJsonLd, canonical, description, title]);
 
   return null;
 };
@@ -254,6 +257,25 @@ export default function SpeciesPage() {
     };
   }, [selectedSpecies, routeSlug, searchParams]);
 
+  const videoJsonLd = useMemo(() => {
+    const slugInUrl = routeSlug || searchParams.get('selected');
+    if (!selectedSpecies || !slugInUrl || !selectedSpecies.video_url) return null;
+    if (![selectedSpecies.new_slug, selectedSpecies.slug, selectedSpecies.legacy_slug].includes(slugInUrl)) return null;
+
+    const rawDescription = selectedSpecies.description?.replace(/\s+/g, ' ').trim() || '';
+    const description = rawDescription.length > 300 ? `${rawDescription.slice(0, 297)}...` : rawDescription;
+
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'VideoObject',
+      name: `${selectedSpecies.commonname} — Pet Serpentes`,
+      description: description || `Vídeo sobre ${selectedSpecies.commonname} (${selectedSpecies.name}).`,
+      thumbnailUrl: selectedSpecies.image || undefined,
+      uploadDate: selectedSpecies.updated_at || selectedSpecies.created_at || undefined,
+      embedUrl: selectedSpecies.video_url,
+    };
+  }, [selectedSpecies, routeSlug, searchParams]);
+
   if (legacyRedirect) {
     return <Navigate to={legacyRedirect} replace />;
   }
@@ -262,7 +284,7 @@ export default function SpeciesPage() {
 
     return (
       <>
-        <SpeciesSeo title={pageTitle} description={pageDescription} canonical={canonicalUrl} breadcrumbJsonLd={breadcrumbJsonLd} />
+        <SpeciesSeo title={pageTitle} description={pageDescription} canonical={canonicalUrl} breadcrumbJsonLd={breadcrumbJsonLd} videoJsonLd={videoJsonLd} />
         <div className="container mx-auto px-4 py-12 min-h-[60vh] flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-t-2 border-b-2 border-serpente-600 mx-auto mb-4"></div>
@@ -276,7 +298,7 @@ export default function SpeciesPage() {
   if (error) {
     return (
       <>
-        <SpeciesSeo title={pageTitle} description={pageDescription} canonical={canonicalUrl} breadcrumbJsonLd={breadcrumbJsonLd} />
+        <SpeciesSeo title={pageTitle} description={pageDescription} canonical={canonicalUrl} breadcrumbJsonLd={breadcrumbJsonLd} videoJsonLd={videoJsonLd} />
         <div className="container mx-auto px-4 py-12">
           <div className="text-center">
             <p className="text-lg text-destructive">Erro ao carregar espécies: {error}</p>
@@ -288,7 +310,7 @@ export default function SpeciesPage() {
 
   return (
     <>
-      <SpeciesSeo title={pageTitle} description={pageDescription} canonical={canonicalUrl} breadcrumbJsonLd={breadcrumbJsonLd} />
+      <SpeciesSeo title={pageTitle} description={pageDescription} canonical={canonicalUrl} breadcrumbJsonLd={breadcrumbJsonLd} videoJsonLd={videoJsonLd} />
       <div className="container px-4 md:px-6 py-8 sm:py-12 min-h-[60vh]">
         {/* Header centralizado com barra verde */}
         <div className="flex flex-col items-center mb-8 sm:mb-12 text-center">
@@ -332,7 +354,10 @@ export default function SpeciesPage() {
               onFilterChange={setActiveFilter}
             />
           </div>
-          <SpeciesMobileView species={filteredSpecies} />
+          <SpeciesMobileView
+            species={filteredSpecies}
+            selectedId={(routeSlug || searchParams.get('selected')) ? selectedSpecies?.id ?? null : null}
+          />
         </>
       ) : (
           <div className="flex gap-6 min-h-[calc(100vh-24rem)]">

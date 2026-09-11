@@ -1,3 +1,4 @@
 - PR4 checkout enxuto atras da flag checkout_v2_enabled: checar available=true na RPC create_guest_lead_order (pedido do usuario), reenviar migracao, implementar frontend (botao WhatsApp direto + modal nome/whatsapp/consent, eventos novos, consent na lista de espera), testar sem publicar
 - PR4: nunca ligar checkout_v2_enabled no banco (preview=producao). Testar via override local ?checkout_v2=1
 - PR5 carrinho enxuto: guestOrderService.createGuestCartOrder + CartPage sem login/CPF/endereco (nome, whatsapp, consent), whatsapp de system_settings. Nao publicar.
+- PR8 especie como ativo: tipos video_url/faq, lista de espera so nome+whatsapp+consent (RPCs join_species_waitlist/species_waitlist_count), contador social no botao, acordeao mobile abrindo a especie da URL, manual relacionado + video + FAQ no painel, VideoObject JSON-LD. Feito, sem publicar. Video/FAQ nao testados no navegador (nenhuma especie tem esses dados ainda).

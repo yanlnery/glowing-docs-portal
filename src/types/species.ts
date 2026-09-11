@@ -18,4 +18,6 @@ export interface Species {
   updated_at?: string; // TIMESTAMPTZ
   focus_desktop?: string; // Focal point for main image on desktop
   focus_mobile?: string; // Focal point for main image on mobile
+  video_url?: string | null; // URL do vídeo (YouTube) da espécie
+  faq?: { question: string; answer: string }[]; // Perguntas frequentes
 }

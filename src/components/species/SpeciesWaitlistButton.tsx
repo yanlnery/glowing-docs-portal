@@ -65,9 +65,8 @@ export function SpeciesWaitlistButton({
       const { error } = await speciesWaitlistService.addToWaitlist({
         species_id: species.id,
         name: fullName,
-        email: user.email || '',
         phone: userPhone,
-        contact_preference: 'whatsapp',
+        consent: true,
       });
 
       if (error) {

@@ -11,9 +11,10 @@ import { SpeciesWaitlistButton } from './SpeciesWaitlistButton';
 
 interface SpeciesMobileViewProps {
   species: Species[];
+  selectedId?: string | null;
 }
 
-export function SpeciesMobileView({ species }: SpeciesMobileViewProps) {
+export function SpeciesMobileView({ species, selectedId }: SpeciesMobileViewProps) {
   if (species.length === 0) {
     return (
       <div className="text-center py-12">
@@ -23,7 +24,13 @@ export function SpeciesMobileView({ species }: SpeciesMobileViewProps) {
   }
 
   return (
-    <Accordion type="single" collapsible className="space-y-2">
+    <Accordion
+      key={selectedId || 'none'}
+      type="single"
+      collapsible
+      defaultValue={selectedId || undefined}
+      className="space-y-2"
+    >
       {species.map((speciesItem) => (
         <AccordionItem 
           key={speciesItem.id} 
