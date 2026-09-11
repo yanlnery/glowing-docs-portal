@@ -54,6 +54,9 @@ export function SpeciesFormFields({
   galleryFiles,
   onGalleryAdd,
   onGalleryRemove,
+  onFaqChange,
+  onAddFaq,
+  onRemoveFaq,
 }: SpeciesFormFieldsProps) {
   if (!speciesData) return null;
 
