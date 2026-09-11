@@ -1,9 +1,8 @@
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCartStore, CartItem } from '@/stores/cartStore';
-import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -12,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Trash2, ShoppingCart, ArrowLeft, AlertCircle, Loader2, CreditCard, QrCode } from 'lucide-react';
+import { Trash2, ShoppingCart, ArrowLeft, AlertCircle, CreditCard, QrCode } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { 
   Dialog, 
@@ -24,85 +23,39 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from '@/hooks/use-toast';
-import { orderService } from '@/services/orderService';
 import { orderEventsService } from '@/services/orderEventsService';
 import { cartAnalyticsService } from '@/services/cartAnalyticsService';
 import { siteAnalyticsService } from '@/services/siteAnalyticsService';
 import { CheckoutAbandonmentDialog } from '@/components/cart/CheckoutAbandonmentDialog';
 import CouponInput from '@/components/cart/CouponInput';
-import { couponService, Coupon } from '@/services/couponService';
+import { Coupon } from '@/services/couponService';
 import { supabase } from '@/integrations/supabase/client';
+import { guestOrderService } from '@/services/guestOrderService';
+import { formatPhoneMask } from '@/components/product/GuestWhatsAppDialog';
 
-// Define proper interfaces for our form data and errors
+// Checkout enxuto: apenas nome e WhatsApp. Sem CPF e sem endereço — esses
+// detalhes passam a ser tratados na conversa do WhatsApp.
 interface CheckoutFormData {
   fullName: string;
-  cpf: string;
   phone: string;
-  cep: string;
-  street: string;
-  number: string;
-  complement: string;
-  neighborhood: string;
-  city: string;
-  state: string;
 }
 
 interface FormErrors {
   [key: string]: string;
 }
 
-// CPF validation with verification digits
-const validateCPF = (cpf: string): boolean => {
-  const cleanCPF = cpf.replace(/\D/g, '');
-  
-  if (cleanCPF.length !== 11) return false;
-  
-  // Reject CPFs with all same digits
-  if (/^(\d)\1{10}$/.test(cleanCPF)) return false;
-  
-  // Validate first verification digit
-  let sum = 0;
-  for (let i = 0; i < 9; i++) {
-    sum += parseInt(cleanCPF[i]) * (10 - i);
-  }
-  let remainder = (sum * 10) % 11;
-  if (remainder === 10 || remainder === 11) remainder = 0;
-  if (remainder !== parseInt(cleanCPF[9])) return false;
-  
-  // Validate second verification digit
-  sum = 0;
-  for (let i = 0; i < 10; i++) {
-    sum += parseInt(cleanCPF[i]) * (11 - i);
-  }
-  remainder = (sum * 10) % 11;
-  if (remainder === 10 || remainder === 11) remainder = 0;
-  if (remainder !== parseInt(cleanCPF[10])) return false;
-  
-  return true;
-};
-
 const CartPage = () => {
   const { items, removeFromCart, clearCart } = useCartStore();
-  const { user } = useAuth();
-  const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'cartao'>('pix');
-  const [isFetchingCep, setIsFetchingCep] = useState(false);
-  const cepDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  
+  const [consent, setConsent] = useState(false);
+
   const [formData, setFormData] = useState<CheckoutFormData>({
     fullName: '',
-    cpf: '',
-    phone: '',
-    cep: '',
-    street: '',
-    number: '',
-    complement: '',
-    neighborhood: '',
-    city: '',
-    state: ''
+    phone: ''
   });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [formOpenTime, setFormOpenTime] = useState<number | null>(null);
@@ -193,168 +146,37 @@ const CartPage = () => {
   }).format(price);
   };
 
-  // Mask functions for CPF and CEP
-  const formatCPF = (value: string): string => {
-    const digits = value.replace(/\D/g, '').slice(0, 11);
-    return digits
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-  };
-
-  const formatCEP = (value: string): string => {
-    const digits = value.replace(/\D/g, '').slice(0, 8);
-    return digits.replace(/(\d{5})(\d)/, '$1-$2');
-  };
-
-  // Fetch address from ViaCEP
-  const fetchAddressFromCEP = useCallback(async (cep: string) => {
-    const cleanCEP = cep.replace(/\D/g, '');
-    if (cleanCEP.length !== 8) return;
-    
-    setIsFetchingCep(true);
-    setFormErrors(prev => ({ ...prev, cep: '' }));
-    
-    try {
-      const response = await fetch(`https://viacep.com.br/ws/${cleanCEP}/json/`);
-      const data = await response.json();
-      
-      if (data.erro) {
-        setFormErrors(prev => ({ ...prev, cep: 'CEP não encontrado' }));
-        // Clear auto-filled fields on error
-        setFormData(prev => ({
-          ...prev,
-          street: '',
-          neighborhood: '',
-          city: '',
-          state: ''
-        }));
-      } else {
-        setFormData(prev => ({
-          ...prev,
-          street: data.logradouro || '',
-          neighborhood: data.bairro || '',
-          city: data.localidade || '',
-          state: data.uf || ''
-        }));
-        // Clear any previous CEP error
-        setFormErrors(prev => ({ ...prev, cep: '' }));
-      }
-    } catch (error) {
-      console.error('Error fetching CEP:', error);
-      setFormErrors(prev => ({ ...prev, cep: 'Não foi possível buscar o CEP' }));
-    } finally {
-      setIsFetchingCep(false);
-    }
-  }, []);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
-    let formattedValue = value;
-    if (name === 'cpf') {
-      formattedValue = formatCPF(value);
-    } else if (name === 'cep') {
-      formattedValue = formatCEP(value);
-      
-      // Clear auto-filled address fields when CEP changes
-      const cleanCEP = value.replace(/\D/g, '');
-      if (cleanCEP.length < 8) {
-        setFormData(prev => ({
-          ...prev,
-          cep: formattedValue,
-          street: '',
-          neighborhood: '',
-          city: '',
-          state: ''
-        }));
-        setFormErrors(prev => ({ ...prev, cep: '' }));
-      }
-      
-      // Debounced CEP lookup
-      if (cepDebounceRef.current) {
-        clearTimeout(cepDebounceRef.current);
-      }
-      
-      if (cleanCEP.length === 8) {
-        cepDebounceRef.current = setTimeout(() => {
-          fetchAddressFromCEP(cleanCEP);
-        }, 300);
-      }
-    }
-    
-    if (name !== 'cep') {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: formattedValue
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        cep: formattedValue
-      }));
-    }
-    
-    // Clear error for this field when user starts typing
-    if (formErrors[name] && name !== 'cep') {
-      setFormErrors((prev) => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
+    const formattedValue = name === 'phone' ? formatPhoneMask(value) : value;
 
-  const handleCpfBlur = () => {
-    const cleanCPF = formData.cpf.replace(/\D/g, '');
-    if (cleanCPF.length > 0 && !validateCPF(cleanCPF)) {
-      setFormErrors(prev => ({ ...prev, cpf: 'CPF inválido' }));
-    } else {
-      setFormErrors(prev => ({ ...prev, cpf: '' }));
+    setFormData((prev) => ({ ...prev, [name]: formattedValue }));
+
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
   const validateForm = () => {
     const errors: FormErrors = {};
     if (!formData.fullName.trim()) errors.fullName = "Nome completo é obrigatório";
-    
+
     const cleanPhone = formData.phone.replace(/\D/g, '');
     if (!cleanPhone) {
-      errors.phone = "Celular é obrigatório";
+      errors.phone = "WhatsApp é obrigatório";
     } else if (cleanPhone.length < 10) {
-      errors.phone = "Celular inválido";
+      errors.phone = "WhatsApp inválido";
     }
-    
-    const cleanCPF = formData.cpf.replace(/\D/g, '');
-    if (!cleanCPF) {
-      errors.cpf = "CPF é obrigatório";
-    } else if (!validateCPF(cleanCPF)) {
-      errors.cpf = "CPF inválido";
+
+    if (!consent) {
+      errors.consent = "É preciso aceitar a política de privacidade";
     }
-    
-    const cleanCEP = formData.cep.replace(/\D/g, '');
-    if (!cleanCEP) {
-      errors.cep = "CEP é obrigatório";
-    } else if (cleanCEP.length !== 8) {
-      errors.cep = "CEP deve ter 8 dígitos";
-    }
-    
-    if (!formData.street.trim()) errors.street = "Rua é obrigatória";
-    if (!formData.number.trim()) errors.number = "Número é obrigatório";
-    if (!formData.neighborhood.trim()) errors.neighborhood = "Bairro é obrigatório";
-    if (!formData.city.trim()) errors.city = "Cidade é obrigatória";
-    if (!formData.state.trim()) errors.state = "Estado é obrigatório";
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleCheckout = async () => {
-    // Check authentication first - redirect to checkout auth page
-    if (!user) {
-      navigate('/checkout-cadastro');
-      return;
-    }
-
     // Track checkout start
     siteAnalyticsService.trackCheckoutStart({
       itemCount: items.length,
@@ -362,240 +184,123 @@ const CartPage = () => {
     });
 
     if (!validateForm()) {
-      console.log("❌ Form validation failed");
-      
-      // Track form validation errors
       const errorTypes = Object.keys(formErrors);
-      if (errorTypes.length > 0) {
-        errorTypes.forEach(errorType => {
-          siteAnalyticsService.trackCheckoutFormError(errorType, formErrors[errorType]);
-        });
-      }
-      
+      errorTypes.forEach(errorType => {
+        siteAnalyticsService.trackCheckoutFormError(errorType, formErrors[errorType]);
+      });
       return;
     }
 
-    if (isProcessing) {
-      console.log("⚠️ Already processing checkout, ignoring duplicate request");
-      return;
-    }
+    if (isProcessing) return;
 
-    console.log("🔄 Starting checkout process...");
     setIsProcessing(true);
 
     try {
-      // Prepare order data with user_id
-      const formattedAddress = `${formData.street}, ${formData.number}${formData.complement ? ` - ${formData.complement}` : ''}, ${formData.neighborhood}, ${formData.city} - ${formData.state}, CEP: ${formData.cep}`;
-      
-      const orderData = {
-        user_id: user.id,
-        customer_name: formData.fullName.trim(),
-        customer_cpf: formData.cpf.trim(),
-        customer_phone: formData.phone.trim(),
-        shipping_address: {
-          street: formData.street.trim(),
-          number: formData.number.trim(),
-          complement: formData.complement.trim(),
-          neighborhood: formData.neighborhood.trim(),
-          city: formData.city.trim(),
-          state: formData.state.trim(),
-          zipcode: formData.cep.replace(/\D/g, '')
-        },
-        payment_method: paymentMethod === 'pix' ? 'pix' : 'cartao',
-        total_amount: total,
-        subtotal_amount: subtotal,
-        coupon_code: appliedCoupon?.code ?? null,
-        status: 'pending' as const // Order starts as pending until confirmed via WhatsApp
-      };
-
-      console.log("🔄 Creating order in database...", orderData);
-
-      // Create order in database
-      const { data: orderResult, error: orderError } = await orderService.createOrder(orderData);
-      
-      if (orderError) {
-        console.error("❌ Error creating order:", orderError);
-        throw new Error(`Erro ao criar pedido: ${orderError.message}`);
-      }
-
-      if (!orderResult?.id) {
-        console.error("❌ Order creation returned no ID");
-        throw new Error("Erro ao criar pedido: ID não retornado");
-      }
-
-      console.log("✅ Order created successfully:", orderResult.id);
-
-      // Add order items
-      const orderItems = items.map(item => ({
-        order_id: orderResult.id,
-        product_id: item.product.id,
-        product_name: item.product.name,
-        product_code: item.product.meta?.productId || null,
-        species_name: item.product.speciesName || 'Não especificado',
-        product_image_url: item.product.images?.[0]?.url || null,
-        quantity: item.quantity,
-        price: item.product.price
-      }));
-
-      console.log("🔄 Adding order items...", orderItems);
-      const { error: itemsError } = await orderService.addOrderItems(orderItems);
-      
-      if (itemsError) {
-        console.error("❌ Error adding order items:", itemsError);
-        throw new Error(`Erro ao adicionar itens do pedido: ${itemsError.message}`);
-      }
-
-      console.log("✅ Order items added successfully");
-
-      // Create 'created' event
-      await orderEventsService.createEvent({
-        order_id: orderResult.id,
-        event_type: 'created',
-        event_data: { item_count: items.length, total: total },
+      const result = await guestOrderService.createGuestCartOrder({
+        items: items.map(i => ({ productId: i.product.id, quantity: i.quantity })),
+        customerName: formData.fullName.trim(),
+        customerPhone: formData.phone.trim(),
+        couponCode: appliedCoupon?.code ?? null,
       });
 
-      // Prepare WhatsApp message with formatted address and order_number
-      const fullAddress = `${formData.street}, ${formData.number}${formData.complement ? ` - ${formData.complement}` : ''}, ${formData.neighborhood}, ${formData.city} - ${formData.state}, CEP: ${formData.cep}`;
-      
-      const orderNumber = orderResult.order_number || `#${orderResult.id.substring(0, 8)}`;
-      
-      const paymentLabel = paymentMethod === 'pix' ? 'PIX' : 'Cartão (até 10x sem juros)';
-      
-      let couponSection = '';
-      if (appliedCoupon) {
-        // Calculate PIX subtotal (with pix prices)
-        const pixSubtotal = items.reduce((sum, item) => {
-          return sum + (item.product.pixPrice || item.product.price) * item.quantity;
-        }, 0);
-        const pixDiscount = appliedCoupon.discount_type === 'percentage'
-          ? pixSubtotal * (appliedCoupon.discount_value / 100)
-          : Math.min(appliedCoupon.discount_value, pixSubtotal);
-        const pixTotal = Math.max(pixSubtotal - pixDiscount, 0);
-
-        // Calculate card subtotal (with regular prices)
-        const cardSubtotal = items.reduce((sum, item) => {
-          return sum + item.product.price * item.quantity;
-        }, 0);
-        const cardDiscount = appliedCoupon.discount_type === 'percentage'
-          ? cardSubtotal * (appliedCoupon.discount_value / 100)
-          : Math.min(appliedCoupon.discount_value, cardSubtotal);
-        const cardTotal = Math.max(cardSubtotal - cardDiscount, 0);
-
-        couponSection = 
-          `\n\n🎟️ Cupom aplicado: ${appliedCoupon.code}` +
-          (appliedCoupon.discount_type === 'percentage' ? ` (${appliedCoupon.discount_value}%)` : '') +
-          `\nSubtotal original: ${formatPrice(cardSubtotal)}` +
-          `\nDesconto: -${formatPrice(cardDiscount)}` +
-          `\nTotal no PIX: ${formatPrice(pixTotal)}` +
-          `\nTotal parcelado (10x): ${formatPrice(cardTotal / 10)}` +
-          `\n\n📍 Retirada exclusiva no evento MEX Festival — 18/04/2026, São Paulo.`;
+      if (result.error) {
+        const raw = String(result.error.message ?? '');
+        if (raw.toLowerCase().includes('disponive')) {
+          toast({
+            title: "Animal indisponível",
+            description: "Um ou mais animais do carrinho não estão mais disponíveis. Revise seu carrinho.",
+            variant: "destructive",
+            duration: 6000,
+          });
+          setIsDialogOpen(false);
+          return;
+        }
+        throw new Error(raw || 'Erro ao criar pedido');
       }
-      
-      const message = 
+
+      const orderId = result.orderId!;
+      const orderNumber = result.orderNumber || `#${orderId.substring(0, 8)}`;
+      // Valores finais vêm do servidor — nunca recalculados aqui.
+      const serverSubtotal = Number(result.subtotalAmount ?? 0);
+      const serverTotal = Number(result.totalAmount ?? 0);
+      const serverDiscount = Number(result.couponDiscount ?? 0);
+      const couponApplied = result.couponApplied === true;
+
+      await orderEventsService.createEvent({
+        order_id: orderId,
+        event_type: 'created',
+        event_data: { item_count: items.length, total: serverTotal },
+      });
+
+      const paymentLabel = paymentMethod === 'pix' ? 'PIX' : 'Cartão (até 10x sem juros)';
+
+      const couponSection = couponApplied
+        ? `\n\n🎟️ Cupom aplicado: ${appliedCoupon?.code}` +
+          `\nSubtotal: ${formatPrice(serverSubtotal)}` +
+          `\nDesconto: -${formatPrice(serverDiscount)}` +
+          `\n\n📍 Retirada exclusiva no evento MEX Festival — 18/04/2026, São Paulo.`
+        : '';
+
+      const message =
         `Olá! Acabei de finalizar um pedido no site Pet Serpentes.\n\n` +
         `Pedido: ${orderNumber}\n` +
-        `Nome do comprador: ${formData.fullName}\n` +
-        `CPF: ${formData.cpf}\n` +
-        `Celular: ${formData.phone}\n` +
-        `Endereço: ${fullAddress}\n` +
+        `Nome: ${formData.fullName}\n` +
+        `WhatsApp: ${formData.phone}\n` +
         `Forma de pagamento: ${paymentLabel}\n\n` +
-        `Animal(is) solicitado(s):\n${items.map(item => `- ${item.product.meta?.productId ? `#${item.product.meta.productId} - ` : ''}${item.product.name} (${item.product.speciesName || "Não especificado"}) - ${formatPrice(getItemPrice(item))}`).join('\n')}\n\n` +
-        `Total: ${formatPrice(total)}` +
+        `Animal(is) solicitado(s):\n${items.map(item => `- ${item.product.meta?.productId ? `#${item.product.meta.productId} - ` : ''}${item.product.name} (${item.product.speciesName || "Não especificado"})`).join('\n')}\n\n` +
+        `Total: ${formatPrice(serverTotal)}` +
         couponSection +
-        (appliedCoupon
+        (couponApplied
           ? `\n\nGostaria de confirmar o pedido.`
           : `\n\nGostaria de confirmar o pedido e combinar os detalhes do envio.`);
 
-      const whatsappUrl = `https://wa.me/5521967802174?text=${encodeURIComponent(message)}`;
+      const whatsappNumber = await guestOrderService.getWhatsAppNumber();
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
-      // Persist order data before redirect (for recovery if needed)
-      localStorage.setItem(
-        "pendingOrder",
-        JSON.stringify({
-          createdAt: Date.now(),
-          orderId: orderResult.id,
-          cartItems: items.map(item => ({
-            id: item.product.id,
-            name: item.product.name,
-            price: item.product.price
-          })),
-          formData,
-          message
-        })
-      );
-
-      // Track checkout success
       siteAnalyticsService.trackCheckoutSuccess({
-        orderId: orderResult.id,
-        totalValue: total,
+        orderId,
+        totalValue: serverTotal,
         itemCount: items.length,
       });
 
-      // Close dialog and show success message
       setIsDialogOpen(false);
-      
+
       toast({
         title: "Pedido criado com sucesso!",
         description: "Abrindo o WhatsApp...",
         duration: 2000,
       });
 
-
-      console.log("✅ Checkout completed successfully, redirecting to WhatsApp...");
-      
-      // Record whatsapp_clicked_at and create event
       await supabase
         .from('orders')
         .update({ whatsapp_clicked_at: new Date().toISOString() })
-        .eq('id', orderResult.id);
-      
+        .eq('id', orderId);
+
       await orderEventsService.createEvent({
-        order_id: orderResult.id,
+        order_id: orderId,
         event_type: 'whatsapp_redirect',
         event_data: { whatsapp_url: whatsappUrl.substring(0, 100) },
       });
-      
-      // Track WhatsApp redirect
+
       siteAnalyticsService.trackWhatsAppRedirect({
-        orderId: orderResult.id,
-        totalValue: total,
+        orderId,
+        totalValue: serverTotal,
       });
-      
-      // Clear cart and reset form before redirect
+
       clearCart();
       setFormOpenTime(null);
-      setFormData({
-        fullName: '',
-        cpf: '',
-        phone: '',
-        cep: '',
-        street: '',
-        number: '',
-        complement: '',
-        neighborhood: '',
-        city: '',
-        state: ''
-      });
+      setFormData({ fullName: '', phone: '' });
+      setConsent(false);
 
-      // Pedido concluído: apaga os dados pessoais guardados no navegador
       localStorage.removeItem("pendingOrder");
 
-      // Immediate redirect - mobile-safe (no setTimeout, no window.open)
       window.location.assign(whatsappUrl);
-
-      
     } catch (error) {
       console.error("❌ Checkout process failed:", error);
-      
-      let errorMessage = "Ocorreu um erro inesperado. Por favor, tente novamente.";
-      
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      
+
       toast({
         title: "Erro ao processar pedido",
-        description: errorMessage,
+        description: error instanceof Error ? error.message : "Ocorreu um erro inesperado. Por favor, tente novamente.",
         variant: "destructive",
         duration: 5000,
       });
@@ -821,10 +526,6 @@ const CartPage = () => {
                 <Button 
                   className="w-full" 
                   onClick={() => {
-                    if (!user) {
-                      navigate('/checkout-cadastro');
-                      return;
-                    }
                     // Track checkout form open
                     siteAnalyticsService.trackCheckoutFormOpen({
                       itemCount: items.length,
@@ -932,16 +633,16 @@ const CartPage = () => {
       >
         <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Informações de envio</DialogTitle>
+            <DialogTitle>Confirmar pedido</DialogTitle>
             <DialogDescription>
-              Preencha seus dados para finalizar a compra.
+              Só precisamos de nome e WhatsApp para confirmar seu pedido.
             </DialogDescription>
           </DialogHeader>
 
           <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-md flex gap-2 text-sm mb-4">
             <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
             <p className="text-yellow-800 dark:text-yellow-300">
-              ⚠️ Estas informações são obrigatórias para emissão legal da documentação e transporte do animal.
+              ⚠️ Os detalhes de documentação, frete e pagamento são combinados na conversa do WhatsApp.
             </p>
           </div>
 
@@ -962,29 +663,13 @@ const CartPage = () => {
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="cpf">CPF</Label>
-              <Input
-                id="cpf"
-                name="cpf"
-                placeholder="000.000.000-00"
-                value={formData.cpf}
-                onChange={handleInputChange}
-                onBlur={handleCpfBlur}
-                className={formErrors.cpf ? "border-destructive focus-visible:ring-destructive" : ""}
-                disabled={isProcessing}
-              />
-              {formErrors.cpf && (
-                <p className="text-destructive text-xs">{formErrors.cpf}</p>
-              )}
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="phone">Celular / WhatsApp</Label>
+              <Label htmlFor="phone">WhatsApp</Label>
               <Input
                 id="phone"
                 name="phone"
                 placeholder="(00) 00000-0000"
                 type="tel"
+                inputMode="numeric"
                 value={formData.phone}
                 onChange={handleInputChange}
                 className={formErrors.phone ? "border-destructive focus-visible:ring-destructive" : ""}
@@ -996,114 +681,32 @@ const CartPage = () => {
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="cep">CEP</Label>
-              <div className="relative">
-                <Input
-                  id="cep"
-                  name="cep"
-                  placeholder="00000-000"
-                  value={formData.cep}
-                  onChange={handleInputChange}
-                  className={formErrors.cep ? "border-destructive focus-visible:ring-destructive pr-8" : "pr-8"}
+              <div className="flex items-start gap-2">
+                <Checkbox
+                  id="consent"
+                  checked={consent}
+                  onCheckedChange={(checked) => {
+                    setConsent(checked === true);
+                    if (checked === true) setFormErrors(prev => ({ ...prev, consent: '' }));
+                  }}
                   disabled={isProcessing}
                 />
-                {isFetchingCep && (
-                  <Loader2 className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
-                )}
+                <Label htmlFor="consent" className="text-sm font-normal leading-snug">
+                  Li e aceito a{' '}
+                  <Link
+                    to="/politica-de-privacidade"
+                    className="text-serpente-600 hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    política de privacidade
+                  </Link>
+                  .
+                </Label>
               </div>
-              {formErrors.cep && (
-                <p className="text-destructive text-xs">{formErrors.cep}</p>
+              {formErrors.consent && (
+                <p className="text-destructive text-xs">{formErrors.consent}</p>
               )}
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="street">Rua / Logradouro</Label>
-              <Input
-                id="street"
-                name="street"
-                value={formData.street}
-                onChange={handleInputChange}
-                className={formErrors.street ? "border-destructive focus-visible:ring-destructive" : ""}
-                disabled={isProcessing}
-              />
-              {formErrors.street && (
-                <p className="text-destructive text-xs">{formErrors.street}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="number">Número</Label>
-                <Input
-                  id="number"
-                  name="number"
-                  value={formData.number}
-                  onChange={handleInputChange}
-                  className={formErrors.number ? "border-destructive focus-visible:ring-destructive" : ""}
-                  disabled={isProcessing}
-                />
-                {formErrors.number && (
-                  <p className="text-destructive text-xs">{formErrors.number}</p>
-                )}
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="complement">Complemento</Label>
-                <Input
-                  id="complement"
-                  name="complement"
-                  placeholder="Opcional"
-                  value={formData.complement}
-                  onChange={handleInputChange}
-                  disabled={isProcessing}
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="neighborhood">Bairro</Label>
-              <Input
-                id="neighborhood"
-                name="neighborhood"
-                value={formData.neighborhood}
-                onChange={handleInputChange}
-                className={formErrors.neighborhood ? "border-destructive focus-visible:ring-destructive" : ""}
-                disabled={isProcessing}
-              />
-              {formErrors.neighborhood && (
-                <p className="text-destructive text-xs">{formErrors.neighborhood}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div className="grid gap-2 col-span-2">
-                <Label htmlFor="city">Cidade</Label>
-                <Input
-                  id="city"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                  className={formErrors.city ? "border-destructive focus-visible:ring-destructive" : ""}
-                  disabled={isProcessing}
-                />
-                {formErrors.city && (
-                  <p className="text-destructive text-xs">{formErrors.city}</p>
-                )}
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="state">UF</Label>
-                <Input
-                  id="state"
-                  name="state"
-                  maxLength={2}
-                  value={formData.state}
-                  onChange={handleInputChange}
-                  className={formErrors.state ? "border-destructive focus-visible:ring-destructive" : ""}
-                  disabled={isProcessing}
-                />
-                {formErrors.state && (
-                  <p className="text-destructive text-xs">{formErrors.state}</p>
-                )}
-              </div>
             </div>
           </div>
 
