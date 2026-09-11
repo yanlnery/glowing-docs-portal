@@ -1,13 +1,79 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Species } from '@/types/species';
 import { SpeciesGallery } from './SpeciesGallery';
 import { SpeciesActionButton } from './SpeciesActionButton';
+import { supabase } from '@/integrations/supabase/client';
+import { BookOpen } from 'lucide-react';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 
 interface SpeciesDetailPanelProps {
   species: Species | null;
 }
 
+interface RelatedManual {
+  id: string;
+  title: string;
+  description: string | null;
+}
+
+export function getYoutubeId(url: string): string | null {
+  const match = url.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/)|youtu\.be\/)([\w-]{6,})/);
+  return match ? match[1] : null;
+}
+
+function useRelatedManual(species: Species | null) {
+  const [manual, setManual] = useState<RelatedManual | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setManual(null);
+    if (!species) return;
+
+    const load = async () => {
+      const { data } = await supabase
+        .from('manuals')
+        .select('id, title, description')
+        .eq('species_id', species.id)
+        .limit(1);
+
+      if (cancelled) return;
+      if (data && data.length > 0) {
+        setManual(data[0] as RelatedManual);
+        return;
+      }
+
+      if (!species.type) return;
+      const { data: fallback } = await supabase
+        .from('manuals')
+        .select('id, title, description')
+        .eq('category', species.type)
+        .limit(1);
+
+      if (!cancelled && fallback && fallback.length > 0) {
+        setManual(fallback[0] as RelatedManual);
+      }
+    };
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [species]);
+
+  return manual;
+}
+
 export function SpeciesDetailPanel({ species }: SpeciesDetailPanelProps) {
+  const relatedManual = useRelatedManual(species);
+  const youtubeId = species?.video_url ? getYoutubeId(species.video_url) : null;
+  const faqItems = (species?.faq || []).filter((item) => item?.question && item?.answer);
+
   return (
     <div className="flex-1 min-h-[calc(100vh-24rem)]">
       {!species ? (
@@ -82,6 +148,63 @@ export function SpeciesDetailPanel({ species }: SpeciesDetailPanelProps) {
                 )
               ))}
             </ul>
+          </div>
+        )}
+
+        {/* FAQ */}
+        {faqItems.length > 0 && (
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold text-serpente-400 mb-3">Perguntas frequentes</h3>
+            <Accordion type="single" collapsible className="space-y-2">
+              {faqItems.map((item, index) => (
+                <AccordionItem
+                  key={index}
+                  value={`faq-${index}`}
+                  className="border border-border rounded-lg px-4"
+                >
+                  <AccordionTrigger className="text-left">{item.question}</AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground">{item.answer}</AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        )}
+
+        {/* Vídeo */}
+        {youtubeId && (
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold text-serpente-400 mb-3">Vídeo</h3>
+            <div className="relative w-full aspect-video overflow-hidden rounded-lg border border-border">
+              <iframe
+                className="absolute inset-0 w-full h-full"
+                src={`https://www.youtube.com/embed/${youtubeId}`}
+                title={`Vídeo sobre ${species.commonname}`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                loading="lazy"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Manual relacionado */}
+        {relatedManual && (
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold text-serpente-400 mb-3">Manual de manejo relacionado</h3>
+            <Link
+              to="/manuais"
+              className="flex items-start gap-3 rounded-lg border border-border p-4 hover:bg-muted/50 transition-colors"
+            >
+              <BookOpen className="w-5 h-5 text-serpente-500 mt-0.5 flex-shrink-0" />
+              <span>
+                <span className="block font-medium">{relatedManual.title}</span>
+                {relatedManual.description && (
+                  <span className="block text-sm text-muted-foreground line-clamp-2">
+                    {relatedManual.description}
+                  </span>
+                )}
+              </span>
+            </Link>
           </div>
         )}
 

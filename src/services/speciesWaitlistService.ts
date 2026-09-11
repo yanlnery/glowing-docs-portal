@@ -1,36 +1,59 @@
 import { supabase } from "@/integrations/supabase/client";
 import { SpeciesWaitlistEntry, SpeciesWaitlistStatus } from "@/types/speciesWaitlist";
 
+const onlyDigits = (value: string) => (value || '').replace(/\D/g, '');
+
 export const speciesWaitlistService = {
+  // Contagem leve de pessoas aguardando por espécie
+  async getWaitingCount(speciesId: string): Promise<number> {
+    const { count, error } = await supabase
+      .from('species_waitlist')
+      .select('*', { count: 'exact', head: true })
+      .eq('species_id', speciesId)
+      .eq('status', 'waiting');
+
+    if (error) return 0;
+    return count ?? 0;
+  },
+
   // Add entry to species waitlist
   async addToWaitlist(entry: {
     species_id: string;
     name: string;
-    email: string;
+    email?: string | null;
     phone: string;
     cpf?: string;
-    contact_preference: string;
+    contact_preference?: string | null;
     consent?: boolean;
     consent_at?: string;
-  }): Promise<{ data: SpeciesWaitlistEntry | null; error: any }> {
-    // Check if email already exists for this species
-    const { data: existing } = await supabase
+  }): Promise<{ data: SpeciesWaitlistEntry | null; error: any; position?: number }> {
+    // Duplicidade por telefone (normalizado) + espécie
+    const phoneDigits = onlyDigits(entry.phone);
+    const { data: sameSpecies } = await supabase
       .from('species_waitlist')
-      .select('id')
-      .eq('species_id', entry.species_id)
-      .eq('email', entry.email)
-      .maybeSingle();
+      .select('id, phone')
+      .eq('species_id', entry.species_id);
 
-    if (existing) {
+    const alreadyIn = (sameSpecies || []).some(
+      (row: { phone: string | null }) => onlyDigits(row.phone || '') === phoneDigits
+    );
+
+    if (alreadyIn) {
       return { data: null, error: { message: 'Você já está na lista de espera desta espécie.' } };
     }
+
+    // Posição na fila = quantos já aguardavam antes deste cadastro + 1
+    const previousWaiting = await this.getWaitingCount(entry.species_id);
 
     const { error } = await supabase
       .from('species_waitlist')
       .insert(entry);
 
-    return { data: null, error };
+    if (error) return { data: null, error };
+
+    return { data: null, error: null, position: previousWaiting + 1 };
   },
+
 
   // Get all waitlist entries with species info
   async getAllEntries(): Promise<{ data: SpeciesWaitlistEntry[] | null; error: any }> {

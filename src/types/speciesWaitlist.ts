@@ -2,10 +2,10 @@ export interface SpeciesWaitlistEntry {
   id: string;
   species_id: string;
   name: string;
-  email: string;
+  email?: string | null;
   phone: string;
   cpf?: string | null;
-  contact_preference: string;
+  contact_preference?: string | null;
   status: 'waiting' | 'contacted' | 'converted' | 'cancelled' | 'migrated';
   priority: number;
   notes?: string | null;

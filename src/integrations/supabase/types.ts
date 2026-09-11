@@ -554,6 +554,7 @@ export type Database = {
           image: string | null
           pages: number | null
           pdf_url: string | null
+          species_id: string | null
           title: string
           updated_at: string | null
         }
@@ -565,6 +566,7 @@ export type Database = {
           image?: string | null
           pages?: number | null
           pdf_url?: string | null
+          species_id?: string | null
           title: string
           updated_at?: string | null
         }
@@ -576,10 +578,19 @@ export type Database = {
           image?: string | null
           pages?: number | null
           pdf_url?: string | null
+          species_id?: string | null
           title?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "manuals_species_id_fkey"
+            columns: ["species_id"]
+            isOneToOne: false
+            referencedRelation: "species"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       material_leads: {
         Row: {
@@ -975,6 +986,7 @@ export type Database = {
           created_at: string | null
           curiosities: Json | null
           description: string | null
+          faq: Json | null
           focus_desktop: string | null
           focus_mobile: string | null
           gallery: Json | null
@@ -987,6 +999,7 @@ export type Database = {
           slug: string
           type: string | null
           updated_at: string | null
+          video_url: string | null
         }
         Insert: {
           characteristics?: Json | null
@@ -994,6 +1007,7 @@ export type Database = {
           created_at?: string | null
           curiosities?: Json | null
           description?: string | null
+          faq?: Json | null
           focus_desktop?: string | null
           focus_mobile?: string | null
           gallery?: Json | null
@@ -1006,6 +1020,7 @@ export type Database = {
           slug: string
           type?: string | null
           updated_at?: string | null
+          video_url?: string | null
         }
         Update: {
           characteristics?: Json | null
@@ -1013,6 +1028,7 @@ export type Database = {
           created_at?: string | null
           curiosities?: Json | null
           description?: string | null
+          faq?: Json | null
           focus_desktop?: string | null
           focus_mobile?: string | null
           gallery?: Json | null
@@ -1025,6 +1041,7 @@ export type Database = {
           slug?: string
           type?: string | null
           updated_at?: string | null
+          video_url?: string | null
         }
         Relationships: []
       }
@@ -1035,7 +1052,7 @@ export type Database = {
           contact_preference: string | null
           cpf: string | null
           created_at: string | null
-          email: string
+          email: string | null
           id: string
           migrated_at: string | null
           name: string
@@ -1053,7 +1070,7 @@ export type Database = {
           contact_preference?: string | null
           cpf?: string | null
           created_at?: string | null
-          email: string
+          email?: string | null
           id?: string
           migrated_at?: string | null
           name: string
@@ -1071,7 +1088,7 @@ export type Database = {
           contact_preference?: string | null
           cpf?: string | null
           created_at?: string | null
-          email?: string
+          email?: string | null
           id?: string
           migrated_at?: string | null
           name?: string
@@ -1221,6 +1238,10 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      link_anonymous_orders_by_phone: {
+        Args: { p_phone: string }
+        Returns: number
+      }
       ps_slugify: { Args: { input: string }; Returns: string }
       validate_coupon: {
         Args: { p_code: string; p_order_total?: number }
