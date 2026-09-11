@@ -176,6 +176,29 @@ export function useSpeciesDialogManager({
   const characteristicsHandler = createArrayHandler('characteristics');
   const curiositiesHandler = createArrayHandler('curiosities');
 
+  const faqHandler = {
+    handleChange: (index: number, field: 'question' | 'answer', value: string) => {
+      if (!currentSpecies) return;
+      const updated = [...(currentSpecies.faq || [])];
+      updated[index] = { ...updated[index], [field]: value };
+      setCurrentSpecies({ ...currentSpecies, faq: updated });
+    },
+    handleAdd: () => {
+      if (!currentSpecies) return;
+      setCurrentSpecies({
+        ...currentSpecies,
+        faq: [...(currentSpecies.faq || []), { question: '', answer: '' }],
+      });
+    },
+    handleRemove: (index: number) => {
+      if (!currentSpecies) return;
+      setCurrentSpecies({
+        ...currentSpecies,
+        faq: (currentSpecies.faq || []).filter((_, i) => i !== index),
+      });
+    },
+  };
+
   const handleSave = async () => {
     if (!currentSpecies) return;
     
@@ -212,6 +235,7 @@ export function useSpeciesDialogManager({
     handleInputChange,
     characteristicsHandler,
     curiositiesHandler,
+    faqHandler,
     handleSave,
   };
 }
