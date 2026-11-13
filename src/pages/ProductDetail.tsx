@@ -16,6 +16,7 @@ import { DEFAULT_OG_IMAGE, restoreSeoDefaults } from '@/lib/seoDefaults';
 import { useCheckoutV2Enabled } from '@/hooks/useCheckoutV2';
 import { guestOrderService } from '@/services/guestOrderService';
 import { GuestWhatsAppDialog, GuestWhatsAppFormData } from '@/components/product/GuestWhatsAppDialog';
+import { ProductSpeciesLink } from '@/components/species/ProductSpeciesLink';
 
 const getAnimalEmoji = (category?: string): string => {
   switch (category) {
@@ -429,6 +430,7 @@ const ProductDetail = () => {
               <p className="text-xl text-muted-foreground italic mt-1">
                 <em>{product.speciesName}</em>
               </p>
+              <ProductSpeciesLink speciesId={product.speciesId} />
             </div>
             
             <div className="space-y-2">

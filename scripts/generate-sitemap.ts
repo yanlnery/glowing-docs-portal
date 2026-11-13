@@ -20,12 +20,11 @@ const staticEntries: SitemapEntry[] = [
   { path: "/", changefreq: "weekly", priority: "1.0" },
   { path: "/catalogo", changefreq: "daily", priority: "0.9" },
   { path: "/especies", changefreq: "weekly", priority: "0.8" },
+  { path: "/especies-criadas/jiboia-arco-iris", changefreq: "monthly", priority: "0.6" },
+  { path: "/especies-criadas/jiboia", changefreq: "monthly", priority: "0.6" },
   { path: "/manuais", changefreq: "monthly", priority: "0.7" },
-  { path: "/educacao", changefreq: "monthly", priority: "0.7" },
   { path: "/sobre", changefreq: "yearly", priority: "0.6" },
-  { path: "/academy", changefreq: "monthly", priority: "0.6" },
   { path: "/contato", changefreq: "yearly", priority: "0.6" },
-  { path: "/lista-de-espera", changefreq: "monthly", priority: "0.4" },
   { path: "/politica-de-privacidade", changefreq: "yearly", priority: "0.2" },
   { path: "/termos-de-uso", changefreq: "yearly", priority: "0.2" },
 ]
@@ -47,28 +46,28 @@ async function fetchRows<T>(path: string): Promise<T[]> {
 }
 
 async function buildEntries(): Promise<SitemapEntry[]> {
-  const products = await fetchRows<{ slug: string | null; new_slug: string | null }>(
-    "products?select=slug,new_slug&visible=eq.true&limit=1000",
+  const products = await fetchRows<{ slug: string | null; new_slug: string | null; updated_at: string | null }>(
+    "products?select=slug,new_slug,updated_at&visible=eq.true&limit=1000",
   )
-  const species = await fetchRows<{ slug: string | null; new_slug: string | null }>(
-    "species?select=slug,new_slug&limit=1000",
+  const species = await fetchRows<{ slug: string | null; new_slug: string | null; updated_at: string | null }>(
+    "species?select=slug,new_slug,updated_at&limit=1000",
   )
 
   return [
     ...staticEntries,
     ...products
-      .map((product) => product.new_slug || product.slug)
-      .filter((slug): slug is string => Boolean(slug))
-      .map((slug) => ({
-        path: `/animais/${slug}`,
+      .filter((product) => Boolean(product.new_slug || product.slug))
+      .map((product) => ({
+        path: `/animais/${product.new_slug || product.slug}`,
+        lastmod: product.updated_at && Number.isFinite(Date.parse(product.updated_at)) ? new Date(product.updated_at).toISOString() : undefined,
         changefreq: "weekly" as const,
         priority: "0.8",
       })),
     ...species
-      .map((row) => row.new_slug || row.slug)
-      .filter((slug): slug is string => Boolean(slug))
-      .map((slug) => ({
-        path: `/especies-criadas/${slug}`,
+      .filter((row) => Boolean(row.new_slug || row.slug))
+      .map((row) => ({
+        path: `/especies-criadas/${row.new_slug || row.slug}`,
+        lastmod: row.updated_at && Number.isFinite(Date.parse(row.updated_at)) ? new Date(row.updated_at).toISOString() : undefined,
         changefreq: "monthly" as const,
         priority: "0.6",
       })),

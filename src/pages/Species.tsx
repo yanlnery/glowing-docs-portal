@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
-import { useSearchParams, useParams, useNavigate, Navigate } from 'react-router-dom';
+import { useSearchParams, useParams, useNavigate, Navigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Species } from '@/types/species';
 import { Input } from '@/components/ui/input';
@@ -320,6 +320,10 @@ export default function SpeciesPage() {
           <p className="text-muted-foreground max-w-2xl mt-3 sm:mt-4 text-sm sm:text-base">
             Conheça as espécies que criamos em nosso criadouro legalizado
           </p>
+          <div className="mt-3 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
+            <Link to="/especies-criadas/jiboia-arco-iris" className="underline underline-offset-4 hover:text-primary">Jiboias arco-íris</Link>
+            <Link to="/especies-criadas/jiboia" className="underline underline-offset-4 hover:text-primary">Jiboias</Link>
+          </div>
       </div>
 
       {/* Busca + Filtros na mesma linha (desktop) */}

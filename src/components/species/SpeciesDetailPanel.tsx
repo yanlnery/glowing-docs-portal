@@ -97,6 +97,7 @@ export function SpeciesDetailPanel({ species }: SpeciesDetailPanelProps) {
           <p className="text-lg italic text-muted-foreground">
             {species.name}
           </p>
+          <Link to={`/especies-criadas/${species.new_slug || species.slug}`} className="mt-3 inline-block text-sm text-primary underline underline-offset-4">Ver página completa</Link>
         </div>
 
         {/* Galeria */}

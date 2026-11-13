@@ -9,10 +9,9 @@ import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
 import About from "./pages/About";
 import Species from "./pages/Species";
-import SpeciesDetail from "./pages/SpeciesDetail";
+import SpeciesProfile from "./pages/SpeciesProfile";
 import ProductDetail from "./pages/ProductDetail";
 import Manuals from "./pages/Manuals";
-import Education from "./pages/Education";
 import Academy from "./pages/Academy";
 import AcademyConfirmation from "./pages/AcademyConfirmation";
 import Contact from "./pages/Contact";
@@ -138,10 +137,10 @@ function App() {
                 <Route path="produtos/:id" element={<ProductDetail />} />
 
                 <Route path="especies" element={<Species />} />
-                <Route path="especies-criadas/:slug" element={<Species />} />
+                <Route path="especies-criadas/:slug" element={<SpeciesProfile />} />
                 <Route path="manuais" element={<Manuals />} />
                 <Route path="sobre" element={<About />} />
-                <Route path="educacao" element={<Education />} />
+                <Route path="educacao" element={<Navigate to="/manuais" replace />} />
                 <Route path="academy" element={<AcademyRoute />} />
                 <Route path="lista-de-espera" element={<WaitlistForm />} />
                 <Route path="confirmacao-inscricao" element={<AcademyConfirmation />} />

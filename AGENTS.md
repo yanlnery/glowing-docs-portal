@@ -1,3 +1,6 @@
 - Home conversion rules live in `src/lib/homeConversion.ts` so availability and feed freshness remain consistent across home and catalog.
 - The Instagram section reads only the public database cache; a daily Edge Function owns provider requests and preserves the previous cache on failures.
 - Forced replacement of an existing Instagram cache requires a validated admin JWT; empty-cache bootstrap and daily callbacks use the project's publishable-key mechanism with a minimum interval.
+- Species profiles and groups use isolated profile components and shared pure content helpers; species slugs take precedence over group slugs to preserve existing canonical routes.
+- Profile FAQ markup and FAQPage JSON-LD use the same derived question array to prevent visible content and metadata from diverging.
+- Species profile animal cards link directly to canonical animal slugs without changing catalog cards or checkout flows.

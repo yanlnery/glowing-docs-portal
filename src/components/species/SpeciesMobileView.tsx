@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Species } from '@/types/species';
 import {
   Accordion,
@@ -56,6 +57,7 @@ export function SpeciesMobileView({ species, selectedId }: SpeciesMobileViewProp
               </div>
             </div>
           </AccordionTrigger>
+          <Link to={`/especies-criadas/${speciesItem.new_slug || speciesItem.slug}`} className="mx-4 mb-3 inline-block text-sm text-primary underline underline-offset-4">Ver página completa</Link>
           <AccordionContent className="px-0 pb-0">
             <div className="p-4 pt-0">
               <SpeciesDetailPanel species={speciesItem} />
