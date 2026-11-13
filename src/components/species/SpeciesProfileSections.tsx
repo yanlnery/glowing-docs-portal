@@ -13,7 +13,7 @@ import { getProductImageUrl } from '@/utils/productImageUtils';
 const price = (value: number) => value === 0 ? 'Sob consulta' : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
 export function SpeciesProfileActions({ products, species, name }: { products: Product[]; species?: Species; name: string }) {
-  const whatsapp = `https://wa.me/5521967802174?text=${encodeURIComponent(`Olá! Vi a página da ${name} no site e quero mais informações.`)}`;
+  const whatsapp = `https://wa.me/5521967802174?text=${encodeURIComponent(`Olá! Vi a página ${species ? 'de' : 'da'} ${name} no site e quero mais informações.`)}`;
   return <section aria-label="Disponibilidade" className="space-y-4">
     {products.length ? <>
       <h2 className="text-xl font-semibold">Disponíveis agora</h2>
