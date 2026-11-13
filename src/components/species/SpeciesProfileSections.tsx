@@ -58,7 +58,7 @@ export function SpeciesFaqSection({ items }: { items: SpeciesFaq[] }) {
 }
 
 export function SpeciesResponsibility() {
-  return <aside className="border-y border-border py-5 text-sm leading-relaxed text-muted-foreground">Responsável técnico: Yan Nery, biólogo — CRBio 143372/02-D. Criadouro comercial de fauna silvestre nativa, CTF IBAMA nº 6654937.</aside>;
+  return <aside className="border-y border-border py-5 text-sm leading-relaxed text-muted-foreground">Criadouro comercial de fauna silvestre nativa, CTF IBAMA nº 6654937.</aside>;
 }
 
 export function SpeciesProfileCards({ species }: { species: Species[] }) {
