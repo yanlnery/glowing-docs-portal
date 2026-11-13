@@ -4,3 +4,4 @@
 - PR8 especie como ativo: tipos video_url/faq, lista de espera so nome+whatsapp+consent (RPCs join_species_waitlist/species_waitlist_count), contador social no botao, acordeao mobile abrindo a especie da URL, manual relacionado + video + FAQ no painel, VideoObject JSON-LD. Feito, sem publicar. Video/FAQ nao testados no navegador (nenhuma especie tem esses dados ainda).
 - Admin de especies: campos video_url (URL YouTube) e faq (pares pergunta/resposta) no formulario + payload de save. Nao publicar.
 - [x] Home conservadora: botões/carrossel com retry, próximas ninhadas e convite no catálogo, Instagram em cache diário (6 posts, 11:00 UTC), passos da compra; validado 375/1280 claro/escuro, sem publicar nem alterar áreas protegidas.
+- [ ] SEO páginas próprias: fichas e grupos, links aditivos, redirect educação, link animal→espécie, script sitemap; testar sem escritas nem publicar.
