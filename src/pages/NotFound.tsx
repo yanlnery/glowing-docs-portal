@@ -1,15 +1,22 @@
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, Navigate } from "react-router-dom";
+import { resolveLegacyRedirect } from "@/lib/legacyRedirects";
 import { useEffect } from "react";
 
 const NotFound = () => {
   const location = useLocation();
+  const legacyTarget = resolveLegacyRedirect(location.pathname);
 
   useEffect(() => {
+    if (legacyTarget) return;
     console.error(
       "404 Error: User attempted to access non-existent route:",
       location.pathname
     );
-  }, [location.pathname]);
+  }, [location.pathname, legacyTarget]);
+
+  if (legacyTarget) {
+    return <Navigate to={legacyTarget} replace />;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">

@@ -293,24 +293,9 @@ const ProductDetail = () => {
   }
   
   if (!product) {
-    return (
-      <>
-        <ProductSeo routeKey={routeKey} product={product} loading={false} />
-        <div className="container px-4 py-12 sm:px-6 flex flex-col items-center">
-
-          <h1 className="text-2xl font-bold mb-4">Produto não encontrado</h1>
-          <p className="text-muted-foreground mb-6">
-            O produto que você está procurando não existe ou foi removido.
-          </p>
-          <Button asChild>
-            <Link to="/catalogo">
-              <ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao Catálogo
-            </Link>
-          </Button>
-        </div>
-      </>
-    );
+    return <Navigate to="/catalogo" replace />;
   }
+
   
   const formatPrice = (price: number) => {
     if (price === 0) return "Sob consulta";
