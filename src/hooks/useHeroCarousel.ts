@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import type { CarouselApi } from "@/components/ui/carousel";
 import { fetchCarouselItems, type CarouselItem } from "@/services/carouselService";
 import Autoplay from "embla-carousel-autoplay";
+import { fetchWithCarouselRetry } from "@/lib/carouselRetry";
 
 const FALLBACK_SLIDE_DATA: CarouselItem = {
   id: "fallback-id",
@@ -40,7 +41,7 @@ export function useHeroCarousel() {
     setError(null);
     
     try {
-      const items = await fetchCarouselItems();
+      const items = await fetchWithCarouselRetry(fetchCarouselItems);
       setCarouselImagesData(items);
     } catch (fetchError) {
       setError("Falha ao carregar dados do carrossel.");

@@ -7,6 +7,9 @@ import CatalogLoading from '@/components/catalog/CatalogLoading';
 import CatalogEmpty from '@/components/catalog/CatalogEmpty';
 import CatalogNoResults from '@/components/catalog/CatalogNoResults';
 import CatalogProductsGrid from '@/components/catalog/CatalogProductsGrid';
+import { Sprout } from 'lucide-react';
+import { hasAvailableAnimals } from '@/lib/homeConversion';
+import SpeciesWaitlistInvitation from '@/components/species/SpeciesWaitlistInvitation';
 
 const Catalog = () => {
   const {
@@ -55,6 +58,10 @@ const Catalog = () => {
       />
 
       {/* Products Grid */}
+      {!isLoading && !hasAvailableAnimals(filteredProducts) && <section className="upcoming-litters mb-6 flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <div className="flex items-start gap-3"><Sprout className="h-6 w-6 shrink-0 text-primary" aria-hidden="true" /><div><h2 className="text-xl font-bold">Próximas ninhadas no fim do ano</h2><p className="mt-2 text-sm text-muted-foreground">Entre na lista e seja avisado quando houver novos filhotes.</p></div></div>
+        <SpeciesWaitlistInvitation />
+      </section>}
       {isLoading ? (
         <CatalogLoading />
       ) : products.length === 0 ? (

@@ -6,6 +6,8 @@ import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import UpcomingLitters from "./UpcomingLitters";
+import { needsUpcomingLitters, stretchesUpcomingLitters } from "@/lib/homeConversion";
 
 interface FeaturedProductsGridProps {
   products: Product[];
@@ -75,6 +77,13 @@ export default function FeaturedProductsGrid({ products }: FeaturedProductsGridP
 
   if (displayedProducts.length === 0) {
     return <FeaturedProductsEmpty />;
+  }
+
+  if (needsUpcomingLitters(displayedProducts.length)) {
+    return <div className="mt-6 grid grid-cols-1 items-stretch gap-4 sm:mt-8 sm:grid-cols-2 lg:grid-cols-3">
+      {displayedProducts.map((product, index) => <FeaturedProductCard key={product.id} product={product} index={index} />)}
+      <UpcomingLitters wide={stretchesUpcomingLitters(displayedProducts.length)} />
+    </div>;
   }
   
   return (

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { productService } from "@/services/productService";
 import { Product } from "@/types/product";
+import { isHomeAnimalAvailable } from "@/lib/homeConversion";
 
 export function useFeaturedProducts() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -11,7 +12,7 @@ export function useFeaturedProducts() {
     const loadProducts = async () => {
       try {
         const products = await productService.getFeaturedProducts();
-        const limitedProducts = products.slice(0, 10);
+        const limitedProducts = products.filter(isHomeAnimalAvailable).slice(0, 10);
         setFeaturedProducts(limitedProducts);
       } catch (error) {
         console.error("Erro ao carregar produtos:", error);

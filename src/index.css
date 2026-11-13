@@ -4,6 +4,13 @@
 
 @layer base {
   :root {
+    --hero-foreground: 0 0% 100%;
+    --hero-scrim: 0 0% 0%;
+    --hero-fallback-gradient: linear-gradient(135deg, hsl(142 28% 10%), hsl(142 45% 20%));
+    --upcoming-gradient: linear-gradient(135deg, hsl(var(--primary) / 0.04), hsl(var(--primary) / 0.14));
+    --hero-overlay-gradient: linear-gradient(to top, hsl(var(--hero-scrim) / 0.8), hsl(var(--hero-scrim) / 0.3), transparent);
+    --instagram-gradient: linear-gradient(45deg, hsl(35 90% 57%), hsl(14 78% 57%) 25%, hsl(351 72% 51%) 50%, hsl(335 71% 47%) 75%, hsl(319 77% 42%));
+    --instagram-mobile-scrim: linear-gradient(to top, hsl(var(--hero-scrim) / 0.7), transparent);
     --background: 144 30% 98%;
     --foreground: 120 7% 8%;
 
@@ -146,6 +153,15 @@
 .docs-section-title {
   @apply relative inline-flex items-center mb-6;
 }
+
+.hero-fallback-surface { background: var(--hero-fallback-gradient); }
+.hero-caption { color: hsl(var(--hero-foreground)); text-shadow: 0 2px 4px hsl(var(--hero-scrim) / 0.9); }
+.hero-overlay { background: var(--hero-overlay-gradient); }
+.hero-indicator, .hero-indicator:hover { background: hsl(var(--hero-foreground) / 0.5); }
+.hero-indicator-active, .hero-indicator-active:hover { background: hsl(var(--hero-foreground)); }
+.upcoming-litters { background: var(--upcoming-gradient); }
+.instagram-brand { background: var(--instagram-gradient); }
+.instagram-mobile-scrim { background: var(--instagram-mobile-scrim); }
 
 .docs-section-title::before {
   content: '';

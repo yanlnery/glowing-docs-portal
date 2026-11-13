@@ -491,6 +491,27 @@ export type Database = {
         }
         Relationships: []
       }
+      instagram_feed_cache: {
+        Row: {
+          fetched_at: string | null
+          id: number
+          posts: Json | null
+          profile: Json | null
+        }
+        Insert: {
+          fetched_at?: string | null
+          id?: number
+          posts?: Json | null
+          profile?: Json | null
+        }
+        Update: {
+          fetched_at?: string | null
+          id?: number
+          posts?: Json | null
+          profile?: Json | null
+        }
+        Relationships: []
+      }
       internship_waitlist: {
         Row: {
           availability: string

@@ -5,6 +5,8 @@ import FeaturedProductsSection from "@/components/home/FeaturedProductsSection";
 import AboutSection from "@/components/home/AboutSection";
 import EducationalContentSection from "@/components/home/EducationalContentSection";
 import CtaSection from "@/components/home/CtaSection";
+import InstagramFeedSection from "@/components/home/InstagramFeedSection";
+import PurchaseStepsSection from "@/components/home/PurchaseStepsSection";
 
 export default function Home() {
   return (
@@ -14,6 +16,7 @@ export default function Home() {
         description="O Pet Serpentes & Companhia é um criadouro comercial legalizado localizado no Rio de Janeiro, certificado pelo IBAMA. Trabalhamos exclusivamente com répteis silvestres nativos."
         canonical="/"
       />
+      <h1 className="sr-only">Criadouro legalizado de répteis nativos no Rio de Janeiro</h1>
       <div className="flex flex-col w-full">
         {/* Hero Carousel Section */}
         <section className="relative mb-0 pb-0">
@@ -28,6 +31,8 @@ export default function Home() {
         
         {/* Educational Content Preview */}
         <EducationalContentSection />
+        <InstagramFeedSection />
+        <PurchaseStepsSection />
         
         {/* CTA Section */}
         <CtaSection />

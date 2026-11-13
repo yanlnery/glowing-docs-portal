@@ -1,0 +1,3 @@
+- Home conversion rules live in `src/lib/homeConversion.ts` so availability and feed freshness remain consistent across home and catalog.
+- The Instagram section reads only the public database cache; a daily Edge Function owns provider requests and preserves the previous cache on failures.
+- Forced replacement of an existing Instagram cache requires a validated admin JWT; empty-cache bootstrap and daily callbacks use the project's publishable-key mechanism with a minimum interval.

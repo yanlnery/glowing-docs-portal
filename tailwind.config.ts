@@ -24,6 +24,8 @@ export default {
     },
     extend: {
       colors: {
+        'hero-foreground': 'hsl(var(--hero-foreground))',
+        'hero-scrim': 'hsl(var(--hero-scrim))',
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
